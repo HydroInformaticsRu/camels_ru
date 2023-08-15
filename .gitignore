@@ -1,0 +1,10 @@
+## ignore in general
+__pycache__/
+._.DS_Store
+._*
+.DS_Store
+.ipynb_checkpoints
+.lr_find*
+test.ipynb
+test_2.ipynb
+# .devcontainer/
