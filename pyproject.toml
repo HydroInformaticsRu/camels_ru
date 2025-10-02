@@ -1,0 +1,97 @@
+[tool.ruff]
+# Honor classic PEP 8 width for code (79) and keep notebooks in scope.
+line-length = 79
+target-version = "py312"
+extend-include = ["*.ipynb"]
+exclude = [
+  ".git",
+  ".venv",
+  "build",
+  "dist",
+  "__pypackages__",
+  "**/__pycache__/**",
+  "**/data/**",
+  "docs/_build",
+]
+
+[tool.ruff.lint]
+# Core PEP 8/pycodestyle + pragmatic extras.
+select = [
+  "E",    # pycodestyle errors
+  "W",    # pycodestyle warnings
+  "F",    # Pyflakes
+  "I",    # isort (import sorting)
+  "N",    # pep8-naming
+  "D",    # pydocstyle (docstrings)
+  "UP",   # pyupgrade
+  "B",    # flake8-bugbear
+  "S",    # flake8-bandit (security)
+  "C4",   # flake8-comprehensions
+  "Q",    # flake8-quotes
+  "T20",  # flake8-print
+  "A",    # flake8-builtins (shadowing builtins)
+  "C90",  # mccabe (cyclomatic complexity)
+  "PIE",  # flake8-pie (small correctness wins)
+]
+# Keep Black-style whitespace compatibility and avoid noisy docstring pedantry.
+ignore = [
+  "E203",  # whitespace before ':' — Black/Ruff-formatter compatible
+  "D100",  # missing docstring in public module
+  "D104",  # missing docstring in public package
+  "S101",  # use of assert (we allow in tests; see per-file too)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests: allow asserts and relax strict docstrings / prints.
+"tests/**/*" = ["S101", "D100", "D101", "D102", "D103", "T20"]
+# Scripts/CLI/notebooks: allow prints and skip docstring requirements for notebooks.
+"scripts/**/*" = ["T20"]
+"**/*.ipynb" = ["D", "T20"]
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
+inline-quotes = "double"
+
+[tool.ruff.lint.isort]
+known-first-party = ["floodforecast"]
+split-on-trailing-comma = true
+combine-as-imports = true
+force-sort-within-sections = true
+
+[tool.ruff.lint.pydocstyle]
+# Google style docstrings; keep concise one-line summaries.
+convention = "google"
+
+[tool.ruff.lint.mccabe]
+# PEP 8 nudges toward simplicity; cap complexity.
+max-complexity = 10
+
+[tool.ruff.format]
+# Match quote policy with lint rules and keep docstring code tidy.
+quote-style = "double"
+docstring-code-format = true
+# PEP 8 suggests ~72 columns for comments/docstrings; apply to fenced code in docstrings.
+docstring-code-line-length = 72
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "basic"
+exclude = [
+  "**/data",
+  "/data",
+  "**/__pycache__",
+  ".venv",
+  "build",
+  "dist",
+]
+reportMissingImports = true
+reportMissingTypeStubs = false
+
+[project]
+name = "camels-ru"
+version = "0.1.0"
+description = "CAMELS-RU. Hydroclimatic dataset for Russia."
+authors = [{ name = "Dmitrii Abramov", email = "dmbrmv96@gmail.com" }]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.12"
