@@ -21,6 +21,41 @@ def _get_aea_crs() -> ccrs.AlbersEqualArea:
     )
 
 
+def _sort_categories(raw_cats: list[str]) -> list[str]:
+    """Sort categories by letter prefix, numeric suffix, or alphabetically.
+
+    Args:
+        raw_cats: List of category strings to sort.
+
+    Returns:
+        Sorted list of categories.
+    """
+
+    def _extract_letter_prefix(s: str) -> str | None:
+        m = re.match(r"^([a-z])\)", s)
+        return m.group(1) if m else None
+
+    def _extract_first_int(s: str) -> int | None:
+        m = re.search(r"(\d+)", s)
+        return int(m.group(1)) if m else None
+
+    cats_with_prefix = [(s, _extract_letter_prefix(s)) for s in raw_cats]
+    if any(prefix is not None for _, prefix in cats_with_prefix):
+        return [s for s, _ in sorted(cats_with_prefix, key=lambda x: (x[1] is None, x[1] or ""))]
+
+    cats_with_nums = [(s, _extract_first_int(s)) for s in raw_cats]
+    if any(n is not None for _, n in cats_with_nums):
+        return [
+            s
+            for s, _ in sorted(
+                cats_with_nums,
+                key=lambda x: (x[1] is None, x[1] if x[1] is not None else x[0]),
+            )
+        ]
+
+    return sorted(raw_cats)
+
+
 def _plot_basemap(ax, basemap_data, aea_crs_proj4):
     """Plot basemap polygons."""
     basemap_data.to_crs(aea_crs_proj4).plot(
@@ -38,6 +73,8 @@ def _plot_points(
     color_list: list | None = None,
     base_marker_size: int = 30,
     base_linewidth: float = 0.35,
+    legend_loc: str = "lower center",
+    marker_size_corrections: dict | None = None,
 ):
     """Plot points with distinction column using unique marker+color combos.
 
@@ -45,27 +82,27 @@ def _plot_points(
     of categories exceeds the number of available marker shapes, the function
     varies marker size and edge linewidth deterministically so repeated shapes
     remain distinguishable.
+
+    Args:
+        ax: Matplotlib axis to plot on.
+        gdf_to_plot: GeoDataFrame with points to plot.
+        distinction_col: Column name for categorizing points.
+        cmap: Matplotlib colormap for default colors.
+        legend_cols: Number of columns in legend.
+        markers_list: Optional list of marker symbols to use.
+        color_list: Optional list of colors to use.
+        base_marker_size: Base size for markers before scaling.
+        base_linewidth: Base edge linewidth for markers.
+        legend_loc: Legend location string (e.g., "lower center").
+        marker_size_corrections: Optional dict mapping marker symbols to size
+            correction factors (e.g., {"s": 0.8, "^": 1.15}) to compensate for
+            visual size differences between marker types.
     """
     # Ensure distinction column is string-like for consistent grouping
     raw_cats = list(gdf_to_plot[distinction_col].astype(str).unique())
 
-    # Try to sort categories by any numeric suffix (e.g. 'Cluster 1', 'Cluster 2')
-    def _extract_first_int(s: str) -> int | None:
-        m = re.search(r"(\d+)", s)
-        return int(m.group(1)) if m else None
-
-    cats_with_nums = [(s, _extract_first_int(s)) for s in raw_cats]
-    if any(n is not None for _, n in cats_with_nums):
-        # sort by numeric value when available, fallback to string
-        cats = [
-            s
-            for s, _ in sorted(
-                cats_with_nums, key=lambda x: (x[1] is None, x[1] if x[1] is not None else x[0])
-            )
-        ]
-    else:
-        # no numeric parts found — sort alphabetically for consistency
-        cats = sorted(raw_cats)
+    # Sort categories using common logic
+    cats = _sort_categories(raw_cats)
     n = len(cats)
 
     # Markers: use provided list or fall back to a conservative set of filled markers
@@ -98,6 +135,10 @@ def _plot_points(
         repeat_idx = i // n_markers
         size_factor = size_variants[repeat_idx % len(size_variants)]
         lw_factor = linewidth_variants[repeat_idx % len(linewidth_variants)]
+
+        # Apply marker-specific size correction if provided
+        if marker_size_corrections and marker in marker_size_corrections:
+            size_factor *= marker_size_corrections[marker]
 
         # Choose color; cycle if color list shorter than n categories
         col = colors[i % len(colors)]
@@ -138,7 +179,7 @@ def _plot_points(
             handles=handles,
             title=distinction_col,
             ncol=legend_cols,
-            loc="lower center",
+            loc=legend_loc,
             frameon=True,
         )
 
@@ -181,12 +222,30 @@ def _plot_ugms(ax, ugms_gdf, metric_col, cmap, norm_cmap, aea_crs_proj4):
     )
 
 
-def _add_histogram(ax, gdf_to_plot, distinction_col, metric_col, list_of_limits, specific_xlabel):
-    """Add histogram inset to plot."""
+def _add_histogram(
+    ax, gdf_to_plot, distinction_col, metric_col, list_of_limits, specific_xlabel, color_list=None
+):
+    """Add histogram inset to plot.
+
+    Args:
+        ax: Matplotlib axis to add histogram to.
+        gdf_to_plot: GeoDataFrame with data to plot.
+        distinction_col: Column name for categorizing data.
+        metric_col: Metric column for non-categorical histograms.
+        list_of_limits: Bin limits for continuous data.
+        specific_xlabel: Custom x-axis labels.
+        color_list: Optional list of colors matching the categories in distinction_col.
+    """
     if distinction_col:
+        # Get sorted categories using the same logic as _plot_points
+        raw_cats = list(gdf_to_plot[distinction_col].astype(str).unique())
+        sorted_cats = _sort_categories(raw_cats)
+
+        # Build histogram with sorted categories
         hist_df = pd.DataFrame()
-        for qual, idx in gdf_to_plot.groupby(f"{distinction_col}").groups.items():
-            hist_df.loc[0, f"{qual}"] = len(idx)
+        for qual in sorted_cats:
+            idx = gdf_to_plot[gdf_to_plot[distinction_col].astype(str) == qual].index
+            hist_df.loc[0, qual] = len(idx)
     else:
         hist_df = pd.crosstab(
             gdf_to_plot[metric_col],
@@ -195,19 +254,23 @@ def _add_histogram(ax, gdf_to_plot, distinction_col, metric_col, list_of_limits,
         hist_df = hist_df.reset_index(drop=True)
 
     ax_hist = ax.inset_axes([0.00, 0.05, 0.33, 0.24])
+
+    # Use provided colors if available, otherwise default to red
+    bar_colors = color_list if color_list and len(color_list) >= len(hist_df.columns) else "red"
+
     extra_hist = hist_df.sum(axis=0).plot.bar(
         ax=ax_hist,
         rot=15,
         width=1,
         grid=False,
-        facecolor="red",
+        color=bar_colors,
         edgecolor="black",
         lw=1,
     )
     if distinction_col:
-        extra_hist.bar_label(extra_hist.containers[0], fmt="%.0f")
+        extra_hist.bar_label(extra_hist.containers[0], fmt="%.0f")  # type: ignore[arg-type]
     else:
-        extra_hist.bar_label(extra_hist.containers[0], fmt="%.0f", fontsize=8)
+        extra_hist.bar_label(extra_hist.containers[0], fmt="%.0f", fontsize=8)  # type: ignore[arg-type]
     extra_hist.set_facecolor("white")
     extra_hist.set_xlabel(f"{metric_col}", fontdict={"fontsize": 8}, loc="right")
 
@@ -257,6 +320,7 @@ def russia_plots(
     color_list: list | None = None,
     base_marker_size: int = 30,
     base_linewidth: float = 0.35,
+    marker_size_corrections: dict | None = None,
 ):
     """Plot Russia map with points or polygons and optional histogram."""
     specific_xlabel = specific_xlabel or []
@@ -280,6 +344,8 @@ def russia_plots(
 
     if just_points:
         cmap = cm.get_cmap(cmap_name, 18)
+        # Determine legend location based on histogram presence
+        legend_loc = "lower right" if with_histogram else "lower center"
         # forward optional marker/color customizations to the low-level plot
         scatter_plot = _plot_points(
             ax,
@@ -291,6 +357,8 @@ def russia_plots(
             color_list=color_list,
             base_marker_size=base_marker_size,
             base_linewidth=base_linewidth,
+            legend_loc=legend_loc,
+            marker_size_corrections=marker_size_corrections,
         )
     else:
         cmap = cm.get_cmap(cmap_name, 5)
@@ -313,6 +381,7 @@ def russia_plots(
             metric_col,
             list_of_limits,
             specific_xlabel,
+            color_list=color_list,
         )
 
     ax.set_title(title_text, fontdict={"size": 12})
