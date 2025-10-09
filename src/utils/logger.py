@@ -155,7 +155,7 @@ def _determine_log_level(explicit_level: int | str | None) -> int:
 
 
 def get_logger(name: str = _DEFAULT_LOGGER_NAME, *, level: int | str | None = None) -> logging.Logger:
-    """Returns the singleton project logger, configured on its first call.
+    """Return the singleton project logger, configuring it on first use.
 
     Args:
         name: The logical name for the logger. All code should generally use the
@@ -233,9 +233,12 @@ def setup_logger(
     max_bytes: int = _ROTATE_MAX_BYTES,
     backup_count: int = _ROTATE_BACKUP_COUNT,
 ) -> logging.LoggerAdapter:
-    """Returns a logger adapter bound to a specific function or logical unit.
+    """Return a logger adapter bound to a specific function or logical unit.
 
-    This function also handles the setup of the rotating file handler.
+    The adapter injects the provided ``function_name`` via the ``func_ctx`` field for
+    every emitted record. When a rotating file handler is requested, any filesystem
+    failures are caught and logged with full stack traces so that caller code can
+    continue operating while still surfacing diagnostics.
 
     Args:
         function_name: A descriptive name of the current function or task.
@@ -249,6 +252,11 @@ def setup_logger(
 
     Returns:
         A `logging.LoggerAdapter` that injects `func_ctx` into log records.
+
+    Raises:
+        Exception: Any unexpected error bubbled up from the stdlib ``logging``
+            module during handler configuration. Filesystem-related issues are
+            logged with stack traces and suppressed to keep the application running.
     """
     base_logger = get_logger(logger_name, level=level)
 
@@ -260,8 +268,8 @@ def setup_logger(
     # Ensure the log directory exists
     try:
         Path(effective_log_file).parent.mkdir(parents=True, exist_ok=True)
-    except OSError as e:
-        base_logger.error("Failed to create log directory for %s: %s", effective_log_file, e)
+    except OSError:
+        base_logger.exception("Failed to create log directory for %s", effective_log_file)
         rotate = False  # Disable rotation if directory creation fails
 
     # Attach a rotating file handler if rotation is enabled and not already present
@@ -291,8 +299,8 @@ def setup_logger(
                     max_bytes,
                     backup_count,
                 )
-            except OSError as e:
-                base_logger.error("Could not add rotating file handler for %s: %s", abs_log_path, e)
+            except OSError:
+                base_logger.exception("Could not add rotating file handler for %s", abs_log_path)
 
     return _FunctionContextAdapter(base_logger, {"func_ctx": function_name})
 
