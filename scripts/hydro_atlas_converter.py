@@ -55,8 +55,8 @@ OUTPUT_CSV = "data/attributes/hydro_atlas_cis_camels.csv"
 def main():
     """Main function to orchestrate the extraction of HydroATLAS attributes."""
     try:
-        ws = gpd.read_file(WATERSHED_FILE).set_index("gage_id")
-        gages = gpd.read_file(GAGES_FILE).set_index("gage_id")
+        ws = gpd.read_file(WATERSHED_FILE).set_index("gauge_id")
+        gages = gpd.read_file(GAGES_FILE).set_index("gauge_id")
     except FileNotFoundError as e:
         logger.error(f"Required file not found: {e}")
         return
@@ -93,7 +93,7 @@ def main():
         return
 
     static_df = pd.DataFrame.from_dict(ha_res, orient="index")
-    static_df.index.name = "gage_id"
+    static_df.index.name = "gauge_id"
     static_df.to_csv(OUTPUT_CSV)
     logger.info(f"Successfully extracted attributes for {len(ha_res)} watersheds.")
     logger.info(f"Results saved to {OUTPUT_CSV}")

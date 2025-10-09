@@ -260,7 +260,7 @@ def _add_histogram(
 
     extra_hist = hist_df.sum(axis=0).plot.bar(
         ax=ax_hist,
-        rot=15,
+        rot=30,
         width=1,
         grid=False,
         color=bar_colors,

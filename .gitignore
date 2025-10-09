@@ -11,3 +11,4 @@ logs/
 *.csv
 paper/
 .github/
+results/
