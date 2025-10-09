@@ -223,7 +223,7 @@ class BaseFlowSeparation:
 
     def __init__(
         self,
-        alpha: Optional[float] = None,
+        alpha: float | None = None,
         passes: int = 3,
         reflect_points: int = 30,
         ensemble_size: int = 1000,
@@ -302,7 +302,7 @@ class BaseFlowSeparation:
 
 def calculate_bfi(
     discharge: pd.Series,
-    alpha: Optional[float] = None,
+    alpha: float | None = None,
     passes: int = 3,
     reflect_points: int = 30,
 ) -> float:

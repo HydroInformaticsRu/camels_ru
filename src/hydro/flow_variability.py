@@ -94,7 +94,7 @@ class FlowVariability:
 
         # Monthly variability (if datetime index available)
         if isinstance(self.discharge.index, pd.DatetimeIndex) and len(self.discharge) > 30:
-            monthly_means = self.discharge.resample("M").mean().dropna()
+            monthly_means = self.discharge.resample("ME").mean().dropna()
             if len(monthly_means) > 1:
                 metrics["monthly_cv"] = float(np.std(monthly_means) / np.mean(monthly_means))
 
