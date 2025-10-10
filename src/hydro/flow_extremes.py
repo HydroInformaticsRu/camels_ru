@@ -143,7 +143,7 @@ class FlowExtremes:
 
         # Low flow variability
         low_flows = self.discharge[self.discharge <= q95]
-        low_flow_cv = np.std(low_flows) / np.mean(low_flows) if len(low_flows) > 0 else np.nan
+        low_flow_cv = np.nanstd(low_flows) / np.nanmean(low_flows) if len(low_flows) > 0 else np.nan
 
         return {
             "q95_flow": q95,
