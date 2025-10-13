@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>CSV Gauge Inspector &mdash; All Reviewed</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>CSV Gauge Inspector</h1>
+    </header>
+
+    <section class="status">
+      <p><strong>Great!</strong> All CSV gauges have been reviewed.</p>
+      <p>{{ progress.reviewed }}/{{ progress.total }} files ({{ progress.percent }}%) complete.</p>
+      <div class="status-breakdown">
+        <span class="breakdown-chip full">
+          Full: {{ category_counts.full }}
+          <span class="chip-percent">({{ '%.1f' | format((category_counts.full / progress.total * 100) if progress.total else 0) }}%)</span>
+        </span>
+        <span class="breakdown-chip partial">
+          Partial: {{ category_counts.partial }}
+          <span class="chip-percent">({{ '%.1f' | format((category_counts.partial / progress.total * 100) if progress.total else 0) }}%)</span>
+        </span>
+        <span class="breakdown-chip shifted">
+          Shifted: {{ category_counts.shifted }}
+          <span class="chip-percent">({{ '%.1f' | format((category_counts.shifted / progress.total * 100) if progress.total else 0) }}%)</span>
+        </span>
+        <span class="breakdown-chip negatives">
+          Negatives: {{ category_counts.negatives }}
+          <span class="chip-percent">({{ '%.1f' | format((category_counts.negatives / progress.total * 100) if progress.total else 0) }}%)</span>
+        </span>
+        <span class="breakdown-chip freezing">
+          Freezing: {{ category_counts.freezing }}
+          <span class="chip-percent">({{ '%.1f' | format((category_counts.freezing / progress.total * 100) if progress.total else 0) }}%)</span>
+        </span>
+        <span class="breakdown-chip poor">
+          Poor: {{ category_counts.poor }}
+          <span class="chip-percent">({{ '%.1f' | format((category_counts.poor / progress.total * 100) if progress.total else 0) }}%)</span>
+        </span>
+      </div>
+    </section>
+
+    {% if resume_file %}
+    <section class="review">
+      <a class="btn primary" href="/?file={{ resume_file }}">Reopen Last File</a>
+    </section>
+    {% endif %}
+
+    <section class="status">
+      <p class="hint">You can close the application now or reopen a file to double-check anything that needs attention.</p>
+    </section>
+  </div>
+</body>
+</html>
