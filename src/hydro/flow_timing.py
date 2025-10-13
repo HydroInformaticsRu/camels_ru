@@ -124,9 +124,14 @@ class FlowTiming:
         for season in ["winter", "spring", "summer", "autumn"]:
             season_flows = seasonal_data[seasonal_data["season"] == season]["discharge"]
             if len(season_flows) > 0:
-                seasonal_stats[f"{season}_mean"] = float(np.mean(season_flows))
-                seasonal_stats[f"{season}_std"] = float(np.std(season_flows))
-                seasonal_stats[f"{season}_cv"] = float(np.std(season_flows) / np.mean(season_flows))
+                mean_val = np.mean(season_flows)
+                std_val = np.std(season_flows)
+                seasonal_stats[f"{season}_mean"] = float(mean_val) if np.isfinite(mean_val) else float(np.nan)
+                seasonal_stats[f"{season}_std"] = float(std_val) if np.isfinite(std_val) else float(np.nan)
+                if np.isfinite(mean_val) and mean_val != 0:
+                    seasonal_stats[f"{season}_cv"] = float(std_val / mean_val)
+                else:
+                    seasonal_stats[f"{season}_cv"] = float(np.nan)
 
         # Calculate seasonal flow ratios
         mean_flow = np.mean(self.discharge)

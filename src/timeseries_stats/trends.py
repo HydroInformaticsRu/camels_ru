@@ -48,8 +48,6 @@ class TrendAnalysis:
                 if data.size == 0:
                     raise ValueError("Input data is empty")
                 self.data = data.to_series()
-            else:
-                raise ValueError("Data must be pandas Series or xarray DataArray")
 
             self.variable_name = variable_name
 

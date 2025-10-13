@@ -55,9 +55,6 @@ def split_by_period(
             if len(year_data) > 0:
                 periods[year] = year_data
 
-    else:
-        raise ValueError(f"Invalid period_type: {period_type}")
-
     return periods
 
 
@@ -132,7 +129,7 @@ def calculate_period_metrics(
     # 7. Timing metrics (if available)
     try:
         timing = calculate_timing_metrics(discharge)
-        metrics["mean_half_flow_date"] = timing.get("center_of_mass", np.nan)
+        metrics["mean_half_flow_date"] = timing.get("hfd_mean", np.nan)
     except Exception as e:
         logger.debug(f"Timing metrics calculation failed: {e}")
         metrics["mean_half_flow_date"] = np.nan
