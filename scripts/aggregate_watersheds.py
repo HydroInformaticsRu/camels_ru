@@ -47,7 +47,9 @@ sys.path.append(str(Path(__file__).parent.parent))
 from src.meteo.aggregation import aggregate_watershed
 from src.utils.logger import setup_logger
 
-logger = setup_logger("AggregateWatersheds", log_file="logs/aggregate_watersheds.log")
+logger = setup_logger(
+    "AggregateWatersheds", log_file="logs/aggregate_watersheds.log"
+)
 
 
 def filter_files_by_date(
@@ -97,9 +99,9 @@ def filter_files_by_date(
                     if start_yr <= year <= end_yr:
                         if month is not None:
                             # Monthly file - check month range
-                            in_range = (year > start_yr or month >= start_month) and (
-                                year < end_yr or month <= end_month
-                            )
+                            in_range = (
+                                year > start_yr or month >= start_month
+                            ) and (year < end_yr or month <= end_month)
                             if in_range:
                                 filtered.append(nc_file)
                                 break
@@ -109,7 +111,9 @@ def filter_files_by_date(
                             break
         except (ValueError, IndexError):
             # Can't parse date, include file
-            logger.warning(f"Could not parse date from {nc_file.name}, including anyway")
+            logger.warning(
+                f"Could not parse date from {nc_file.name}, including anyway"
+            )
             filtered.append(nc_file)
 
     logger.info(
@@ -180,14 +184,23 @@ def main() -> None:
         type=Path,
         help="GeoPackage with watershed geometries (must have 'gauge_id' column)",
     )
-    parser.add_argument("--output-dir", required=True, type=Path, help="Output directory for CSV files")
+    parser.add_argument(
+        "--output-dir",
+        required=True,
+        type=Path,
+        help="Output directory for CSV files",
+    )
 
     # Input: either directory or single file
     input_group = parser.add_mutually_exclusive_group(required=True)
     input_group.add_argument(
-        "--input-dir", type=Path, help="Directory with NetCDF files (processes all)"
+        "--input-dir",
+        type=Path,
+        help="Directory with NetCDF files (processes all)",
     )
-    input_group.add_argument("--input-file", type=Path, help="Single NetCDF file to process")
+    input_group.add_argument(
+        "--input-file", type=Path, help="Single NetCDF file to process"
+    )
 
     # Optional arguments - Date range filtering
     date_group = parser.add_argument_group("date range options")
@@ -228,7 +241,10 @@ def main() -> None:
 
     # Processing options
     parser.add_argument(
-        "--grid-res", type=float, default=0.10, help="Grid resolution in degrees (default: 0.10)"
+        "--grid-res",
+        type=float,
+        default=0.10,
+        help="Grid resolution in degrees (default: 0.10)",
     )
     parser.add_argument(
         "--small-threshold",
@@ -280,7 +296,9 @@ def main() -> None:
         )
 
     if not nc_files:
-        logger.error(f"No NetCDF files found matching pattern '{args.pattern}' and date range")
+        logger.error(
+            f"No NetCDF files found matching pattern '{args.pattern}' and date range"
+        )
         sys.exit(1)
 
     logger.info(f"Processing {len(nc_files)} NetCDF files")
@@ -299,7 +317,9 @@ def main() -> None:
 
     # Outer loop: iterate over NetCDF files (sequential)
     for file_idx, nc_file in enumerate(nc_files, 1):
-        logger.info(f"[{file_idx}/{total_files}] Processing file: {nc_file.name}")
+        logger.info(
+            f"[{file_idx}/{total_files}] Processing file: {nc_file.name}"
+        )
 
         # Build tasks for all gauges for this file
         tasks = []
@@ -318,9 +338,16 @@ def main() -> None:
 
         # Inner loop: parallelize across gauges (bounded memory)
         with ProcessPoolExecutor(max_workers=args.workers) as executor:
-            futures = {executor.submit(process_single_watershed, *task): task for task in tasks}
+            futures = {
+                executor.submit(process_single_watershed, *task): task
+                for task in tasks
+            }
 
-            with tqdm(total=total_gauges, desc=f"File {file_idx}/{total_files}", leave=False) as pbar:
+            with tqdm(
+                total=total_gauges,
+                desc=f"File {file_idx}/{total_files}",
+                leave=False,
+            ) as pbar:
                 for future in as_completed(futures):
                     gauge_id, success, message = future.result()
                     if success:
