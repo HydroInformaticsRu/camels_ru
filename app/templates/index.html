@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>CSV Gauge Inspector</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>CSV Gauge Inspector</h1>
+      
+      <!-- Color Legend -->
+      <div class="legend">
+        <span class="legend-title">Background Colors:</span>
+        <span class="legend-item">
+          <span class="legend-color" style="background-color: white; border: 2px solid #6b7280;"></span>
+          NaN
+        </span>
+        <span class="legend-item">
+          <span class="legend-color" style="background-color: #d1fae5; border: 2px solid #10b981;"></span>
+          Full Coverage
+        </span>
+        <span class="legend-item">
+          <span class="legend-color" style="background-color: #fecaca; border: 2px solid #dc2626;"></span>
+          Has Negatives
+        </span>
+      </div>
+      
+      <div class="nav">
+        {% if prev_file %}
+        <a class="btn" href="/?file={{ prev_file }}">◀ Prev</a>
+        {% endif %}
+  <select id="fileSelect" onchange="onFileChange(this.value)">
+          {% for f in csv_files %}
+          <option value="{{ f }}" {% if f == file %}selected{% endif %}>{{ f }}</option>
+          {% endfor %}
+        </select>
+  {% if next_file %}
+  <a id="nextBtn" class="btn" href="/?file={{ next_file }}">Next ▶</a>
+  {% endif %}
+      </div>
+    </header>
+
+    <section class="status">
+      <div class="progress-container">
+        <div class="progress">
+          <div class="bar" style="width: {{ progress.percent }}%"></div>
+        </div>
+        <span class="progress-counter">{{ progress.reviewed }}/{{ progress.total }}</span>
+      </div>
+      <span class="progress-detail">{{ progress.percent }}% reviewed</span>
+      <div class="status-breakdown">
+        <span class="breakdown-chip full">
+          Full: {{ category_counts.full }}
+          <span class="chip-percent">({{ '%.1f' | format((category_counts.full / progress.total * 100) if progress.total else 0) }}%)</span>
+        </span>
+        <span class="breakdown-chip partial">
+          Partial: {{ category_counts.partial }}
+          <span class="chip-percent">({{ '%.1f' | format((category_counts.partial / progress.total * 100) if progress.total else 0) }}%)</span>
+        </span>
+        <span class="breakdown-chip shifted">
+          Shifted: {{ category_counts.shifted }}
+          <span class="chip-percent">({{ '%.1f' | format((category_counts.shifted / progress.total * 100) if progress.total else 0) }}%)</span>
+        </span>
+        <span class="breakdown-chip negatives">
+          Negatives: {{ category_counts.negatives }}
+          <span class="chip-percent">({{ '%.1f' | format((category_counts.negatives / progress.total * 100) if progress.total else 0) }}%)</span>
+        </span>
+        <span class="breakdown-chip freezing">
+          Freezing: {{ category_counts.freezing }}
+          <span class="chip-percent">({{ '%.1f' | format((category_counts.freezing / progress.total * 100) if progress.total else 0) }}%)</span>
+        </span>
+        <span class="breakdown-chip poor">
+          Poor: {{ category_counts.poor }}
+          <span class="chip-percent">({{ '%.1f' | format((category_counts.poor / progress.total * 100) if progress.total else 0) }}%)</span>
+        </span>
+      </div>
+      <p>
+        Status: <strong>{{ status }}</strong>
+        {% if is_empty %}<span class="tag empty">empty</span>{% endif %}
+        {% if has_nans %}<span class="tag partial">has NaNs ({{ nan_count }})</span>{% else %}<span class="tag full">no NaNs <span class="color-indicator" style="background-color: #d1fae5; border: 1px solid #10b981;"></span></span>{% endif %}
+        {% if has_negatives %}<span class="tag negative">has negatives <span class="color-indicator" style="background-color: #fecaca; border: 1px solid #dc2626;"></span></span>{% endif %}
+        {% if has_zeros %}<span class="tag zeros">has zeros ({{ zero_count }})</span>{% endif %}
+      </p>
+      {% if metrics %}
+      <div class="metrics-grid">
+        {% if metrics.NSE is not none %}<span class="metric-chip">NSE: {{ '%.2f' | format(metrics.NSE) }}</span>{% endif %}
+        {% if metrics.KGE is not none %}<span class="metric-chip">KGE: {{ '%.2f' | format(metrics.KGE) }}</span>{% endif %}
+        {% if metrics.r is not none %}<span class="metric-chip">r: {{ '%.2f' | format(metrics.r) }}</span>{% endif %}
+        {% if metrics.RMSE is not none %}<span class="metric-chip">RMSE: {{ '%.2f' | format(metrics.RMSE) }}</span>{% endif %}
+      </div>
+      {% endif %}
+    </section>
+
+    <section class="visual-grid">
+      <div class="plot-panel visual-panel">
+        {{ plot_html | safe }}
+      </div>
+      <aside class="map-panel visual-panel">
+        {% set _ws_name = watershed_name if (watershed_name is defined) else None %}
+        {% set _ws_area = watershed_area if (watershed_area is defined) else None %}
+        {% if (_ws_name and _ws_name|trim) or (_ws_area is not none) %}
+        <div class="map-meta">
+          {% if _ws_name and _ws_name|trim %}
+          <span class="map-meta-name">{{ _ws_name }}</span>
+          {% endif %}
+          {% if _ws_area is not none %}
+          <span class="map-meta-area">
+            {% if _ws_area >= 1000 %}
+              {{ '{:,.0f}'.format(_ws_area) }} km²
+            {% else %}
+              {{ '{:,.1f}'.format(_ws_area) }} km²
+            {% endif %}
+          </span>
+          {% endif %}
+        </div>
+        {% endif %}
+        <div class="map-content">
+          {% if map_html %}
+            {{ map_html | safe }}
+          {% else %}
+            <div class="map-placeholder">Spatial map unavailable for this gauge.</div>
+          {% endif %}
+        </div>
+      </aside>
+    </section>
+
+    <section class="review">
+      <form id="reviewForm" action="/review" method="post">
+        <input type="hidden" name="file" value="{{ file }}" />
+        <label><input type="checkbox" id="poorBox" name="poor" /> Mark as Poor (Space, unchecked = Decent)</label>
+        <label><input type="checkbox" id="shiftedBox" name="shifted" /> Mark as Shifted (S)</label>
+        <label><input type="checkbox" id="negativesBox" name="negatives" {% if has_negatives %}checked{% endif %} /> Mark as Negatives (N)</label>
+        <label><input type="checkbox" id="zerosBox" name="zeros" {% if has_zeros %}checked{% endif %} /> Mark as Freezing (Z)</label>
+        <button class="btn primary" type="submit">Save & Next</button>
+      </form>
+      <p class="hint">Rules: empty/no data → update/freezing/&lt;poor|decent&gt;/; partial/full → update/&lt;type&gt;/&lt;poor|decent&gt;/; shifted → update/shifted/ only; negatives additionally land in update/negatives/&lt;poor|decent&gt;/; freezing checkbox copies into update/freezing/&lt;poor|decent&gt;/</p>
+      <p class="hint">Shortcuts: Space toggle Poor, S toggle Shifted, N toggle Negatives, Z toggle Freezing, Enter submit, ←/→ navigate</p>
+    </section>
+
+    <script>
+    // Keyboard shortcuts
+    const prevFile = "{{ prev_file if prev_file else '' }}";
+    const nextFile = "{{ next_file if next_file else '' }}";
+
+    function onFileChange(val) {
+      const url = '/?file=' + encodeURIComponent(val);
+      window.location.href = url;
+    }
+
+    document.addEventListener('keydown', function(e) {
+      const poorBox = document.getElementById('poorBox');
+      const shiftedBox = document.getElementById('shiftedBox');
+      const negativesBox = document.getElementById('negativesBox');
+      const zerosBox = document.getElementById('zerosBox');
+      const form = document.getElementById('reviewForm');
+      function applyShiftedRules() {
+        if (shiftedBox && shiftedBox.checked) {
+          if (poorBox) poorBox.checked = false;
+          if (negativesBox) negativesBox.checked = false;
+          if (zerosBox) zerosBox.checked = false;
+        }
+      }
+
+      if (shiftedBox) {
+        shiftedBox.addEventListener('change', applyShiftedRules);
+        applyShiftedRules();
+      }
+      if (!form) return;
+
+      const activeTag = document.activeElement ? document.activeElement.tagName : null;
+      if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') return;
+
+      if (e.code === 'Space' && poorBox) {
+        e.preventDefault();
+        poorBox.checked = !poorBox.checked;
+      }
+      if (e.code === 'KeyS' && shiftedBox) {
+        e.preventDefault();
+        shiftedBox.checked = !shiftedBox.checked;
+        applyShiftedRules();
+      }
+      if (e.code === 'KeyN' && negativesBox) {
+        e.preventDefault();
+        negativesBox.checked = !negativesBox.checked;
+      }
+      if (e.code === 'KeyZ' && zerosBox) {
+        e.preventDefault();
+        zerosBox.checked = !zerosBox.checked;
+      }
+      if (e.code === 'ArrowLeft' && prevFile) {
+        e.preventDefault();
+        window.location.href = '/?file=' + encodeURIComponent(prevFile);
+      }
+      if (e.code === 'ArrowRight' && nextFile) {
+        e.preventDefault();
+        window.location.href = '/?file=' + encodeURIComponent(nextFile);
+      }
+      if (e.code === 'Enter') {
+        e.preventDefault();
+        form.submit();
+      }
+    });
+
+    </script>
+  </div>
+</body>
+</html>

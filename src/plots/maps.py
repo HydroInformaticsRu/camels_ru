@@ -158,7 +158,7 @@ def _plot_points(
         )
 
         # Create a legend handle that shows marker+color and smaller size than map markers
-        legend_size = max(4, int(0.45 * size))
+        legend_size = max(4, int(0.45 * 20))
         handles.append(
             Line2D(
                 [],

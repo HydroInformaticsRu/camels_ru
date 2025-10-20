@@ -21,13 +21,17 @@ try:
     HAS_PYMANNKENDALL = True
 except ImportError:
     HAS_PYMANNKENDALL = False
-    logger.warning("pymannkendall not available. Using basic Mann-Kendall implementation.")
+    logger.warning(
+        "pymannkendall not available. Using basic Mann-Kendall implementation."
+    )
 
 
 class TrendAnalysis:
     """Comprehensive trend analysis for time series data."""
 
-    def __init__(self, data: pd.Series | xr.DataArray, variable_name: str = "variable") -> None:
+    def __init__(
+        self, data: pd.Series | xr.DataArray, variable_name: str = "variable"
+    ) -> None:
         """Initialize trend analysis.
 
         Args:
@@ -48,8 +52,6 @@ class TrendAnalysis:
                 if data.size == 0:
                     raise ValueError("Input data is empty")
                 self.data = data.to_series()
-            else:
-                raise ValueError("Data must be pandas Series or xarray DataArray")
 
             self.variable_name = variable_name
 
@@ -71,13 +73,17 @@ class TrendAnalysis:
             # Remove missing values
             valid_mask = ~self.data.isna()
             if valid_mask.sum() < 3:
-                raise ValueError("Insufficient valid data points for trend analysis")
+                raise ValueError(
+                    "Insufficient valid data points for trend analysis"
+                )
 
             x = time_years[valid_mask]
             y = self.data[valid_mask]
 
             # Calculate linear regression
-            slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+            slope, intercept, r_value, p_value, std_err = stats.linregress(
+                x, y
+            )
 
             return {
                 "slope": float(slope),
@@ -141,7 +147,9 @@ class TrendAnalysis:
             logger.error("Failed to perform Mann-Kendall test: %s", e)
             raise
 
-    def _basic_mann_kendall(self, data: pd.Series, alpha: float) -> dict[str, Any]:
+    def _basic_mann_kendall(
+        self, data: pd.Series, alpha: float
+    ) -> dict[str, Any]:
         """Basic Mann-Kendall test implementation."""
         n = len(data)
         s = 0
@@ -223,15 +231,21 @@ class TrendAnalysis:
         """
         try:
             if not HAS_PYMANNKENDALL:
-                logger.warning("Seasonal Mann-Kendall requires pymannkendall library")
+                logger.warning(
+                    "Seasonal Mann-Kendall requires pymannkendall library"
+                )
                 return self._seasonal_mk_basic(alpha)
 
             valid_data = self.data.dropna()
 
             if len(valid_data) < 12:
-                raise ValueError("Insufficient data for seasonal Mann-Kendall test")
+                raise ValueError(
+                    "Insufficient data for seasonal Mann-Kendall test"
+                )
 
-            result = mk.seasonal_test(valid_data.values, period=12, alpha=alpha)
+            result = mk.seasonal_test(
+                valid_data.values, period=12, alpha=alpha
+            )
 
             return {
                 "trend": result.trend,
@@ -276,7 +290,11 @@ class TrendAnalysis:
             p_value = 2 * (1 - stats.norm.cdf(abs(z)))
             h = p_value < alpha
             trend = (
-                "increasing" if s_total > 0 and h else "decreasing" if s_total < 0 and h else "no trend"
+                "increasing"
+                if s_total > 0 and h
+                else "decreasing"
+                if s_total < 0 and h
+                else "no trend"
             )
         else:
             z = 0
@@ -295,7 +313,9 @@ class TrendAnalysis:
             "test_used": "basic_seasonal",
         }
 
-    def piecewise_trends(self, breakpoint_years: list[int] | None = None) -> dict[str, Any]:
+    def piecewise_trends(
+        self, breakpoint_years: list[int] | None = None
+    ) -> dict[str, Any]:
         """Calculate piecewise linear trends.
 
         Args:
@@ -315,12 +335,18 @@ class TrendAnalysis:
                 return {"single_trend": self.linear_trend(), "breakpoints": []}
 
             # Add start and end years
-            years = [self.data.index[0].year] + sorted(breakpoint_years) + [self.data.index[-1].year]
+            years = (
+                [self.data.index[0].year]
+                + sorted(breakpoint_years)
+                + [self.data.index[-1].year]
+            )
             segments = []
 
             for i in range(len(years) - 1):
                 start_year, end_year = years[i], years[i + 1]
-                mask = (self.data.index.year >= start_year) & (self.data.index.year <= end_year)
+                mask = (self.data.index.year >= start_year) & (
+                    self.data.index.year <= end_year
+                )
                 segment_data = self.data[mask]
 
                 if len(segment_data) >= 3:
@@ -356,14 +382,18 @@ class TrendAnalysis:
             breakpoint_candidates = var_diff[var_diff > threshold].index
 
             # Convert to years and remove duplicates
-            breakpoint_years = sorted(set(date.year for date in breakpoint_candidates))
+            breakpoint_years = sorted(
+                set(date.year for date in breakpoint_candidates)
+            )
 
             # Remove years too close to start/end
             start_year = self.data.index[0].year
             end_year = self.data.index[-1].year
 
             breakpoint_years = [
-                year for year in breakpoint_years if year > start_year + 2 and year < end_year - 2
+                year
+                for year in breakpoint_years
+                if year > start_year + 2 and year < end_year - 2
             ]
 
             return breakpoint_years[:3]  # Limit to 3 breakpoints
@@ -386,7 +416,9 @@ class TrendAnalysis:
                 raise ValueError("Insufficient annual data for trend analysis")
 
             # Create analyzer for annual data
-            annual_analyzer = TrendAnalysis(annual_data, f"{self.variable_name}_annual")
+            annual_analyzer = TrendAnalysis(
+                annual_data, f"{self.variable_name}_annual"
+            )
 
             # Calculate trends
             linear_trend = annual_analyzer.linear_trend()
@@ -401,7 +433,8 @@ class TrendAnalysis:
                 "mk_p_value": mk_trend["p_value"],
                 "mk_tau": mk_trend["tau"],
                 "mk_slope": mk_trend["slope"],
-                "trend_significant": linear_trend["trend_significant"] or mk_trend["trend_significant"],
+                "trend_significant": linear_trend["trend_significant"]
+                or mk_trend["trend_significant"],
             }
 
             return pd.DataFrame([trend_stats], index=["annual"])
@@ -444,13 +477,19 @@ def analyze_trends(
 
         if include_seasonal:
             try:
-                results["seasonal_mann_kendall"] = analyzer.seasonal_mann_kendall(alpha)
+                results["seasonal_mann_kendall"] = (
+                    analyzer.seasonal_mann_kendall(alpha)
+                )
             except Exception as e:
-                logger.warning("Failed to calculate seasonal Mann-Kendall: %s", e)
+                logger.warning(
+                    "Failed to calculate seasonal Mann-Kendall: %s", e
+                )
 
         if include_piecewise:
             try:
-                results["piecewise_trends"] = analyzer.piecewise_trends(breakpoint_years)
+                results["piecewise_trends"] = analyzer.piecewise_trends(
+                    breakpoint_years
+                )
             except Exception as e:
                 logger.warning("Failed to calculate piecewise trends: %s", e)
 
