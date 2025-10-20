@@ -202,7 +202,7 @@ def download_file(
             rsize = getattr(rstat, "st_size", 0)
         except OSError as e:
             logger.exception("Remote missing or inaccessible: %s", remote_path)
-            raise RuntimeError(f"Remote missing: {remote_path} ({e})")
+            raise RuntimeError(f"Remote missing: {remote_path} ({e})") from e
 
         if expected_size and expected_size != rsize:
             logger.warning(
@@ -260,12 +260,12 @@ def download_file(
     finally:
         try:
             sftp.close()
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug("Error closing SFTP client in download_file: %s", exc, exc_info=True)
         try:
             ssh.close()
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug("Error closing SSH client in download_file: %s", exc, exc_info=True)
 
 
 def human_bytes(n: int) -> str:
@@ -278,7 +278,7 @@ def human_bytes(n: int) -> str:
 
 
 def parse_years(spec: str) -> set[int]:
-    """Parse "2008:2023", "2008-2015", "2008,2010,2012-2014" -> {years}"""
+    """Parse "2008:2023", "2008-2015", "2008,2010,2012-2014" -> {years}."""
     spec = spec.strip()
     years: set[int] = set()
     for part in re.split(r"\s*,\s*", spec):
@@ -298,10 +298,34 @@ def parse_years(spec: str) -> set[int]:
 def build_include_globs(
     remote_root: str, version: str, freq: str, years: set[int] | None, vars_: list[str] | None
 ) -> list[str]:
-    """Build full-path glob patterns matching:
-      {remote_root}/{year}/{var}_{year}_GLEAM_{version}.nc
-    If vars_ is None -> any var.
-    If years is None -> any year.
+    """Build glob patterns to match remote GLEAM files based on selectors.
+
+    The function generates a list of remote path glob patterns using the provided
+    remote root, GLEAM version, frequency (kept for API clarity), an optional set
+    of years, and an optional list of variable short names. Patterns are produced
+    to match filenames like:
+      /data/v4.2a/daily/2019/E_2019_GLEAM_v4.2a.nc
+
+    Parameters
+    ----------
+    remote_root : str
+        Base remote directory (e.g. "/data/v4.2a/daily").
+    version : str
+        GLEAM version string (e.g. "v4.2a").
+    freq : str
+        Frequency string ("daily" or "monthly") — currently not used in pattern
+        composition but kept for clarity and future use.
+    years : set[int] | None
+        If provided, restrict patterns to the given years.
+    vars_ : list[str] | None
+        If provided, restrict patterns to these variable short names (e.g. "E",
+        "Ep_rad", "SMs").
+
+    Returns:
+    -------
+    list[str]
+        A list of glob patterns for matching remote files; each pattern includes
+        both ".nc" and ".nc4" variants where applicable.
     """
     remote_root = remote_root.rstrip("/")
     patterns: list[str] = []
@@ -442,6 +466,14 @@ def main():
     else:
         existing_bytes = 0
 
+    remaining_bytes = sum(f.size for f, _, _ in pending)
+    if pending:
+        logger.info(
+            "Pending downloads: %s files (~ %s)",
+            len(pending),
+            human_bytes(remaining_bytes),
+        )
+
     if args.list_only:
         for f in files:
             logger.info("%s  %s", f.path, human_bytes(f.size))
@@ -470,11 +502,15 @@ def main():
     future_to_item: dict = {}
     lock = threading.Lock()
     with (
-        tqdm(total=total_bytes, unit="B", unit_scale=True, unit_divisor=1024, desc="Total") as total_bar,
+        tqdm(
+            total=remaining_bytes,
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+            desc="Remaining",
+        ) as total_bar,
         ThreadPoolExecutor(max_workers=max(1, args.workers)) as ex,
     ):
-        if existing_bytes:
-            total_bar.update(existing_bytes)
 
         def submit_download(fitem: RemoteItem, local: Path):
             def task():

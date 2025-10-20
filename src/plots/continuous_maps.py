@@ -1,10 +1,11 @@
 """Plotting functions for continuous (float) metrics on Russia maps.
 
-This module extends the categorical mapping capabilities to support continuous
-float-valued metrics with discrete colorbars and flexible subplot layouts.
+Reworked to match russia_plots style with manual bin intervals,
+improved NaN handling, and histogram/colorbar positioning.
 """
 
 import math
+from typing import TYPE_CHECKING
 
 import cartopy.crs as ccrs
 import geopandas as gpd
@@ -12,6 +13,13 @@ from matplotlib import cm
 from matplotlib.colors import BoundaryNorm
 import matplotlib.pyplot as plt
 import numpy as np
+
+from ..utils.logger import setup_logger
+
+logger = setup_logger("continuous_maps", log_file="logs/continuous_maps.log")
+
+if TYPE_CHECKING:
+    from matplotlib.figure import Figure
 
 
 def _get_aea_crs() -> ccrs.AlbersEqualArea:
@@ -25,49 +33,19 @@ def _get_aea_crs() -> ccrs.AlbersEqualArea:
     )
 
 
-def _round_to_nice_value(value: float, is_min: bool = True) -> float:
-    """Round value to nice colorbar limits (no rounding, use raw values).
+def _create_bins_from_intervals(intervals: list[tuple[float, float]]) -> np.ndarray:
+    """Create bin edges from list of interval tuples.
 
     Args:
-        value: Value to use.
-        is_min: If True, for minimum; else for maximum.
+        intervals: List of (min, max) tuples defining intervals.
 
     Returns:
-        Original value (no rounding applied).
+        Array of bin edges suitable for BoundaryNorm.
     """
-    return float(value)
-
-
-def _format_colorbar_label(value: float) -> str:
-    """Format colorbar label to max 3 characters.
-
-    Rules:
-    - < 10: Keep to 1 decimal digit (0.56 -> "0.5", 9.24 -> "9.2")
-    - 10-99: Keep to 1 decimal digit (12.34 -> "12.3")
-    - >= 100: Round to nearest 5 or 0 ending (103 -> "105", 237 -> "235")
-
-    Args:
-        value: Value to format.
-
-    Returns:
-        Formatted string (max 3 characters).
-    """
-    abs_val = abs(value)
-
-    if abs_val < 0.01:
-        return "0"
-    elif abs_val < 10.0:
-        # Keep 1 decimal digit, max 3 chars (e.g., "0.5", "9.2")
-        return f"{value:.1f}"
-    elif abs_val < 100.0:
-        # Keep 1 decimal digit if fits in 3 chars
-        formatted = f"{value:.1f}"
-
-        return formatted
-    else:
-        # Round to nearest 5 or 0 ending (103 -> 105, 237 -> 235)
-        rounded = int(round(value / 5) * 5)
-        return f"{rounded}"
+    edges = [intervals[0][0]]
+    for _, upper in intervals:
+        edges.append(upper)
+    return np.array(edges)
 
 
 def _add_histogram_inset(
@@ -78,7 +56,10 @@ def _add_histogram_inset(
     cmap,
     norm,
 ) -> None:
-    """Add compact histogram inset below map (no background, no labels).
+    """Add histogram inset matching russia_plots style.
+
+    Histogram positioned at bottom-left with bars colored to match colorbar.
+    No x-axis labels, only y-axis with occurrence counts.
 
     Args:
         ax: Matplotlib axis to add histogram to.
@@ -95,22 +76,20 @@ def _add_histogram_inset(
     # Create histogram data
     hist, _ = np.histogram(values, bins=bin_edges)
 
-    ax_hist = ax.inset_axes([0.15, 0.03, 0.70, 0.10])
-
-    # Create bars with matching colors
+    ax_hist = ax.inset_axes([0.1, 0.07, 0.25, 0.20])
+    # Create bars with matching colors from colorbar
     bar_colors = [cmap(norm((bin_edges[i] + bin_edges[i + 1]) / 2)) for i in range(len(hist))]
-
-    bars = ax_hist.bar(
+    extra_hist = ax_hist.bar(
         range(len(hist)),
         hist,
-        width=0.95,
+        width=0.7,
         color=bar_colors,
         edgecolor="black",
-        linewidth=0.5,
+        linewidth=1.0,
     )
 
     # Add count labels on bars
-    for bar in bars:
+    for bar in extra_hist:
         height = bar.get_height()
         if height > 0:
             ax_hist.text(
@@ -119,216 +98,77 @@ def _add_histogram_inset(
                 f"{int(height)}",
                 ha="center",
                 va="bottom",
-                fontsize=6,
+                fontsize=8,
             )
 
-    # Remove all labels and background
+    # Style matching russia_plots
+    ax_hist.set_facecolor("white")
+    ax_hist.set(frame_on=False)
+
+    # Remove x-axis labels (as requested)
     ax_hist.set_xticks([])
-    ax_hist.set_yticks([])
     ax_hist.set_xlabel("")
-    ax_hist.set_ylabel("")
-    ax_hist.spines["top"].set_visible(False)
-    ax_hist.spines["right"].set_visible(False)
-    ax_hist.spines["bottom"].set_visible(False)
-    ax_hist.spines["left"].set_visible(False)
-    ax_hist.patch.set_visible(False)  # Remove background
+
+    # Keep y-axis with occurrence count labels
+    plt.setp(ax_hist.get_yticklabels(), fontsize=8)
 
 
-def russia_continuous_plot(
-    gdf_to_plot: gpd.GeoDataFrame,
-    basemap_data: gpd.GeoDataFrame,
-    metric_col: str,
-    title_text: str = "",
-    rus_extent: list | None = None,
-    n_bins: int = 6,
-    cmap_name: str = "RdYlGn",
-    figsize: tuple = (4.88189, 3.34646),
-    vmin: float | None = None,
-    vmax: float | None = None,
-) -> plt.Figure:
-    """Plot Russia map with continuous metric using discrete colorbar.
+def _determine_bins(
+    metric: str,
+    gdf_proj: gpd.GeoDataFrame,
+    bin_intervals: dict[str, list[tuple[float, float]]] | None,
+) -> tuple[np.ndarray, int]:
+    """Determine bin edges for metric.
 
     Args:
-        gdf_to_plot: GeoDataFrame with points to plot (must have geometry).
-        basemap_data: GeoDataFrame with basemap polygons.
-        metric_col: Column name containing continuous metric values.
-        title_text: Plot title.
-        rus_extent: Extent [lon_min, lon_max, lat_min, lat_max] for plot.
-        n_bins: Number of discrete bins for colorbar (default 6).
-        cmap_name: Matplotlib colormap name.
-        figsize: Figure size (width, height) in inches.
-        vmin: Minimum value for color scale (auto if None).
-        vmax: Maximum value for color scale (auto if None).
+        metric: Metric column name.
+        gdf_proj: Projected GeoDataFrame.
+        bin_intervals: Optional dict of manual intervals.
 
     Returns:
-        Matplotlib figure object.
+        Tuple of (bin_edges array, number of bins).
     """
-    aea_crs = _get_aea_crs()
-    aea_crs_proj4 = aea_crs.proj4_init
-
-    if rus_extent is None:
-        rus_extent = [19.5, 180, 41.5, 82]
-
-    # Convert to projected CRS
-    gdf_proj = gdf_to_plot.to_crs(aea_crs_proj4)
-    basemap_proj = basemap_data.to_crs(aea_crs_proj4)
-
-    # Extract metric values and compute bins
-    values = gdf_proj[metric_col].dropna()
-    if len(values) == 0:
-        raise ValueError(f"No valid values in column '{metric_col}'")
-
-    if vmin is None:
-        vmin = float(values.min())
-    if vmax is None:
-        vmax = float(values.max())
-
-    # Create discrete bins
-    bin_edges = np.linspace(vmin, vmax, n_bins + 1)
-    norm = BoundaryNorm(bin_edges, n_bins)
-    cmap = cm.get_cmap(cmap_name, n_bins)
-
-    # Create figure
-    fig, ax = plt.subplots(figsize=figsize, subplot_kw={"projection": aea_crs})
-    ax.set_aspect("equal")
-    ax.axis("off")
-    ax.set_extent(rus_extent)  # type: ignore
-
-    # Plot basemap
-    basemap_proj.plot(ax=ax, color="grey", edgecolor="black", alpha=0.8, legend=False)
-
-    # Plot points with continuous colormap
-    scatter = gdf_proj.plot(
-        ax=ax,
-        column=metric_col,
-        cmap=cmap,
-        norm=norm,
-        marker="o",
-        markersize=24,
-        edgecolor="black",
-        linewidth=0.2,
-        legend=True,
-        legend_kwds={
-            "orientation": "horizontal",
-            "shrink": 0.35,
-            "pad": 0.02,
-            "anchor": (0.6, 0.5),
-            "label": metric_col,
-        },
-    )
-
-    ax.set_title(title_text, fontdict={"size": 12})
-    plt.tight_layout()
-
-    return fig
-
-
-def russia_continuous_multiplot(
-    gdf_to_plot: gpd.GeoDataFrame,
-    basemap_data: gpd.GeoDataFrame,
-    metrics: list[str],
-    titles: list[str] | None = None,
-    main_title: str = "",
-    rus_extent: list | None = None,
-    n_bins: int = 6,
-    cmap_name: str = "RdYlGn",
-    ncols: int = 3,
-    subplot_size: tuple = (6.0, 4.5),
-    vmin_dict: dict[str, float] | None = None,
-    vmax_dict: dict[str, float] | None = None,
-    with_histogram: bool = True,
-    marker_size: int = 18,
-) -> plt.Figure:
-    """Create multipanel plot with continuous metrics.
-
-    Automatically calculates optimal subplot layout based on number of metrics.
-
-    Args:
-        gdf_to_plot: GeoDataFrame with points to plot.
-        basemap_data: GeoDataFrame with basemap polygons.
-        metrics: List of column names to plot.
-        titles: Optional list of titles for each subplot.
-        main_title: Overall figure title.
-        rus_extent: Extent for Russia map.
-        n_bins: Number of discrete bins per colorbar.
-        cmap_name: Matplotlib colormap name.
-        ncols: Number of columns in subplot grid.
-        subplot_size: Size (width, height) of each subplot.
-        vmin_dict: Optional dict mapping metric name to minimum value.
-        vmax_dict: Optional dict mapping metric name to maximum value.
-        with_histogram: Whether to add histogram inset (default True).
-        marker_size: Size of point markers (default 18).
-
-    Returns:
-        Matplotlib figure object.
-    """
-    n_metrics = len(metrics)
-    if n_metrics == 0:
-        raise ValueError("No metrics provided")
-
-    # Calculate subplot grid
-    nrows = math.ceil(n_metrics / ncols)
-
-    # Use default titles if not provided
-    if titles is None:
-        titles = metrics
-
-    if len(titles) != n_metrics:
-        raise ValueError("Number of titles must match number of metrics")
-
-    # Initialize min/max dicts if not provided
-    vmin_dict = vmin_dict or {}
-    vmax_dict = vmax_dict or {}
-
-    # Setup CRS
-    aea_crs = _get_aea_crs()
-    aea_crs_proj4 = aea_crs.proj4_init
-
-    if rus_extent is None:
-        rus_extent = [19.5, 180, 41.5, 82]
-
-    # Convert to projected CRS once
-    gdf_proj = gdf_to_plot.to_crs(aea_crs_proj4)
-    basemap_proj = basemap_data.to_crs(aea_crs_proj4)
-
-    # Create figure with subplots
-    fig_width = subplot_size[0] * ncols
-    fig_height = subplot_size[1] * nrows
-    fig = plt.figure(figsize=(fig_width, fig_height))
-
-    for idx, (metric, title) in enumerate(zip(metrics, titles, strict=False)):
-        # Create subplot with projection
-        ax = fig.add_subplot(nrows, ncols, idx + 1, projection=aea_crs)
-        ax.set_aspect("auto")
-        ax.axis("off")
-        ax.set_extent(rus_extent, crs=ccrs.PlateCarree())
-
-        # Plot basemap with better visibility
-        basemap_proj.plot(
-            ax=ax, color="#E5E5E5", edgecolor="#404040", linewidth=0.5, alpha=1.0, legend=False
-        )
-
-        # Get values and determine range
+    if bin_intervals and metric in bin_intervals:
+        intervals = bin_intervals[metric]
+        bin_edges = _create_bins_from_intervals(intervals)
+        n_bins = len(intervals)
+    else:
+        # Fallback: auto-generate bins from data
         values = gdf_proj[metric].dropna()
-
-        # Get value range and round to nice limits
-        raw_vmin = vmin_dict.get(metric, float(values.min()))
-        raw_vmax = vmax_dict.get(metric, float(values.max()))
-
-        vmin = _round_to_nice_value(raw_vmin, is_min=True)
-        vmax = _round_to_nice_value(raw_vmax, is_min=False)
-
-        # Ensure vmin < vmax
+        if len(values) == 0:
+            return np.array([0.0, 1.0]), 1
+        vmin, vmax = float(values.min()), float(values.max())
         if vmin >= vmax:
             vmax = vmin + 0.1
-
-        # Create discrete bins
+        n_bins = 6
         bin_edges = np.linspace(vmin, vmax, n_bins + 1)
-        norm = BoundaryNorm(bin_edges, n_bins)
-        cmap = cm.get_cmap(cmap_name, n_bins)
 
-        # Plot points with improved visibility
-        gdf_proj.plot(
+    return bin_edges, n_bins
+
+
+def _plot_metric_points(
+    ax,
+    gdf_valid: gpd.GeoDataFrame,
+    gdf_nan: gpd.GeoDataFrame,
+    metric: str,
+    cmap,
+    norm,
+    marker_size: int,
+) -> None:
+    """Plot valid and NaN points for a metric.
+
+    Args:
+        ax: Matplotlib axis.
+        gdf_valid: GeoDataFrame with valid values.
+        gdf_nan: GeoDataFrame with NaN values.
+        metric: Metric column name.
+        cmap: Colormap.
+        norm: Normalization.
+        marker_size: Point marker size.
+    """
+    # Plot valid points with colormap
+    if not gdf_valid.empty:
+        gdf_valid.plot(
             ax=ax,
             column=metric,
             cmap=cmap,
@@ -340,38 +180,161 @@ def russia_continuous_multiplot(
             legend=True,
             legend_kwds={
                 "orientation": "horizontal",
-                "shrink": 0.70,
-                "pad": 0.09,
+                "shrink": 0.50,
+                "pad": -0.08,
                 "aspect": 35,
-                "anchor": (0.5, 1.0),
-                "panchor": (0.5, 0.0),
+                "anchor": (0.70, 1.0),
+                "panchor": (0.70, 0.0),
                 "label": "",
             },
-            missing_kwds={"color": "lightgrey", "edgecolor": "red", "label": "Missing"},
         )
 
-        # Format colorbar ticks - get the colorbar from most recent plot
-        if len(fig.axes) > idx + 1:
-            cbar_ax = fig.axes[-1]
-            if hasattr(cbar_ax, "get_ylabel") or "colorbar" in str(type(cbar_ax)):
-                # Format tick labels with proper rounding
-                tick_locs = bin_edges
-                tick_labels = [_format_colorbar_label(val) for val in tick_locs]
-                cbar_ax.set_xticks(tick_locs)
-                cbar_ax.set_xticklabels(tick_labels, fontsize=7)
-                cbar_ax.tick_params(labelsize=7, length=3, width=0.5)
+    # Plot NaN values as tiny black dots
+    if not gdf_nan.empty:
+        ax.scatter(
+            gdf_nan.geometry.x,
+            gdf_nan.geometry.y,
+            s=4,  # Tiny size
+            c="black",
+            marker="o",
+            edgecolor="none",
+            zorder=2,
+            alpha=0.8,
+        )
+
+
+def _format_colorbar(fig, idx: int, bin_edges: np.ndarray) -> None:
+    """Format colorbar ticks and labels.
+
+    Args:
+        fig: Matplotlib figure.
+        idx: Current subplot index.
+        bin_edges: Bin edge values.
+    """
+    if len(fig.axes) <= idx + 1:
+        return
+
+    cbar_ax = fig.axes[-1]
+    if not hasattr(cbar_ax, "get_xlim"):
+        return
+    try:
+        cbar_ax.set_xticks(bin_edges)
+        tick_labels = [f"{val:.3g}" for val in bin_edges]
+        cbar_ax.set_xticklabels(tick_labels, fontsize=7)
+        cbar_ax.tick_params(labelsize=7, length=3, width=0.5)
+    except Exception:
+        logger.exception("Failed to format colorbar ticks and labels")
+        # Skip if colorbar formatting fails
+
+
+def russia_continuous_multiplot(
+    gdf_to_plot: gpd.GeoDataFrame,
+    basemap_data: gpd.GeoDataFrame,
+    metrics: list[str],
+    titles: list[str] | None = None,
+    main_title: str = "",
+    rus_extent: list | None = None,
+    bin_intervals: dict[str, list[tuple[float, float]]] | None = None,
+    cmap_name: str = "RdYlGn",
+    ncols: int = 3,
+    subplot_size: tuple = (6.0, 4.5),
+    with_histogram: bool = True,
+    marker_size: int = 12,
+) -> "Figure":
+    """Create multipanel plot with continuous metrics.
+
+    Completely reworked to match russia_plots style with manual bin intervals.
+
+    Args:
+        gdf_to_plot: GeoDataFrame with points to plot.
+        basemap_data: GeoDataFrame with basemap polygons.
+        metrics: List of column names to plot.
+        titles: Optional list of titles for each subplot.
+        main_title: Overall figure title.
+        rus_extent: Extent for Russia map.
+        bin_intervals: Dict mapping metric name to list of (min, max) tuples
+            defining custom intervals. Example:
+            {"mean_discharge": [(0, 0.5), (0.5, 1.0), (1.0, 2.0), (2.0, 5.0)]}
+        cmap_name: Matplotlib colormap name.
+        ncols: Number of columns in subplot grid.
+        subplot_size: Size (width, height) of each subplot.
+        with_histogram: Whether to add histogram inset (default True).
+        marker_size: Size of point markers (default 12).
+
+    Returns:
+        Matplotlib figure object.
+    """
+    from matplotlib.figure import Figure
+
+    n_metrics = len(metrics)
+    if n_metrics == 0:
+        raise ValueError("No metrics provided")
+
+    # Calculate subplot grid
+    nrows = math.ceil(n_metrics / ncols)
+
+    # Use default titles if not provided
+    titles_to_use = titles if titles is not None else metrics
+
+    if len(titles_to_use) != n_metrics:
+        raise ValueError("Number of titles must match number of metrics")
+
+    # Setup CRS
+    aea_crs = _get_aea_crs()
+    aea_crs_proj4 = aea_crs.proj4_init
+
+    extent = rus_extent if rus_extent is not None else [19.5, 180, 41.5, 82]
+
+    # Convert to projected CRS once
+    gdf_proj = gdf_to_plot.to_crs(aea_crs_proj4)
+    basemap_proj = basemap_data.to_crs(aea_crs_proj4)
+
+    # Create figure with subplots
+    fig_width = subplot_size[0] * ncols
+    fig_height = subplot_size[1] * nrows
+    fig = Figure(figsize=(fig_width, fig_height))
+
+    for idx, (metric, title) in enumerate(zip(metrics, titles_to_use, strict=False)):
+        # Create subplot with projection
+        ax = fig.add_subplot(nrows, ncols, idx + 1, projection=aea_crs)
+        ax.set_aspect("auto")
+        ax.axis("off")
+        ax.set_extent(extent, crs=ccrs.PlateCarree())  # type: ignore
+
+        # Plot basemap
+        basemap_proj.plot(
+            ax=ax, color="#E5E5E5", edgecolor="#404040", linewidth=0.5, alpha=1.0, legend=False
+        )
+
+        # Determine bins for this metric
+        bin_edges, n_bins = _determine_bins(metric, gdf_proj, bin_intervals)
+
+        # Create colormap and normalization
+        norm = BoundaryNorm(bin_edges, n_bins)
+        cmap = cm.get_cmap(cmap_name, n_bins)
+
+        # Separate NaN and valid values
+        gdf_valid = gdf_proj[gdf_proj[metric].notna()].copy()
+        gdf_nan = gdf_proj[gdf_proj[metric].isna()].copy()
+
+        # Plot points
+        _plot_metric_points(ax, gdf_valid, gdf_nan, metric, cmap, norm, marker_size)
+
+        # Format colorbar
+        _format_colorbar(fig, idx, bin_edges)
 
         # Add histogram if requested
-        if with_histogram:
-            _add_histogram_inset(ax, gdf_proj, metric, bin_edges, cmap, norm)
+        if with_histogram and not gdf_valid.empty:
+            _add_histogram_inset(ax, gdf_valid, metric, bin_edges, cmap, norm)
 
         ax.set_title(title, fontdict={"size": 11, "weight": "normal"}, pad=8)
 
-    # Add main title with better spacing
+    # Add main title
     if main_title:
         fig.suptitle(main_title, fontsize=15, y=0.99, weight="bold")
 
-    # Adjust layout with more space for colorbars
-    plt.tight_layout(rect=[0, 0.01, 1, 0.97] if main_title else [0, 0.01, 1, 1])
+    # Adjust layout
+    rect = (0.0, 0.01, 1.0, 0.97) if main_title else (0.0, 0.01, 1.0, 1.0)
+    fig.tight_layout(rect=rect)
 
     return fig
