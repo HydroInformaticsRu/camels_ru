@@ -6,7 +6,7 @@ __pycache__/
 ._*
 .DS_Store
 *.zip
-data/
+data
 logs/
 *.csv
 paper/

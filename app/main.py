@@ -15,7 +15,10 @@ from app.src.plots.spatial_map import render_spatial_map_html
 from app.src.review.counts import compute_review_counts
 from app.src.review.metrics import fetch_metrics
 from app.src.state.persistence import load_state, save_state
-from app.src.storage.directories import ensure_review_dirs, remove_existing_copies
+from app.src.storage.directories import (
+    ensure_review_dirs,
+    remove_existing_copies,
+)
 
 # App setup
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,12 +26,8 @@ DATA_DIR = BASE_DIR / "data"
 UPDATE_DIR = BASE_DIR / "update"
 STATE_PATH = UPDATE_DIR / "review_state.json"
 METRICS_PATH = BASE_DIR / "Handof_2803_adjusted_metric.csv"
-GAUGE_GPKG_PATH = (
-    DATA_DIR / "Geometry/GaugeGeomCAMELS.gpkg"
-)
-WATERSHED_GPKG_PATH = (
-    DATA_DIR / "Geometry/WatershedGeomCAMELS.gpkg"
-)
+GAUGE_GPKG_PATH = DATA_DIR / "Geometry/GaugeGeomCAMELS.gpkg"
+WATERSHED_GPKG_PATH = DATA_DIR / "Geometry/WatershedGeomCAMELS.gpkg"
 
 # shorter path aliases for mounting
 STATIC_DIR = BASE_DIR / "app" / "static"
@@ -65,14 +64,18 @@ except Exception:
         # Ensure log directory exists and attach rotating file handler
         try:
             LOG_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
-            if not any(isinstance(h, RotatingFileHandler) for h in log.handlers):
+            if not any(
+                isinstance(h, RotatingFileHandler) for h in log.handlers
+            ):
                 rfh = RotatingFileHandler(
                     str(LOG_FILE_PATH),
                     maxBytes=10 * 1024 * 1024,
                     backupCount=5,
                     encoding="utf-8",
                 )
-                fmt = logging.Formatter("%(asctime)s | %(levelname)-8s | %(name)s | %(message)s")
+                fmt = logging.Formatter(
+                    "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+                )
                 rfh.setFormatter(fmt)
                 log.addHandler(rfh)
         except Exception:
@@ -103,7 +106,9 @@ async def index(request: Request, file: str | None = None) -> HTMLResponse:
     ensure_review_dirs(UPDATE_DIR, logger=log)
     csv_files = sorted([p.name for p in DATA_DIR.glob("*.csv")])
     if not csv_files:
-        raise HTTPException(status_code=404, detail="No CSV files found in data/")
+        raise HTTPException(
+            status_code=404, detail="No CSV files found in data/"
+        )
 
     state = load_state(STATE_PATH, UPDATE_DIR, logger=log)
     reviewed = set(state.get("reviewed", []))
@@ -128,7 +133,11 @@ async def index(request: Request, file: str | None = None) -> HTMLResponse:
 
             context = {
                 "request": request,
-                "progress": {"reviewed": reviewed_count, "total": total, "percent": percent},
+                "progress": {
+                    "reviewed": reviewed_count,
+                    "total": total,
+                    "percent": percent,
+                },
                 "resume_file": resume_file,
                 "category_counts": counts,
             }
@@ -204,7 +213,11 @@ async def index(request: Request, file: str | None = None) -> HTMLResponse:
         "metrics": gauge_metrics,
         "prev_file": prev_file,
         "next_file": next_file,
-        "progress": {"reviewed": reviewed_count, "total": total, "percent": percent},
+        "progress": {
+            "reviewed": reviewed_count,
+            "total": total,
+            "percent": percent,
+        },
         "category_counts": category_counts,
     }
 
@@ -272,15 +285,23 @@ async def review(
         zeros_checked = False
     else:
         quality_label = "poor" if poor_checked else "decent"
-        base_category = "freezing" if (is_empty or not has_data) else ("partial" if has_nans else "full")
+        base_category = (
+            "freezing"
+            if (is_empty or not has_data)
+            else ("partial" if has_nans else "full")
+        )
         base_dir = UPDATE_DIR / base_category / quality_label
         destinations.append(base_dir / path.name)
 
         if negatives_checked:
-            destinations.append(UPDATE_DIR / "negatives" / quality_label / path.name)
+            destinations.append(
+                UPDATE_DIR / "negatives" / quality_label / path.name
+            )
 
         if base_category != "freezing" and zeros_checked:
-            destinations.append(UPDATE_DIR / "freezing" / quality_label / path.name)
+            destinations.append(
+                UPDATE_DIR / "freezing" / quality_label / path.name
+            )
 
     # Ensure destination directories exist and copy file to each unique location
     unique_destinations = []

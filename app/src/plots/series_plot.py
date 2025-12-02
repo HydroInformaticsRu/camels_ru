@@ -15,7 +15,11 @@ _PLOT_END = pd.Timestamp("2023-12-31 23:59:59", tz="UTC")
 
 
 def _extract_datetime_series(df: pd.DataFrame) -> pd.Series:
-    datetime_cols = [col for col in df.columns if pd.api.types.is_datetime64_any_dtype(df[col])]
+    datetime_cols = [
+        col
+        for col in df.columns
+        if pd.api.types.is_datetime64_any_dtype(df[col])
+    ]
     if datetime_cols:
         return pd.to_datetime(df[datetime_cols[0]], utc=True, errors="coerce")
 
@@ -29,11 +33,15 @@ def _extract_datetime_series(df: pd.DataFrame) -> pd.Series:
         return pd.Series(pd.DatetimeIndex([], tz="UTC"))
 
     periods = len(df)
-    generated = pd.date_range(start=_PLOT_START, end=_PLOT_END, periods=periods, tz="UTC")
+    generated = pd.date_range(
+        start=_PLOT_START, end=_PLOT_END, periods=periods, tz="UTC"
+    )
     return pd.Series(generated)
 
 
-def _background_color(df: pd.DataFrame, y: pd.Series, logger: logging.Logger) -> str:
+def _background_color(
+    df: pd.DataFrame, y: pd.Series, logger: logging.Logger
+) -> str:
     if not y.empty and (y < 0).any():
         return "#fecaca"
 
@@ -60,7 +68,11 @@ def plot_series_html(
     x = _extract_datetime_series(df)
 
     if not y.empty and x.empty:
-        x = pd.Series(pd.date_range(start=_PLOT_START, periods=len(y), freq="D", tz="UTC"))
+        x = pd.Series(
+            pd.date_range(
+                start=_PLOT_START, periods=len(y), freq="D", tz="UTC"
+            )
+        )
 
     x = x.reset_index(drop=True)
     y = y.reset_index(drop=True)

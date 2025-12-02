@@ -7,12 +7,12 @@ happy and it can be imported early during app startup.
 
 from __future__ import annotations
 
-import logging
-import os
-import sys
 from collections.abc import MutableMapping
+import logging
 from logging.handlers import RotatingFileHandler
+import os
 from pathlib import Path
+import sys
 from typing import Any
 
 _DEFAULT_LOGGER_NAME = "hydro_logs"
@@ -55,7 +55,9 @@ class EmojiFormatter(logging.Formatter):
             try:
                 _ = record.msg % record.args
             except Exception:
-                record.msg = " ".join([str(record.msg), *(str(a) for a in record.args)])
+                record.msg = " ".join(
+                    [str(record.msg), *(str(a) for a in record.args)]
+                )
                 record.args = ()
 
         record.emoji = _LEVEL_EMOJIS.get(record.levelno, "➡️")
@@ -66,11 +68,15 @@ class EmojiFormatter(logging.Formatter):
 
 
 def _determine_log_level(explicit_level: int | str | None) -> int:
-    level_str = str(explicit_level or os.getenv("HYDRO_LOGS_LOG_LEVEL", "INFO")).upper()
+    level_str = str(
+        explicit_level or os.getenv("HYDRO_LOGS_LOG_LEVEL", "INFO")
+    ).upper()
     return getattr(logging, level_str, logging.INFO)
 
 
-def get_logger(name: str = _DEFAULT_LOGGER_NAME, *, level: int | str | None = None) -> logging.Logger:
+def get_logger(
+    name: str = _DEFAULT_LOGGER_NAME, *, level: int | str | None = None
+) -> logging.Logger:
     """Return a configured logger for the given name.
 
     The function is idempotent: subsequent calls return the same logger
@@ -93,7 +99,11 @@ def get_logger(name: str = _DEFAULT_LOGGER_NAME, *, level: int | str | None = No
         logger.addHandler(sh)
 
     logger._hydro_logs_configured = True  # type: ignore[attr-defined]
-    logger.debug("Logger '%s' initialized at level %s.", name, logging.getLevelName(log_level))
+    logger.debug(
+        "Logger '%s' initialized at level %s.",
+        name,
+        logging.getLevelName(log_level),
+    )
     return logger
 
 
@@ -103,7 +113,9 @@ class _FunctionContextAdapter(logging.LoggerAdapter):
         msg: str,
         kwargs: MutableMapping[str, Any],
     ) -> tuple[str, MutableMapping[str, Any]]:
-        kwargs.setdefault("extra", {})["func_ctx"] = self.extra.get("func_ctx", "-")
+        kwargs.setdefault("extra", {})["func_ctx"] = self.extra.get(
+            "func_ctx", "-"
+        )
         return msg, kwargs
 
 
@@ -123,24 +135,32 @@ def setup_logger(
     """
     base_logger = get_logger(logger_name, level=level)
     effective_log_file = (
-        log_file or os.getenv("HYDRO_LOGS_LOG_FILE") or Path(_DEFAULT_LOG_DIR) / _DEFAULT_LOG_FILENAME
+        log_file
+        or os.getenv("HYDRO_LOGS_LOG_FILE")
+        or Path(_DEFAULT_LOG_DIR) / _DEFAULT_LOG_FILENAME
     )
     try:
         Path(effective_log_file).parent.mkdir(parents=True, exist_ok=True)
     except OSError as exc:  # pragma: no cover - OS depends
-        base_logger.error("Failed to create log dir for %s: %s", effective_log_file, exc)
+        base_logger.error(
+            "Failed to create log dir for %s: %s", effective_log_file, exc
+        )
         rotate = False
 
     if rotate:
         abs_log_path = str(Path(effective_log_file).resolve())
         handler_exists = any(
-            isinstance(h, RotatingFileHandler) and getattr(h, "baseFilename", None) == abs_log_path
+            isinstance(h, RotatingFileHandler)
+            and getattr(h, "baseFilename", None) == abs_log_path
             for h in base_logger.handlers
         )
         if not handler_exists:
             try:
                 rfh = RotatingFileHandler(
-                    abs_log_path, maxBytes=max_bytes, backupCount=backup_count, encoding="utf-8"
+                    abs_log_path,
+                    maxBytes=max_bytes,
+                    backupCount=backup_count,
+                    encoding="utf-8",
                 )
                 rfh.setFormatter(EmojiFormatter(use_color=False))
                 base_logger.addHandler(rfh)
@@ -151,7 +171,11 @@ def setup_logger(
                     backup_count,
                 )
             except OSError as exc:  # pragma: no cover - OS depends
-                base_logger.error("Could not add rotating file handler for %s: %s", abs_log_path, exc)
+                base_logger.error(
+                    "Could not add rotating file handler for %s: %s",
+                    abs_log_path,
+                    exc,
+                )
 
     return _FunctionContextAdapter(base_logger, {"func_ctx": function_name})
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import logging
 from collections.abc import Iterable
+import logging
 from pathlib import Path
 
 from app.src.storage.directories import ensure_review_dirs
@@ -31,11 +31,19 @@ def compute_review_counts(
 
     ensure_review_dirs(update_dir, logger=log)
 
-    full_dirs = [update_dir / "full" / quality for quality in ("poor", "decent")]
-    partial_dirs = [update_dir / "partial" / quality for quality in ("poor", "decent")]
+    full_dirs = [
+        update_dir / "full" / quality for quality in ("poor", "decent")
+    ]
+    partial_dirs = [
+        update_dir / "partial" / quality for quality in ("poor", "decent")
+    ]
     shifted_dirs = [update_dir / "shifted"]
-    negatives_dirs = [update_dir / "negatives" / quality for quality in ("poor", "decent")]
-    freezing_dirs = [update_dir / "freezing" / quality for quality in ("poor", "decent")]
+    negatives_dirs = [
+        update_dir / "negatives" / quality for quality in ("poor", "decent")
+    ]
+    freezing_dirs = [
+        update_dir / "freezing" / quality for quality in ("poor", "decent")
+    ]
     poor_dirs = [
         update_dir / "full" / "poor",
         update_dir / "partial" / "poor",

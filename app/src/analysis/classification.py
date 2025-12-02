@@ -39,20 +39,24 @@ def classify_series(
                 datetime_col = pd.to_datetime(df[col], errors="raise")
                 break
             except Exception as exc:  # noqa: PERF203
-                log.debug("Failed to parse column %s as datetime: %s", col, exc)
+                log.debug(
+                    "Failed to parse column %s as datetime: %s", col, exc
+                )
                 continue
 
     if datetime_col is not None:
         try:
-            temp_df = pd.DataFrame({"datetime": pd.to_datetime(datetime_col), "value": series}).dropna(
-                subset=["datetime"]
-            )
+            temp_df = pd.DataFrame(
+                {"datetime": pd.to_datetime(datetime_col), "value": series}
+            ).dropna(subset=["datetime"])
 
             if not temp_df.empty:
                 start_date = pd.Timestamp("2008-01-01")
                 end_date = pd.Timestamp("2023-12-31")
 
-                period_mask = (temp_df["datetime"] >= start_date) & (temp_df["datetime"] <= end_date)
+                period_mask = (temp_df["datetime"] >= start_date) & (
+                    temp_df["datetime"] <= end_date
+                )
                 period_data = temp_df[period_mask]
 
                 if not period_data.empty:

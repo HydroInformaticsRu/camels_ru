@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-import logging
 from collections.abc import Iterable
+import logging
 from pathlib import Path
 
 _logger = logging.getLogger("app.storage.directories")
 
 
-def ensure_review_dirs(update_dir: Path, logger: logging.Logger | None = None) -> None:
+def ensure_review_dirs(
+    update_dir: Path, logger: logging.Logger | None = None
+) -> None:
     """Ensure the expected update/ directory structure exists."""
     log = logger or _logger
 
@@ -55,4 +57,6 @@ def remove_existing_copies(
                 target.unlink()
                 log.debug("Removed previous copy: %s", target)
         except Exception:
-            log.warning("Failed to remove previous copy: %s", target, exc_info=True)
+            log.warning(
+                "Failed to remove previous copy: %s", target, exc_info=True
+            )

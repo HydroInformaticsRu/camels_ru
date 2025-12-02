@@ -1,6 +1,6 @@
 [tool.ruff]
-# Honor classic PEP 8 width for code (79) and keep notebooks in scope.
-line-length = 79
+# Honor classic PEP 8 width for code (105) and keep notebooks in scope.
+line-length = 105
 target-version = "py312"
 extend-include = ["*.ipynb"]
 exclude = [

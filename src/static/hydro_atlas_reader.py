@@ -12,7 +12,10 @@ from shapely.geometry import Polygon
 
 # Add project root to sys.path
 sys.path.append(str(Path(__file__).parent.parent))
-from src.data_processing.gdal_processing import create_tif_get_area, get_point_height_from_dem
+from src.data_processing.gdal_processing import (
+    create_tif_get_area,
+    get_point_height_from_dem,
+)
 from src.data_processing.geom_functions import poly_from_multipoly
 from src.utils.logger import setup_logger
 
@@ -27,7 +30,9 @@ class HydroAtlas:
 
     monthes = tuple(f"{i:02d}" for i in range(1, 13))
     lc_classes = tuple(f"{i:02d}" for i in range(1, 23))
-    pnv_classes = tuple(f"{i:02d}" for i in range(1, 16))  # Potential natural vegetation
+    pnv_classes = tuple(
+        f"{i:02d}" for i in range(1, 16)
+    )  # Potential natural vegetation
     wetland_classes = tuple(f"{i:02d}" for i in range(1, 10))
 
     # ═══════════════════════════════════════════════════════════════════
@@ -279,7 +284,9 @@ class HydroAtlas:
         *tuple(f"cmi_ix_s{m}" for m in monthes),
     ]
 
-    def __init__(self, tmp_flood_folder: str | Path = "/app/data/.tmp_flood") -> None:
+    def __init__(
+        self, tmp_flood_folder: str | Path = "/app/data/.tmp_flood"
+    ) -> None:
         """Initialize HydroATLAS parser.
 
         Args:
@@ -342,9 +349,9 @@ class HydroAtlas:
             target_crs = f"EPSG:{epsg_base + utm_zone}"
 
             gdf_projected = gdf.to_crs(target_crs)
-            user_poly_projected = gpd.GeoSeries([user_poly], crs=original_crs or "EPSG:4326").to_crs(
-                target_crs
-            )[0]
+            user_poly_projected = gpd.GeoSeries(
+                [user_poly], crs=original_crs or "EPSG:4326"
+            ).to_crs(target_crs)[0]
         else:
             gdf_projected = gdf
             user_poly_projected = user_poly
@@ -353,7 +360,10 @@ class HydroAtlas:
         user_catchment_area = user_poly_projected.area
         geom_projected = gdf_projected["geometry"]
         inter_areas = np.asarray(
-            [poly.intersection(user_poly_projected).area for poly in geom_projected]
+            [
+                poly.intersection(user_poly_projected).area
+                for poly in geom_projected
+            ]
         )
 
         # Filter small artifacts (<5 km²) per Caravan methodology
@@ -406,14 +416,18 @@ class HydroAtlas:
             geo_vector["lat"], geo_vector["lon"] = centroid.y, centroid.x
 
         # Add metadata about aggregation quality
-        geo_vector["area_fraction_used"] = inter_areas.sum() / user_catchment_area
+        geo_vector["area_fraction_used"] = (
+            inter_areas.sum() / user_catchment_area
+        )
         geo_vector["n_hydroatlas_polygons"] = len(inter_areas)
 
         return geo_vector
 
     # -----------------------------------------------------------------
     @staticmethod
-    def save_results(extracted: Sequence[pd.Series], gauge_ids: Sequence[str], out_dir: Path) -> None:
+    def save_results(
+        extracted: Sequence[pd.Series], gauge_ids: Sequence[str], out_dir: Path
+    ) -> None:
         """Thread-safe disk-append of results."""
         out_dir = Path(out_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -422,7 +436,9 @@ class HydroAtlas:
 
         csv_path = out_dir / "geo_vector.csv"
         if csv_path.exists():
-            result = result.combine_first(pd.read_csv(csv_path, index_col="gauge_id"))
+            result = result.combine_first(
+                pd.read_csv(csv_path, index_col="gauge_id")
+            )
         result.to_csv(csv_path, float_format="%.6g")
 
 
@@ -465,13 +481,17 @@ def ha_worker(
 
 def load_static_data(data_path: str, valid_gauges: list[str]) -> pd.DataFrame:
     """Load and filter static data for valid gauges."""
-    static_data = pd.read_csv(data_path, dtype={"gage_id": str}, index_col="gage_id")
+    static_data = pd.read_csv(
+        data_path, dtype={"gage_id": str}, index_col="gage_id"
+    )
 
     return static_data.loc[valid_gauges, :]
 
 
 def select_uncorrelated_features(
-    data: pd.DataFrame, threshold: float = 0.75, min_valid_fraction: float = 0.8
+    data: pd.DataFrame,
+    threshold: float = 0.75,
+    min_valid_fraction: float = 0.8,
 ) -> list[str]:
     """Select features from the DataFrame.
 
@@ -496,7 +516,9 @@ def select_uncorrelated_features(
     # Filter out columns with less than min_valid_fraction valid (non-zero, non-NaN) data
     valid_mask = (filtered_data != 0) & (~filtered_data.isna())
     valid_fraction = valid_mask.sum(axis=0) / len(filtered_data)
-    sufficient_data_cols = valid_fraction[valid_fraction >= min_valid_fraction].index.tolist()
+    sufficient_data_cols = valid_fraction[
+        valid_fraction >= min_valid_fraction
+    ].index.tolist()
 
     # Subset data to columns with sufficient valid data
     filtered_data = filtered_data[sufficient_data_cols]
@@ -505,7 +527,9 @@ def select_uncorrelated_features(
     corr_matrix = filtered_data.corr().abs()
 
     # Select upper triangle of correlation matrix
-    upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+    upper = corr_matrix.where(
+        np.triu(np.ones(corr_matrix.shape), k=1).astype(bool)
+    )
 
     # Identify columns to drop based on correlation threshold
     to_drop = set()
@@ -514,11 +538,15 @@ def select_uncorrelated_features(
             to_drop.add(col)
 
     # Features to keep are those not in to_drop
-    selected_features = [col for col in filtered_data.columns if col not in to_drop]
+    selected_features = [
+        col for col in filtered_data.columns if col not in to_drop
+    ]
     return selected_features
 
 
-def get_combined_features(static_data: pd.DataFrame) -> tuple[list[str], pd.DataFrame]:
+def get_combined_features(
+    static_data: pd.DataFrame,
+) -> tuple[list[str], pd.DataFrame]:
     """Select and combine static features."""
     old_static_features = [
         "for_pc_sse",
@@ -542,7 +570,11 @@ def get_combined_features(static_data: pd.DataFrame) -> tuple[list[str], pd.Data
         "ele_mt_sav",
     ]
     uncorrelated_static_features = select_uncorrelated_features(static_data)
-    combined_feature = sorted(set(old_static_features + uncorrelated_static_features))
+    combined_feature = sorted(
+        set(old_static_features + uncorrelated_static_features)
+    )
     combined_features_df = static_data[combined_feature].reset_index()
-    logger.info(f"Selected {len(combined_feature)} uncorrelated features from static_data.")
+    logger.info(
+        f"Selected {len(combined_feature)} uncorrelated features from static_data."
+    )
     return combined_feature, combined_features_df

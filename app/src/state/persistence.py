@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 import logging
+from pathlib import Path
 
 import pandas as pd
 
@@ -16,7 +16,6 @@ def load_state(
     logger: logging.Logger | None = None,
 ) -> dict:
     """Load persistent review state from disk."""
-
     log = logger or _logger
 
     ensure_review_dirs(update_dir, logger=log)
@@ -24,7 +23,9 @@ def load_state(
         try:
             return pd.read_json(state_path).to_dict(orient="records")[0]  # type: ignore[index]
         except Exception:
-            log.exception("Failed to read review state; resetting", exc_info=True)
+            log.exception(
+                "Failed to read review state; resetting", exc_info=True
+            )
     return {"reviewed": [], "last_file": None}
 
 
@@ -35,7 +36,6 @@ def save_state(
     logger: logging.Logger | None = None,
 ) -> None:
     """Persist review state to disk."""
-
     log = logger or _logger
 
     ensure_review_dirs(update_dir, logger=log)

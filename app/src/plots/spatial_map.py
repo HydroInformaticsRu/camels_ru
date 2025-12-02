@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import json
-import logging
 from dataclasses import dataclass
 from functools import lru_cache
+import json
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -111,7 +111,9 @@ def render_spatial_map_html(
     log = logger or _logger
 
     if folium is None or gpd is None:
-        log.warning("Folium/GeoPandas not installed; skipping spatial map rendering")
+        log.warning(
+            "Folium/GeoPandas not installed; skipping spatial map rendering"
+        )
         return SpatialMapRender(html="")
 
     if not gauge_path.exists() or not watershed_path.exists():
@@ -162,7 +164,9 @@ def render_spatial_map_html(
             watershed_name = name.strip()
         area_value = row.get("area")
         try:
-            watershed_area = float(area_value) if area_value is not None else None
+            watershed_area = (
+                float(area_value) if area_value is not None else None
+            )
         except (TypeError, ValueError):
             watershed_area = None
 
@@ -228,7 +232,9 @@ def render_spatial_map_html(
         ).add_to(fmap)
 
     if gauge_latlon is not None:
-        popup_value = gauge.iloc[0].get("name_en") or gauge.iloc[0].get("name_ru")
+        popup_value = gauge.iloc[0].get("name_en") or gauge.iloc[0].get(
+            "name_ru"
+        )
         folium.CircleMarker(
             location=list(gauge_latlon),
             radius=7,
@@ -244,7 +250,11 @@ def render_spatial_map_html(
             (south, west), (north, east) = bounds
             fmap.fit_bounds([[south, west], [north, east]])
         except Exception:  # noqa: BLE001
-            log.debug("Failed to fit map bounds for gauge_id=%s", gauge_id, exc_info=True)
+            log.debug(
+                "Failed to fit map bounds for gauge_id=%s",
+                gauge_id,
+                exc_info=True,
+            )
 
     return SpatialMapRender(
         html=fmap._repr_html_(),
