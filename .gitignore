@@ -10,6 +10,6 @@ data
 logs/
 *.csv
 paper/
-.github/
+.github/*
+!.github/copilot-instructions.md
 results/
-docs/
