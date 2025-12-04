@@ -19,7 +19,6 @@ import pandas as pd
 from pysheds.grid import Grid
 from shapely import geometry, ops
 from tqdm.auto import tqdm
-from transliterate import translit
 
 # Fix GDAL library path issue - use conda environment's libstdc++
 conda_env = os.environ.get("CONDA_PREFIX")
@@ -186,6 +185,24 @@ def process_roi_watersheds(
     Returns:
         GeoDataFrame containing processed watershed geometries
     """
+    # Create temp directory for this ROI
+    roi_temp_dir = geom_path / "temp" / f"roi_{roi_id}"
+    roi_temp_dir.mkdir(parents=True, exist_ok=True)
+
+    # Check if watersheds already exist for this ROI
+    watersheds_path = roi_temp_dir / f"roi_{roi_id}_watersheds.gpkg"
+    if watersheds_path.exists():
+        log.info("ROI %d: Watersheds already exist at %s, skipping processing", roi_id, watersheds_path)
+        try:
+            watersheds_gdf = gpd.read_file(watersheds_path)
+            watersheds_gdf.set_index("gauge_id", inplace=True)
+            log.info("ROI %d: Loaded %d existing watersheds", roi_id, len(watersheds_gdf))
+            return watersheds_gdf
+        except Exception as e:
+            log.warning(
+                "ROI %d: Failed to load existing watersheds (%s), reprocessing...", roi_id, str(e)
+            )
+
     D8_DIRMAP = (64, 128, 1, 2, 4, 8, 16, 32)
     ACC_COEFF = 1e2
 
@@ -193,10 +210,6 @@ def process_roi_watersheds(
     grid_path = str(elv_path / "elv" / f"{roi_id}_elv.tif")
     acc_path = str(elv_path / "upg" / f"{roi_id}_upg.tif")
     fdir_path = str(elv_path / "dir" / f"{roi_id}_dir.tif")
-
-    # Create temp directory for this ROI
-    roi_temp_dir = geom_path / "temp" / f"roi_{roi_id}"
-    roi_temp_dir.mkdir(parents=True, exist_ok=True)
 
     # Verify files exist
     for path_str, name in [
@@ -216,6 +229,7 @@ def process_roi_watersheds(
         (str(gauge_id), gauge.geometry.x, gauge.geometry.y, gauge["name_en"])
         for gauge_id, gauge in roi_gauges.iterrows()
     ]
+    total_tasks = len(tasks)
 
     watersheds_list = []
 
@@ -289,7 +303,9 @@ def process_roi_watersheds(
             if len(watersheds_list) % 10 == 0:
                 gc.collect()
 
-    log.info("ROI %d: Successfully processed %d/%d watersheds", roi_id, len(watersheds_list), len(tasks))
+    log.info(
+        "ROI %d: Successfully processed %d/%d watersheds", roi_id, len(watersheds_list), total_tasks
+    )
 
     # Convert to GeoDataFrame
     if watersheds_list:
@@ -297,12 +313,10 @@ def process_roi_watersheds(
         watersheds_gdf.set_index("gauge_id", inplace=True)
 
         # Save ROI watersheds and gauges to temp directory for manual evaluation
-        watersheds_path = roi_temp_dir / f"roi_{roi_id}_watersheds.gpkg"
         watersheds_gdf.to_file(watersheds_path, driver="GPKG")
         log.info("ROI %d: Saved watersheds to %s", roi_id, watersheds_path)
 
         # Save corresponding gauges
-        roi_gauges = full_gauges.loc[roi_gauge_ids, :].copy()
         gauges_path = roi_temp_dir / f"roi_{roi_id}_gauges.gpkg"
         roi_gauges.to_file(gauges_path, driver="GPKG")
         log.info("ROI %d: Saved gauges to %s", roi_id, gauges_path)
