@@ -43,6 +43,29 @@ _worker_D8_DIRMAP = None
 _worker_ACC_COEFF = None
 
 
+def _write_combined_outputs(
+    watersheds: list[gpd.GeoDataFrame],
+    gauges: list[gpd.GeoDataFrame],
+    geom_path: Path,
+) -> None:
+    """Merge processed ROIs into single files for manual review."""
+    if watersheds:
+        combined_watersheds = pd.concat(watersheds, ignore_index=False)
+        combined_watersheds = combined_watersheds.loc[~combined_watersheds.index.duplicated(keep="last")]
+        output_path = geom_path / "camels_ru_watersheds.gpkg"
+        combined_watersheds.to_file(output_path, driver="GPKG")
+        log.info(
+            "Updated combined watersheds (%d features) at %s", len(combined_watersheds), output_path
+        )
+
+    if gauges:
+        combined_gauges = pd.concat(gauges, ignore_index=False)
+        combined_gauges = combined_gauges.loc[~combined_gauges.index.duplicated(keep="last")]
+        gauges_output = geom_path / "camels_ru_gauges.gpkg"
+        combined_gauges.to_file(gauges_output, driver="GPKG")
+        log.info("Updated combined gauges (%d points) at %s", len(combined_gauges), gauges_output)
+
+
 def _init_worker(grid_path: str, acc_path: str, fdir_path: str, dirmap: tuple, acc_coeff: float) -> None:
     """Initialize worker: load rasters ONCE per worker process.
 
@@ -189,6 +212,14 @@ def process_roi_watersheds(
     roi_temp_dir = geom_path / "temp" / f"roi_{roi_id}"
     roi_temp_dir.mkdir(parents=True, exist_ok=True)
 
+    # Prepare gauges for this ROI (saved regardless of watershed reprocessing)
+    roi_gauges = full_gauges.loc[roi_gauge_ids, :].copy()
+    roi_gauges = roi_gauges.to_crs(epsg=4326)
+
+    gauges_path = roi_temp_dir / f"roi_{roi_id}_gauges.gpkg"
+    roi_gauges.to_file(gauges_path, driver="GPKG")
+    log.info("ROI %d: Saved gauges to %s", roi_id, gauges_path)
+
     # Check if watersheds already exist for this ROI
     watersheds_path = roi_temp_dir / f"roi_{roi_id}_watersheds.gpkg"
     if watersheds_path.exists():
@@ -204,7 +235,7 @@ def process_roi_watersheds(
             )
 
     D8_DIRMAP = (64, 128, 1, 2, 4, 8, 16, 32)
-    ACC_COEFF = 1e2
+    ACC_COEFF = 1e3
 
     # Set up file paths
     grid_path = str(elv_path / "elv" / f"{roi_id}_elv.tif")
@@ -219,10 +250,6 @@ def process_roi_watersheds(
     ]:
         if not Path(path_str).exists():
             raise FileNotFoundError(f"Missing {name} raster: {path_str}")
-
-    # Get gauges for this ROI
-    roi_gauges = full_gauges.loc[roi_gauge_ids, :].copy()
-    roi_gauges = roi_gauges.to_crs(epsg=4326)
 
     # Prepare task arguments
     tasks: list[tuple[str, float, float, str]] = [
@@ -316,11 +343,6 @@ def process_roi_watersheds(
         watersheds_gdf.to_file(watersheds_path, driver="GPKG")
         log.info("ROI %d: Saved watersheds to %s", roi_id, watersheds_path)
 
-        # Save corresponding gauges
-        gauges_path = roi_temp_dir / f"roi_{roi_id}_gauges.gpkg"
-        roi_gauges.to_file(gauges_path, driver="GPKG")
-        log.info("ROI %d: Saved gauges to %s", roi_id, gauges_path)
-
         return watersheds_gdf
     else:
         log.warning("ROI %d: No watersheds were successfully processed", roi_id)
@@ -361,6 +383,7 @@ def main():
 
     # Process each ROI
     all_watersheds = []
+    all_gauges = []
 
     for roi_id, roi_gauges_df in gauges_by_roi:
         # Get the gauge IDs directly from the grouped dataframe index
@@ -383,6 +406,10 @@ def main():
 
             if not watersheds_gdf.empty:
                 all_watersheds.append(watersheds_gdf)
+                roi_gauges_merge = full_gauges.loc[roi_gauge_ids, :].copy()
+                roi_gauges_merge = roi_gauges_merge.to_crs(epsg=4326)
+                all_gauges.append(roi_gauges_merge)
+                _write_combined_outputs(all_watersheds, all_gauges, geom_path)
 
         except Exception as e:
             log.error("Failed to process ROI %d: %s", roi_id, str(e))
