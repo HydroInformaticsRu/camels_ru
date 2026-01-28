@@ -1,15 +1,50 @@
-## ignore in general
+# IDE and editor
 .vscode/
 .idea/
+
+# Python
 __pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# macOS
+.DS_Store
 ._.DS_Store
 ._*
-.DS_Store
-*.zip
-data
+
+# Large files and data
+data/
 logs/
+results/
+*.zip
+
+# CSV files in general (except specific locations)
 *.csv
-paper/
+!configs/*.csv
+
+# GitHub (keep copilot instructions)
 .github/*
 !.github/copilot-instructions.md
-results/
+
+# Keep these directories tracked (important for collaboration)
+!docs/
+!.claude/
+!paper/
+!paper_v2/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
