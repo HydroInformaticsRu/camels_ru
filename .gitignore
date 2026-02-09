@@ -33,8 +33,8 @@ results/
 # Keep these directories tracked (important for collaboration)
 !docs/
 !.claude/
-!paper/
-!paper_v2/
+paper/
+paper_v2/
 
 # Virtual environments
 .venv/
