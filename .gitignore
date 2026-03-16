@@ -20,21 +20,10 @@ build/
 data/
 logs/
 results/
-*.zip
 
 # CSV files in general (except specific locations)
 *.csv
 !configs/*.csv
-
-# GitHub (keep copilot instructions)
-.github/*
-!.github/copilot-instructions.md
-
-# Keep these directories tracked (important for collaboration)
-!docs/
-!.claude/
-paper/
-paper_v2/
 
 # Virtual environments
 .venv/
@@ -48,3 +37,35 @@ env/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+
+# LaTeX build artifacts
+paper/LaTeX/*.pdf
+paper/LaTeX/*.log
+paper/LaTeX/*.aux
+paper/LaTeX/*.bbl
+paper/LaTeX/*.blg
+paper/LaTeX/*.fdb_latexmk
+paper/LaTeX/*.fls
+paper/LaTeX/*.out
+paper/LaTeX/*.synctex.gz
+paper/LaTeX/*.toc
+paper/LaTeX/*.lof
+paper/LaTeX/*.lot
+texput.log
+
+# Large archives
+*.zip
+
+# Dataset release builds
+release/
+
+# Paper drafts (keep LaTeX source, ignore builds)
+paper/paper_v2/
+
+# Claude Code local config
+CLAUDE.local.md
+.claude/settings.local.json
