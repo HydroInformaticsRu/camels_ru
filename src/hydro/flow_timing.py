@@ -78,10 +78,16 @@ class FlowTiming:
             try:
                 hfd_idx = year_data[year_data["cum_discharge"] >= half_annual].index[0]
                 # Convert to day of hydrological year (Oct 1 = day 1)
+                oct1_doy = pd.Timestamp(year=hfd_idx.year, month=10, day=1).dayofyear
                 if hfd_idx.month >= 10:
-                    hfd_day = hfd_idx.dayofyear - 274 + 1  # Oct 1 = day 274
+                    hfd_day = hfd_idx.dayofyear - oct1_doy + 1
                 else:
-                    hfd_day = hfd_idx.dayofyear + 92  # Jan 1 = day 92 of hydro year
+                    # Days remaining in Oct-Dec of previous year
+                    prev_year = hfd_idx.year - 1
+                    dec31_doy = pd.Timestamp(year=prev_year, month=12, day=31).dayofyear
+                    oct1_prev = pd.Timestamp(year=prev_year, month=10, day=1).dayofyear
+                    days_in_oct_dec = dec31_doy - oct1_prev + 1
+                    hfd_day = days_in_oct_dec + hfd_idx.dayofyear
 
                 hfd_values.append(hfd_day)
             except IndexError:
@@ -126,8 +132,12 @@ class FlowTiming:
             if len(season_flows) > 0:
                 mean_val = np.mean(season_flows)
                 std_val = np.std(season_flows)
-                seasonal_stats[f"{season}_mean"] = float(mean_val) if np.isfinite(mean_val) else float(np.nan)
-                seasonal_stats[f"{season}_std"] = float(std_val) if np.isfinite(std_val) else float(np.nan)
+                seasonal_stats[f"{season}_mean"] = (
+                    float(mean_val) if np.isfinite(mean_val) else float(np.nan)
+                )
+                seasonal_stats[f"{season}_std"] = (
+                    float(std_val) if np.isfinite(std_val) else float(np.nan)
+                )
                 if np.isfinite(mean_val) and mean_val != 0:
                     seasonal_stats[f"{season}_cv"] = float(std_val / mean_val)
                 else:

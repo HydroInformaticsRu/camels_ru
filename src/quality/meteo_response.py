@@ -57,11 +57,7 @@ def detect_precipitation_events(
         if is_event_day:
             if not in_event:
                 # Check if we should merge with previous event
-                if (
-                    last_event_end is not None
-                    and (date - last_event_end).days <= gap_days
-                    and events
-                ):
+                if last_event_end is not None and (date - last_event_end).days <= gap_days and events:
                     # Merge: remove last event and continue from its start
                     prev_start, _, prev_total = events.pop()
                     event_start = prev_start
@@ -177,7 +173,9 @@ def calculate_event_response(
         "event_response_rate": float(event_response_rate),
         "n_events": len(events),
         "n_responsive": n_responsive,
-        "mean_response_ratio": float(mean_response_ratio) if not np.isnan(mean_response_ratio) else np.nan,
+        "mean_response_ratio": float(mean_response_ratio)
+        if not np.isnan(mean_response_ratio)
+        else np.nan,
     }
 
 
@@ -308,9 +306,7 @@ def detect_dead_years(
 
     if hydro_year_start_month > 1:
         hydro_years = valid_q.index.year.copy()
-        hydro_years = hydro_years.where(
-            valid_q.index.month < hydro_year_start_month, hydro_years + 1
-        )
+        hydro_years = hydro_years.where(valid_q.index.month < hydro_year_start_month, hydro_years + 1)
         years = sorted(set(hydro_years))
     else:
         years = sorted(set(valid_q.index.year))
@@ -387,9 +383,7 @@ def get_year_meteo_response_metrics(
 
     if hydro_year_start_month > 1:
         hydro_years = valid_q.index.year.copy()
-        hydro_years = hydro_years.where(
-            valid_q.index.month < hydro_year_start_month, hydro_years + 1
-        )
+        hydro_years = hydro_years.where(valid_q.index.month < hydro_year_start_month, hydro_years + 1)
         years = sorted(set(hydro_years))
     else:
         years = sorted(set(valid_q.index.year))

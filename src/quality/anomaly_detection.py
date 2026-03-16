@@ -59,9 +59,7 @@ def detect_constant_periods(
         else:
             # End of constant period
             if period_start is not None and period_length >= min_days:
-                constant_periods.append(
-                    (period_start, prev_date, period_length, period_value)
-                )
+                constant_periods.append((period_start, prev_date, period_length, period_value))
             period_start = None
             period_value = None
             period_length = 0
@@ -71,9 +69,7 @@ def detect_constant_periods(
 
     # Handle period at end of series
     if period_start is not None and period_length >= min_days:
-        constant_periods.append(
-            (period_start, valid_data.index[-1], period_length, period_value)
-        )
+        constant_periods.append((period_start, valid_data.index[-1], period_length, period_value))
 
     return constant_periods
 
@@ -157,9 +153,7 @@ def compare_annual_variance(
     # Extract year data
     if hydro_year_start_month > 1:
         start_date = pd.Timestamp(year=year - 1, month=hydro_year_start_month, day=1)
-        end_date = pd.Timestamp(year=year, month=hydro_year_start_month, day=1) - pd.Timedelta(
-            days=1
-        )
+        end_date = pd.Timestamp(year=year, month=hydro_year_start_month, day=1) - pd.Timedelta(days=1)
     else:
         start_date = pd.Timestamp(year=year, month=1, day=1)
         end_date = pd.Timestamp(year=year, month=12, day=31)
@@ -239,9 +233,7 @@ def detect_data_quality_issues(
     # Extract year data
     if hydro_year_start_month > 1:
         start_date = pd.Timestamp(year=year - 1, month=hydro_year_start_month, day=1)
-        end_date = pd.Timestamp(year=year, month=hydro_year_start_month, day=1) - pd.Timedelta(
-            days=1
-        )
+        end_date = pd.Timestamp(year=year, month=hydro_year_start_month, day=1) - pd.Timedelta(days=1)
     else:
         start_date = pd.Timestamp(year=year, month=1, day=1)
         end_date = pd.Timestamp(year=year, month=12, day=31)
@@ -305,9 +297,7 @@ def detect_anomalies_all_years(
 
     if hydro_year_start_month > 1:
         hydro_years = valid_data.index.year.copy()
-        hydro_years = hydro_years.where(
-            valid_data.index.month < hydro_year_start_month, hydro_years + 1
-        )
+        hydro_years = hydro_years.where(valid_data.index.month < hydro_year_start_month, hydro_years + 1)
         years = sorted(set(hydro_years))
     else:
         years = sorted(set(valid_data.index.year))
@@ -402,9 +392,7 @@ def get_year_anomaly_metrics(
 
     if hydro_year_start_month > 1:
         hydro_years = valid_data.index.year.copy()
-        hydro_years = hydro_years.where(
-            valid_data.index.month < hydro_year_start_month, hydro_years + 1
-        )
+        hydro_years = hydro_years.where(valid_data.index.month < hydro_year_start_month, hydro_years + 1)
         years = sorted(set(hydro_years))
     else:
         years = sorted(set(valid_data.index.year))

@@ -46,6 +46,7 @@ ignore = [
 "tests/**/*" = ["S101", "D100", "D101", "D102", "D103", "T20"]
 # Scripts/CLI/notebooks: allow prints and skip docstring requirements for notebooks.
 "scripts/**/*" = ["T20"]
+"notebooks/**/*.py" = ["D", "T20", "S112"]
 "**/*.ipynb" = ["D", "T20"]
 
 [tool.ruff.lint.flake8-quotes]
@@ -53,7 +54,7 @@ docstring-quotes = "double"
 inline-quotes = "double"
 
 [tool.ruff.lint.isort]
-known-first-party = ["floodforecast"]
+known-first-party = ["hydro", "meteo", "quality", "data_processing", "plots", "static", "timeseries_stats", "utils"]
 split-on-trailing-comma = true
 combine-as-imports = true
 force-sort-within-sections = true
@@ -95,3 +96,41 @@ authors = [{ name = "Dmitrii Abramov", email = "dmbrmv96@gmail.com" }]
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.12"
+dependencies = ["transliterate>=1.10.2,<2"]
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.pypi-dependencies]
+camels-ru = { path = ".", editable = true }
+
+[tool.pixi.tasks]
+lint = "ruff check src/"
+format = "ruff format src/"
+typecheck = "pyright src/"
+
+[tool.pixi.dependencies]
+pysheds = ">=0.5,<0.6"
+numpy = "1.26.4.*"
+numba = "0.59.1.*"
+gdal = ">=3.12.2,<4"
+geopandas = ">=1.1.2,<2"
+ipykernel = ">=7.2.0,<8"
+jupyter = ">=1.1.1,<2"
+ipywidgets = ">=8.1.8,<9"
+tqdm = ">=4.67.3,<5"
+rioxarray = ">=0.20.0,<0.21"
+netcdf4 = ">=1.7.4,<2"
+cfgrib = ">=0.9.15.1,<0.10"
+bottleneck = ">=1.6.0,<2"
+dask = ">=2026.1.2,<2027"
+h5netcdf = ">=1.8.1,<2"
+fiona = ">=1.10.1,<2"
+shapely = ">=2.1.2,<3"
+ruff = ">=0.9.0"
+pyright = ">=1.1.0"
+lxml = ">=6.0.2,<7"
+paramiko = ">=4.0.0,<5"
+html5lib = ">=1.1,<2"
+xlrd = ">=2.0.2,<3"
+seaborn = ">=0.13.2,<0.14"

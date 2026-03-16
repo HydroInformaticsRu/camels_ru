@@ -1,5 +1,9 @@
-from functools import partial
-import multiprocessing as mp
+"""AIS GMVO data parsing utilities.
+
+Parses discharge and water level exports from AIS GMVO (https://gmvo.skniivh.ru/)
+Excel format into per-gauge CSV files with standardized daily time series.
+"""
+
 from pathlib import Path
 import re
 
@@ -7,446 +11,344 @@ import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
 
-from src.utils.logger import setup_logger
+from utils.logger import setup_logger
 
 logger = setup_logger(Path(__file__).name, log_file="")
 
+# Pre-compiled regex: keep only digits and dots
+_NON_NUMERIC_RE = re.compile(r"[^0-9.]")
 
-def df_from_excel(observations: np.ndarray, dates: pd.DatetimeIndex, col_name: str):
-    temp_df = pd.DataFrame()
-
-    temp_df["date"] = dates
-    temp_df[col_name] = observations
-    temp_df[col_name] = temp_df[col_name].replace(to_replace=-9999, value=np.nan)
-    return temp_df
+# 30-day months in the AIS 31-row grid (April, June, September, November)
+_SHORT_MONTH_COLS = ("Unnamed: 4", "Unnamed: 6", "Unnamed: 9", "Unnamed: 11")
 
 
-def replace_val(my_val):
-    if my_val == "" or my_val == "-" or my_val == "--" or my_val == " ":
-        return -9999
-    elif isinstance(my_val, str):
-        if my_val[-1] == "-":
-            my_val = my_val[:-1]
-        try:
-            return pd.to_numeric(my_val)
-        except ValueError:
-            pass
-    else:
+# ---------------------------------------------------------------------------
+# Cell-level helpers
+# ---------------------------------------------------------------------------
+
+
+def _clean_cell(x: object) -> str:
+    """Normalize AIS cell: Cyrillic hydro codes -> '0', comma -> dot, strip non-numeric.
+
+    "npscx" (flow passing) and "npms" (frozen) are standard AIS notation.
+    """
+    s = str(x).replace("прсх", "0").replace("прмз", "0").replace(",", ".")
+    return _NON_NUMERIC_RE.sub("", s)
+
+
+def _to_float(val: object) -> float:
+    """Convert a cleaned cell value to float.
+
+    Returns NaN for non-string padding (from _trim_short_months), and -9999
+    sentinel for empty/no-data strings. The sentinel survives the NaN filter
+    and is replaced with NaN later in _df_from_observations.
+    """
+    if not isinstance(val, str):
+        return np.nan  # padding cells set by _trim_short_months
+    if not val or val.isspace():
+        return -9999.0  # no-observation sentinel (e.g. "нб" cleaned to "")
+    s = val.rstrip("-")
+    if not s:
+        return -9999.0
+    try:
+        return float(s)
+    except ValueError:
         return np.nan
 
 
-def discharge_to_csv(data_path: Path, save_folder: Path) -> dict:
-    """Script allows to parse data from AIS GMVO (https://gmvo.skniivh.ru/).
+def _df_from_observations(
+    observations: np.ndarray, dates: pd.DatetimeIndex, col_name: str
+) -> pd.DataFrame:
+    """Build DataFrame from flat observation array + dates, replacing -9999 with NaN."""
+    df = pd.DataFrame({"date": dates, col_name: observations})
+    df.loc[df[col_name] == -9999, col_name] = np.nan
+    return df
 
-    Excel output format both for level and discharge into .csv for separate
-    observation points included in final file
+
+# ---------------------------------------------------------------------------
+# Block-level helpers (operating on a 31x12 year-grid)
+# ---------------------------------------------------------------------------
+
+
+def _interpolate_dots(selection: pd.DataFrame) -> None:
+    """Replace lone '.' cells with the mean of vertical neighbors (in-place)."""
+    if "." not in selection.values:
+        return
+
+    mask = (selection == ".").values
+    rows, cols = np.divmod(np.flatnonzero(mask), selection.shape[1])
+
+    for r, c in zip(rows, cols, strict=False):
+        try:
+            prev = pd.to_numeric(selection.iloc[r - 1, c])
+        except (IndexError, ValueError):
+            prev = pd.to_numeric(selection.iloc[r + 1, c])
+        try:
+            nxt = pd.to_numeric(selection.iloc[r + 1, c])
+        except (IndexError, ValueError):
+            nxt = pd.to_numeric(selection.iloc[r - 1, c])
+        selection.iat[r, c] = str(np.mean([prev, nxt]))
+
+
+def _trim_short_months(selection: pd.DataFrame, year_days: int) -> None:
+    """NaN-pad the 31-row grid for months with fewer than 31 days."""
+    feb = "Unnamed: 2"
+    if year_days == 365:
+        # Non-leap: Feb has 28 days -> last 3 rows are padding
+        selection.loc[:, feb].values[-3:] = [np.nan, np.nan, np.nan]
+    elif year_days == 366:
+        # Leap: Feb has 29 days -> day 29 may be blank, last 2 are padding
+        if selection.loc[:, feb].values[-3] == "":
+            try:
+                avg = selection.loc[selection.index[:-3], feb].astype(int).mean()
+                selection.loc[:, feb].values[-3] = str(int(avg))
+            except ValueError:
+                pass
+            selection.loc[:, feb].values[-2:] = [np.nan, np.nan]
+        else:
+            selection.loc[:, feb].values[-2:] = [np.nan, np.nan]
+
+    # 30-day months: last row is padding
+    for col in _SHORT_MONTH_COLS:
+        selection.loc[:, col].values[-1:] = [np.nan]
+
+
+def _process_year_block(
+    file_df: pd.DataFrame,
+    block_idx: int,
+    monthes_range: list[int],
+    year_fields: list[int],
+    col_name: str,
+) -> pd.DataFrame | None:
+    """Parse one year-block (31x12 grid) into a tidy (date, value) DataFrame.
+
+    Returns None on parsing failure (e.g. date/observation length mismatch).
+    """
+    month_days = 31
+    sel = file_df.iloc[monthes_range[block_idx] : monthes_range[block_idx] + month_days, 1:]
+    sel = sel.map(_clean_cell)
+    sel.columns = [f"Unnamed: {c}" for c in range(1, 13)]
+
+    year = file_df.iloc[year_fields[block_idx], 1]
+    dates = pd.date_range(start=f"{year}-01-01", end=f"{year}-12-31")
+
+    _trim_short_months(sel, len(dates))
+    _interpolate_dots(sel)
+
+    # Flatten column-major: each column is one month, rows are days 1-31
+    flat = np.array(list(map(_to_float, sel.to_numpy().T.flatten())), dtype=float)
+    flat = flat[~np.isnan(flat)]
+
+    try:
+        return _df_from_observations(flat, dates, col_name)
+    except ValueError:
+        return None
+
+
+# ---------------------------------------------------------------------------
+# Public API: discharge
+# ---------------------------------------------------------------------------
+
+
+def discharge_to_csv(data_path: Path, save_folder: Path) -> dict:
+    """Parse AIS GMVO discharge .xls export into per-gauge CSV files.
 
     Args:
-        data_path (Path): Path to .xls file
-        save_folder (Path): Folder where results will be stored
+        data_path: Path to .xls file from AIS GMVO discharge export.
+        save_folder: Folder where per-gauge CSVs will be saved.
 
+    Returns:
+        Dict mapping river_id -> [DataFrame] of daily discharge.
     """
-    save_path = Path(f"{save_folder}/{data_path.stem}")
+    save_path = save_folder / data_path.stem
     save_path.mkdir(exist_ok=True, parents=True)
-    month_days = 31
-    # print(f"Reading .xls file {data_path}\n")
+
+    # Read file -- format depends on encoding
     try:
-        # if 0 -- ID of gauge, 2 -- river name
-        river_step = 4
-        river_label = 6
-        year_step = 5
-        skip_top = 18
-
-        month_step = 9
-        # jump over year fro gauge
-        table_step = 47
+        river_step, river_label, year_step = 4, 6, 5
+        month_step, table_step = 9, 47
         xml = pd.read_html(data_path, decimal=".", thousands=" ")
-        file = xml[0]
+        file_df = xml[0]
     except UnicodeDecodeError:
-        # if 0 -- ID of gauge, 2 -- river name
-        river_step = 0
-        river_label = 2
-        year_step = 1
-        skip_top = 18
+        river_step, river_label, year_step = 0, 2, 1
+        month_step, table_step = 5, 53
+        file_df = pd.read_excel(data_path, skiprows=18, skipfooter=0)
 
-        month_step = 5
-        # jump over year fro gauge
-        table_step = 53
-        file = pd.read_excel(data_path, skiprows=skip_top, skipfooter=0)
-
-    monthes_range = list(range(month_step, file.shape[0], table_step))
-    river_fields = list(range(river_step, file.shape[0], table_step))
-    river_labels = list(range(river_label, file.shape[0], table_step))
-    year_fields = list(range(year_step, file.shape[0], table_step))
+    monthes_range = list(range(month_step, file_df.shape[0], table_step))
+    river_fields = list(range(river_step, file_df.shape[0], table_step))
+    river_labels = list(range(river_label, file_df.shape[0], table_step))
+    year_fields = list(range(year_step, file_df.shape[0], table_step))
+    n_blocks = len(monthes_range)
 
     river_ids = np.array(
-        [file.iloc[river_fields[i], 1] for i in range(len(monthes_range))],
+        [file_df.iloc[river_fields[i], 1] for i in range(n_blocks)],
         dtype=np.int32,
     )
+    river_names = np.array([file_df.iloc[river_labels[i], 1] for i in range(n_blocks)])
 
-    river_names = np.array([file.iloc[river_labels[i], 1] for i in range(len(monthes_range))])
-    # ID always unique
-    number_of_rivers = len(np.unique(river_ids))
-    # define number of downloaded rivers
-    results = {river: [] for river in river_ids[0:number_of_rivers]}
+    unique_rivers = np.unique(river_ids)
+    results: dict[int, list[pd.DataFrame]] = {int(r): [] for r in unique_rivers}
 
-    for river_name, data in results.items():
-        for i in range(len(monthes_range)):
-            test_selection = file.iloc[monthes_range[i] : monthes_range[i] + month_days, 1:]
+    # Single pass: process each year-block once and assign to its river
+    for i in range(n_blocks):
+        river_id = int(river_ids[i])
+        if river_id not in results:
+            continue
 
-            test_selection = (
-                test_selection.map(lambda x: str(x).replace("прсх", "0"))
-                .map(lambda x: str(x).replace("прмз", "0"))
-                .map(lambda x: str(x).replace(",", "."))
-                .map(lambda x: str(x).replace("?", ""))
-                .map(lambda x: str(x).replace("-", ""))
-                .map(lambda x: re.sub("[^-?0-9.]", "", x))
-            )
-            test_selection.columns = [f"Unnamed: {i}" for i in range(1, 13)]
-
-            dates = pd.date_range(
-                start=f"{file.iloc[year_fields[i], 1]}-01-01",
-                end=f"{file.iloc[year_fields[i], 1]}-12-31",
-            )
-
-            if len(dates) == 365:
-                test_selection.loc[:, "Unnamed: 2"].values[-3:] = np.array([np.nan, np.nan, np.nan])
-            elif len(dates) == 366:
-                if test_selection.loc[:, "Unnamed: 2"].values[-3] == "":
-                    try:
-                        row_mean = (
-                            test_selection.loc[test_selection.index[:-3], "Unnamed: 2"]
-                            .astype(int)
-                            .mean()
-                        )
-                        test_selection.loc[:, "Unnamed: 2"].values[-3] = row_mean
-                        test_selection.loc[:, "Unnamed: 2"].values[-2:] = np.array([np.nan, np.nan])
-                    except ValueError:
-                        test_selection.loc[:, "Unnamed: 2"].values[-2:] = np.array([np.nan, np.nan])
-                else:
-                    test_selection.loc[:, "Unnamed: 2"].values[-2:] = np.array([np.nan, np.nan])
-
-            test_selection.loc[:, "Unnamed: 4"].values[-1:] = np.array([np.nan])
-            test_selection.loc[:, "Unnamed: 6"].values[-1:] = np.array([np.nan])
-            test_selection.loc[:, "Unnamed: 9"].values[-1:] = np.array([np.nan])
-            test_selection.loc[:, "Unnamed: 11"].values[-1:] = np.array([np.nan])
-
-            if "." in test_selection.values:
-                rows = np.flatnonzero((test_selection == ".").values) // test_selection.shape[1]
-                cols = np.flatnonzero((test_selection == ".").values) % test_selection.shape[1]
-
-                prev_vals = list()
-                for r, c in zip(rows, cols, strict=False):
-                    try:
-                        prev_vals.append(pd.to_numeric(test_selection.iloc[r - 1, c]))
-                    except IndexError:
-                        prev_vals.append(pd.to_numeric(test_selection.iloc[r + 1, c]))
-
-                next_vals = list()
-                for r, c in zip(rows, cols, strict=False):
-                    try:
-                        next_vals.append(pd.to_numeric(test_selection.iloc[r + 1, c]))
-                    except IndexError:
-                        next_vals.append(pd.to_numeric(test_selection.iloc[r - 1, c]))
-
-                fill_val = [np.mean([pr, nx]) for pr, nx in zip(prev_vals, next_vals, strict=False)]
-
-                for i, (r, c) in enumerate(zip(rows, cols, strict=False)):
-                    test_selection.iat[r, c] = str(fill_val[i])
-
-                test_selection = np.array(
-                    list(map(replace_val, test_selection.to_numpy().T.flatten())),
-                    dtype=float,
-                )
-            else:
-                test_selection = np.array(
-                    list(map(replace_val, test_selection.to_numpy().T.flatten())),
-                    dtype=float,
-                )
-
-            test_selection = test_selection[~np.isnan(test_selection)]
-
-            # ID always unique -- no need to check river name
-            river_id = file.iloc[river_fields[i], 1]
-            river_id = int(river_id)  # type: ignore
-
-            if river_id == river_name:
-                try:
-                    results[river_name].append(
-                        df_from_excel(
-                            observations=test_selection,
-                            dates=dates,
-                            col_name="discharge",
-                        )
-                    )
-                except ValueError:
-                    print(f"{river_name} at {file.iloc[year_fields[i], 1]}\n")
-                    print(data_path)
-                    print("\n")
-
-    label_id = {}
-    # association between id and river name
-    for i, r_id in enumerate(river_ids):
-        if r_id in label_id.keys():
-            pass
+        df = _process_year_block(file_df, i, monthes_range, year_fields, col_name="discharge")
+        if df is not None:
+            results[river_id].append(df)
         else:
-            label_id[r_id] = [river_names[i]]
+            logger.warning(
+                "%s: length mismatch for river %d at year %s",
+                data_path.name,
+                river_id,
+                file_df.iloc[year_fields[i], 1],
+            )
 
-    for river_name, data in results.items():
-        data = pd.concat(results[river_name]).reset_index(drop=True)
-        results[river_name] = [data]
-        data.to_csv(f"{save_path}/{river_name}.csv", index=False)
+    # Build label_id mapping (river_id -> [river_name])
+    label_id: dict[int, list] = {}
+    for i, r_id in enumerate(river_ids):
+        if r_id not in label_id:
+            label_id[int(r_id)] = [river_names[i]]
+
+    # Concatenate per-river DataFrames and save
+    for river_id, frames in results.items():
+        if frames:
+            combined = pd.concat(frames).reset_index(drop=True)
+            results[river_id] = [combined]
+            combined.to_csv(save_path / f"{river_id}.csv", index=False)
 
     return results
 
 
-def level_to_csv(data_path: Path, save_folder: Path) -> dict:
-    """Script allows to parse data from AIS GMVO (https://gmvo.skniivh.ru/).
+# ---------------------------------------------------------------------------
+# Public API: water level
+# ---------------------------------------------------------------------------
 
-    Excel output format both for level and discharge into .csv for separate
-    observation points included in final file
+
+def level_to_csv(data_path: Path, save_folder: Path) -> dict:
+    """Parse AIS GMVO water level .xls export into per-gauge CSV files.
 
     Args:
-        data_path (Path): Path to .xlsx file
-        save_folder (Path): Folder where results will be stored
+        data_path: Path to .xls file from AIS GMVO level export.
+        save_folder: Folder where per-gauge CSVs will be saved.
 
+    Returns:
+        Dict mapping river_id -> [river_name, baltic_height].
     """
-    save_path = Path(f"{save_folder}/{data_path.stem}")
+    save_path = save_folder / data_path.stem
     save_path.mkdir(exist_ok=True, parents=True)
 
-    month_days = 31
-
     try:
-        # if 0 -- ID of gauge, 2 -- river name
-        river_step = 52
-        river_label = 54
-        year_step = 53
-        m_bs = 55
-
-        month_step = 59
-        table_step = 49
-
+        river_step, river_label, year_step, m_bs_step = 52, 54, 53, 55
+        month_step, table_step = 59, 49
         xml = pd.read_html(data_path, decimal=".", thousands=" ")
-        file = xml[0]
+        file_df = xml[0]
     except UnicodeDecodeError:
-        # if 0 -- ID of gauge, 2 -- river name
-        river_step = 0
-        river_label = 2
-        year_step = 1
-        m_bs = 3
-        skip_top = 39
+        river_step, river_label, year_step, m_bs_step = 0, 2, 1, 3
+        month_step, table_step = 7, 55
+        file_df = pd.read_excel(data_path, skiprows=39, skipfooter=0)
 
-        month_step = 7
-        table_step = 55
-        file = pd.read_excel(data_path, skiprows=skip_top, skipfooter=0)
-
-    monthes_range = list(range(month_step, file.shape[0], table_step))
-    river_fields = list(range(river_step, file.shape[0], table_step))
-    river_labels = list(range(river_label, file.shape[0], table_step))
-    m_bs_fields = list(range(m_bs, file.shape[0], table_step))
-    year_fields = list(range(year_step, file.shape[0], table_step))
+    monthes_range = list(range(month_step, file_df.shape[0], table_step))
+    river_fields = list(range(river_step, file_df.shape[0], table_step))
+    river_labels = list(range(river_label, file_df.shape[0], table_step))
+    m_bs_fields = list(range(m_bs_step, file_df.shape[0], table_step))
+    year_fields = list(range(year_step, file_df.shape[0], table_step))
+    n_blocks = len(monthes_range)
 
     river_ids = np.array(
-        [file.iloc[river_fields[i], 1] for i in range(len(monthes_range))],
+        [file_df.iloc[river_fields[i], 1] for i in range(n_blocks)],
         dtype=np.int32,
     )
-
-    river_names = np.array([file.iloc[river_labels[i], 1] for i in range(len(monthes_range))])
-
+    river_names = np.array([file_df.iloc[river_labels[i], 1] for i in range(n_blocks)])
     m_bs_values = np.array(
-        [file.iloc[m_bs_fields[i], 1] for i in range(len(monthes_range))],
+        [file_df.iloc[m_bs_fields[i], 1] for i in range(n_blocks)],
         dtype=np.float32,
     )
-    # ID always unique
-    number_of_rivers = len(np.unique(river_ids))
-    # define number of downloaded rivers
-    results = {river: [] for river in river_ids[0:number_of_rivers]}
 
-    for i, (river_name, data) in enumerate(results.items()):
-        test_selection = file.iloc[monthes_range[i] : monthes_range[i] + month_days, 1:]
+    unique_rivers = np.unique(river_ids)
+    results: dict[int, list[pd.DataFrame]] = {int(r): [] for r in unique_rivers}
 
-        test_selection = (
-            test_selection.map(lambda x: str(x).replace("прсх", "0"))
-            .map(lambda x: str(x).replace("прмз", "0"))
-            .map(lambda x: str(x).replace(",", "."))
-            .map(lambda x: str(x).replace("?", ""))
-            .map(lambda x: re.sub("[^-?0-9.]", "", x))
-        )
-        test_selection.columns = [f"Unnamed: {i}" for i in range(1, 13)]
+    # Single pass: process each year-block once and assign to its river
+    for i in range(n_blocks):
+        river_id = int(river_ids[i])
+        if river_id not in results:
+            continue
 
-        dates = pd.date_range(
-            start=f"{file.iloc[year_fields[i], 1]}-01-01",
-            end=f"{file.iloc[year_fields[i], 1]}-12-31",
-        )
-
-        if len(dates) == 365:
-            test_selection.loc[:, "Unnamed: 2"].values[-3:] = np.array([np.nan, np.nan, np.nan])
-        elif len(dates) == 366:
-            if test_selection.loc[:, "Unnamed: 2"].values[-3] == "":
-                try:
-                    row_mean = str(
-                        int(
-                            test_selection.loc[test_selection.index[:-3], "Unnamed: 2"]
-                            .astype(int)
-                            .mean()
-                        )
-                    )
-                    test_selection.loc[:, "Unnamed: 2"].values[-3] = row_mean
-                    test_selection.loc[:, "Unnamed: 2"].values[-2:] = np.array([np.nan, np.nan])
-                except ValueError:
-                    test_selection.loc[:, "Unnamed: 2"].values[-2:] = np.array([np.nan, np.nan])
-            else:
-                test_selection.loc[:, "Unnamed: 2"].values[-2:] = np.array([np.nan, np.nan])
-
-        test_selection.loc[:, "Unnamed: 4"].values[-1:] = np.array([np.nan])
-        test_selection.loc[:, "Unnamed: 6"].values[-1:] = np.array([np.nan])
-        test_selection.loc[:, "Unnamed: 9"].values[-1:] = np.array([np.nan])
-        test_selection.loc[:, "Unnamed: 11"].values[-1:] = np.array([np.nan])
-
-        if "." in test_selection.values:
-            rows = np.flatnonzero((test_selection == ".").values) // test_selection.shape[1]
-            cols = np.flatnonzero((test_selection == ".").values) % test_selection.shape[1]
-
-            prev_vals = list()
-            for r, c in zip(rows, cols, strict=False):
-                try:
-                    prev_vals.append(pd.to_numeric(test_selection.iloc[r - 1, c]))
-                except IndexError:
-                    prev_vals.append(pd.to_numeric(test_selection.iloc[r + 1, c]))
-
-            next_vals = list()
-            for r, c in zip(rows, cols, strict=False):
-                try:
-                    next_vals.append(pd.to_numeric(test_selection.iloc[r + 1, c]))
-                except IndexError:
-                    next_vals.append(pd.to_numeric(test_selection.iloc[r - 1, c]))
-
-            fill_val = [np.mean([pr, nx]) for pr, nx in zip(prev_vals, next_vals, strict=False)]
-
-            for i, (r, c) in enumerate(zip(rows, cols, strict=False)):
-                test_selection.iat[r, c] = str(fill_val[i])
-
-            test_selection = np.array(
-                list(map(replace_val, test_selection.to_numpy().T.flatten())),
-                dtype=float,
-            )
+        df = _process_year_block(file_df, i, monthes_range, year_fields, col_name="lvl_sm")
+        if df is not None:
+            results[river_id].append(df)
         else:
-            test_selection = np.array(
-                list(map(replace_val, test_selection.to_numpy().T.flatten())),
-                dtype=float,
+            logger.warning(
+                "%s: length mismatch for river %d at year %s",
+                data_path.name,
+                river_id,
+                file_df.iloc[year_fields[i], 1],
             )
 
-        test_selection = test_selection[~np.isnan(test_selection)]
-        try:
-            results[river_name].append(
-                df_from_excel(observations=test_selection, dates=dates, col_name="lvl_sm")
-            )
-        except ValueError:
-            print(f"\n{river_name} at {file.iloc[year_fields[i], 1]}")
-            print(data_path)
-            print("\n")
-
-    label_id = {}
-    # association between id and river name
+    # Build label_id mapping (river_id -> [name, baltic_height])
+    label_id: dict[int, list] = {}
     for i, r_id in enumerate(river_ids):
-        if r_id in label_id.keys():
-            pass
-        else:
-            label_id[r_id] = [river_names[i], m_bs_values[i]]
+        if r_id not in label_id:
+            label_id[int(r_id)] = [river_names[i], m_bs_values[i]]
 
-    for river_name, data in results.items():
-        data = pd.concat(data)
-
-        data.to_csv(f"{save_path}/{river_name}.csv", index=False)
+    # Concatenate per-river DataFrames and save
+    for river_id, frames in results.items():
+        if frames:
+            pd.concat(frames).to_csv(save_path / f"{river_id}.csv", index=False)
 
     return label_id
 
 
-def parse_single_file(file, save_storage, initial_column, column_variable):
-    """Process a single file for the ais_merger function.
+# ---------------------------------------------------------------------------
+# Public API: merger (combine per-district CSVs into unified time series)
+# ---------------------------------------------------------------------------
 
-    Creates a complete date range DataFrame from 2008-2023 and merges it with
-    existing CSV data, filling gaps in the time series. The processed file is
-    saved to the specified storage location.
+
+def ais_merger(
+    files_list: list[Path],
+    save_storage: Path,
+    initial_column: str,
+    column_variable: str,
+) -> None:
+    """Merge per-gauge CSVs into standardized daily time series (2008-2023).
+
+    Groups source files by gauge, merges all sources in memory, then writes
+    once per gauge. This avoids the race condition of parallel read-modify-write
+    on shared output files.
 
     Args:
-        file (Path): Path object to the input CSV file to process
-        save_storage (str): Directory path where the processed file will be saved
-        initial_column (str): Name of the column in the input file to be renamed
-        column_variable (str): New name for the column after processing
-
-    Returns:
-        None: Function saves the processed DataFrame as CSV but returns nothing
-
-    Note:
-        - Creates a daily frequency date range from 2008-01-01 to 2023-12-31
-        - Input file must have a 'date' column that can be parsed as datetime
-        - Output file is named using the stem of the input file path
-        - Missing values in the original data are preserved as NaN
+        files_list: Paths to per-gauge CSV files to merge.
+        save_storage: Output directory for merged time series.
+        initial_column: Column name in input files to rename.
+        column_variable: Target column name after renaming.
     """
-    """Process a single file for the ais_merger function."""
-    gauge = file.stem
-    if Path(f"{save_storage}/{gauge}.csv").exists():
-        # read existing file
-        initial_file = pd.read_csv(f"{save_storage}/{gauge}.csv", index_col="date", parse_dates=True)
-        old_file = pd.read_csv(file, index_col="date", parse_dates=True)
-        old_file = old_file.rename(columns={f"{initial_column}": f"{column_variable}"})
-        combined = initial_file.combine_first(old_file)
-        combined.to_csv(f"{save_storage}/{gauge}.csv")
-        return None
-    else:
-        initial_file = pd.DataFrame(
+    save_storage.mkdir(exist_ok=True, parents=True)
+
+    # Group source files by gauge_id (filename stem)
+    gauge_files: dict[str, list[Path]] = {}
+    for f in files_list:
+        gauge_files.setdefault(f.stem, []).append(f)
+
+    for gauge_id, files in tqdm(
+        gauge_files.items(), desc="Merging per-gauge files", total=len(gauge_files)
+    ):
+        out_path = save_storage / f"{gauge_id}.csv"
+
+        base_df = pd.DataFrame(
             index=pd.date_range(start="2008-01-01", end="2023-12-31", freq="D"),
             columns=[column_variable],
             dtype=float,
         )
-        initial_file.index.name = "date"
-        old_file = pd.read_csv(file, index_col="date", parse_dates=True)
-        old_file = old_file.rename(columns={f"{initial_column}": f"{column_variable}"})
-        combined = initial_file.combine_first(old_file)
-        combined.to_csv(f"{save_storage}/{gauge}.csv")
-        return None
+        base_df.index.name = "date"
 
+        for f in files:
+            new_data = pd.read_csv(f, index_col="date", parse_dates=True)
+            new_data = new_data.rename(columns={initial_column: column_variable})
+            base_df = base_df.combine_first(new_data)
 
-def ais_merger(files_list: list, save_storage: Path, initial_column: str, column_variable: str):
-    """Merge and process multiple AIS data files into a standardized format.
-
-    Creates a complete date range DataFrame from 2008-2023 for each file and merges it with
-    existing CSV data, filling gaps in the time series. The processed files are saved to
-    the specified storage location using multiprocessing for parallel execution.
-
-    Args:
-        files_list (list): List of Path objects pointing to input CSV files to process
-        save_storage (Path): Directory path where processed files will be saved
-        initial_column (str): Name of the column in input files to be renamed
-        column_variable (str): New name for the column after processing
-
-    Returns:
-        None: Function saves processed DataFrames as CSV files but returns nothing
-
-    Note:
-        - Creates daily frequency date range from 2008-01-01 to 2023-12-31
-        - Input files must have a 'date' column that can be parsed as datetime
-        - Output files are named using the stem of input file paths
-        - Uses multiprocessing for parallel file processing
-    """
-    save_storage.mkdir(exist_ok=True, parents=True)
-
-    # Create partial function with fixed arguments
-    process_func = partial(
-        parse_single_file,
-        save_storage=save_storage,
-        initial_column=initial_column,
-        column_variable=column_variable,
-    )
-
-    # Use multiprocessing to process files in parallel
-    with mp.Pool() as pool:
-        list(
-            tqdm(
-                pool.imap(process_func, files_list),
-                total=len(files_list),
-                desc="Parsing files from districts",
-            )
-        )
-    return None
+        # Drop duplicate dates (can occur when a river appears twice in one
+        # AIS export, e.g. correction entries)
+        base_df = base_df[~base_df.index.duplicated(keep="first")]
+        base_df.to_csv(out_path)

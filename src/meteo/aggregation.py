@@ -27,14 +27,10 @@ from src.data_processing.geom_functions import create_gdf, polygon_area
 from src.data_processing.nc_proc import nc_by_extent
 from src.utils.logger import setup_logger
 
-logger = setup_logger(
-    "MeteoAggregation", log_file="logs/meteo_aggregation.log"
-)
+logger = setup_logger("MeteoAggregation", log_file="logs/meteo_aggregation.log")
 
 # Constants
-SMALL_WATERSHED_THRESHOLD_KM2 = (
-    150.0  # Watersheds smaller than this use weights
-)
+SMALL_WATERSHED_THRESHOLD_KM2 = 150.0  # Watersheds smaller than this use weights
 
 # Dataset unit specifications (source → target)
 DATASET_UNITS = {
@@ -59,6 +55,24 @@ DATASET_UNITS = {
         "conversion_factor": 1000.0,
     },
 }
+
+
+def _iter_aggregatable_data_vars(ds: xr.Dataset):
+    """Yield data variables safe for spatial aggregation.
+
+    Only numeric variables with both ``lat`` and ``lon`` dimensions are valid
+    for watershed spatial averaging. Auxiliary variables such as ``time_bnds``
+    (datetime) are skipped.
+    """
+    for var_name, da in ds.data_vars.items():
+        dims = set(da.dims)
+        if not {"lat", "lon"}.issubset(dims):
+            logger.debug(f"Skipping non-spatial variable '{var_name}' with dims {da.dims}")
+            continue
+        if not np.issubdtype(da.dtype, np.number):
+            logger.debug(f"Skipping non-numeric variable '{var_name}' with dtype {da.dtype}")
+            continue
+        yield var_name, da
 
 
 def get_unit_conversion(dataset: str) -> float:
@@ -116,16 +130,12 @@ def compute_fractional_weights(
     for i, lat in enumerate(grid_lats):
         for j, lon in enumerate(grid_lons):
             # Create grid cell polygon
-            cell_poly = box(
-                lon - half_res, lat - half_res, lon + half_res, lat + half_res
-            )
+            cell_poly = box(lon - half_res, lat - half_res, lon + half_res, lat + half_res)
             cell_gdf = create_gdf(cell_poly)
 
             # Compute intersection
             try:
-                intersection = gpd.overlay(
-                    ws_gdf, cell_gdf, how="intersection"
-                )
+                intersection = gpd.overlay(ws_gdf, cell_gdf, how="intersection")
                 if not intersection.empty:
                     # Get intersection area in km² (extract Polygon from GeoSeries)
                     geom = intersection.loc[0, "geometry"]
@@ -139,9 +149,7 @@ def compute_fractional_weights(
     weight_sum = weights_data.sum()
     if weight_sum > 0:
         weights_data /= weight_sum
-        logger.debug(
-            f"Normalized weights (sum before: {weight_sum:.6f}, after: 1.0)"
-        )
+        logger.debug(f"Normalized weights (sum before: {weight_sum:.6f}, after: 1.0)")
 
     # Create DataArray
     weights = xr.DataArray(
@@ -195,9 +203,9 @@ def aggregate_small_watershed(
     }
 
     aggregated_vars = {}
-    for var_name in ds.data_vars:
+    for var_name, da in _iter_aggregatable_data_vars(ds):
         # Weighted mean across spatial dimensions
-        weighted_obj = ds[var_name].weighted(weights)
+        weighted_obj = da.weighted(weights)
         mean_val = weighted_obj.mean(dim=("lat", "lon"))
 
         # Apply unit conversion ONLY to precipitation/ET variables
@@ -207,6 +215,8 @@ def aggregate_small_watershed(
             # Temperature and other intensive variables: no conversion
             aggregated_vars[var_name] = mean_val
 
+    if not aggregated_vars:
+        raise ValueError("No aggregatable numeric variables with lat/lon found")
     return xr.Dataset(aggregated_vars)
 
 
@@ -241,13 +251,11 @@ def aggregate_large_watershed(
     # Clip to watershed boundary
     ws_gdf = create_gdf(watershed_geom)
     try:
-        ds_clipped = ds.rio.clip(
-            ws_gdf.geometry, 4326, drop=True, all_touched=True
-        )
+        ds_clipped = ds.rio.clip(ws_gdf.geometry, 4326, drop=True, all_touched=True)
     except NoDataInBounds:
-        logger.warning(
-            "No data in watershed bounds; using unclipped extent for aggregation"
-        )
+        # logger.warning(
+        #     "No data in watershed bounds; using unclipped extent for aggregation"
+        # )
         ds_clipped = ds
 
     # Variables that need unit conversion (precipitation, ET)
@@ -263,8 +271,8 @@ def aggregate_large_watershed(
 
     # Compute spatial mean for all variables
     aggregated_vars = {}
-    for var_name in ds_clipped.data_vars:
-        mean_val = ds_clipped[var_name].mean(dim=("lat", "lon"))
+    for var_name, da in _iter_aggregatable_data_vars(ds_clipped):
+        mean_val = da.mean(dim=("lat", "lon"))
 
         # Apply unit conversion ONLY to precipitation/ET variables
         if str(var_name).lower() in conversion_vars:
@@ -273,6 +281,8 @@ def aggregate_large_watershed(
             # Temperature and other intensive variables: no conversion
             aggregated_vars[var_name] = mean_val
 
+    if not aggregated_vars:
+        raise ValueError("No aggregatable numeric variables with lat/lon found")
     return xr.Dataset(aggregated_vars)
 
 
@@ -292,9 +302,7 @@ def _get_or_compute_weights(
             grid_resolution,
         )
 
-    weight_path = (
-        cache_dir / "weights" / f"{grid_resolution:.2f}" / f"{gauge_id}.nc"
-    )
+    weight_path = cache_dir / "weights" / f"{grid_resolution:.2f}" / f"{gauge_id}.nc"
     weight_path.parent.mkdir(parents=True, exist_ok=True)
 
     if weight_path.exists():
@@ -348,6 +356,7 @@ def aggregate_watershed(
     grid_resolution: float = 0.10,
     small_ws_threshold: float = SMALL_WATERSHED_THRESHOLD_KM2,
     cache_dir: Path | None = None,
+    variables: list[str] | None = None,
 ) -> pd.DataFrame:
     """Aggregate gridded meteorological data to watershed scale.
 
@@ -381,6 +390,9 @@ def aggregate_watershed(
 
     # Load and clip data to watershed extent
     with xr.open_dataset(dataset_path) as ds:
+        if variables:
+            available = [v for v in variables if v in ds.data_vars]
+            ds = ds[available]
         ds_extent = nc_by_extent(
             nc=ds,
             shape=watershed_geom,
@@ -400,9 +412,7 @@ def aggregate_watershed(
         ds_masked = ds_extent.where(weights > 0)
         agg_ds = aggregate_small_watershed(ds_masked, weights, dataset_type)
     else:
-        agg_ds = aggregate_large_watershed(
-            ds_extent, watershed_geom, dataset_type
-        )
+        agg_ds = aggregate_large_watershed(ds_extent, watershed_geom, dataset_type)
 
     # Convert to DataFrame and postprocess
     df = agg_ds.to_dataframe().reset_index()

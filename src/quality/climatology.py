@@ -70,9 +70,7 @@ def detect_seasonal_signal(
     # Extract year data
     if hydro_year_start_month > 1:
         start_date = pd.Timestamp(year=year - 1, month=hydro_year_start_month, day=1)
-        end_date = pd.Timestamp(year=year, month=hydro_year_start_month, day=1) - pd.Timedelta(
-            days=1
-        )
+        end_date = pd.Timestamp(year=year, month=hydro_year_start_month, day=1) - pd.Timedelta(days=1)
     else:
         start_date = pd.Timestamp(year=year, month=1, day=1)
         end_date = pd.Timestamp(year=year, month=12, day=31)
@@ -147,9 +145,7 @@ def detect_flat_years(
     # Get hydrological years
     if hydro_year_start_month > 1:
         hydro_years = valid_data.index.year.copy()
-        hydro_years = hydro_years.where(
-            valid_data.index.month < hydro_year_start_month, hydro_years + 1
-        )
+        hydro_years = hydro_years.where(valid_data.index.month < hydro_year_start_month, hydro_years + 1)
         years = sorted(set(hydro_years))
     else:
         years = sorted(set(valid_data.index.year))
@@ -282,9 +278,7 @@ def calculate_year_deviation(
     # Extract hydrological year data
     if hydro_year_start_month > 1:
         start_date = pd.Timestamp(year=year - 1, month=hydro_year_start_month, day=1)
-        end_date = pd.Timestamp(year=year, month=hydro_year_start_month, day=1) - pd.Timedelta(
-            days=1
-        )
+        end_date = pd.Timestamp(year=year, month=hydro_year_start_month, day=1) - pd.Timedelta(days=1)
     else:
         start_date = pd.Timestamp(year=year, month=1, day=1)
         end_date = pd.Timestamp(year=year, month=12, day=31)
@@ -395,9 +389,7 @@ def detect_climatology_anomalies(
     # Determine hydrological years in the data
     if hydro_year_start_month > 1:
         hydro_years = valid_data.index.year.copy()
-        hydro_years = hydro_years.where(
-            valid_data.index.month < hydro_year_start_month, hydro_years + 1
-        )
+        hydro_years = hydro_years.where(valid_data.index.month < hydro_year_start_month, hydro_years + 1)
         years = sorted(set(hydro_years))
     else:
         years = sorted(set(valid_data.index.year))
@@ -406,9 +398,7 @@ def detect_climatology_anomalies(
     flags_by_year: dict[int, list[QualityFlag]] = {}
 
     for year in years:
-        deviation = calculate_year_deviation(
-            discharge, year, climatology, hydro_year_start_month
-        )
+        deviation = calculate_year_deviation(discharge, year, climatology, hydro_year_start_month)
 
         flags: list[QualityFlag] = []
 
@@ -468,9 +458,7 @@ def get_year_climatology_metrics(
 
     if hydro_year_start_month > 1:
         hydro_years = valid_data.index.year.copy()
-        hydro_years = hydro_years.where(
-            valid_data.index.month < hydro_year_start_month, hydro_years + 1
-        )
+        hydro_years = hydro_years.where(valid_data.index.month < hydro_year_start_month, hydro_years + 1)
         years = sorted(set(hydro_years))
     else:
         years = sorted(set(valid_data.index.year))
@@ -478,9 +466,7 @@ def get_year_climatology_metrics(
     # Calculate metrics for each year
     metrics_list = []
     for year in years:
-        deviation = calculate_year_deviation(
-            discharge, year, climatology, hydro_year_start_month
-        )
+        deviation = calculate_year_deviation(discharge, year, climatology, hydro_year_start_month)
         deviation["year"] = year
         metrics_list.append(deviation)
 

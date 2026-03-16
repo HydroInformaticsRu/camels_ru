@@ -75,9 +75,7 @@ class GradedDischargeLoader:
             List of gauge IDs matching the specified grade(s).
         """
         if grade == "all":
-            return sorted(
-                [gid for grades in self.grade_mapping.values() for gid in grades]
-            )
+            return sorted([gid for grades in self.grade_mapping.values() for gid in grades])
 
         if isinstance(grade, str):
             grades = [grade]
@@ -201,13 +199,13 @@ class GradedDischargeLoader:
         """
         stats = []
         for grade, gauge_ids in self.grade_mapping.items():
-            stats.append({
-                "grade": grade,
-                "n_gauges": len(gauge_ids),
-                "pct_total": 100 * len(gauge_ids) / sum(
-                    len(v) for v in self.grade_mapping.values()
-                ),
-            })
+            stats.append(
+                {
+                    "grade": grade,
+                    "n_gauges": len(gauge_ids),
+                    "pct_total": 100 * len(gauge_ids) / sum(len(v) for v in self.grade_mapping.values()),
+                }
+            )
 
         df = pd.DataFrame(stats)
         df = df.set_index("grade")

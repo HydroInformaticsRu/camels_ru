@@ -42,14 +42,14 @@ logger = setup_logger("hydroAtlasWS", log_file="logs/hydroAtlasWS.log")
 
 # --- Configuration ---
 HYDRO_KW: dict[str, Any] = {
-    "gdb_path": Path("data/BasinATLAS_v10.gdb/"),
+    "gdb_path": Path("data/Russia/BasinATLAS_v10.gdb/"),
     "elev_path": Path("data/Rasters/gage_elv/"),
-    "fdir_path": Path("data/DEM/MeritDEM"),
+    "fdir_path": Path("data/Russia/DEM/MeritDEM"),
     "tmp_dir": Path("data/.tmp_raster"),
 }
-WATERSHED_FILE = "data/Geometry/WatershedGeomCAMELS.gpkg"
-GAGES_FILE = "data/Geometry/GaugeGeomCAMELS.gpkg"
-OUTPUT_CSV = "data/attributes/hydro_atlas_cis_camels.csv"
+WATERSHED_FILE = "data/CAMELS_RU/geometry/camels_watersheds.gpkg"
+GAGES_FILE = "data/CAMELS_RU/geometry/camels_gauges.gpkg"
+OUTPUT_CSV = "data/CAMELS_RU/attributes/hydro_atlas_cis_camels.csv"
 
 
 def main():

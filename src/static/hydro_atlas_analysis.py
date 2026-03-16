@@ -4,7 +4,188 @@ Functions for catchment size categorization, feature filtering,
 and cluster interpretation for CAMELS-RU dataset.
 """
 
+from __future__ import annotations
+
 import pandas as pd
+
+# ── Feature metadata for the 22 selected HydroATLAS attributes ──────────────
+# Used by clustering scripts for naming and interpretation.
+# Keys are HydroATLAS variable codes after feature selection + correlated-drop.
+
+FEATURE_DESCRIPTIONS: dict[str, dict[str, str]] = {
+    "inu_pc_ult": {
+        "short": "Inundation",
+        "category": "Flood & Water Regulation",
+    },
+    "lka_pc_use": {
+        "short": "Lake coverage",
+        "category": "Flood & Water Regulation",
+    },
+    "gwt_cm_sav": {
+        "short": "GW depth",
+        "category": "Hydrogeology & Baseflow",
+    },
+    "ele_mt_uav": {
+        "short": "Elevation",
+        "category": "Topography & Climate",
+    },
+    "pre_mm_uyr": {
+        "short": "Precipitation",
+        "category": "Topography & Climate",
+    },
+    "pet_mm_uyr": {
+        "short": "Potential ET",
+        "category": "Topography & Climate",
+    },
+    "aet_mm_uyr": {
+        "short": "Actual ET",
+        "category": "Topography & Climate",
+    },
+    "snw_pc_uyr": {
+        "short": "Snow cover",
+        "category": "Topography & Climate",
+    },
+    "for_pc_use": {
+        "short": "Forest",
+        "category": "Land Cover",
+    },
+    "crp_pc_use": {
+        "short": "Cropland",
+        "category": "Land Cover",
+    },
+    "pst_pc_use": {
+        "short": "Pasture",
+        "category": "Land Cover",
+    },
+    "ire_pc_use": {
+        "short": "Irrigated",
+        "category": "Land Cover",
+    },
+    "gla_pc_use": {
+        "short": "Glacier",
+        "category": "Cryosphere",
+    },
+    "prm_pc_use": {
+        "short": "Permafrost",
+        "category": "Cryosphere",
+    },
+    "pac_pc_use": {
+        "short": "Protected areas",
+        "category": "Land Cover",
+    },
+    "cly_pc_uav": {
+        "short": "Clay",
+        "category": "Soil",
+    },
+    "slt_pc_uav": {
+        "short": "Silt",
+        "category": "Soil",
+    },
+    "snd_pc_uav": {
+        "short": "Sand",
+        "category": "Soil",
+    },
+    "kar_pc_use": {
+        "short": "Karst",
+        "category": "Hydrogeology & Baseflow",
+    },
+    "ppd_pk_uav": {
+        "short": "Pop. density",
+        "category": "Human Impact",
+    },
+    "urb_pc_use": {
+        "short": "Urban",
+        "category": "Human Impact",
+    },
+    "gdp_ud_sav": {
+        "short": "GDP density",
+        "category": "Human Impact",
+    },
+}
+
+# Features dropped due to high correlation with retained features
+CORRELATED_DROPS = [
+    "slp_dg_uav",
+    "sgr_dk_sav",
+    "cmi_ix_uyr",
+    "ari_ix_uav",
+    "tmp_dc_uyr",
+    "rdd_mk_uav",
+    "swc_pc_uyr",
+    "soc_th_uav",
+    "ero_kh_uav",
+    "hdi_ix_sav",
+    "run_mm_syr",
+    "nli_ix_uav",
+]
+
+
+def name_cluster(
+    norm_row: pd.Series,
+    raw_row: pd.Series,
+    high_thresh: float = 0.65,
+) -> str:
+    """Generate a short descriptive name for a cluster centroid.
+
+    Args:
+        norm_row: 0-1 normalized centroid values.
+        raw_row: Raw (original-scale) centroid values.
+        high_thresh: Threshold for "high" normalized values.
+
+    Returns:
+        Human-readable cluster name (max 2 components).
+    """
+    # Priority: cryosphere > climate > hydrology > land cover > soil
+    _priority = {
+        "prm_pc_use": (1, "Permafrost"),
+        "snw_pc_uyr": (2, "Snow-dominated"),
+        "ele_mt_uav": (2, "Highland"),
+        "lka_pc_use": (2, "Lake-regulated"),
+        "kar_pc_use": (2, "Karst"),
+        "gla_pc_use": (3, "Glacial"),
+        "pre_mm_uyr": (3, "Humid"),
+        "aet_mm_uyr": (3, "High-ET"),
+        "gwt_cm_sav": (3, "Deep-GW"),
+        "for_pc_use": (4, "Forested"),
+        "crp_pc_use": (4, "Cropland"),
+        "pst_pc_use": (4, "Pasture"),
+        "ire_pc_use": (4, "Irrigated"),
+        "urb_pc_use": (4, "Urban"),
+        "cly_pc_uav": (5, "Clay-rich"),
+        "snd_pc_uav": (5, "Sandy"),
+    }
+
+    high = norm_row[norm_row > high_thresh].sort_values(ascending=False)
+
+    parts: list[str] = []
+    ranked = []
+    for feat in high.index:
+        if feat in _priority:
+            prio, label = _priority[feat]
+            ranked.append((prio, norm_row[feat], feat, label))
+    ranked.sort(key=lambda x: (x[0], -x[1]))
+
+    for _, _, feat, label in ranked[:2]:
+        rv = raw_row[feat]
+        if feat == "ele_mt_uav":
+            parts.append(f"{label} ({rv:.0f}m)")
+        elif feat == "pre_mm_uyr":
+            parts.append(f"{label} ({rv:.0f}mm/yr)")
+        elif feat == "gwt_cm_sav":
+            parts.append(f"{'Deep' if rv > 200 else 'Shallow'} GW ({rv:.0f}cm)")
+        elif feat.endswith(("_pc_use", "_pc_uyr", "_pc_ult")):
+            parts.append(f"{label} ({rv:.1f}%)")
+        else:
+            parts.append(label)
+
+    if not parts:
+        ev = raw_row.get("ele_mt_uav", 0)
+        pv = raw_row.get("pre_mm_uyr", 0)
+        e_label = "Highland" if ev > 1000 else "Upland" if ev > 500 else "Lowland"
+        p_label = "Humid" if pv > 700 else "Semi-arid" if pv < 400 else "Moderate"
+        parts = [f"{e_label} ({ev:.0f}m)", f"{p_label} ({pv:.0f}mm/yr)"]
+
+    return " / ".join(parts[:2])
 
 
 def categorize_catchment_size(area: float) -> str:

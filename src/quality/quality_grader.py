@@ -4,15 +4,15 @@ This module assigns quality grades (A-F) to individual years and
 generates gauge-level quality summaries.
 """
 
-import logging
 from dataclasses import dataclass, field
 from enum import Enum
+import logging
 from typing import Any
 
 import numpy as np
 import pandas as pd
 
-from .quality_flags import QualityFlag, FlagSeverity, get_flag_severity, has_critical_flag
+from .anomaly_detection import detect_anomalies_all_years
 from .climatology import (
     build_daily_climatology,
     calculate_year_deviation,
@@ -20,8 +20,8 @@ from .climatology import (
     detect_flat_years,
     detect_seasonal_signal,
 )
-from .meteo_response import detect_dead_years, calculate_flashiness_index
-from .anomaly_detection import detect_anomalies_all_years
+from .meteo_response import calculate_flashiness_index, detect_dead_years
+from .quality_flags import FlagSeverity, QualityFlag, get_flag_severity
 
 logger = logging.getLogger(__name__)
 
@@ -72,9 +72,7 @@ class YearQualityResult:
             "n_critical_flags": sum(
                 1 for f in self.flags if get_flag_severity(f) == FlagSeverity.CRITICAL
             ),
-            "n_major_flags": sum(
-                1 for f in self.flags if get_flag_severity(f) == FlagSeverity.MAJOR
-            ),
+            "n_major_flags": sum(1 for f in self.flags if get_flag_severity(f) == FlagSeverity.MAJOR),
         }
 
 
@@ -199,19 +197,19 @@ class YearQualityGrader:
         if data_completeness < self.min_completeness_c:
             return QualityGrade.D
 
-        # Grade C: 1 major flag or 3+ minor flags
-        if n_major >= 1 or n_minor >= 3:
+        # Grade C: 1 major flag or 5+ minor flags
+        if n_major >= 1 or n_minor >= 5:
             return QualityGrade.C
         if data_completeness < self.min_completeness_b:
             return QualityGrade.C
 
-        # Grade B: 1-2 minor flags
-        if n_minor >= 1:
+        # Grade B: 3-4 minor flags
+        if n_minor >= 3:
             return QualityGrade.B
         if data_completeness < self.min_completeness_a:
             return QualityGrade.B
 
-        # Grade A: No flags and good completeness
+        # Grade A: 0-2 minor flags and good completeness
         return QualityGrade.A
 
 
@@ -257,17 +255,13 @@ def assess_gauge_quality(
     # Determine hydrological years
     if hydro_year_start_month > 1:
         hydro_years = valid_data.index.year.copy()
-        hydro_years = hydro_years.where(
-            valid_data.index.month < hydro_year_start_month, hydro_years + 1
-        )
+        hydro_years = hydro_years.where(valid_data.index.month < hydro_year_start_month, hydro_years + 1)
         years = sorted(set(hydro_years))
     else:
         years = sorted(set(valid_data.index.year))
 
     if len(years) < min_years:
-        logger.warning(
-            f"Gauge {gauge_id}: Insufficient years ({len(years)} < {min_years})"
-        )
+        logger.warning(f"Gauge {gauge_id}: Insufficient years ({len(years)} < {min_years})")
         return [], GaugeQualitySummary(
             gauge_id=gauge_id,
             overall_grade=QualityGrade.F,
@@ -339,9 +333,7 @@ def assess_gauge_quality(
     for year in years:
         # Get metrics
         if climatology is not None:
-            deviation = calculate_year_deviation(
-                discharge, year, climatology, hydro_year_start_month
-            )
+            deviation = calculate_year_deviation(discharge, year, climatology, hydro_year_start_month)
             clim_corr = deviation["correlation"]
             clim_nrmse = deviation["nrmse"]
             amplitude_ratio = deviation["amplitude_ratio"]
@@ -464,7 +456,7 @@ def get_gauge_summary(
         )
 
     # Count grades
-    grade_counts = {grade: 0 for grade in QualityGrade}
+    grade_counts = dict.fromkeys(QualityGrade, 0)
     for result in year_results:
         grade_counts[result.grade] += 1
 
@@ -492,9 +484,23 @@ def get_gauge_summary(
     else:
         overall_grade = QualityGrade.F
 
-    # Determine recommendation and tier
+    # Cap overall grade based on record coverage
+    # A gauge with few usable years shouldn't get top grades regardless
+    # of how clean those few years are.
     usable_fraction = n_years_usable / n_years_total if n_years_total > 0 else 0
+    fail_fraction = n_fail / n_years_total if n_years_total > 0 else 0
 
+    if usable_fraction < 0.5:
+        # Less than half usable → cap at D
+        overall_grade = max(overall_grade, QualityGrade.D, key=lambda g: list(QualityGrade).index(g))
+    elif usable_fraction < 0.7:
+        # 50-70% usable → cap at C
+        overall_grade = max(overall_grade, QualityGrade.C, key=lambda g: list(QualityGrade).index(g))
+    elif fail_fraction > 0.3:
+        # More than 30% F years → cap at B
+        overall_grade = max(overall_grade, QualityGrade.B, key=lambda g: list(QualityGrade).index(g))
+
+    # Determine recommendation and tier
     if overall_grade in [QualityGrade.A, QualityGrade.B] and usable_fraction >= 0.8:
         recommendation = "Include"
         new_tier = "decent"
