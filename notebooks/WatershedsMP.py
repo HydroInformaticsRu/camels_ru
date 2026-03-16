@@ -20,14 +20,6 @@ from pysheds.grid import Grid
 from shapely import geometry, ops
 from tqdm.auto import tqdm
 
-# Fix GDAL library path issue - use conda environment's libstdc++
-conda_env = os.environ.get("CONDA_PREFIX")
-if conda_env:
-    lib_path = os.path.join(conda_env, "lib")
-    current_ld_path = os.environ.get("LD_LIBRARY_PATH", "")
-    if lib_path not in current_ld_path:
-        os.environ["LD_LIBRARY_PATH"] = f"{lib_path}:{current_ld_path}" if current_ld_path else lib_path
-
 sys.path.append("../src")
 
 from data_processing.geom_functions import poly_from_multipoly, polygon_area
@@ -64,6 +56,35 @@ def _write_combined_outputs(
         gauges_output = geom_path / "camels_ru_gauges.gpkg"
         combined_gauges.to_file(gauges_output, driver="GPKG")
         log.info("Updated combined gauges (%d points) at %s", len(combined_gauges), gauges_output)
+
+
+def merge_stream_saved_roi(roi_id: int, geom_path: Path) -> gpd.GeoDataFrame:
+    """Merge per-watershed GPKGs for an ROI into a single watersheds file.
+
+    Call this after processing the ROI with stream_save_roi_ids when you have
+    enough memory. Reads each roi_{id}_watershed_{gauge_id}.gpkg and writes
+    roi_{id}_watersheds.gpkg.
+    """
+    roi_temp_dir = geom_path / "temp" / f"roi_{roi_id}"
+    pattern = f"roi_{roi_id}_watershed_*.gpkg"
+    paths = sorted(roi_temp_dir.glob(pattern))
+    if not paths:
+        log.warning("No stream-saved watershed files found for ROI %d in %s", roi_id, roi_temp_dir)
+        return gpd.GeoDataFrame()
+
+    frames = []
+    for p in paths:
+        gdf = gpd.read_file(p)
+        frames.append(gdf)
+    merged = pd.concat(frames, ignore_index=True)
+    merged = gpd.GeoDataFrame(merged, crs="EPSG:4326")
+    if "gauge_id" in merged.columns:
+        merged.set_index("gauge_id", inplace=True)
+
+    out_path = roi_temp_dir / f"roi_{roi_id}_watersheds.gpkg"
+    merged.to_file(out_path, driver="GPKG")
+    log.info("Merged %d watersheds for ROI %d to %s", len(merged), roi_id, out_path)
+    return merged
 
 
 def _init_worker(grid_path: str, acc_path: str, fdir_path: str, dirmap: tuple, acc_coeff: float) -> None:
@@ -112,7 +133,9 @@ def _init_worker(grid_path: str, acc_path: str, fdir_path: str, dirmap: tuple, a
         raise
 
 
-def process_single_watershed(gauge_id: str, gauge_x: float, gauge_y: float, gauge_name: str) -> dict:
+def process_single_watershed(
+    gauge_id: str, gauge_x: float, gauge_y: float, gauge_name: str, acc_coeff: float | None = None
+) -> dict:
     """Process a single watershed using pre-loaded worker rasters.
 
     Args:
@@ -120,43 +143,46 @@ def process_single_watershed(gauge_id: str, gauge_x: float, gauge_y: float, gaug
         gauge_x: Longitude of gauge location
         gauge_y: Latitude of gauge location
         gauge_name: Place name for the gauge
+        acc_coeff: Optional accumulation coefficient override; if None, use worker default.
 
     Returns:
         Dictionary containing gauge_id, name, area_km2, and geometry
     """
+    coeff = (acc_coeff if acc_coeff is not None else _worker_ACC_COEFF) or 1e3
+    original_viewfinder = None
     try:
-        # Create a copy of the grid for this watershed (grid metadata only, ~1KB)
-        gauge_grid = deepcopy(_worker_grid)
-
-        if gauge_grid is None:
+        if _worker_grid is None:
             raise ValueError("Worker grid not initialized.")
 
-        # Use pre-loaded rasters (no disk I/O per watershed!)
+        # Save the original viewfinder (lightweight metadata, not raster data)
+        original_viewfinder = deepcopy(_worker_grid.viewfinder)
+
         acc = _worker_acc
         fdir = _worker_fdir
 
         # Snap pour point to high accumulation cell
-        x_snap, y_snap = gauge_grid.snap_to_mask(acc > _worker_ACC_COEFF, (gauge_x, gauge_y))
+        x_snap, y_snap = _worker_grid.snap_to_mask(acc > coeff, (gauge_x, gauge_y))
 
         # Delineate catchment
-        catch_mask = gauge_grid.catchment(
+        catch_mask = _worker_grid.catchment(
             x=x_snap,
             y=y_snap,
             fdir=fdir,
             dirmap=_worker_D8_DIRMAP,
             xytype="coordinate",
         )
-        gauge_grid.clip_to(catch_mask)
+        _worker_grid.clip_to(catch_mask)
 
         # Vectorize catchment
-        ws = gauge_grid.polygonize()
+        ws = _worker_grid.polygonize()
         ws = ops.unary_union([geometry.shape(shape) for shape, _ in ws])
         ws = poly_from_multipoly(ws)
 
         area_km2 = polygon_area(ws)
 
-        # Clean up only the clipped objects
-        del catch_mask, gauge_grid
+        # Restore original grid view (no deepcopy of multi-GB rasters needed)
+        _worker_grid.viewfinder = original_viewfinder
+        del catch_mask
 
         return {
             "gauge_id": gauge_id,
@@ -165,6 +191,9 @@ def process_single_watershed(gauge_id: str, gauge_x: float, gauge_y: float, gaug
             "geometry": ws,
         }
     except Exception as e:
+        # Restore viewfinder even on failure to keep grid usable
+        if _worker_grid is not None and original_viewfinder is not None:
+            _worker_grid.viewfinder = original_viewfinder
         log.error("Failed processing gauge %s (%s): %s", gauge_id, gauge_name, str(e))
         raise
 
@@ -192,6 +221,7 @@ def process_roi_watersheds(
     use_multiprocessing: bool = False,
     batch_size: int = 10,
     max_workers: int = 1,
+    stream_save_roi_ids: list[int] | None = None,
 ) -> gpd.GeoDataFrame:
     """Process all watersheds for a given ROI.
 
@@ -204,13 +234,20 @@ def process_roi_watersheds(
         use_multiprocessing: Whether to use multiprocessing (default: False for memory safety)
         batch_size: Number of tasks per batch (default: 10)
         max_workers: Number of parallel workers if multiprocessing enabled (default: 1)
+        stream_save_roi_ids: If set, for these ROI IDs each watershed is saved to its own
+            file immediately (roi_{id}_watershed_{gauge_id}.gpkg) and not held in memory.
+            Use merge_stream_saved_roi(roi_id, geom_path) later to merge when resources allow.
 
     Returns:
-        GeoDataFrame containing processed watershed geometries
+        GeoDataFrame containing processed watershed geometries (empty if stream_save used).
     """
     # Create temp directory for this ROI
     roi_temp_dir = geom_path / "temp" / f"roi_{roi_id}"
     roi_temp_dir.mkdir(parents=True, exist_ok=True)
+
+    stream_save = stream_save_roi_ids is not None and roi_id in stream_save_roi_ids
+    if stream_save:
+        log.info("ROI %d: stream-save mode (one file per watershed, no in-memory accumulation)", roi_id)
 
     # Prepare gauges for this ROI (saved regardless of watershed reprocessing)
     roi_gauges = full_gauges.loc[roi_gauge_ids, :].copy()
@@ -220,9 +257,9 @@ def process_roi_watersheds(
     roi_gauges.to_file(gauges_path, driver="GPKG")
     log.info("ROI %d: Saved gauges to %s", roi_id, gauges_path)
 
-    # Check if watersheds already exist for this ROI
+    # Check if watersheds already exist for this ROI (skip when stream_save: we use per-gauge files)
     watersheds_path = roi_temp_dir / f"roi_{roi_id}_watersheds.gpkg"
-    if watersheds_path.exists():
+    if not stream_save and watersheds_path.exists():
         log.info("ROI %d: Watersheds already exist at %s, skipping processing", roi_id, watersheds_path)
         try:
             watersheds_gdf = gpd.read_file(watersheds_path)
@@ -235,7 +272,19 @@ def process_roi_watersheds(
             )
 
     D8_DIRMAP = (64, 128, 1, 2, 4, 8, 16, 32)
-    ACC_COEFF = 1e3
+    ACC_COEFF_DEFAULT = 1e3
+    ACC_COEFF_STRICT = 1e2
+
+    # Per-gauge ACC_COEFF: use stricter threshold (1e2) when area_roshydromet < 100 and area_diff_perc outside ±20%
+    if "area_roshydromet" in roi_gauges.columns and "area_diff_perc" in roi_gauges.columns:
+        area_small = roi_gauges["area_roshydromet"] < 100
+        diff_out_of_bounds = roi_gauges["area_diff_perc"].lt(-20) | roi_gauges["area_diff_perc"].gt(20)
+        use_strict = area_small & diff_out_of_bounds
+        acc_coeff_by_gauge = np.where(use_strict, ACC_COEFF_STRICT, ACC_COEFF_DEFAULT)
+    else:
+        acc_coeff_by_gauge = np.full(len(roi_gauges), ACC_COEFF_DEFAULT)
+
+    ACC_COEFF = ACC_COEFF_DEFAULT  # default for worker init
 
     # Set up file paths
     grid_path = str(elv_path / "elv" / f"{roi_id}_elv.tif")
@@ -251,16 +300,31 @@ def process_roi_watersheds(
         if not Path(path_str).exists():
             raise FileNotFoundError(f"Missing {name} raster: {path_str}")
 
-    # Prepare task arguments
-    tasks: list[tuple[str, float, float, str]] = [
-        (str(gauge_id), gauge.geometry.x, gauge.geometry.y, gauge["name_en"])
-        for gauge_id, gauge in roi_gauges.iterrows()
+    # Prepare task arguments (gauge_id, x, y, name_en, acc_coeff)
+    tasks: list[tuple[str, float, float, str, float]] = [
+        (
+            str(gauge_id),
+            gauge.geometry.x,
+            gauge.geometry.y,
+            gauge["name_en"],
+            float(acc_coeff_by_gauge[i]),
+        )
+        for i, (gauge_id, gauge) in enumerate(roi_gauges.iterrows())
     ]
+    if stream_save:
+        # Skip gauges that already have a saved watershed file (resume support)
+        existing = {
+            p.stem.replace(f"roi_{roi_id}_watershed_", "")
+            for p in roi_temp_dir.glob(f"roi_{roi_id}_watershed_*.gpkg")
+        }
+        tasks = [t for t in tasks if t[0] not in existing]
+        if existing:
+            log.info("ROI %d: Resuming, skipping %d already-saved watersheds", roi_id, len(existing))
     total_tasks = len(tasks)
 
     watersheds_list = []
 
-    if use_multiprocessing and max_workers > 1:
+    if use_multiprocessing and max_workers > 1 and not stream_save:
         # Multiprocessing mode (risky with limited memory)
         log.info(
             "Processing ROI %d: %d watersheds with %d workers in batches of %d",
@@ -304,15 +368,24 @@ def process_roi_watersheds(
             log.error("Falling back to sequential processing...")
             # Continue with sequential processing below
 
-    # Sequential mode (always run if multiprocessing disabled or failed)
-    if not use_multiprocessing or max_workers == 1 or not watersheds_list:
-        if watersheds_list:
+    # Sequential mode (always run if multiprocessing disabled, failed, or stream_save)
+    if not use_multiprocessing or max_workers == 1 or not watersheds_list or stream_save:
+        if watersheds_list and not stream_save:
             log.info("ROI %d: Continuing with sequential processing for remaining gauges", roi_id)
             # Remove successfully processed gauges
             processed_ids = {w["gauge_id"] for w in watersheds_list}
             tasks = [t for t in tasks if t[0] not in processed_ids]
+        elif stream_save:
+            # Stream-save: process all sequentially, no list accumulation
+            tasks = tasks
+            watersheds_list.clear()
 
-        log.info("Processing ROI %d: %d watersheds sequentially (memory-safe mode)", roi_id, len(tasks))
+        log.info(
+            "Processing ROI %d: %d watersheds sequentially%s",
+            roi_id,
+            len(tasks),
+            " (stream-save mode)" if stream_save else " (memory-safe mode)",
+        )
 
         # Initialize worker state in main process
         _init_worker(grid_path, acc_path, fdir_path, D8_DIRMAP, ACC_COEFF)
@@ -322,13 +395,32 @@ def process_roi_watersheds(
             gauge_id = task[0]
             try:
                 result = process_single_watershed(*task)
-                watersheds_list.append(result)
+                if stream_save:
+                    # Save immediately to avoid memory buildup; do not keep in list
+                    one_gdf = gpd.GeoDataFrame([result], crs="EPSG:4326")
+                    one_path = roi_temp_dir / f"roi_{roi_id}_watershed_{gauge_id}.gpkg"
+                    one_gdf.to_file(one_path, driver="GPKG")
+                    del one_gdf
+                    gc.collect()
+                else:
+                    watersheds_list.append(result)
             except Exception as exc:
                 log.error("Gauge %s generated exception: %s", gauge_id, str(exc))
 
-            # Periodic garbage collection
-            if len(watersheds_list) % 10 == 0:
+            # Periodic garbage collection (non-stream mode)
+            if not stream_save and len(watersheds_list) % 10 == 0:
                 gc.collect()
+
+    if stream_save:
+        n_saved = len(list(roi_temp_dir.glob(f"roi_{roi_id}_watershed_*.gpkg")))
+        log.info(
+            "ROI %d: %d/%d watersheds saved as individual files. Merge later with: merge_stream_saved_roi(%d, geom_path)",
+            roi_id,
+            n_saved,
+            len(roi_gauge_ids),
+            roi_id,
+        )
+        return gpd.GeoDataFrame()
 
     log.info(
         "ROI %d: Successfully processed %d/%d watersheds", roi_id, len(watersheds_list), total_tasks
@@ -352,21 +444,24 @@ def process_roi_watersheds(
 def main():
     """Main execution function."""
     # Set up paths
-    save_path = Path("../data/zenodo")
+    project_root = Path(__file__).parent.parent
+    data_dir = project_root / "data"
+
+    save_path = data_dir / "CAMELS_RU"
     save_path.mkdir(parents=True, exist_ok=True)
-    geom_path = save_path / "geometry"
+    geom_path = save_path / "geometry_v2"
     geom_path.mkdir(parents=True, exist_ok=True)
 
-    elv_path = Path("../data/SpatialData/MeritRU")
+    elv_path = data_dir / "Russia" / "SpatialData" / "MeritRU"
 
     # Load gauge data
     log.info("Loading gauge data...")
-    full_gauges = gpd.read_file("../data/Geometry/CompleteGauges2025.gpkg")
+    full_gauges = gpd.read_file(save_path / "geometry" / "camels_gauges_edit_v2.gpkg")
     full_gauges.set_index("gauge_id", inplace=True)
 
     # Load HYBAS mapping
     log.info("Loading HYBAS mapping...")
-    hybas_mapping = gpd.read_file("../data/Geometry/HybasSelection.gpkg")
+    hybas_mapping = gpd.read_file(data_dir / "Russia" / "Geometry" / "HybasSelection.gpkg")
 
     # Spatial join to find which gauges are in which HYBAS regions
     full_gauges_with_crs = full_gauges.copy()
@@ -394,7 +489,7 @@ def main():
 
         try:
             watersheds_gdf = process_roi_watersheds(
-                roi_id=roi_id,
+                roi_id=int(roi_id),
                 roi_gauge_ids=roi_gauge_ids,
                 full_gauges=full_gauges,
                 elv_path=elv_path,
@@ -402,6 +497,7 @@ def main():
                 use_multiprocessing=False,  # Set to True to enable multiprocessing (risky!)
                 batch_size=10,
                 max_workers=1,  # Only used if use_multiprocessing=True
+                stream_save_roi_ids=[22],  # Save each watershed to its own file to avoid OOM
             )
 
             if not watersheds_gdf.empty:
@@ -423,7 +519,7 @@ def main():
         combined_watersheds = pd.concat(all_watersheds, ignore_index=False)
 
         # Save to file
-        output_path = geom_path / "camels_ru_watersheds.gpkg"
+        output_path = geom_path / "camels_ru_watersheds_v2.gpkg"
         combined_watersheds.to_file(output_path, driver="GPKG")
 
         log.info("Successfully processed %d watersheds", len(combined_watersheds))

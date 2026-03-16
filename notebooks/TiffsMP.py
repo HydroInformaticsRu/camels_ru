@@ -1,21 +1,11 @@
 from multiprocessing import Pool, cpu_count
-import os
 from pathlib import Path
 import sys
 
-# Fix GDAL library path issue - use conda environment's libstdc++
-conda_env = os.environ.get("CONDA_PREFIX")
-if conda_env:
-    lib_path = os.path.join(conda_env, "lib")
-    current_ld_path = os.environ.get("LD_LIBRARY_PATH", "")
-    if lib_path not in current_ld_path:
-        os.environ["LD_LIBRARY_PATH"] = f"{lib_path}:{current_ld_path}" if current_ld_path else lib_path
+PROJECT_ROOT = Path(__file__).parent.parent
 
 import geopandas as gpd
-import numpy as np
 from osgeo import gdal
-import pandas as pd
-from transliterate import translit
 
 sys.path.append("../src")
 
@@ -32,26 +22,31 @@ save_path.mkdir(parents=True, exist_ok=True)
 geom_path = save_path / "geometry"
 geom_path.mkdir(parents=True, exist_ok=True)
 
-full_gauges = gpd.read_file("../data/Geometry/GaugesFull.gpkg")
-full_gauges["wmo_id"] = full_gauges["wmo_id"].astype(str)
-full_gauges.set_index("wmo_id", inplace=True)
-full_gauges.index.name = "gauge_id"
-full_gauges = full_gauges[["name", "height", "area", "geometry"]]
-full_gauges["area"] = full_gauges["area"].str.replace(r"[^\d.-]", "", regex=True)
-full_gauges["area"] = pd.to_numeric(full_gauges["area"], errors="coerce")
-full_gauges.replace({"area": {0.0: np.nan}}, inplace=True)
-full_gauges["height"] = [h.replace(",", ".") if isinstance(h, str) else h for h in full_gauges["height"]]
-full_gauges["height"] = full_gauges["height"].str.replace(r"[^\d.-]", "", regex=True)
-full_gauges["height"] = pd.to_numeric(full_gauges["height"], errors="coerce")
-full_gauges.rename(columns={"name": "name_ru"}, inplace=True)
-full_gauges["name_en"] = [translit(n, "ru", reversed=True) for n in full_gauges["name_ru"]]
+# full_gauges = gpd.read_file("../data/Geometry/GaugesFull.gpkg")
+# full_gauges["wmo_id"] = full_gauges["wmo_id"].astype(str)
+# full_gauges.set_index("wmo_id", inplace=True)
+# full_gauges.index.name = "gauge_id"
+# full_gauges = full_gauges[["name", "height", "area", "geometry"]]
+# full_gauges["area"] = full_gauges["area"].str.replace(r"[^\d.-]", "", regex=True)
+# full_gauges["area"] = pd.to_numeric(full_gauges["area"], errors="coerce")
+# full_gauges.replace({"area": {0.0: np.nan}}, inplace=True)
+# full_gauges["height"] = [h.replace(",", ".") if isinstance(h, str) else h for h in full_gauges["height"]]
+# full_gauges["height"] = full_gauges["height"].str.replace(r"[^\d.-]", "", regex=True)
+# full_gauges["height"] = pd.to_numeric(full_gauges["height"], errors="coerce")
+# full_gauges.rename(columns={"name": "name_ru"}, inplace=True)
+# full_gauges["name_en"] = [translit(n, "ru", reversed=True) for n in full_gauges["name_ru"]]
 
-full_gauges = full_gauges[["name_en", "name_ru", "height", "area", "geometry"]]
-full_gauges.to_file(geom_path / "camels_ru_gauges.gpkg")
+# full_gauges = full_gauges[["name_en", "name_ru", "height", "area", "geometry"]]
+# full_gauges.to_file(geom_path / "camels_ru_gauges.gpkg")
+
+full_gauges = gpd.read_file(PROJECT_ROOT / "data" / "CAMELS_RU" / "geometry" / "camels_ru_gauges.gpkg")
+full_gauges.set_index("gauge_id", inplace=True)
 
 
-hybas_mapping = gpd.read_file("../data/Geometry/HybasSelection.gpkg")
+hybas_mapping = gpd.read_file(PROJECT_ROOT / "data" / "Russia" / "Geometry" / "HybasSelection.gpkg")
 hybas_mapping = hybas_mapping[["OBJECTID", "geometry"]]
+hybas_mapping = hybas_mapping.loc[hybas_mapping["OBJECTID"].isin([24, 28]), :]
+
 
 name_dict = {
     "elv": "adjusted_elevation",
@@ -67,7 +62,7 @@ dtype_dict = {
 nodata_dict = {"dir": 247, "elv": -9999.0, "upg": -9999}
 
 
-elv_path = Path("../data/SpatialData/MeritRU")
+elv_path = PROJECT_ROOT / "data" / "Russia" / "SpatialData" / "MeritRU"
 elv_path.mkdir(parents=True, exist_ok=True)
 tmp_tif = Path("../data/tmp/rasters")
 tmp_tif.mkdir(parents=True, exist_ok=True)
@@ -94,7 +89,7 @@ def process_raster_task(args: tuple) -> tuple[str, int, str]:
         wgs_window = (upper_left_x, upper_left_y, lower_right_x, lower_right_y)
 
         tiles = flood_extent_tiles(
-            topo_p="/mnt/storage/ResearchData/World/DEM/MeritDEM/",
+            topo_p="/mnt/storage/ResearchData/HydroHub/Storage/SpatialData/DEM/MeritDEM/",
             extent_coords=wgs_window,
             variable_dict=name_dict,
         )

@@ -1,15 +1,14 @@
 from collections.abc import Generator, Sequence
-from itertools import chain, product
+from itertools import product
 from pathlib import Path
 import sys
-from tkinter import NO
 
 import geopandas as gpd
 import numpy as np
 from osgeo import gdal
 import rasterio
 from rasterio.warp import transform
-from shapely.geometry import MultiPolygon, Polygon
+from shapely.geometry import MultiPolygon, Point, Polygon
 
 sys.path.append(str(Path(__file__).parent.parent))
 from data_processing.geom_functions import (
