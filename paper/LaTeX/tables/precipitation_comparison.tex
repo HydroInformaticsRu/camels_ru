@@ -1,0 +1,23 @@
+\begin{table}[htbp]
+\centering
+\caption{Precipitation dataset comparison for CAMELS-RU catchments (2008--2023).}
+\label{tab:precipitation_comparison}
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Dataset} & \textbf{N} & \textbf{Mean P} & \textbf{Std P} & \textbf{P--Q Corr} \\
+ & \textbf{Gauges} & \textbf{(mm/yr)} & \textbf{(mm/yr)} & \textbf{(lag 0)} \\
+\midrule
+ERA5-Land & 1721 & 893 & 246 & 0.087 \\
+MSWEP v2.8 & 1721 & 604 & 183 & 0.066 \\
+GPCP v3.2 & 1721 & 653 & 167 & 0.081 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item P--Q Corr: Pearson correlation between annual precipitation sum and annual discharge at lag 0.
+\item N = 1{,}721: catchments with concurrent discharge and complete precipitation coverage from all three products.
+\item ERA5-Land shows highest mean precipitation and strongest correlation with discharge.
+\item All datasets show similar spatial patterns but differ in absolute magnitudes (see Section~\ref{sec:technical_validation}).
+\item GPCP coverage: 2008--2021 only.
+\end{tablenotes}
+\end{table}

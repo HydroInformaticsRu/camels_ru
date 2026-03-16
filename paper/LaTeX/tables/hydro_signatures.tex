@@ -1,0 +1,35 @@
+\begin{table}[htbp]
+\centering
+\caption{Hydrological signatures computed for CAMELS-RU catchments. All signatures derived from daily discharge time series for gauges with $>$70\% data completeness per hydrological year and at least 5 qualifying years ($n = \nsigngauges$; half-flow date requires $>$82\% completeness, $n = \nhalfflowgauges$). FDC slope is positive for steeper curves (opposite sign convention to \citealt{Sawicz2011}).}
+\label{tab:hydro_signatures}
+\begin{tabular}{llp{5.5cm}}
+\toprule
+\textbf{Signature} & \textbf{Unit} & \textbf{Description} \\
+\midrule
+\multicolumn{3}{l}{\textit{Magnitude}} \\
+\quad q\_mean & mm/day & Mean daily discharge \\
+\quad runoff\_ratio & -- & Annual $Q/P$ ratio (ERA5-Land precipitation) \\
+\midrule
+\multicolumn{3}{l}{\textit{Variability}} \\
+\quad q\_cv & -- & Coefficient of variation of daily discharge \\
+\quad FDC\_slope & -- & FDC slope between 33rd and 66th exceedance percentiles (log-space; positive = steeper) \\
+\quad flashiness\_index & -- & Richards--Baker index: $\sum|Q_{i}-Q_{i-1}|/\sum Q_i$ \\
+\midrule
+\multicolumn{3}{l}{\textit{Extremes}} \\
+\quad Q5 & mm/day & 5th exceedance percentile (high flows) \\
+\quad Q95 & mm/day & 95th exceedance percentile (low flows) \\
+\quad high\_flow\_freq & \% of days & Days exceeding $2\times$ median discharge \\
+\quad high\_flow\_dur & days & Mean duration of high-flow events ($>2\times$ median) \\
+\midrule
+\multicolumn{3}{l}{\textit{Baseflow}} \\
+\quad baseflow\_index & -- & Baseflow fraction; ensemble of 1{,}000 Lyne--Hollick filter runs, $\alpha \sim U[0.9, 0.98]$, 3-pass \\
+\midrule
+\multicolumn{3}{l}{\textit{Low Flow}} \\
+\quad low\_flow\_freq & \% of days & Days below $0.2\times$ mean discharge \\
+\quad low\_flow\_dur & days & Mean duration of low-flow events ($<0.2\times$ mean) \\
+\midrule
+\multicolumn{3}{l}{\textit{Seasonality}} \\
+\quad half\_flow\_date & day of hydro yr & Day of hydrological year (Oct~1 = day~1) when 50\% of annual streamflow volume has passed \\
+\bottomrule
+\end{tabular}
+\end{table}

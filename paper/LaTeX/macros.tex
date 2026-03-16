@@ -1,0 +1,69 @@
+% CAMELS-RU Dataset Macros
+% Last updated: 2026-03-16
+% Copernicus ESSD — Paper 1 (dataset description)
+% Numbers verified against notebook output (full 3,353-catchment scope)
+
+% Dataset name and utilities
+\newcommand{\dataset}{CAMELS-RU\xspace}
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+\newcommand{\placeholder}[1]{\textcolor{gray}{\textit{#1}}}
+\newcommand{\citeplaceholder}[1]{\textcolor{blue}{[CITE: #1]}}
+
+% Key numbers (from v1 geometry + notebook output)
+\newcommand{\ntotal}{3{,}353\xspace}  % Total catchments with delineated watersheds
+\newcommand{\ndischarge}{2{,}170\xspace}  % Catchments with discharge data
+\newcommand{\nwaterlevel}{2{,}989\xspace}  % Catchments with water level data
+\newcommand{\nhighquality}{1{,}055\xspace}  % Grade A discharge gauges (>95% completeness)
+\newcommand{\startyear}{2008\xspace}
+\newcommand{\studyendyear}{2023\xspace}
+\newcommand{\years}{\startyear--\studyendyear\xspace}
+
+% Geographic extent
+\newcommand{\minlat}{41.4$^\circ$N\xspace}
+\newcommand{\maxlat}{73.0$^\circ$N\xspace}
+\newcommand{\minlon}{19.9$^\circ$E\xspace}
+\newcommand{\maxlon}{174.4$^\circ$E\xspace}
+
+% Catchment area statistics (all 3,353 catchments, no area filter)
+\newcommand{\minarea}{0.49~km$^2$\xspace}
+\newcommand{\maxarea}{2{,}670{,}000~km$^2$\xspace}
+\newcommand{\meanarea}{78{,}217~km$^2$\xspace}
+\newcommand{\medianarea}{2{,}817~km$^2$\xspace}
+
+% Precipitation dataset statistics (annual means, n=3,353)
+\newcommand{\erafiveannual}{826~mm/yr\xspace}
+\newcommand{\mswepannual}{608~mm/yr\xspace}
+\newcommand{\gpcpannual}{644~mm/yr\xspace}
+
+% Inter-dataset correlations (daily, mean across gauges)
+\newcommand{\eramsweprcorr}{0.83\xspace}
+\newcommand{\eragpcpcorr}{0.58\xspace}
+\newcommand{\mswepgpcpcorr}{0.73\xspace}
+
+% Water balance metrics (ERA5-Land, n=2,105)
+\newcommand{\medianrunoffratio}{0.26\xspace}
+\newcommand{\climaticsensPQ}{0.824\xspace}
+
+% Dataset components
+\newcommand{\nattributes}{22\xspace}
+\newcommand{\nsignatures}{13\xspace}
+
+% Signature sample sizes
+\newcommand{\nsigngauges}{1{,}716\xspace}
+\newcommand{\nhalfflowgauges}{1{,}641\xspace}
+
+% Hydrological signature statistics
+\newcommand{\meandischarge}{0.908~mm/day\xspace}
+\newcommand{\mediandischarge}{0.698~mm/day\xspace}
+\newcommand{\meanbaseflowindex}{0.562\xspace}
+\newcommand{\meanfdcslope}{2.496\xspace}
+\newcommand{\medianfdcslope}{2.254\xspace}
+\newcommand{\meanhalfflowday}{217\xspace}
+
+% Manual verification metrics
+\newcommand{\meanerror}{4.8\%\xspace}
+\newcommand{\withinfive}{68\%\xspace}
+\newcommand{\withinten}{89\%\xspace}
+
+% License
+\newcommand{\license}{CC BY 4.0\xspace}

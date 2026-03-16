@@ -1,0 +1,85 @@
+%% CAMELS-RU manuscript for Earth System Science Data (ESSD)
+%% Copernicus Publications LaTeX Package v7.14
+\documentclass[essd, manuscript]{copernicus}
+
+%% Additional packages not included in copernicus.cls
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage{xspace}
+
+%% Dataset macros
+\input{macros}
+
+\begin{document}
+
+\title{CAMELS-RU: A Large-Sample Hydroclimatic Dataset for \ntotal Russian Catchments}
+
+% \Author[affil]{given_name}{surname}
+\Author[1]{Dmitrii V.}{Abramov}
+
+\affil[1]{International Center for Corporate Data Analysis, Astana, Kazakhstan}
+
+\correspondence{Dmitrii V. Abramov (d.abramov@iccda.kz)}
+
+\runningtitle{CAMELS-RU: Hydroclimatic dataset for Russian catchments}
+
+\runningauthor{Abramov}
+
+\received{}
+\pubdiscuss{}
+\revised{}
+\accepted{}
+\published{}
+
+\firstpage{1}
+
+\maketitle
+
+\input{sections/00_abstract}
+
+\input{sections/01_introduction}
+\input{sections/02_study_area}
+\input{sections/03_data_methods}
+\input{sections/04_technical_validation}
+\input{sections/05_data_records}
+\input{sections/06_conclusions}
+
+%% Code and data availability — Copernicus requires these specific commands.
+\codedataavailability{%
+The \dataset dataset (v1.0) is permanently archived on Zenodo at
+\placeholder{[DOI: 10.XXXX/zenodo.XXXXXXX]} under \license license.
+The dataset includes daily discharge and water level time series,
+meteorological forcing (ERA5-Land, MSWEP, GPCP), physiographic attributes
+(HydroATLAS), and computed hydrological signatures in NetCDF-4, GeoPackage,
+and CSV formats (approximately 1.2\,GB compressed).
+All processing and analysis code is publicly available at
+\placeholder{[https://github.com/username/camels-ru]} under MIT license,
+with pinned dependencies for full reproducibility.%
+}
+
+%% Author contributions — mandatory for Copernicus
+\authorcontribution{DVA: Conceptualization, Data curation, Formal analysis, Investigation, Methodology, Software, Validation, Visualization, Writing -- original draft, Writing -- review \& editing.}
+
+%% Competing interests — mandatory for Copernicus
+\competinginterests{The author declares that there are no competing interests.}
+
+%% Acknowledgements
+\begin{acknowledgements}
+The author gratefully acknowledges the Russian Federal Service for Hydrometeorology
+and Environmental Monitoring (Roshydromet) for providing discharge data
+through AIS GMVO, and the developers of HydroATLAS, MERIT Hydro,
+ERA5-Land, MSWEP, and GPCP for making their datasets publicly
+available. The broader CAMELS community is acknowledged for
+establishing the framework that inspired this work.
+
+\textit{AI disclosure:} The author used Claude (Anthropic) to assist with
+code development and manuscript editing. All AI-generated content was
+critically reviewed, verified against primary data sources, and revised
+by the author, who takes full responsibility for the accuracy and
+integrity of the work.
+\end{acknowledgements}
+
+\bibliographystyle{copernicus}
+\bibliography{refs}
+
+\end{document}

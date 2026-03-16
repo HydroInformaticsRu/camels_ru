@@ -1,0 +1,85 @@
+dataset:
+  name: "CAMELS-RU"
+  watersheds: 2638
+  period:
+    start: 2008
+    end: 2023
+  timeseries:
+    hydrology:
+      discharge:
+        total_gauges: 2183
+        full_records: 1097
+        partial_records: 1086
+        decent_quality_full: 1021
+        poor_quality_full: 80
+      stage:
+        total_gauges: 2687
+        full_records: 1378
+        partial_records: 943
+        freezing_issues: 140
+        negative_values: 226
+      colocated: 2031  # gauges with both Q and H
+    meteorology:
+      variables: ["tmax", "tmin", "tmean", "precipitation"]
+      precipitation_sources: ["ERA5-Land", "MSWEP v2.8", "GPCP v3.2"]
+      era5_land:
+        mean_annual: "772 mm/yr (mean across 1721 gauges)"
+        cv: 0.18
+        correlation_with_discharge: 0.82
+      mswep:
+        mean_annual: "525 mm/yr (mean across 1721 gauges)"
+        cv: 0.22
+      gpcp:
+        mean_annual: "589 mm/yr (mean across 1721 gauges)"
+        coverage: "2008-2021"
+      temperature_trends:
+        significant_gauges_pct: "42-48%"
+        mean_trend: "+0.048°C/year"
+  static_attributes:
+    hydroatlas:
+      features: 22
+      categories: ["flood_regulation", "hydrogeology", "topography_climate", "land_cover", "cryosphere", "soil_properties"]
+    watershed_geometry: true
+    gauge_points: true
+  signatures:
+    hydrological: ["mean_discharge", "Q5", "Q95", "BFI", "half_flow_date", "FDC_slope", "high_flow_freq", "low_flow_freq"]
+    mean_discharge: "0.86 mm/day (median: 0.67 mm/day)"
+    baseflow_index: "0.55 (mean)"
+    half_flow_date: "day 217 (early August, ±28 days SD)"
+    runoff_ratio: "0.24-0.36 (Q/P ratio)"
+  clustering:
+    geophysical:
+      method: "Ward hierarchical clustering"
+      n_clusters: 15
+      features: "22 HydroATLAS attributes"
+      catchments: 2251  # <50,000 km²
+      silhouette_score: 0.194
+      calinski_harabasz: 314.9
+    hydrological:
+      method: "Ward hierarchical clustering"
+      n_clusters: 15
+      features: "366-day normalized hydrographs"
+      gauges: 1463  # high-quality subset
+      primary_regime: "Snow-dominated (60-70% of catchments)"
+  size_distribution:
+    lt_100_km2: 137  # 5.2%
+    100_to_2000_km2: 1026  # 38.9%
+    2000_to_10000_km2: 641  # 24.3%
+    10000_to_50000_km2: 453  # 17.2%
+    50000_to_200000_km2: 198  # 7.5%
+    gt_200000_km2: 183  # 6.9%
+    median_size_km2: 2922.9
+  regions:
+    - "European Russia (Volga, Don basins)"
+    - "Western Siberia (Ob basin)"
+    - "Central Siberia (Yenisei basin)"
+    - "Eastern Siberia (Lena, Kolyma basins)"
+    - "Far East (Amur, Kamchatka basins)"
+  doi: "[TK_DOI]"
+  license: "CC-BY 4.0"
+  code_repo: "[TK_GitHub_URL]"
+  data_hosting: "[TK_Zenodo_URL]"
+  contact_email: "[TK_contact@email]"
+journals:
+  target: "Earth System Science Data (ESSD)"
+  style: "natbib"

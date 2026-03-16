@@ -1,0 +1,35 @@
+\begin{table*}[htbp]
+\centering
+\caption{Geophysical clustering results: key characteristics of 15 catchment clusters based on HydroATLAS attributes.}
+\label{tab:geo_clusters}
+\small
+\begin{tabular}{clrrrrrrr}
+\toprule
+\textbf{ID} & \textbf{Cluster Name} & \textbf{N} & \textbf{Area} & \textbf{Elev.} & \textbf{Precip.} & \textbf{Forest} & \textbf{Crop} & \textbf{Perm.} \\
+ &  & \textbf{Gauges} & \textbf{(km$^2$)} & \textbf{(m)} & \textbf{(mm/yr)} & \textbf{(\%)} & \textbf{(\%)} & \textbf{(\%)} \\
+\midrule
+1 & Cropland / Clay-rich & 179 & 4659 & 202 & 532 & 3.0 & 64.0 & 0.0 \\
+2 & Lowland / Moderate P & 238 & 4971 & 228 & 493 & 19.3 & 39.1 & 0.4 \\
+3 & Silty / Snow-dominated & 59 & 3589 & 693 & 869 & 38.2 & 0.0 & 28.6 \\
+4 & Permafrost / Snow & 110 & 11377 & 705 & 423 & 28.6 & 0.0 & 88.0 \\
+5 & Forested / Sandy & 182 & 11104 & 1298 & 517 & 68.7 & 0.8 & 60.0 \\
+6 & Forested / Permafrost & 105 & 9970 & 732 & 433 & 77.9 & 0.0 & 75.0 \\
+7 & Snow-dominated & 46 & 10327 & 108 & 516 & 57.7 & 0.8 & 27.1 \\
+8 & Sandy / Snow & 159 & 2701 & 159 & 561 & 59.6 & 2.7 & 2.0 \\
+9 & Forested / Snow & 480 & 6570 & 321 & 605 & 88.8 & 2.1 & 5.6 \\
+10 & Forested & 242 & 6336 & 382 & 539 & 57.4 & 17.7 & 6.4 \\
+11 & Forested / High-PET & 67 & 3011 & 807 & 766 & 78.8 & 4.9 & 11.2 \\
+12 & Forested / Karst & 253 & 5428 & 411 & 606 & 84.1 & 4.1 & 4.4 \\
+13 & Karst / Clay-rich & 47 & 816 & 638 & 703 & 38.9 & 22.2 & 0.5 \\
+14 & Protected / Karst & 21 & 498 & 1811 & 1023 & 34.6 & 3.8 & 11.0 \\
+15 & Highland / Deep-GW & 63 & 7080 & 2215 & 813 & 16.5 & 10.8 & 19.7 \\
+\midrule
+\multicolumn{2}{l}{\textbf{Total / Mean}} & \textbf{2251} & \textbf{6080} & \textbf{513} & \textbf{574} & \textbf{52.1} & \textbf{14.5} & \textbf{21.3} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item Clustering performed using Ward's method on 22 normalized HydroATLAS attributes (catchments $<$ 50\,000 km$^2$).
+\item Area: median catchment area; Elev.: mean elevation; Precip.: mean annual precipitation; Forest/Crop/Perm.: percentage land cover.
+\item Silhouette score: 0.194; Calinski--Harabasz index: 314.9. See Section~\ref{sec:physiographic_regionalization} for full analysis.
+\end{tablenotes}
+\end{table*}
