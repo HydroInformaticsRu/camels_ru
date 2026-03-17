@@ -99,7 +99,9 @@ Automated and manual quality control for discharge time series:
 - `quality_grader`: Rule-based grading of time series quality
 - `anomaly_detection`: Spike and flatline detection
 - `climatology`: Seasonal envelope checks
+- `meteo_response`: Precipitation-discharge consistency checks
 - `quality_flags`: Standardized flag definitions
+- `data_loader`: Unified loading of gauge time series
 
 ### 4. Statistical Analysis (`src/timeseries_stats/`)
 
@@ -115,47 +117,61 @@ trend_results = analyze_trends(discharge)
 homogeneity_results = test_homogeneity(discharge)
 ```
 
-### 5. Data Processing Scripts
+### 5. Data Processing Scripts (`scripts/`)
 
-#### Aggregate Meteorological Data
+#### Data acquisition
+
+| Script | Description |
+|--------|-------------|
+| `load_era5_land.py` | Download ERA5-Land meteorological forcing via CDS API |
+| `gleam_loader.py` | Download GLEAM evapotranspiration data via SFTP |
+| `split_gleam_monthly.py` | Split large GLEAM NetCDF files into monthly chunks |
+
+#### Source data parsing
+
+| Script | Description |
+|--------|-------------|
+| `ParseAisQData.py` | Parse AIS discharge XLS files into per-gauge CSVs |
+| `ParseAisHData.py` | Parse AIS water level XLS files into per-gauge CSVs |
+| `ParseAisCompound.py` | Merge discharge and water level into compound per-gauge CSVs |
+
+#### Processing and aggregation
+
+| Script | Description |
+|--------|-------------|
+| `aggregate_watersheds.py` | Aggregate gridded meteorological data over watershed geometries |
+| `hydro_atlas_converter.py` | Extract catchment attributes from HydroATLAS |
+| `detect_nesting.py` | Identify parent-child watershed nesting relationships |
+| `aggregate_signatures.py` | Compute hydrological signatures across all catchments |
+| `create_signatures_csv.py` | Calculate per-catchment hydrological signatures and trend statistics |
+| `create_signatures_final.py` | Assemble final signatures CSV for the dataset release |
+| `GradeCompound.py` | Assess discharge quality against precipitation and assign grades (A–F) |
+
+#### Dataset packaging
+
+| Script | Description |
+|--------|-------------|
+| `create_hydro_netcdf.py` | Generate CF-compliant NetCDF files for discharge and water level |
+| `create_forcing_netcdf.py` | Generate CF-compliant NetCDF for basin-averaged meteorological forcing |
+| `package_dataset.py` | Assemble the final Zenodo release package |
+
+#### Example usage
 
 ```bash
+# Aggregate ERA5-Land variables over watersheds
 python scripts/aggregate_watersheds.py \
     --watersheds data/Geometry/WatershedGeomCAMELS.gpkg \
     --input-dir data/MeteoData/ERA5 \
     --output-dir data/MeteoData/Aggregated \
     --dataset-type era5-land \
     --workers 4
-```
 
-#### Download GLEAM Data
-
-```bash
-python scripts/gleam_loader.py \
-    --version v4.2a \
-    --freq daily \
-    --years "2008:2023" \
-    --vars E Ei Ep Et Ew S SMsurf SMroot \
-    --dest data/MeteoData/GLEAM \
-    --username gleamuser \
-    --password $GLEAM_SFTP_PASSWORD
-```
-
-#### Download ERA5-Land Data
-
-```bash
+# Download ERA5-Land data
 python scripts/load_era5_land.py \
     --bbox 40 130 75 170 \
     --variables 2m_temperature total_precipitation \
-    --start-year 2000 \
-    --end-year 2023 \
+    --start-year 2000 --end-year 2023 \
     --output data/MeteoData/ERA5
-```
-
-#### Extract HydroATLAS Attributes
-
-```bash
-python scripts/hydro_atlas_converter.py
 ```
 
 ### 6. Web Application for Data Quality Review
