@@ -2,7 +2,7 @@
 
 ## Overview
 
-CAMELS-RU is a comprehensive hydrological dataset project for Russia providing catchment attributes, meteorological forcing data, and hydrological analysis tools. This project creates a CAMELS-type dataset tailored for Russian river basins, following standards established by Newman et al. (2015) and Addor et al. (2017).
+CAMELS-RU is a comprehensive hydrological dataset for Russia providing catchment attributes, meteorological forcing data, and hydrological analysis tools. This project creates a CAMELS-type dataset tailored for Russian river basins, following standards established by Newman et al. (2015) and Addor et al. (2017).
 
 ## Project Structure
 
@@ -12,19 +12,15 @@ camels_ru/
 │   ├── hydro/               # Hydrological metrics and signatures
 │   ├── meteo/               # Meteorological data processing and analysis
 │   ├── data_processing/     # Geospatial and NetCDF utilities
+│   ├── quality/             # Discharge quality assessment and grading
 │   ├── timeseries_stats/    # Trend analysis and statistical tests
-│   ├── plots/               # Visualization functions
+│   ├── plots/               # Visualization and cartographic functions
 │   ├── static/              # HydroATLAS and clustering tools
 │   └── utils/               # Logging and utilities
 ├── scripts/                 # Command-line data processing tools
-│   ├── aggregate_watersheds.py  # Aggregate meteorological data
-│   ├── gleam_loader.py          # GLEAM data downloader
-│   ├── load_era5_land.py        # ERA5-Land data retrieval
-│   └── hydro_atlas_converter.py # HydroATLAS attribute extraction
 ├── app/                     # Web interface for data quality review
 ├── notebooks/               # Jupyter analysis notebooks
-├── docs/                    # Documentation
-└── data/                    # Data storage (not in repository)
+└── paper/                   # Manuscript (Copernicus/ESSD template)
 ```
 
 ## Core Components
@@ -96,7 +92,16 @@ print(result)
 - `seasonal_stats`: Seasonal climatologies
 - `water_balance`: Water balance calculations
 
-### 3. Statistical Analysis (`src/timeseries_stats/`)
+### 3. Quality Assessment (`src/quality/`)
+
+Automated and manual quality control for discharge time series:
+
+- `quality_grader`: Rule-based grading of time series quality
+- `anomaly_detection`: Spike and flatline detection
+- `climatology`: Seasonal envelope checks
+- `quality_flags`: Standardized flag definitions
+
+### 4. Statistical Analysis (`src/timeseries_stats/`)
 
 Time series analysis tools:
 
@@ -110,12 +115,11 @@ trend_results = analyze_trends(discharge)
 homogeneity_results = test_homogeneity(discharge)
 ```
 
-### 4. Data Processing Scripts
+### 5. Data Processing Scripts
 
 #### Aggregate Meteorological Data
 
 ```bash
-# Aggregate all ERA5-Land variables for multiple watersheds
 python scripts/aggregate_watersheds.py \
     --watersheds data/Geometry/WatershedGeomCAMELS.gpkg \
     --input-dir data/MeteoData/ERA5 \
@@ -127,7 +131,6 @@ python scripts/aggregate_watersheds.py \
 #### Download GLEAM Data
 
 ```bash
-# Download GLEAM evapotranspiration data
 python scripts/gleam_loader.py \
     --version v4.2a \
     --freq daily \
@@ -141,7 +144,6 @@ python scripts/gleam_loader.py \
 #### Download ERA5-Land Data
 
 ```bash
-# Download ERA5-Land meteorological forcing
 python scripts/load_era5_land.py \
     --bbox 40 130 75 170 \
     --variables 2m_temperature total_precipitation \
@@ -153,19 +155,16 @@ python scripts/load_era5_land.py \
 #### Extract HydroATLAS Attributes
 
 ```bash
-# Extract catchment attributes from HydroATLAS
 python scripts/hydro_atlas_converter.py
 ```
 
-### 5. Web Application for Data Quality Review
+### 6. Web Application for Data Quality Review
 
 A FastAPI-based interface for manual review of discharge time series quality:
 
 ```bash
-# Start the review application
 cd app
 python main.py
-
 # Open browser to http://127.0.0.1:8000
 ```
 
@@ -174,47 +173,50 @@ python main.py
 - Spatial map of gauge locations
 - Quality classification (poor/decent, shifted, negatives, zeros)
 - Review progress tracking
-- Automated series classification
 
-### 6. Analysis Notebooks
+### 7. Analysis Notebooks
 
 Jupyter notebooks for comprehensive analysis:
 
-- `HydrologicalFinal.ipynb`: Complete hydrological analysis workflow
-- `ForcingsFinal.ipynb`: Meteorological forcing analysis
-- `HydroAtlasFinal.ipynb`: Catchment attribute analysis
-- `PaperBook.ipynb`: Paper figure generation
+- `00_DataDescription.ipynb`: Watershed size distribution and data coverage
+- `01_HydroAtlasFinal.ipynb`: Catchment attribute clustering and PCA analysis
+- `02_HydrologicalFinal.ipynb`: Hydrological metrics and regime analysis
+- `03_ForcingsFinal.ipynb`: Meteorological forcing and water balance analysis
+- `04_ZenodoDataset.ipynb`: Dataset packaging for Zenodo release
 
 ## Installation
 
+This project uses [pixi](https://pixi.sh) for reproducible dependency management.
+
 ```bash
 # Clone repository
-git clone <repository-url>
+git clone https://github.com/dmbrmv/camels_ru.git
 cd camels_ru
 
 # Install dependencies (Python 3.12+)
-pip install -r requirements.txt
-
-# Or use pip install with extras
-pip install -e ".[dev]"
+pixi install
 ```
+
+## Data
+
+The dataset itself is not included in this repository. To use the analysis tools:
+
+1. Download the CAMELS-RU dataset from [Zenodo](#) *(link to be added upon publication)*
+2. Place or symlink the data directory:
+   ```bash
+   ln -s /path/to/your/camels_ru_data data
+   ```
+
+The `data/` directory is expected to contain subdirectories for geometry, meteorological forcing, discharge observations, and derived attributes. See the notebooks for the expected structure.
 
 ## Key Dependencies
 
 - **Core**: Python 3.12+, NumPy, Pandas, SciPy
 - **Geospatial**: GeoPandas, Rasterio, Xarray, GDAL
 - **Analysis**: Scikit-learn, Statsmodels
-- **Visualization**: Matplotlib, Cartopy, Folium
+- **Visualization**: Matplotlib, Seaborn, Cartopy
 - **Performance**: Numba (JIT compilation)
 - **Web**: FastAPI, Uvicorn
-
-## Documentation
-
-- **[Documentation Index](docs/index.md)**: Central documentation hub
-- **[Methodology](docs/methodology/)**: Scientific methods and formulations
-- **[Usage Guides](docs/usage_guides/)**: Practical how-to guides
-- **[Analysis Results](docs/analysis_results/)**: Dataset analysis summaries
-- **[API Reference](docs/complete_reference.md)**: Complete function reference
 
 ## Data Coverage
 
@@ -232,33 +234,24 @@ pip install -e ".[dev]"
 - **Spatial Aggregation**: Area-weighted and optimized NetCDF processing
 - **Quality Control**: Comprehensive validation and manual review workflows
 
-## Code Quality
-
-- **Type Hints**: Full type annotations throughout
-- **Linting**: Ruff-compliant (PEP 8 standards)
-- **Formatting**: Consistent code style with 79-char line limit
-- **Documentation**: Google-style docstrings
-- **Logging**: Comprehensive logging with emoji-enhanced console output
-
 ## Citation
 
-*Citation information will be updated upon publication*
+*Citation information will be updated upon publication.*
 
 ## Acknowledgments
 
 This work builds upon:
 
-- Newman et al. (2015) - CAMELS US
-- Addor et al. (2017) - CAMELS GB
-- Addor et al. (2018) - Hydrological signatures
-- Lehner et al. (2013) - HydroATLAS
+- Newman et al. (2015) — CAMELS US
+- Addor et al. (2017) — CAMELS GB
+- Addor et al. (2018) — Hydrological signatures
+- Lehner et al. (2013) — HydroATLAS
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT License — see [LICENSE](LICENSE) for details.
 
 ## Contact
 
-**Author**: Dmitrii Abramov  
-**Email**: dmbrmv96@gmail.com  
-**Project**: CAMELS-RU Hydrological Dataset
+**Author**: Dmitrii Abramov
+**Email**: dmbrmv96@gmail.com

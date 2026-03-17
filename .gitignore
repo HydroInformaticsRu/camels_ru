@@ -18,10 +18,9 @@ build/
 
 # Large files and data
 data/
+docs/
 logs/
 results/
-
-# CSV files in general (except specific locations)
 *.csv
 !configs/*.csv
 
@@ -66,6 +65,11 @@ release/
 # Paper drafts (keep LaTeX source, ignore builds)
 paper/paper_v2/
 
-# Claude Code local config
+# Claude Code / AI agent config
+.claude/
+CLAUDE.md
 CLAUDE.local.md
-.claude/settings.local.json
+
+# QGIS
+*.qgz
+*.qgs
