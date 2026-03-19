@@ -257,6 +257,28 @@ def assess_gauge_quality(
         hydro_years = valid_data.index.year.copy()
         hydro_years = hydro_years.where(valid_data.index.month < hydro_year_start_month, hydro_years + 1)
         years = sorted(set(hydro_years))
+
+        # Exclude partial edge hydro-years that cannot be complete due to the
+        # data window. E.g., if data starts Jan 2008 and hydro-year starts Oct,
+        # then HY 2008 (Oct 2007–Sep 2008) is missing Oct-Dec 2007 by
+        # definition — not a quality issue. Similarly, the last HY may extend
+        # beyond the data end date.
+        data_start = valid_data.index.min()
+        data_end = valid_data.index.max()
+        first_complete_hy_start = pd.Timestamp(
+            year=data_start.year if data_start.month < hydro_year_start_month else data_start.year + 1,
+            month=hydro_year_start_month,
+            day=1,
+        )
+        # First complete HY is the one starting at first_complete_hy_start
+        first_complete_hy = first_complete_hy_start.year + 1  # HY labeled by end year
+        # Last complete HY ends at month before hydro_year_start_month
+        last_complete_hy_end_year = (
+            data_end.year if data_end.month >= hydro_year_start_month - 1 else data_end.year - 1
+        )
+        last_complete_hy = last_complete_hy_end_year  # HY that ends in Sep of this year
+
+        years = [y for y in years if first_complete_hy <= y <= last_complete_hy]
     else:
         years = sorted(set(valid_data.index.year))
 
@@ -473,16 +495,29 @@ def get_gauge_summary(
     # Excluded years (grade F)
     excluded_years = [r.year for r in year_results if r.grade == QualityGrade.F]
 
-    # Determine overall grade (mode of year grades, excluding F)
-    usable_grades = [r.grade for r in year_results if r.grade != QualityGrade.F]
-    if usable_grades:
-        # Find most common grade
-        grade_freq = {}
+    # Determine overall grade
+    # Grade A is STRICT: every single year must be A. One bad year → gauge
+    # drops. This ensures "Grade A" means "use without checking individual
+    # years" — critical for modeling where a D/F year in the validation
+    # window silently corrupts metrics.
+    # Grades B-D use mode-based logic (existing behavior).
+    all_grades = [r.grade for r in year_results]
+    usable_grades = [g for g in all_grades if g != QualityGrade.F]
+
+    if not usable_grades:
+        overall_grade = QualityGrade.F
+    elif all(g == QualityGrade.A for g in all_grades):
+        # Strict Grade A: every year must be A (no F years either)
+        overall_grade = QualityGrade.A
+    else:
+        # For B-D: mode of non-F grades (existing logic)
+        grade_freq: dict[QualityGrade, int] = {}
         for g in usable_grades:
             grade_freq[g] = grade_freq.get(g, 0) + 1
         overall_grade = max(grade_freq.keys(), key=lambda g: grade_freq[g])
-    else:
-        overall_grade = QualityGrade.F
+        # Cannot be A (handled above), so cap at B minimum
+        if overall_grade == QualityGrade.A:
+            overall_grade = QualityGrade.B
 
     # Cap overall grade based on record coverage
     # A gauge with few usable years shouldn't get top grades regardless

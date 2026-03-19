@@ -80,11 +80,11 @@ def grade_compound(
 
     overall_grade = summary.overall_grade.value
 
-    # Hard requirement: Grade A demands zero missing discharge days in 2008-2023
-    if overall_grade == "A":
-        q_2008_2023 = compound.loc["2008":"2023", "q_mm_day"]
-        if q_2008_2023.isna().any() or len(q_2008_2023) < 5844:  # 16 years × 365.25
-            overall_grade = "B"
+    # Note: the full-coverage gate (zero missing days in 2008-2023) was removed.
+    # The strict Grade A rule in quality_grader.py now handles this: every
+    # hydro-year must be individually graded A (≥95% completeness, ≤2 minor flags).
+    # The calendar-boundary check was overly restrictive and penalized gauges
+    # with perfect hydro-years but partial coverage at the 2008/2023 edges.
 
     return compound, overall_grade, year_grades
 

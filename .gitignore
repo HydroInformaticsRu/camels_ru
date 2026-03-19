@@ -41,20 +41,11 @@ htmlcov/
 .pixi/*
 !.pixi/config.toml
 
-# LaTeX build artifacts
-paper/LaTeX/*.pdf
-paper/LaTeX/*.log
-paper/LaTeX/*.aux
-paper/LaTeX/*.bbl
-paper/LaTeX/*.blg
-paper/LaTeX/*.fdb_latexmk
-paper/LaTeX/*.fls
-paper/LaTeX/*.out
-paper/LaTeX/*.synctex.gz
-paper/LaTeX/*.toc
-paper/LaTeX/*.lof
-paper/LaTeX/*.lot
-texput.log
+# LaTeX source (kept locally for eventual ESSD submission, regenerated from markdown)
+paper/latex/
+
+# Legacy LaTeX path (old structure, fully removed)
+paper/LaTeX/
 
 # Large archives
 *.zip
