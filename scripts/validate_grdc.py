@@ -195,16 +195,27 @@ def match_grdc_to_camels(
 
     tree = cKDTree(camels_coords)
 
+    def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+        """Haversine distance in km between two points."""
+        R = 6371.0
+        dlat = np.radians(lat2 - lat1)
+        dlon = np.radians(lon2 - lon1)
+        a = (
+            np.sin(dlat / 2) ** 2
+            + np.cos(np.radians(lat1)) * np.cos(np.radians(lat2)) * np.sin(dlon / 2) ** 2
+        )
+        return R * 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+
     matches = []
     for st in grdc_stations:
-        # Query nearest neighbor (approximate distance in degrees → km)
-        dist_deg, idx = tree.query([st.lat, st.lon])
-        dist_km = dist_deg * 111.0  # rough degree-to-km conversion
+        # Query nearest neighbor using KD-tree (degree-space), then compute true distance
+        _, idx = tree.query([st.lat, st.lon])
+        camels_id = camels_ids[idx]
+        camels_pt = camels_gauges.geometry.iloc[idx]
+        dist_km = haversine_km(st.lat, st.lon, camels_pt.y, camels_pt.x)
 
         if dist_km > max_dist_km:
             continue
-
-        camels_id = camels_ids[idx]
 
         # Area ratio check
         camels_area = camels_areas.get(camels_id)
