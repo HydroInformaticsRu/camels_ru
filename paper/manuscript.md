@@ -448,7 +448,7 @@ Known caveats:
 - For modeling applications, users should consult `year_grades.csv` to filter out individual years with grades D or F, even for gauges with overall grade A or B. This prevents low-quality years in validation windows from corrupting model performance metrics
 
 The dataset is publicly available under CC BY 4.0 license at *[DOI: 10.XXXX/zenodo.XXXXXXX]*.
-Processing code is available at *[github.com/username/camels-ru]*.
+Processing code is available at https://github.com/dmbrmv/camels_ru.
 
 ### 5.4 Limitations
 
@@ -503,7 +503,7 @@ The dataset is publicly available under CC BY 4.0 license at *[DOI: 10.XXXX/zeno
 
 The CAMELS-RU dataset (v1.0) is permanently archived on Zenodo at *[DOI: 10.XXXX/zenodo.XXXXXXX]* under CC BY 4.0 license.
 The dataset includes daily discharge and water level time series, meteorological forcing (ERA5-Land, MSWEP, GPCP), physiographic attributes (HydroATLAS), and computed hydrological signatures in NetCDF-4, GeoPackage, and CSV formats (approximately 1.2 GB compressed).
-All processing and analysis code is publicly available at *[github.com/username/camels-ru]* under MIT license, with pinned dependencies for full reproducibility.
+All processing and analysis code is publicly available at https://github.com/dmbrmv/camels_ru under MIT license, with pinned dependencies for full reproducibility.
 
 ## Author Contributions
 
