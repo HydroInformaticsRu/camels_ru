@@ -513,7 +513,7 @@ summary_data = [
     ["Grade A (Q)", f"{int(grade_q.get('A', 0)):,}"],
     ["Full coverage 2008\u20132023", f"{n_full:,}"],
     ["Hydropower stations", f"{n_hp}"],
-    ["Graded / total", f"{n_graded:,} / {len(quality_df):,}"],
+    ["Graded / discharge", f"{n_graded:,} / {len(q_df):,}"],
 ]
 
 table = ax_tbl.table(
