@@ -81,7 +81,7 @@ Boreal taiga dominates in the north (up to 95% forest), while southern steppe ca
 Soils range between clay-rich Chernozems in agricultural lowlands and sandy Podzols in permafrost terrain.
 
 ![Figure 1](images/fig_gauge_network.png)
-**Figure 1.** (a) Spatial distribution of 3,353 gauging stations colored by discharge quality grade (A–F; triangles denote hydropower stations). (b) Catchment size distribution. Higher gauge density in European Russia and southern Siberia reflects Roshydromet's operational network.
+**Figure 1.** (a) Spatial distribution of 3,353 catchments colored by discharge quality grade (A–F; triangles denote hydropower stations). (b) Catchment size distribution. Higher gauge density in European Russia and southern Siberia reflects Roshydromet's operational network.
 
 ---
 
@@ -102,7 +102,7 @@ Selection criteria:
 - Quality flags indicating operational sensors and regular maintenance
 
 Quality tiers are assigned by the automated grading procedure described below: *decent quality* gauges receive overall grades A–C; the *high-quality* subset comprises Grade A gauges (≥ 95% completeness, ≤ 2 minor flags).
-Overall, 86% of discharge gauges meet the decent quality threshold, with the high-quality subset comprising 849 gauges (detailed data organization in Sect. 5).
+Overall, 87% of discharge gauges meet the decent quality threshold, with the high-quality subset comprising 849 gauges (detailed data organization in Sect. 5).
 
 The 2008–2023 period was selected because systematic digitization and standardized reporting procedures were implemented across Roshydromet's network during this era.
 
@@ -121,7 +121,7 @@ The procedure evaluates four categories of quality metrics:
 
 Each year receives a grade (A–F, no E) based on quality flags of varying severity (critical, major, minor; 18 flags defined, of which 2 variance-based flags are disabled because annual discharge variance varies naturally in snowmelt-dominated catchments): any critical flag assigns F; ≥ 2 major flags or completeness < 70% assigns D; 1 major flag, ≥ 5 minor flags, or completeness < 85% assigns C; 3–4 minor flags or completeness < 95% assigns B; ≤ 2 minor flags with completeness ≥ 95% assigns A.
 Gauge-level grades aggregate year-level results with a strict Grade A rule: a gauge receives overall Grade A only if every assessed hydro-year is individually graded A. For grades B–D, the mode of non-F year grades is used, capped by the fraction of usable years: usable fraction < 50% caps at D, < 70% caps at C.
-Gauges with overall grade A–C are classified as *decent quality* (86% of discharge gauges); grades D–F as *poor*.
+Gauges with overall grade A–C are classified as *decent quality* (87% of discharge gauges); grades D–F as *poor*.
 The resulting grade distribution and data completeness by grade are shown in Figure 2; discharge and water level characteristics by grade are summarized in Figure 3.
 
 Sensitivity analysis confirms the robustness of the grading system: varying the completeness threshold for Grade A from 0.90 to 0.99 changes the Grade A gauge count by only ±3% (95–101 gauges per 208-gauge random subsample of discharge gauges with ≥ 3 assessed years), indicating that flag counts dominate the grade assignment rather than the exact completeness cutoff.
@@ -158,11 +158,11 @@ Variables extracted:
 - Potential evapotranspiration (mm/day, computed via Penman-Monteith)
 - Precipitation (mm/day): mean annual 826 mm/yr across catchments
 
-For each catchment, basin-averaged forcing computed by weighting ERA5-Land grid cells by fractional catchment coverage, applying the standard environmental lapse rate (−6.5°C/km) for elevation correction in mountain basins.
+For each catchment, basin-averaged forcing was computed by weighting ERA5-Land grid cells by fractional catchment coverage, applying the standard environmental lapse rate (−6.5°C/km) for elevation correction in mountain basins.
 
 #### 3.2.2 MSWEP Precipitation
 
-Precipitation data sourced from Multi-Source Weighted-Ensemble Precipitation (MSWEP) version 2.8 (Beck et al., 2019), a global precipitation dataset merging gauge observations, satellite estimates, and reanalysis data at 0.1° resolution.
+Precipitation data were sourced from Multi-Source Weighted-Ensemble Precipitation (MSWEP) version 2.8 (Beck et al., 2019), a global precipitation dataset merging gauge observations, satellite estimates, and reanalysis data at 0.1° resolution.
 Mean annual precipitation: 608 mm/yr across CAMELS-RU catchments.
 MSWEP outperforms reanalysis-only products in gauge-sparse and snowfall-dominated regions (Beck et al., 2017).
 Daily precipitation (mm/day) aggregated to catchment scale using area-weighted averaging of grid cells intersecting each watershed boundary.
@@ -402,7 +402,7 @@ The largest improvements over automated delineation occurred in:
 - Permafrost regions: Subsurface flow paths verified with expert knowledge
 - Regulated systems: Reservoir operations and diversions mapped from infrastructure databases
 
-Independent validation using satellite-derived river widths (Global River Widths from Landsat, GRWL; Allen and Pavelsky, 2018) shows upstream area-width scaling exponent β = 0.52 ± 0.08, consistent with expected β ≈ 0.5 from hydraulic geometry (Leopold and Maddock, 1953), supporting the accuracy of the delineated boundaries.
+Independent validation using satellite-derived river widths (Global River Widths from Landsat, GRWL; Allen and Pavelsky, 2018) shows upstream area-width scaling exponent *b* = 0.52 ± 0.08, consistent with the expected *b* ≈ 0.5 from hydraulic geometry (Leopold and Maddock, 1953), supporting the accuracy of the delineated boundaries.
 
 ---
 
@@ -413,7 +413,7 @@ Independent validation using satellite-derived river widths (Global River Widths
 The dataset encompasses 3,353 catchments with delineated watersheds across Russia.
 Hydrological observations include 2,170 discharge gauging stations and 2,989 water level gauges.
 The high-quality subset comprises 849 Grade A gauges (≥ 95% completeness) during 2008–2023.
-Overall, 86% of discharge gauges meet the decent quality threshold (see Sect. 3.1 for quality tier definitions).
+Overall, 87% of discharge gauges meet the decent quality threshold (see Sect. 3.1 for quality tier definitions).
 
 Hydrological signatures (N = 1,716 gauges; half-flow date: N = 1,641) span wide ranges: mean discharge 0.908 mm/day (0.017–8.346 mm/day), BFI 0.562 (0.210–0.903), FDC slope 2.496 (0.160–13.633), and mean half-flow date at day 217 of the hydrological year (early May).
 
@@ -552,9 +552,9 @@ Kratzert, F., Nearing, G., Addor, N., Erickson, T., Gauch, M., Gilon, O., Gudmun
 
 Lavers, D. A., Simmons, A., Vamborg, F., and Rodwell, M. J.: An evaluation of ERA5 precipitation for climate monitoring, Q. J. Roy. Meteor. Soc., 148, 3152–3165, https://doi.org/10.1002/qj.4351, 2022.
 
-Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Hogan, N., Revenga, C., Robertson, B., Röthlisberger, M., Tockner, K., Thieme, M., Walser, T., Wlasich, J., and Yoshikawa, S.: Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution, Sci. Data, 6, 283, https://doi.org/10.1038/s41597-019-0300-6, 2019.
-
 Lehner, B., Verdin, K., and Jarvis, A.: New Global Hydrography Derived From Spaceborne Elevation Data, Eos Trans. AGU, 89, 93–94, https://doi.org/10.1029/2008EO100001, 2008.
+
+Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Hogan, N., Revenga, C., Robertson, B., Röthlisberger, M., Tockner, K., Thieme, M., Walser, T., Wlasich, J., and Yoshikawa, S.: Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution, Sci. Data, 6, 283, https://doi.org/10.1038/s41597-019-0300-6, 2019.
 
 Leopold, L. B. and Maddock, T.: The Hydraulic Geometry of Stream Channels and Some Physiographic Implications, USGS Professional Paper 252, U.S. Government Printing Office, Washington, DC, https://doi.org/10.3133/pp252, 1953.
 
