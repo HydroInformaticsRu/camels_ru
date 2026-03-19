@@ -1,6 +1,6 @@
 # CAMELS-RU: A Large-Sample Hydroclimatic Dataset for 3,353 Russian Catchments
 
-**Dmitrii V. Abramov** ^1^
+**Dmitrii V. Abramov** ^1^ <!-- ORCID: insert your ORCID here before submission -->
 
 ^1^ International Center for Corporate Data Analysis, Astana, Kazakhstan
 
@@ -17,7 +17,7 @@ Each of the 3,353 watershed boundaries was manually verified against official Ro
 Hydrological signatures (13 metrics for 1,716 gauges) characterize discharge magnitude, variability, timing, and extremes.
 Water balance consistency checks using ERA5-Land precipitation yield runoff ratios ≤ 1 for 98.6% of catchments (median 0.260), though ERA5-Land's high-latitude wet bias contributes to this result.
 To our knowledge, CAMELS-RU is the first publicly available CAMELS-standard dataset for the Russian Federation.
-The dataset is available under CC BY 4.0 license at *[DOI: to be assigned]*.
+The dataset is available under CC BY 4.0 license at *[DOI: to be assigned upon Zenodo upload]*.
 
 ---
 
@@ -127,7 +127,7 @@ The resulting grade distribution and data completeness by grade are shown in Fig
 Sensitivity analysis confirms the robustness of the grading system: varying the completeness threshold for Grade A from 0.90 to 0.99 changes the Grade A gauge count by only ±3% (95–101 gauges per 208-gauge random subsample of discharge gauges with ≥ 3 assessed years), indicating that flag counts dominate the grade assignment rather than the exact completeness cutoff.
 The 8σ outlier threshold was chosen because snowmelt-dominated Russian catchments routinely produce spring discharge peaks 20–50× winter baseflow.
 At the commonly used 3σ threshold, 100% of gauges receive at least one spike flag; at 5σ, 93% are flagged — in both cases the "outliers" are predominantly genuine flood peaks rather than sensor errors.
-The 8σ threshold (82% flagged) was selected empirically as a conservative, regime-specific screening threshold that balances detection of true sensor anomalies against preservation of genuine flood peaks.
+The 8σ threshold (82% flagged) was selected from this sensitivity analysis as a conservative, regime-specific screening threshold that balances detection of true sensor anomalies against preservation of genuine flood peaks.
 A seasonally stratified or hydrograph-shape-based anomaly detector would be more principled but was beyond the scope of this dataset release.
 
 Discharge was standardized to mm/day by dividing volumetric flow (m³ s⁻¹) by catchment area.
@@ -138,11 +138,11 @@ Daily water level records (2,989 gauges, including 152 hydropower and reservoir 
 zero values (instrument artifacts) were replaced with day-of-year medians computed from non-zero observations at the same gauge;
 gaps ≤ 6 days were interpolated using second-order polynomial interpolation (reservoir gauges: ≤ 15 days);
 multi-source records for the same gauge were merged using preferential selection (latest correction takes precedence).
-All water levels are in centimetres, referenced to the Baltic Sea datum as reported in AIS GMVO metadata.
+All water levels are in centimetres, referenced to the Baltic Height System 1977 (BHS-77) as reported in AIS GMVO metadata.
 No automated quality grading (A–F) was applied to water level data; users should assess completeness per gauge before use.
 
 ![Figure 2](images/fig_quality_assessment.png)
-**Figure 2.** Quality assessment summary: (a) discharge and water level grade distribution, (b) missing data percentage by grade, (c) gauge variable overlap (discharge-only, level-only, both), (d) dataset summary statistics.
+**Figure 2.** Quality assessment summary: (a) grade distribution for discharge gauges (bars labeled "Levels" show water level record availability at co-located gauges; water level data itself is not graded), (b) missing discharge data percentage by grade, (c) gauge variable overlap (discharge-only, level-only, both), (d) dataset summary statistics.
 
 ![Figure 3](images/fig_hydro_characteristics.png)
 **Figure 3.** Discharge and water level characteristics across quality grades: summary statistics for the 2,170 discharge gauges and 2,989 water level gauges.
@@ -151,7 +151,7 @@ No automated quality grading (A–F) was applied to water level data; users shou
 
 #### 3.2.1 ERA5-Land Reanalysis
 
-Meteorological forcing derived from ERA5-Land reanalysis (Muñoz-Sabater et al., 2021), providing 0.1° (~9 km) hourly data aggregated to daily resolution.
+Meteorological forcing was derived from ERA5-Land reanalysis (Muñoz-Sabater et al., 2021), which provides 0.1° (~9 km) hourly data aggregated to daily resolution.
 Variables extracted:
 
 - Air temperature: mean, minimum, maximum (°C)
@@ -256,7 +256,7 @@ We computed 13 hydrological signatures (Table 3) characterizing discharge magnit
 Signatures were computed separately for individual hydrological years (October–September) and then averaged to produce catchment-characteristic values.
 Key methodological choices:
 
-- Runoff ratio uses ERA5-Land precipitation as denominator; ratios are higher with MSWEP (median 0.40) or GPCP (median 0.35) due to lower annual totals
+- Runoff ratio uses ERA5-Land precipitation as denominator; ratios are higher with MSWEP (median 0.40) or GPCP (median 0.35) due to their lower annual precipitation totals
 - Flow duration curve (FDC) slope computed as [ln(Q₃₃) − ln(Q₆₆)] / (66 − 33) × 100 where Qₚ is discharge at the p-th exceedance percentile; positive values indicate steeper curves (note: sign convention opposite to Sawicz et al., 2011)
 - Baseflow index (BFI) computed as the mean of an ensemble of 1,000 Lyne–Hollick digital filter (Nathan and McMahon, 1990) runs with α ~ U[0.9, 0.98] (3-pass), following Euser et al. (2013)
 - Half-flow date requires > 82% annual completeness (≥ 300 days) because partial years can shift the cumulative midpoint
@@ -447,7 +447,7 @@ Known caveats:
 - Runoff ratio depends on precipitation product choice (see Sect. 4)
 - For modeling applications, users should consult `year_grades.csv` to filter out individual years with grades D or F, even for gauges with overall grade A or B. This prevents low-quality years in validation windows from corrupting model performance metrics
 
-The dataset is publicly available under CC BY 4.0 license at *[DOI: 10.XXXX/zenodo.XXXXXXX]*.
+The dataset is publicly available under CC BY 4.0 license at *[DOI: to be assigned upon Zenodo upload]*.
 Processing code is available at https://github.com/dmbrmv/camels_ru.
 
 ### 5.4 Limitations
@@ -494,13 +494,13 @@ ERA5-Land yields Q/P ≤ 1 for 98.6% of catchments (median 0.260), though this p
 To our knowledge, CAMELS-RU is the first publicly available CAMELS-standard dataset for the Russian Federation.
 The dataset covers the largest previously unrepresented landmass in the global CAMELS network.
 
-The dataset is publicly available under CC BY 4.0 license at *[DOI: 10.XXXX/zenodo.XXXXXXX]*.
+The dataset is publicly available under CC BY 4.0 license at *[DOI: to be assigned upon Zenodo upload]*.
 
 ---
 
 ## Code and Data Availability
 
-The CAMELS-RU dataset (v1.0) is permanently archived on Zenodo at *[DOI: 10.XXXX/zenodo.XXXXXXX]* under CC BY 4.0 license.
+The CAMELS-RU dataset (v1.0) is permanently archived on Zenodo at *[DOI: to be assigned upon Zenodo upload]* under CC BY 4.0 license.
 The dataset includes daily discharge and water level time series, meteorological forcing (ERA5-Land, MSWEP, GPCP), physiographic attributes (HydroATLAS), and computed hydrological signatures in NetCDF-4, GeoPackage, and CSV formats (approximately 1.2 GB compressed).
 All processing and analysis code is publicly available at https://github.com/dmbrmv/camels_ru under MIT license, with pinned dependencies for full reproducibility.
 
@@ -522,9 +522,9 @@ The author gratefully acknowledges the Russian Federal Service for Hydrometeorol
 
 ## References
 
-Allen, G. H. and Pavelsky, T. M.: Global extent of rivers and streams, Science, 361, 585–588, https://doi.org/10.1126/science.aat0636, 2018.
-
 Addor, N., Newman, A. J., Mizukami, N., and Clark, M. P.: The CAMELS data set: catchment attributes and meteorology for large-sample studies, Hydrol. Earth Syst. Sci., 21, 5293–5313, https://doi.org/10.5194/hess-21-5293-2017, 2017.
+
+Allen, G. H. and Pavelsky, T. M.: Global extent of rivers and streams, Science, 361, 585–588, https://doi.org/10.1126/science.aat0636, 2018.
 
 Alvarez-Garreton, C., Mendoza, P. A., Boisier, J. P., Addor, N., Galleguillos, M., Zambrano-Bigiarini, M., Lara, A., Puelma, C., Cortes, G., Garreaud, R., McPhee, J., and Ayala, A.: The CAMELS-CL dataset: catchment attributes and meteorology for large-sample studies in Chile, Hydrol. Earth Syst. Sci., 22, 5817–5846, https://doi.org/10.5194/hess-22-5817-2018, 2018.
 
@@ -552,6 +552,8 @@ Kratzert, F., Nearing, G., Addor, N., Erickson, T., Gauch, M., Gilon, O., Gudmun
 
 Lavers, D. A., Simmons, A., Vamborg, F., and Rodwell, M. J.: An evaluation of ERA5 precipitation for climate monitoring, Q. J. Roy. Meteor. Soc., 148, 3152–3165, https://doi.org/10.1002/qj.4351, 2022.
 
+Linke, S., Lehner, B., Ouellet Dallaire, C., Ariwi, J., Grill, G., Anand, M., Beames, P., Burchard-Levine, V., Maxwell, S., Moidu, H., Hogan, N., Revenga, C., Robertson, B., Röthlisberger, M., Tockner, K., Thieme, M., Walser, T., Wlasich, J., and Yoshikawa, S.: Global hydro-environmental sub-basin and river reach characteristics at high spatial resolution, Sci. Data, 6, 283, https://doi.org/10.1038/s41597-019-0300-6, 2019.
+
 Lehner, B., Verdin, K., and Jarvis, A.: New Global Hydrography Derived From Spaceborne Elevation Data, Eos Trans. AGU, 89, 93–94, https://doi.org/10.1029/2008EO100001, 2008.
 
 Leopold, L. B. and Maddock, T.: The Hydraulic Geometry of Stream Channels and Some Physiographic Implications, USGS Professional Paper 252, U.S. Government Printing Office, Washington, DC, https://doi.org/10.3133/pp252, 1953.
@@ -562,7 +564,7 @@ Muñoz-Sabater, J., Dutra, E., Agustí-Panareda, A., Albergel, C., Arduini, G., 
 
 Nathan, R. J. and McMahon, T. A.: Evaluation of automated techniques for base flow and recession analyses, Water Resour. Res., 26, 1465–1473, https://doi.org/10.1029/WR026i007p01465, 1990.
 
-Roshydromet: Automated Information System of State Monitoring of Water Bodies (AIS GMVO), http://gmvo.skniivh.ru/, 2023.
+Roshydromet: Automated Information System of State Monitoring of Water Bodies (AIS GMVO), http://gmvo.skniivh.ru/ (last access: March 2024; site discontinued 2025), 2023.
 
 Sankarasubramanian, A., Vogel, R. M., and Limbrunner, J. F.: Climate elasticity of streamflow in the United States, Water Resour. Res., 37, 1771–1781, https://doi.org/10.1029/2000WR900330, 2001.
 
