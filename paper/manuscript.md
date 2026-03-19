@@ -15,7 +15,7 @@ The dataset integrates quality-controlled daily discharge from 2,170 gauging sta
 Meteorological forcing combines ERA5-Land reanalysis and MSWEP v2.8 precipitation (Beck et al., 2019), with GPCP v3.3 (Huffman, 2024) as an independent reference.
 Each of the 3,353 watershed boundaries was manually verified against official Roshydromet data (mean areal error 4.8%), and 288 HydroATLAS-derived attributes (Linke et al., 2019) were computed per catchment.
 Hydrological signatures (13 metrics for 1,716 gauges) characterise discharge magnitude, variability, timing, and extremes.
-Water balance consistency checks using ERA5-Land precipitation yield runoff ratios ≤ 1 for all catchments (median 0.26), though ERA5-Land's high-latitude wet bias contributes to this result.
+Water balance consistency checks using ERA5-Land precipitation yield runoff ratios ≤ 1 for 98.6% of catchments (median 0.260), though ERA5-Land's high-latitude wet bias contributes to this result.
 To our knowledge, CAMELS-RU is the first publicly available CAMELS-standard dataset for the Russian Federation.
 The dataset is available under CC BY 4.0 license at *[DOI: to be assigned]*.
 
@@ -124,6 +124,11 @@ Each year receives a grade (A–F, no E) based on 16 active quality flags of var
 Gauge-level grades aggregate year-level results with a strict Grade A rule: a gauge receives overall Grade A only if every assessed hydro-year is individually graded A. For grades B–D, the mode of non-F year grades is used, capped by the fraction of usable years: usable fraction < 50% caps at D, < 70% caps at C.
 Gauges with overall grade A–C are classified as *decent quality* (86% of discharge gauges); grades D–F as *poor*.
 The resulting grade distribution and data completeness by grade are shown in Figure 2; discharge and water level characteristics by grade are summarized in Figure 3.
+
+Sensitivity analysis confirms the robustness of the grading system: varying the completeness threshold for Grade A from 0.90 to 0.99 changes the Grade A gauge count by only ±3% (95–101 gauges per 208-gauge test sample), indicating that flag counts dominate the grade assignment rather than the exact completeness cutoff.
+The 8σ outlier threshold was chosen because snowmelt-dominated Russian catchments routinely produce spring discharge peaks 20–50× winter baseflow.
+At the commonly used 3σ threshold, 100% of gauges receive at least one spike flag; at 5σ, 93% are flagged — in both cases the "outliers" are predominantly genuine flood peaks rather than sensor errors.
+The 8σ threshold (82% flagged) provides a conservative balance between detecting true anomalies and preserving hydrologically real extremes.
 
 Discharge was standardized to mm/day by dividing volumetric flow (m³ s⁻¹) by catchment area.
 
@@ -325,13 +330,13 @@ Because ERA5-Land supplies both precipitation and temperature/PET forcing, this 
 
 | Dataset | Median Q/P | Mean Q/P | Q/P > 1 (%) |
 |---------|-----------|----------|-------------|
-| ERA5-Land | 0.26 | 0.278 | 0.0% ✓ |
-| MSWEP | 0.361 | 0.420 | 5.1% (87 gauges) |
-| GPCP | 0.329 | 0.329 | 0.9% (15 gauges) |
+| ERA5-Land | 0.260 | 0.302 | 1.4% (29 gauges) |
+| MSWEP | 0.398 | 0.453 | 5.5% (114 gauges) |
+| GPCP | 0.353 | 0.433 | 6.3% (130 gauges) |
 
-With ERA5-Land precipitation, all catchments yield Q/P ≤ 1 (median 0.26; Figure 6), consistent with an evapotranspiration proxy of 213 ± 223 mm/yr (P−Q).
-However, this partly reflects ERA5-Land's high-latitude wet bias rather than independent confirmation of discharge accuracy.
-MSWEP produces Q/P > 1 for 5.1% of catchments (87 gauges), which may indicate precipitation underestimation in high-discharge regions, watershed boundary errors, or unaccounted lateral flows.
+With ERA5-Land precipitation, 98.6% of catchments yield Q/P ≤ 1 (median 0.260; Figure 6); the 29 exceptions (1.4%) are concentrated in small catchments with possible area errors or groundwater imports.
+MSWEP produces Q/P > 1 for 5.5% of catchments (114 gauges), likely reflecting precipitation underestimation in high-discharge regions, watershed boundary errors, or unaccounted lateral flows.
+The low ERA5-Land exceedance rate partly reflects its high-latitude wet bias rather than independent confirmation of discharge accuracy.
 
 Seasonal runoff ratios (ERA5-Land) reveal expected snowmelt dominance:
 
@@ -346,15 +351,14 @@ Linear regression of annual discharge vs. annual precipitation quantifies the ma
 
 $$Q_{\text{annual}} = \alpha + \beta \times P_{\text{annual}}$$
 
-ERA5-Land yields a median slope β = 0.824 (mean: 0.824), indicating that on average a 1 mm/yr increase in annual precipitation corresponds to a 0.824 mm/yr increase in discharge.
-Note that β is a simple regression slope, not the dimensionless precipitation elasticity of streamflow (Sankarasubramanian et al., 2001); it depends on the absolute magnitudes of P and Q.
-The sub-unity slope is consistent with evapotranspiration buffering and storage changes that dampen the precipitation signal.
-Only 0.7% of catchments exceed β = 1.0, concentrated in karst terrain where groundwater imports from adjacent basins may supplement local precipitation inputs.
+Per-gauge linear regression of annual discharge on annual ERA5-Land precipitation yields a median slope β = 0.290 (mean: 0.332), indicating that on average a 1 mm/yr increase in annual precipitation corresponds to a 0.29 mm/yr increase in discharge.
+The sub-unity slope reflects evapotranspiration buffering and storage changes that dampen the precipitation signal; 2.0% of catchments exceed β = 1.0, concentrated in karst terrain where groundwater imports from adjacent basins may supplement local precipitation inputs.
+The corresponding precipitation elasticity of streamflow (Sankarasubramanian et al., 2001), computed as ε = β × P̄/Q̄, has a median of 1.03 — indicating near-proportional sensitivity of discharge to precipitation variability at the interannual scale.
 
-MSWEP yields β = 1.07 (14.2% catchments > 1), which may reflect either precipitation underestimation or real differences in the precipitation–discharge relationship at lower annual totals.
+MSWEP yields a steeper median slope (β = 0.446; 9.7% of catchments > 1), consistent with its lower mean annual precipitation producing a stronger marginal response.
 
 ![Figure 6](images/fig_water_balance.png)
-**Figure 6.** Water balance components across CAMELS-RU catchments: (a) runoff ratio (Q/P) and (b) evapotranspiration proxy (P−Q). ERA5-Land precipitation yields physically consistent Q/P ≤ 1 for all catchments.
+**Figure 6.** Water balance components across CAMELS-RU catchments: (a) runoff ratio (Q/P) and (b) evapotranspiration proxy (P−Q). ERA5-Land precipitation yields Q/P ≤ 1 for 98.6% of catchments.
 
 ### 4.2 Discharge Quality Control
 
@@ -366,6 +370,17 @@ The 849 high-quality discharge subset undergoes the following validation:
 - Mass balance closure: Mean water balance error < 10% for 89% of catchments (P−Q−ET proxy, accounting for storage)
 
 Median data completeness: 97.5% (2008–2023), with gaps ≤ 6 days filled by second-order polynomial interpolation (5.2% of station-days), longer gaps retained as missing to preserve autocorrelation structure.
+
+#### 4.2.1 Cross-Reference with GRDC
+
+Where temporal overlap permits, CAMELS-RU discharge was compared against the Global Runoff Data Centre (GRDC) archive.
+Of the 792 Russian stations in GRDC, 16 have daily discharge extending into the 2008–2023 study period; 11 of these matched a CAMELS-RU gauge within 25 km and with a catchment area ratio of 0.5–2.0.
+The matched stations are predominantly large rivers (Neva, Northern Dvina, Pechora, Don, Amur, Olenek, Anabar; catchment areas 7,940–2,430,000 km²).
+
+Agreement is near-perfect: median Pearson r = 1.000, median NSE = 1.000, median PBIAS = 0.0% (range −0.6% to 0.0%) across all 11 pairs (overlap periods 569–5,479 days).
+This high agreement reflects the shared upstream data source: both CAMELS-RU and GRDC obtain Russian discharge observations from Roshydromet's gauging network.
+The comparison therefore confirms processing correctness (unit conversions, date alignment, gap-filling) rather than providing independent validation of the underlying observations.
+The single station with slightly lower agreement (Bol'shoy Anyuy at Konstantinovo: r = 0.996, NSE = 0.991, PBIAS = −0.6%) suggests minor differences in gap-handling or data version between the two archives.
 
 Figures 7 and 8 show spatial patterns of key hydrological signatures.
 Mean annual discharge is highest in mountain headwaters and humid northern forests.
@@ -442,7 +457,7 @@ Processing code is available at *[github.com/username/camels-ru]*.
 - **Nested catchments:** Spatial analysis shows that the majority of gauges are nested within at least one larger catchment, with nesting depths up to 58 levels in major river systems (e.g., Ob basin). Users must account for nesting to avoid double-counting discharge or overstating sample independence.
 - **Attribute temporal mismatch:** HydroATLAS attributes are based on circa-2000 global datasets; land cover and population density may have shifted during 2008–2023.
 - **Stationarity assumption:** All hydrological signatures assume stationary catchment behavior, which may not hold for basins undergoing rapid land use change or permafrost degradation.
-- **No independent discharge validation:** Discharge data are validated through internal QC and water balance consistency, but no comparison against external databases (e.g., GRDC) was performed due to limited overlap with publicly available records for Russia.
+- **Limited independent discharge validation:** Comparison against the GRDC archive (Sect. 4.2.1) confirms processing correctness but shares the same Roshydromet source data, so it does not constitute independent observational validation. No alternative discharge data source exists for Russia during the 2008–2023 period.
 - **ERA5-Land circularity:** Water balance closure uses ERA5-Land precipitation, which also serves as forcing input, limiting the independence of this consistency check. Rating curve uncertainties (10–20% at extremes) further contribute to water balance residuals.
 - **Gauge network bias:** Arctic permafrost-dominated catchments and Pacific-draining basins are underrepresented relative to their geographic extent.
 - **Water level data:** Water level records undergo basic QC (zero replacement, gap interpolation) but lack the automated A–F quality grading applied to discharge data. Users should assess per-gauge completeness before use.
@@ -474,7 +489,7 @@ Analysis of 1,716 discharge records yields 13 hydrological signatures spanning w
 
 **3. Meteorological forcing consistency.**
 Three precipitation products (ERA5-Land: 826 mm/yr; MSWEP: 608 mm/yr; GPCP: 644 mm/yr) show pairwise daily correlations ranging from r = 0.58 to 0.83, with systematic differences in annual totals.
-ERA5-Land yields Q/P ≤ 1 (median 0.26) across all catchments, though this partly reflects ERA5-Land's high-latitude wet bias rather than independent validation (see Sect. 4).
+ERA5-Land yields Q/P ≤ 1 for 98.6% of catchments (median 0.260), though this partly reflects ERA5-Land's high-latitude wet bias rather than independent validation (see Sect. 4).
 
 Key limitations are discussed in Sect. 5.4.
 To our knowledge, CAMELS-RU is the first publicly available CAMELS-standard dataset for the Russian Federation.
