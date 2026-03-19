@@ -52,6 +52,17 @@ latexmk -pdf main.tex
 
 Requires: `copernicus.cls` (included), `booktabs`, `threeparttable`, `xspace`.
 
+## Review History
+
+The manuscript went through 4 rounds of automated peer review (4 independent Opus agents + Codex second opinion per round):
+
+| Round | Score | Key fixes |
+|-------|-------|-----------|
+| R1 | 74 | Strict Grade A, per-year mask, paper→markdown |
+| R2 | 72 | β corrected (0.824→0.290), Q/P >1 fixed, GRDC added, sensitivities |
+| R3 | 89 | Missing Linke ref, flag count, grading logic, grammar |
+| R4 | 91 | Ref ordering, rounding, verb fragments, symbol clash |
+
 ## Key Numbers
 
-Dataset facts are in `latex/facts.yaml` and `latex/macros.tex`. When updating numbers in `manuscript.md`, also update these files for LaTeX consistency.
+All numbers in `manuscript.md` were verified against source code and recomputation on 2026-03-19. The LaTeX source in `latex/` is a snapshot from the original conversion; `manuscript.md` is the source of truth.
