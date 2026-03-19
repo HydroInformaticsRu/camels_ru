@@ -38,7 +38,7 @@ class QualityFlag(Enum):
 
     # Statistical anomaly flags
     CONSTANT_VALUE = "constant_value"  # Sensor stuck (>30 days constant)
-    IMPLAUSIBLE_SPIKE = "implausible_spike"  # Values > 5 sigma
+    IMPLAUSIBLE_SPIKE = "implausible_spike"  # Values > 8 MAD-sigma from rolling median
     ABNORMAL_LOW_VARIANCE = "abnormal_low_variance"  # F-test significant low
     ABNORMAL_HIGH_VARIANCE = "abnormal_high_variance"  # F-test significant high
 
@@ -103,7 +103,7 @@ def count_flags_by_severity(
     Returns:
         Dictionary mapping severity to count.
     """
-    counts = {severity: 0 for severity in FlagSeverity}
+    counts = dict.fromkeys(FlagSeverity, 0)
     for flag in flags:
         severity = get_flag_severity(flag)
         counts[severity] += 1
