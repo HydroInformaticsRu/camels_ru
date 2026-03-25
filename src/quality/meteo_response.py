@@ -9,7 +9,6 @@ import logging
 
 import numpy as np
 import pandas as pd
-from scipy import signal
 
 from .quality_flags import QualityFlag
 
@@ -216,7 +215,7 @@ def calculate_pq_cross_correlation(
 
     # Calculate cross-correlation at different lags
     correlations = {}
-    for lag in range(0, max_lag + 1):
+    for lag in range(max_lag + 1):
         if lag > 0:
             p_lagged = p_values[:-lag]
             q_shifted = q_values[lag:]
@@ -274,7 +273,7 @@ def calculate_flashiness_index(discharge: pd.Series) -> float:
     return float(daily_changes.sum() / total_flow)
 
 
-def detect_dead_years(
+def detect_dead_years(  # noqa: C901
     discharge: pd.Series,
     precipitation: pd.Series,
     hydro_year_start_month: int = 10,

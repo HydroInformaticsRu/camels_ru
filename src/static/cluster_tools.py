@@ -25,8 +25,8 @@ def get_silhouette_scores(
     - Validates input and bounds max number of clusters by n_samples - 1.
     - Uses silhouette_samples to compute per-sample scores and stores mean & min.
     """
-    X = _ensure_2d_array(features)
-    n_samples = X.shape[0]
+    x_arr = _ensure_2d_array(features)
+    n_samples = x_arr.shape[0]
     if n_samples < 2:
         raise ValueError("Need at least 2 samples to compute silhouette scores.")
 
@@ -39,9 +39,9 @@ def get_silhouette_scores(
 
     for k in range(min_clusters, max_k + 1):
         km = KMeans(n_clusters=k, random_state=random_state, n_init=n_init)
-        labels = km.fit_predict(X)
+        labels = km.fit_predict(x_arr)
         # silhouette_samples requires at least 2 distinct labels; KMeans should produce k clusters
-        scores = silhouette_samples(X, labels, metric="euclidean")
+        scores = silhouette_samples(x_arr, labels, metric="euclidean")
         mean_scores[k] = float(np.mean(scores))
         min_scores[k] = float(np.min(scores))
 
@@ -56,13 +56,15 @@ def plot_silhouette_range(
     n_init: int = 10,
     figsize: tuple = (15, 8),
 ) -> tuple[plt.Figure, dict[int, float]]:
-    """Compute silhouette_score for a range of cluster counts, plot the results and return (fig, scores_dict).
+    """Compute silhouette_score for a range of cluster counts.
+
+    Plots the results and returns (fig, scores_dict).
 
     - Adapts max cluster to n_samples - 1.
     - Returns both the matplotlib Figure and the dict of average silhouette scores.
     """
-    X = _ensure_2d_array(data)
-    n_samples = X.shape[0]
+    x_arr = _ensure_2d_array(data)
+    n_samples = x_arr.shape[0]
     if n_samples < 2:
         raise ValueError("Need at least 2 samples to compute silhouette scores.")
 
@@ -73,9 +75,9 @@ def plot_silhouette_range(
     results: dict[int, float] = {}
     for k in range(min_clusters, max_k + 1):
         km = KMeans(n_clusters=k, random_state=random_state, n_init=n_init)
-        labels = km.fit_predict(X)
+        labels = km.fit_predict(x_arr)
         # silhouette_score gives the average value directly
-        avg = float(silhouette_score(X, labels))
+        avg = float(silhouette_score(x_arr, labels))
         results[k] = avg
 
     if not results:

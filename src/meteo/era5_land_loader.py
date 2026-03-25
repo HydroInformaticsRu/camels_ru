@@ -377,7 +377,8 @@ class Era5LandDownloader:
             self.logger.info(f"🚀 Prepared {len(download_tasks)} download tasks for '{variable}'")
         else:
             self.logger.info(
-                f"✨ No new files to download for '{variable}' - all files already exist and are complete"
+                f"✨ No new files to download for '{variable}' "
+                f"- all files already exist and are complete"
             )
 
         return download_tasks

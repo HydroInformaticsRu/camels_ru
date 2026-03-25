@@ -46,7 +46,8 @@ class TemperatureAnalysis:
             temp_min, temp_max = self.data.min(), self.data.max()
             if temp_max > 100:  # Likely Kelvin
                 logger.warning(
-                    "Temperature values appear to be in Kelvin (max=%.1f). Consider converting to Celsius.",
+                    "Temperature values appear to be in Kelvin (max=%.1f). "
+                    "Consider converting to Celsius.",
                     temp_max,
                 )
             elif temp_min < -100 or temp_max > 60:

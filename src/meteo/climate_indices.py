@@ -337,7 +337,7 @@ class DroughtIndices:
             raise
 
 
-def calculate_drought_indices(
+def calculate_drought_indices(  # noqa: C901
     precipitation: pd.Series | xr.DataArray,
     temperature: pd.Series | xr.DataArray | None = None,
     include_spi: bool = True,

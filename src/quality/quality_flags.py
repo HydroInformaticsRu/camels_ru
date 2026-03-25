@@ -70,7 +70,7 @@ _FLAG_SEVERITY: dict[QualityFlag, FlagSeverity] = {
     QualityFlag.CONSTANT_VALUE: FlagSeverity.MAJOR,  # Downgraded - short constant periods may be natural
     QualityFlag.IMPLAUSIBLE_SPIKE: FlagSeverity.MINOR,  # Downgraded - spikes may be real flood events
     QualityFlag.ABNORMAL_LOW_VARIANCE: FlagSeverity.MINOR,  # Minor - naturally low outside flood season
-    QualityFlag.ABNORMAL_HIGH_VARIANCE: FlagSeverity.MINOR,  # Minor - high variance during flood is natural
+    QualityFlag.ABNORMAL_HIGH_VARIANCE: FlagSeverity.MINOR,  # high variance during flood is natural
     # Completeness flags
     QualityFlag.LOW_COMPLETENESS: FlagSeverity.MAJOR,
     QualityFlag.VERY_LOW_COMPLETENESS: FlagSeverity.CRITICAL,

@@ -347,7 +347,7 @@ def calculate_year_deviation(
     }
 
 
-def detect_climatology_anomalies(
+def detect_climatology_anomalies(  # noqa: C901
     discharge: pd.Series,
     hydro_year_start_month: int = 10,
     min_correlation: float = 0.5,

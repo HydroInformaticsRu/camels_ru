@@ -213,7 +213,7 @@ class YearQualityGrader:
         return QualityGrade.A
 
 
-def assess_gauge_quality(
+def assess_gauge_quality(  # noqa: C901
     discharge: pd.Series,
     precipitation: pd.Series | None = None,
     gauge_id: str = "unknown",
@@ -450,7 +450,7 @@ def assess_gauge_quality(
     return year_results, summary
 
 
-def get_gauge_summary(
+def get_gauge_summary(  # noqa: C901
     gauge_id: str,
     year_results: list[YearQualityResult],
 ) -> GaugeQualitySummary:

@@ -192,7 +192,7 @@ def _bfi_ensemble(
     """
     # Set seed for reproducibility
     random.seed(1996)
-    alpha_values = [random.uniform(0.9, 0.98) for _ in range(n_samples)]
+    alpha_values = [random.uniform(0.9, 0.98) for _ in range(n_samples)]  # noqa: S311
 
     bfi_values = np.empty(n_samples, dtype=np.float64)
     base_flow_arrays = []

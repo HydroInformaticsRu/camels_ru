@@ -403,7 +403,7 @@ class HomogeneityTests:
             raise
 
 
-def test_homogeneity(
+def test_homogeneity(  # noqa: C901
     data: pd.Series | xr.DataArray,
     variable_name: str = "variable",
     include_pettitt: bool = True,

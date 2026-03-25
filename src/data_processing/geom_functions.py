@@ -29,8 +29,8 @@ __all__ = [
     "find_extent",
     "round_nearest",
     "create_gdf",
-    "RotM",
-    "getSquareVertices",
+    "rot_m",
+    "get_square_vertices",
     "point_distance",
     "inside_mask",
     "get_river_points",
@@ -284,13 +284,13 @@ def gauge_buffer_creator(
 # ---------------------------------------------------------------------------
 
 
-def RotM(alpha: float) -> np.ndarray:
+def rot_m(alpha: float) -> np.ndarray:
     """Return 2x2 rotation matrix for angle alpha (radians)."""
     sa, ca = np.sin(alpha), np.cos(alpha)
     return np.array([[ca, -sa], [sa, ca]])
 
 
-def getSquareVertices(center: Iterable[float], side: float, phi: float) -> np.ndarray:
+def get_square_vertices(center: Iterable[float], side: float, phi: float) -> np.ndarray:
     """Return vertices (4x2) of a rotated square.
 
     Parameters
@@ -303,7 +303,7 @@ def getSquareVertices(center: Iterable[float], side: float, phi: float) -> np.nd
     """
     c = np.asarray(center)
     half = np.ones(2) * side
-    return np.asarray([c + reduce(np.dot, [RotM(phi), RotM(np.pi / 2 * i), half]) for i in range(4)])
+    return np.asarray([c + reduce(np.dot, [rot_m(phi), rot_m(np.pi / 2 * i), half]) for i in range(4)])
 
 
 # ---------------------------------------------------------------------------
@@ -376,8 +376,9 @@ def gauge_to_utm(
             If False, return the projected Point geometry. Defaults to False.
 
     Returns:
-        tuple[gpd.GeoDataFrame, int] | Point | None: Projected geometry and EPSG code if return_gdf is True,
-            otherwise the projected Point. Returns None if input is empty.
+        tuple[gpd.GeoDataFrame, int] | Point | None: Projected geometry and EPSG
+            code if return_gdf is True, otherwise the projected Point.
+            Returns None if input is empty.
 
     Raises:
         ValueError: If gauge_series is empty or does not contain valid geometry.
@@ -417,7 +418,7 @@ def str_to_np(s: str) -> np.ndarray:
         arr = np.fromstring(s_clean, sep=" ")
         if arr.size:
             return arr
-    except Exception:
+    except Exception:  # noqa: S110
         pass
     # Fallback (expects something like "[x y]" or tuple)
     return np.array(ast.literal_eval(s_clean.replace(" ", ",")))

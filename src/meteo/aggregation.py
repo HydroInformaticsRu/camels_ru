@@ -371,6 +371,7 @@ def aggregate_watershed(
         grid_resolution: Grid resolution in degrees (default: 0.10).
         small_ws_threshold: Area threshold for small watershed in km² (default: 5.0).
         cache_dir: Optional directory for caching weights (NetCDF format).
+        variables: Optional list of variable names to aggregate.
 
     Returns:
         Aggregated DataFrame with DatetimeIndex.

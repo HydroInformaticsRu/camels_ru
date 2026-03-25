@@ -127,11 +127,11 @@ class EmojiFormatter(logging.Formatter):
             try:
                 start_idx = formatted_message.index(first)
                 indent = " " * start_idx
-                continuation = "\n".join(indent + l for l in lines[1:])
+                continuation = "\n".join(indent + line for line in lines[1:])
                 formatted_message = formatted_message.replace(first, first + "\n" + continuation, 1)
             except ValueError:
                 # Fallback: simple indent without alignment
-                continuation = "\n".join("    " + l for l in lines[1:])
+                continuation = "\n".join("    " + line for line in lines[1:])
                 formatted_message = formatted_message + "\n" + continuation
 
         # Apply color if enabled and a color is defined for the level

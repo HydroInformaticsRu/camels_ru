@@ -43,6 +43,7 @@ def detect_constant_periods(
     period_length = 0
 
     prev_value = None
+    prev_date = None
     for date, value in valid_data.items():
         if prev_value is not None:
             is_same = abs(value - prev_value) <= tolerance
@@ -266,7 +267,7 @@ def detect_data_quality_issues(
     return flags
 
 
-def detect_anomalies_all_years(
+def detect_anomalies_all_years(  # noqa: C901
     discharge: pd.Series,
     hydro_year_start_month: int = 10,
     constant_min_days: int = 30,
@@ -282,6 +283,7 @@ def detect_anomalies_all_years(
         constant_min_days: Minimum days for constant value detection.
         spike_sigma_threshold: Sigma threshold for spike detection.
         variance_alpha: Alpha level for variance F-test.
+        check_variance: Whether to run inter-annual variance check.
 
     Returns:
         Dictionary mapping year to list of quality flags.
@@ -311,7 +313,7 @@ def detect_anomalies_all_years(
     # Map constant periods and spikes to years
     flags_by_year: dict[int, list[QualityFlag]] = {year: [] for year in years}
 
-    for start, end, duration, value in constant_periods:
+    for start, end, _duration, _value in constant_periods:
         # Determine which year(s) this affects
         for year in years:
             if hydro_year_start_month > 1:
@@ -328,7 +330,7 @@ def detect_anomalies_all_years(
                 if QualityFlag.CONSTANT_VALUE not in flags_by_year[year]:
                     flags_by_year[year].append(QualityFlag.CONSTANT_VALUE)
 
-    for spike_date, value, n_sigma in spikes:
+    for spike_date, _value, _n_sigma in spikes:
         # Determine which year this spike belongs to
         for year in years:
             if hydro_year_start_month > 1:
@@ -419,7 +421,7 @@ def get_year_anomaly_metrics(
 
         # Count constant days in this year
         constant_days = 0
-        for start, end, duration, value in constant_periods:
+        for start, end, _duration, _value in constant_periods:
             if start <= year_end and end >= year_start:
                 overlap_start = max(start, year_start)
                 overlap_end = min(end, year_end)

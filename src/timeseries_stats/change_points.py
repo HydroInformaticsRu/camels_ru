@@ -344,7 +344,7 @@ class ChangePointDetection:
             raise
 
 
-def detect_change_points(
+def detect_change_points(  # noqa: C901
     data: pd.Series | xr.DataArray,
     variable_name: str = "variable",
     methods: list[str] | None = None,

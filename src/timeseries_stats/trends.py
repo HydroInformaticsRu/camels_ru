@@ -139,7 +139,7 @@ class TrendAnalysis:
             logger.error("Failed to perform Mann-Kendall test: %s", e)
             raise
 
-    def _basic_mann_kendall(self, data: pd.Series, alpha: float) -> dict[str, Any]:
+    def _basic_mann_kendall(self, data: pd.Series, alpha: float) -> dict[str, Any]:  # noqa: C901
         """Basic Mann-Kendall test implementation."""
         n = len(data)
         s = 0
@@ -256,7 +256,7 @@ class TrendAnalysis:
         s_total = 0
         var_s_total = 0
 
-        for month, group_data in monthly_groups:
+        for _month, group_data in monthly_groups:
             if len(group_data) >= 3:
                 mk_result = self._basic_mann_kendall(group_data, alpha)
                 s_total += mk_result["s_statistic"]
@@ -354,7 +354,7 @@ class TrendAnalysis:
             breakpoint_candidates = var_diff[var_diff > threshold].index
 
             # Convert to years and remove duplicates
-            breakpoint_years = sorted(set(date.year for date in breakpoint_candidates))
+            breakpoint_years = sorted({date.year for date in breakpoint_candidates})
 
             # Remove years too close to start/end
             start_year = self.data.index[0].year
