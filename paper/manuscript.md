@@ -17,7 +17,7 @@ Each of the 3,353 watershed boundaries was manually verified against official Ro
 Hydrological signatures (13 metrics for 1,716 gauges) characterize discharge magnitude, variability, timing, and extremes.
 Water balance consistency checks using ERA5-Land precipitation yield runoff ratios ≤ 1 for 98.6% of catchments (median 0.260), though ERA5-Land's high-latitude wet bias contributes to this result.
 To our knowledge, CAMELS-RU is the first publicly available CAMELS-standard dataset for the Russian Federation.
-The dataset is available under CC BY 4.0 license at *[DOI: to be assigned upon Zenodo upload]*.
+The dataset is available at *[DOI: to be assigned upon Zenodo upload]*.
 
 ---
 
@@ -41,15 +41,17 @@ These datasets share a standardized structure — daily discharge, meteorologica
 | LamaH-CE | Central Europe | 859 | 1981–2017 | 61 / – | 1–132,000 |
 | CAMELS-DE | Germany | 1,582 | 1951–2020 | 69 / 13 | 1–54,000 |
 | Caravan | Global | 6,830 | varies | 38 / 13 | varies |
-| **CAMELS-RU** | **Russia** | **3,353** | **2008–2023** | **22 (288) / 13** | **0.49–2,670,000** |
+| **CAMELS-RU** | **Russia** | **3,353** | **2008–2023** | **22 (288)^†^ / 13** | **0.49–2,670,000** |
+
+^†^ 22 primary attributes selected by removing highly correlated features (|r| > 0.7); 288 total HydroATLAS-derived attributes provided per catchment.
 
 ### 1.2 The Russian Federation: An Unrepresented Region
 
 Although Russia spans climate zones from Arctic permafrost to semi-arid steppe, no large-sample dataset following CAMELS standards currently exists for the Russian Federation.
 Russian hydrological records remain fragmented across institutional archives and non-standardized formats.
-The closure of the AIS GMVO public data platform in 2025 further underscores the need to preserve and standardize hydrological records for this region.
+The closure of the AIS GMVO public data platform in 2025 adds urgency to preserving and standardizing hydrological records for this region.
 
-### 1.3 Objectives and Novelty
+### 1.3 Objectives
 
 This study presents CAMELS-RU, a quality-controlled hydrological dataset for 3,353 catchments across Russia (2008–2023).
 The dataset integrates daily discharge from 2,170 gauging stations (AIS GMVO; Roshydromet, 2023), meteorological forcing from ERA5-Land (Muñoz-Sabater et al., 2021) and MSWEP (Beck et al., 2019), 288 physiographic attributes from HydroATLAS (Linke et al., 2019), and 13 hydrological signatures.
@@ -76,7 +78,7 @@ Mean annual precipitation is 350–1,100 mm/yr; mean annual temperature −10 to
 Snow cover persists 60–250+ days depending on latitude; permafrost is absent in the south but continuous in northeastern Siberia.
 These gradients drive contrasting hydrological regimes: snowmelt-dominated pulses in the permafrost zone versus baseflow-sustained flow in temperate forests (Sect. 4).
 
-Elevations span 50–2,800 m, with lowland rivers draining to the Caspian and Arctic seas and mountain headwaters in the Caucasus, Altai, and Sayan ranges.
+Mean catchment elevations span 50–2,800 m, with lowland rivers draining to the Caspian and Arctic seas and mountain headwaters in the Caucasus, Altai, and Sayan ranges.
 Boreal taiga dominates in the north (up to 95% forest), while southern steppe catchments are predominantly agricultural (up to 85% cropland); urban fraction reaches 35% near major cities.
 Soils range between clay-rich Chernozems in agricultural lowlands and sandy Podzols in permafrost terrain.
 
@@ -119,12 +121,12 @@ The procedure evaluates four categories of quality metrics:
 
 4. **Gap-filling:** Gaps ≤ 6 days interpolated using second-order polynomial interpolation; longer gaps retained as missing. Interpolated values producing negative discharge set to missing.
 
-Each year receives a grade (A–F, no E) based on quality flags of varying severity (critical, major, minor; 18 flags defined, of which 2 variance-based flags are disabled because annual discharge variance varies naturally in snowmelt-dominated catchments): any critical flag assigns F; ≥ 2 major flags or completeness < 70% assigns D; 1 major flag, ≥ 5 minor flags, or completeness < 85% assigns C; 3–4 minor flags or completeness < 95% assigns B; ≤ 2 minor flags with completeness ≥ 95% assigns A.
+Each year receives a grade (A–D, F; grade E is omitted to avoid ambiguity with "Excellent" in some grading conventions) based on quality flags of varying severity (critical, major, minor; 18 flags defined, of which 2 variance-based flags are disabled because annual discharge variance varies naturally in snowmelt-dominated catchments): any critical flag assigns F; ≥ 2 major flags or completeness < 70% assigns D; 1 major flag, ≥ 5 minor flags, or completeness < 85% assigns C; 3–4 minor flags or completeness < 95% assigns B; ≤ 2 minor flags with completeness ≥ 95% assigns A.
 Gauge-level grades aggregate year-level results with a strict Grade A rule: a gauge receives overall Grade A only if every assessed hydro-year is individually graded A. For grades B–D, the mode of non-F year grades is used, capped by the fraction of usable years: usable fraction < 50% caps at D, < 70% caps at C.
 Gauges with overall grade A–C are classified as *decent quality* (87% of discharge gauges); grades D–F as *poor*.
 The resulting grade distribution and data completeness by grade are shown in Figure 2; discharge and water level characteristics by grade are summarized in Figure 3.
 
-Sensitivity analysis confirms the robustness of the grading system: varying the completeness threshold for Grade A from 0.90 to 0.99 changes the Grade A gauge count by only ±3% (95–101 gauges per 208-gauge random subsample of discharge gauges with ≥ 3 assessed years), indicating that flag counts dominate the grade assignment rather than the exact completeness cutoff.
+Sensitivity analysis indicates the grading system is insensitive to threshold choice: varying the completeness threshold for Grade A from 0.90 to 0.99 changes the Grade A gauge count by only ±3% (95–101 gauges per 208-gauge random subsample of discharge gauges with ≥ 3 assessed years), indicating that flag counts dominate the grade assignment rather than the exact completeness cutoff.
 The 8σ outlier threshold was chosen because snowmelt-dominated Russian catchments routinely produce spring discharge peaks 20–50× winter baseflow.
 At the commonly used 3σ threshold, 100% of gauges receive at least one spike flag; at 5σ, 93% are flagged — in both cases the "outliers" are predominantly genuine flood peaks rather than sensor errors.
 The 8σ threshold (82% flagged) was selected from this sensitivity analysis as a conservative, regime-specific screening threshold that balances detection of true sensor anomalies against preservation of genuine flood peaks.
@@ -145,7 +147,7 @@ No automated quality grading (A–F) was applied to water level data; users shou
 **Figure 2.** Quality assessment summary: (a) grade distribution for discharge gauges (bars labeled "Levels" show water level record availability at co-located gauges; water level data itself is not graded), (b) missing discharge data percentage by grade, (c) gauge variable overlap (discharge-only, level-only, both), (d) dataset summary statistics.
 
 ![Figure 3](images/fig_hydro_characteristics.png)
-**Figure 3.** Discharge and water level characteristics across quality grades: summary statistics for the 2,170 discharge gauges and 2,989 water level gauges.
+**Figure 3.** Discharge and water level characteristics across quality grades: (a) discharge record length, (b) mean discharge, (c) discharge variability (CV), (d) water level record length, (e) mean water level, (f) level range. Based on 2,170 discharge gauges and 2,837 water level gauges (152 hydropower stations excluded from level panels).
 
 ### 3.2 Meteorological Forcing Data
 
@@ -251,7 +253,7 @@ All removed attributes — including aridity index, slope, temperature, and soil
 
 ### 3.5 Hydrological Signatures
 
-We computed 13 hydrological signatures (Table 3) characterizing discharge magnitude, variability, timing, and extremes for gauges meeting the per-year completeness criterion (> 70% for at least 5 hydrological years; N = 1,716, or N = 1,641 for half-flow date which requires > 82%), following established methodologies (Sawicz et al., 2011; McMillan et al., 2017).
+We computed 13 hydrological signatures (Table 3) characterizing discharge magnitude, variability, timing, and extremes for catchments smaller than 50,000 km² (to avoid spatial averaging of signatures in very large basins) meeting the per-year completeness criterion (> 70% for at least 5 hydrological years; N = 1,716, or N = 1,641 for half-flow date which requires > 82%), following established methodologies (Sawicz et al., 2011; McMillan et al., 2017).
 
 Signatures were computed separately for individual hydrological years (October–September) and then averaged to produce catchment-characteristic values.
 Key methodological choices:
@@ -275,8 +277,8 @@ Key methodological choices:
 | FDC_slope | – | FDC slope between 33rd and 66th exceedance percentiles (log-space; positive = steeper) |
 | flashiness_index | – | Richards–Baker index: Σ\|Qᵢ−Qᵢ₋₁\|/ΣQᵢ |
 | **Extremes** | | |
-| Q5 | mm/day | 5th exceedance percentile (high flows) |
-| Q95 | mm/day | 95th exceedance percentile (low flows) |
+| Q₀₅ | mm/day | 5th exceedance percentile (high flows) |
+| Q₉₅ | mm/day | 95th exceedance percentile (low flows) |
 | high_flow_freq | % of days | Days exceeding 2× median discharge |
 | high_flow_dur | days | Mean duration of high-flow events (> 2× median) |
 | **Baseflow** | | |
@@ -312,8 +314,8 @@ However, systematic biases in annual totals reflect different data assimilation 
 | MSWEP | 608 | 92.4 | 15.3 |
 | GPCP | 644 | 96.9 | 14.8 |
 
-ERA5-Land precipitation (826 mm/yr) exceeds MSWEP (608 mm/yr) by ~220 mm/yr (36%; per-catchment mean bias ~229 mm/yr; Figure 5).
 ERA5 precipitation is a model forecast product, and its prognostic cloud microphysics scheme tends to overestimate snowfall at high latitudes (Wang et al., 2019; Lavers et al., 2022) (Figure 4).
+ERA5-Land precipitation (826 mm/yr) exceeds MSWEP (608 mm/yr) by 218 mm/yr in the basin-averaged means (per-catchment mean annual bias 229 mm/yr; Figure 5).
 GPCP (644 mm/yr) is closer to MSWEP, suggesting ERA5-Land is the outlier.
 
 ![Figure 4](images/fig_precip_comparison.png)
@@ -358,7 +360,7 @@ The corresponding precipitation elasticity of streamflow (Sankarasubramanian et 
 MSWEP yields a steeper median slope (β = 0.446; 9.7% of catchments > 1), consistent with its lower mean annual precipitation producing a stronger marginal response.
 
 ![Figure 6](images/fig_water_balance.png)
-**Figure 6.** Water balance components across CAMELS-RU catchments: (a) runoff ratio (Q/P) and (b) evapotranspiration proxy (P−Q). ERA5-Land precipitation yields Q/P ≤ 1 for 98.6% of catchments.
+**Figure 6.** Water balance components across CAMELS-RU catchments: (a) runoff ratio (Q/P) and (b) evapotranspiration proxy (P−Q). ERA5-Land precipitation yields Q/P ≤ 1 for 98.6% of catchments. Grey dots denote catchments without discharge data (precipitation-only stations).
 
 ### 4.2 Discharge Quality Control
 
@@ -382,16 +384,16 @@ This high agreement reflects the shared upstream data source: both CAMELS-RU and
 The comparison therefore confirms processing correctness (unit conversions, date alignment, gap-filling) rather than providing independent validation of the underlying observations.
 The single station with slightly lower agreement (Bol'shoy Anyuy at Konstantinovo: r = 0.996, NSE = 0.991, PBIAS = −0.6%) suggests minor differences in gap-handling or data version between the two archives.
 
-Figures 7 and 8 show spatial patterns of key hydrological signatures.
+Figures 7 and 8 show spatial patterns of key hydrological signatures for the 1,716 gauges with at least 5 complete hydrological years (out of 2,170 with discharge data); the remaining gauges are shown as grey dots.
 Mean annual discharge is highest in mountain headwaters and humid northern forests.
 BFI is high in temperate forests (0.6–0.7) and low in permafrost regions (0.2–0.3), reflecting differences in infiltration capacity.
 Half-flow date shows a latitudinal gradient from early spring snowmelt in the south to late summer in the permafrost zone.
 
 ![Figure 7](images/fig_hydro_signatures_1.png)
-**Figure 7.** Spatial distribution of magnitude and baseflow signatures: (a) mean annual discharge, (b) Q₉₅ (low-flow threshold), (c) Q₀₅ (high-flow threshold), (d) baseflow index. Color scales from low (blue) to high (red).
+**Figure 7.** Spatial distribution of magnitude and baseflow signatures: (a) mean annual discharge, (b) Q₉₅ (low-flow threshold), (c) Q₀₅ (high-flow threshold), (d) baseflow index. Color scales from low (blue) to high (red). Grey dots indicate gauges where the metric could not be computed due to insufficient record length (<5 complete hydrological years).
 
 ![Figure 8](images/fig_hydro_signatures_2.png)
-**Figure 8.** Spatial distribution of timing, variability, and extreme signatures: (e) mean half-flow date (day of hydrological year), (f) FDC slope, (g) high-flow frequency, (h) low-flow frequency. Color scales from low (blue) to high (red).
+**Figure 8.** Spatial distribution of timing, variability, and extreme signatures: (e) mean half-flow date (day of hydrological year), (f) FDC slope, (g) high-flow frequency, (h) low-flow frequency. Color scales from low (blue) to high (red). Grey dots as in Fig. 7.
 
 ### 4.3 Watershed Boundary Accuracy
 
@@ -491,10 +493,7 @@ Analysis of 1,716 discharge records yields 13 hydrological signatures spanning w
 Three precipitation products (ERA5-Land: 826 mm/yr; MSWEP: 608 mm/yr; GPCP: 644 mm/yr) show pairwise daily correlations ranging from r = 0.58 to 0.83, with systematic differences in annual totals.
 ERA5-Land yields Q/P ≤ 1 for 98.6% of catchments (median 0.260), though this partly reflects ERA5-Land's high-latitude wet bias rather than independent validation (see Sect. 4).
 
-To our knowledge, CAMELS-RU is the first publicly available CAMELS-standard dataset for the Russian Federation.
-The dataset covers the largest previously unrepresented landmass in the global CAMELS network.
-
-The dataset is publicly available under CC BY 4.0 license at *[DOI: to be assigned upon Zenodo upload]*.
+CAMELS-RU fills a gap for the largest previously unrepresented landmass (~17.1 million km²) in the global CAMELS network and is publicly available under CC BY 4.0 (see Code and Data Availability).
 
 ---
 

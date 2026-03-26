@@ -394,7 +394,7 @@ fig_precip, axes_p = plt.subplots(3, 1, figsize=(12, 12), subplot_kw={"projectio
 for ax, metric, title in zip(
     axes_p,
     ["era5_mean_annual_mm", "mswep_mean_annual_mm", "gpcp_mean_annual_mm"],
-    ["(a) ERA5-Land", "(b) MSWEP v2.8", "(c) GPCP v3.2"],
+    ["(a) ERA5-Land", "(b) MSWEP v2.8", "(c) GPCP v3.3"],
 ):
     from src.plots.paper_maps import _set_extent_from_data  # noqa: E402
 

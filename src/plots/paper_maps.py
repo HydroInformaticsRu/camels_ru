@@ -363,6 +363,7 @@ def categorical_map(
     legend_fontsize: float = 6,
     legend_loc: str = "lower right",
     show_counts: bool = True,
+    background_gdf: gpd.GeoDataFrame | None = None,
 ) -> Axes:
     """Plot scatter map with categorical colors and legend.
 
@@ -392,11 +393,26 @@ def categorical_map(
         Legend location string.
     show_counts : bool
         Append "(n=X)" to legend labels.
+    background_gdf : GeoDataFrame, optional
+        Landmass polygons for background (e.g. Natural Earth).
 
     Returns:
     -------
     Axes
     """
+    ax.axis("off")
+    _set_extent_from_data(ax, gdf)
+
+    if background_gdf is not None:
+        aea_proj4 = get_russia_projection().proj4_init
+        background_gdf.to_crs(aea_proj4).plot(
+            ax=ax,
+            color="#EDEDED",
+            edgecolor="#CCCCCC",
+            linewidth=0.3,
+            zorder=1,
+        )
+
     colors = palette or PAUL_TOL_EXTENDED
     mkrs = markers or _MARKERS
 
@@ -455,6 +471,4 @@ def categorical_map(
     if title:
         ax.set_title(title, fontsize=10, fontweight="bold", loc="left")
 
-    ax.axis("off")
-    _set_extent_from_data(ax, gdf)
     return ax

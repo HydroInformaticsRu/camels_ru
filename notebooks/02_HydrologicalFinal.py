@@ -325,6 +325,7 @@ category_order = sorted(gauge_hydro["hydro_cluster"].unique(), key=_cluster_sort
 
 from src.plots.paper_maps import get_russia_projection  # noqa: E402
 
+_ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
 _aea = get_russia_projection()
 fig_map, ax_map = plt.subplots(figsize=(14, 7), subplot_kw={"projection": _aea})
 categorical_map(
@@ -338,6 +339,7 @@ categorical_map(
     legend_fontsize=7,
     legend_loc="lower right",
     show_counts=True,
+    background_gdf=_ne_land,
 )
 fig_map.tight_layout()
 fig_map.savefig(IMAGE_DIR / "fig_regime_map.png", dpi=300, bbox_inches="tight")
@@ -399,9 +401,6 @@ bins_1 = {k: bin_intervals[k] for k in metrics_1}
 metrics_2 = KEY_METRICS[4:]  # half-flow, FDC slope, high-flow freq, low-flow freq
 titles_2 = METRIC_TITLES[4:]
 bins_2 = {k: bin_intervals[k] for k in metrics_2}
-
-# Natural Earth coastline (no political borders)
-_ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
 
 fig_sig1 = continuous_multiplot(
     gdf=gauge_analysis,
