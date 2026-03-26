@@ -312,7 +312,7 @@ fig_hydro.suptitle(
 )
 fig_hydro.tight_layout()
 fig_hydro.savefig(IMAGE_DIR / "fig_regime_hydrographs.png", dpi=300, bbox_inches="tight")
-plt.show()
+plt.close()
 print(f"  Saved {IMAGE_DIR / 'fig_regime_hydrographs.png'}")
 
 # =============================================================================
@@ -323,7 +323,10 @@ print("Plotting regime spatial map...")
 
 category_order = sorted(gauge_hydro["hydro_cluster"].unique(), key=_cluster_sort_key)
 
-fig_map, ax_map = plt.subplots(figsize=(14, 7))
+from src.plots.paper_maps import get_russia_projection  # noqa: E402
+
+_aea = get_russia_projection()
+fig_map, ax_map = plt.subplots(figsize=(14, 7), subplot_kw={"projection": _aea})
 categorical_map(
     gauge_hydro,
     ax_map,
@@ -338,7 +341,7 @@ categorical_map(
 )
 fig_map.tight_layout()
 fig_map.savefig(IMAGE_DIR / "fig_regime_map.png", dpi=300, bbox_inches="tight")
-plt.show()
+plt.close()
 print(f"  Saved {IMAGE_DIR / 'fig_regime_map.png'}")
 
 # =============================================================================

@@ -377,22 +377,36 @@ print(f"\nPlot GeoDataFrame: {len(plot_gdf)} gauges, {len(plot_gdf.columns)} col
 _ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
 
 # -- Precip comparison: 3 panels with ONE shared colorbar --
-from matplotlib import cm as mpl_cm
-from matplotlib.colors import BoundaryNorm
+import cartopy.crs as ccrs  # noqa: E402
+from matplotlib import cm as mpl_cm  # noqa: E402
+from matplotlib.colors import BoundaryNorm  # noqa: E402
 
-_ASPECT = 1.0 / np.cos(np.radians(55.0))
+from src.plots.paper_maps import get_russia_projection  # noqa: E402
+
+_aea = get_russia_projection()
+_data_crs = ccrs.PlateCarree()
 _bin_edges = np.array([200, 400, 600, 800, 1000, 1200, 1400])
 _norm = BoundaryNorm(_bin_edges, len(_bin_edges) - 1)
 _cmap = mpl_cm.get_cmap("YlGnBu", len(_bin_edges) - 1)
 
-fig_precip, axes_p = plt.subplots(3, 1, figsize=(12, 12))
+fig_precip, axes_p = plt.subplots(3, 1, figsize=(12, 12), subplot_kw={"projection": _aea})
 
 for ax, metric, title in zip(
     axes_p,
     ["era5_mean_annual_mm", "mswep_mean_annual_mm", "gpcp_mean_annual_mm"],
     ["(a) ERA5-Land", "(b) MSWEP v2.8", "(c) GPCP v3.2"],
 ):
-    _ne_land.plot(ax=ax, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.3, zorder=1)
+    from src.plots.paper_maps import _set_extent_from_data  # noqa: E402
+
+    ax.axis("off")
+    _set_extent_from_data(ax, plot_gdf)
+    _ne_land.to_crs(_aea.proj4_init).plot(
+        ax=ax,
+        color="#EDEDED",
+        edgecolor="#CCCCCC",
+        linewidth=0.3,
+        zorder=1,
+    )
     valid = plot_gdf[plot_gdf[metric].notna()]
     sc = ax.scatter(
         valid.geometry.x,
@@ -403,17 +417,9 @@ for ax, metric, title in zip(
         s=8,
         edgecolors="none",
         zorder=3,
+        transform=_data_crs,
     )
     ax.set_title(title, fontsize=13, fontweight="bold", loc="left")
-    ax.set_xlabel("Longitude (°E)", fontsize=11)
-    ax.set_ylabel("Latitude (°N)", fontsize=11)
-    ax.tick_params(labelsize=10)
-    ax.set_aspect(_ASPECT)
-    ax.grid(alpha=0.15, linestyle="--")
-    x_buf = (valid.geometry.x.max() - valid.geometry.x.min()) * 0.05
-    y_buf = (valid.geometry.y.max() - valid.geometry.y.min()) * 0.08
-    ax.set_xlim(valid.geometry.x.min() - x_buf, valid.geometry.x.max() + x_buf)
-    ax.set_ylim(valid.geometry.y.min() - y_buf, valid.geometry.y.max() + y_buf)
 
 # Single shared colorbar — positioned explicitly below all panels
 fig_precip.subplots_adjust(hspace=0.35, bottom=0.08)

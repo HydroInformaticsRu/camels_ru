@@ -1,14 +1,11 @@
-"""Border-free plotting for ESSD Paper 1 figures.
+"""Projected plotting for ESSD Paper 1 figures.
 
-Lightweight spatial plotting using raw geographic coordinates (lon/lat)
-with latitude-corrected aspect ratio. No Cartopy, no basemap dependency.
+Spatial plotting using Albers Equal-Area Conic projection (Cartopy)
+optimised for the Russian territory.
 
-Matches the pattern established in notebooks 00_DataDescription.py and
-01_HydroAtlasFinal.py:
-  - Plain matplotlib scatter on unprojected lon/lat
-  - Aspect correction: 1 / cos(55°) for Russia's center latitude
+  - Albers Equal-Area Conic: central_lon=100°E, parallels 46.4°N/71.8°N
   - Colorblind-safe Paul Tol palette
-  - Grid with alpha=0.15, linestyle="--"
+  - No political borders (uses Natural Earth landmass)
 
 Usage
 -----
@@ -22,6 +19,7 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING
 
+import cartopy.crs as ccrs
 import geopandas as gpd
 from matplotlib import cm
 from matplotlib.colors import BoundaryNorm
@@ -33,9 +31,7 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 
-# Russia center latitude for aspect correction
-_CENTER_LAT = 55.0
-_ASPECT = 1.0 / np.cos(np.radians(_CENTER_LAT))
+_DATA_CRS = ccrs.PlateCarree()
 
 # Paul Tol bright palette (colorblind-safe, up to 7 distinct colors)
 PAUL_TOL_BRIGHT: list[str] = [
@@ -87,21 +83,28 @@ _MARKERS: list[str] = [
 ]
 
 
-def _apply_map_style(
-    ax: Axes,
-    xlim: tuple[float, float] | None = None,
-    ylim: tuple[float, float] | None = None,
-) -> None:
-    """Apply consistent map styling to an axis."""
-    ax.set_xlabel("Longitude (°E)", fontsize=11)
-    ax.set_ylabel("Latitude (°N)", fontsize=11)
-    ax.tick_params(labelsize=10)
-    ax.set_aspect(_ASPECT)
-    ax.grid(alpha=0.15, linestyle="--")
-    if xlim is not None:
-        ax.set_xlim(xlim)
-    if ylim is not None:
-        ax.set_ylim(ylim)
+def get_russia_projection() -> ccrs.AlbersEqualArea:
+    """Return Albers Equal-Area Conic CRS for Russia."""
+    return ccrs.AlbersEqualArea(
+        central_longitude=100,
+        standard_parallels=(46.4, 71.8),
+        central_latitude=56,
+        false_easting=0,
+        false_northing=0,
+    )
+
+
+def _set_extent_from_data(ax: Axes, gdf: gpd.GeoDataFrame, pad: float = 0.08) -> None:
+    """Set axis extent from GeoDataFrame bounds in Albers coordinates."""
+    aea = get_russia_projection()
+    pts = aea.transform_points(_DATA_CRS, gdf.geometry.x.values, gdf.geometry.y.values)
+    valid = ~np.isnan(pts[:, 0])
+    xmin, xmax = pts[valid, 0].min(), pts[valid, 0].max()
+    ymin, ymax = pts[valid, 1].min(), pts[valid, 1].max()
+    xpad = (xmax - xmin) * pad
+    ypad = (ymax - ymin) * pad
+    ax.set_xlim(xmin - xpad, xmax + xpad)
+    ax.set_ylim(ymin - ypad, ymax + ypad)
 
 
 def _auto_bins(values: np.ndarray, n_bins: int = 6) -> np.ndarray:
@@ -164,9 +167,13 @@ def scatter_map(
     -------
     Axes
     """
-    # Draw background landmass if provided
+    # Set extent from data, then draw background clipped to it
+    ax.axis("off")
+    _set_extent_from_data(ax, gdf)
+
     if background_gdf is not None:
-        background_gdf.plot(
+        aea_proj4 = get_russia_projection().proj4_init
+        background_gdf.to_crs(aea_proj4).plot(
             ax=ax,
             color="#EDEDED",
             edgecolor="#CCCCCC",
@@ -193,6 +200,7 @@ def scatter_map(
             s=marker_size,
             edgecolors="none",
             zorder=3,
+            transform=_DATA_CRS,
         )
         if colorbar:
             cb = ax.figure.colorbar(  # type: ignore[union-attr]
@@ -229,21 +237,12 @@ def scatter_map(
             edgecolors="none",
             zorder=2,
             alpha=0.5,
+            transform=_DATA_CRS,
         )
 
     if title:
         ax.set_title(title, fontsize=12, fontweight="bold", loc="left")
 
-    # Set axis limits from data extent with buffer
-    all_x = gdf.geometry.x
-    all_y = gdf.geometry.y
-    x_buf = (all_x.max() - all_x.min()) * 0.05
-    y_buf = (all_y.max() - all_y.min()) * 0.08
-    _apply_map_style(
-        ax,
-        xlim=(all_x.min() - x_buf, all_x.max() + x_buf),
-        ylim=(all_y.min() - y_buf, all_y.max() + y_buf),
-    )
     return ax
 
 
@@ -305,12 +304,14 @@ def continuous_multiplot(
         raise ValueError("len(titles) must match len(metrics)")
 
     nrows = math.ceil(n / ncols)
+    aea = get_russia_projection()
     fig, axes = plt.subplots(
         nrows,
         ncols,
         figsize=(panel_size[0] * ncols, panel_size[1] * nrows),
         squeeze=False,
         constrained_layout=True,
+        subplot_kw={"projection": aea},
     )
 
     bin_intervals = bin_intervals or {}
@@ -421,6 +422,7 @@ def categorical_map(
             alpha=0.7,
             edgecolors="none",
             zorder=3,
+            transform=_DATA_CRS,
         )
 
         label = f"{cat} (n={len(subset)})" if show_counts else str(cat)
@@ -453,5 +455,6 @@ def categorical_map(
     if title:
         ax.set_title(title, fontsize=10, fontweight="bold", loc="left")
 
-    _apply_map_style(ax)
+    ax.axis("off")
+    _set_extent_from_data(ax, gdf)
     return ax

@@ -23,7 +23,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.append(str(Path(__file__).parent.parent))
-from src.static.hydro_atlas_analysis import (
+from src.static.hydro_atlas_analysis import (  # noqa: E402
     categorize_catchment_size,
     get_size_categories,
 )
@@ -238,17 +238,30 @@ print(f"Gauges with levels:    {len(lvl_df)} (hydropower: {lvl_df['is_hydropower
 # FIGURE 1 — Gauge network & catchment sizes  (Section 2)
 # ══════════════════════════════════════════════════════════════════════════════
 
-fig, (ax_map, ax_hist) = plt.subplots(
-    1,
-    2,
-    figsize=(14.0, 5.5),
-    gridspec_kw={"width_ratios": [2.2, 1]},
-    constrained_layout=True,
-)
+import cartopy.crs as ccrs  # noqa: E402, I001
+
+from src.plots.paper_maps import get_russia_projection  # noqa: E402
+
+_aea = get_russia_projection()
+_data_crs = ccrs.PlateCarree()
+
+fig = plt.figure(figsize=(14.0, 5.5), constrained_layout=True)
+gs = fig.add_gridspec(1, 2, width_ratios=[2.2, 1])
+ax_map = fig.add_subplot(gs[0, 0], projection=_aea)
+ax_hist = fig.add_subplot(gs[0, 1])
+
+ax_map.axis("off")
+
+# Set extent from gauge data
+from src.plots.paper_maps import _set_extent_from_data  # noqa: E402
+
+_set_extent_from_data(ax_map, gauge)
 
 # Natural Earth coastline (no political borders)
 _ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
-_ne_land.plot(ax=ax_map, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.3, zorder=1)
+_ne_land.to_crs(_aea.proj4_init).plot(
+    ax=ax_map, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.3, zorder=1
+)
 
 # (a) Gauge locations by grade — ungraded first (background), then graded on top
 for grade in reversed(GRADE_ORDER):
@@ -269,6 +282,7 @@ for grade in reversed(GRADE_ORDER):
             label=f"{grade} (n={len(subset)})",
             edgecolors="none",
             zorder=zorder,
+            transform=_data_crs,
         )
     if len(hydro) > 0:
         ax_map.scatter(
@@ -281,18 +295,10 @@ for grade in reversed(GRADE_ORDER):
             edgecolors="black",
             linewidths=0.4,
             zorder=4,
+            transform=_data_crs,
         )
 
-ax_map.set_xlabel("Longitude (°E)", fontsize=12)
-ax_map.set_ylabel("Latitude (°N)", fontsize=12)
 ax_map.set_title("(a) Gauge network", fontsize=13, fontweight="bold", loc="left")
-ax_map.grid(alpha=0.15, linestyle="--")
-ax_map.set_aspect(1.0 / np.cos(np.radians(55.0)))  # lat/lon aspect correction
-# Clip to data extent
-x_buf = (gauge.geometry.x.max() - gauge.geometry.x.min()) * 0.05
-y_buf = (gauge.geometry.y.max() - gauge.geometry.y.min()) * 0.08
-ax_map.set_xlim(gauge.geometry.x.min() - x_buf, gauge.geometry.x.max() + x_buf)
-ax_map.set_ylim(gauge.geometry.y.min() - y_buf, gauge.geometry.y.max() + y_buf)
 # Reverse legend so Grade A appears first; add hydropower marker
 from matplotlib.lines import Line2D
 
