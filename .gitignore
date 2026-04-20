@@ -55,6 +55,7 @@ release/
 
 # Paper drafts (keep LaTeX source, ignore builds)
 paper/paper_v2/
+.tmp/
 
 # Claude Code / AI agent config
 .claude/
