@@ -140,7 +140,7 @@ Daily water level records (2,989 gauges, including 152 hydropower and reservoir 
 zero values (instrument artifacts) were replaced with day-of-year medians computed from non-zero observations at the same gauge;
 gaps ≤ 6 days were interpolated using second-order polynomial interpolation (reservoir gauges: ≤ 15 days);
 multi-source records for the same gauge were merged using preferential selection (latest correction takes precedence).
-All water levels are in centimetres, referenced to the Baltic Height System 1977 (BHS-77) as reported in AIS GMVO metadata.
+The release provides two forms of water level: `water_level_cm` (native AIS GMVO `lvl_sm`, stage in centimetres above the gauge zero-post) and `water_level_mbs` (absolute water-surface elevation in metres above the Baltic Height System 1977, BHS-77, computed as `water_level_cm / 100 + gauge_zero_m`). Per-gauge zero-post elevations (`gauge_zero_m`) were taken from the AIS GMVO gauge-height tables and cover all 2,989 water-level gauges; a `gauge_type` coordinate distinguishes river (0) from reservoir/hydropower (1) gauges.
 No automated quality grading (A–F) was applied to water level data; users should assess completeness per gauge before use.
 
 ![Figure 2](images/fig_quality_assessment.png)
@@ -481,7 +481,7 @@ All NetCDF files include CF-compliant metadata with per-variable `units`, `long_
 | `camels_ru_year_grades.csv` | CSV | Per-gauge × per-hydro-year quality grade (A–F) |
 | `camels_ru_gauge_summary.csv` | CSV | Overall grade, year counts, recommendation, `forcing_note` per discharge gauge |
 | `camels_ru_forcing_notes.csv` | CSV | Per-gauge fill provenance for the 24 gauges with gap-filled ERA5 temperature (Sect. 3.2.5) |
-| `camels_ru_water_level/` | CSV directory | Daily water level (cm, BHS-77 datum) for 2,989 gauges, one CSV per gauge |
+| `camels_ru_water_level.nc` | NetCDF-4 | `water_level_cm` (stage above gauge zero-post, cm), `water_level_mbs` (absolute elevation, m BHS-77), plus per-gauge `gauge_zero_m` (m BHS-77) and `gauge_type` (0 = river, 1 = reservoir/hydropower); 3,353 × 5,844 d with 2,989 gauges carrying observations (2,837 river + 152 reservoir/hydropower) |
 
 ### 5.3 Usage Notes
 

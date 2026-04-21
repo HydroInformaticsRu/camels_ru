@@ -6,7 +6,7 @@ Creates the release directory structure described in Table 4 of the ESSD paper:
   - camels_ru_forcing.nc         Meteorological forcing (NetCDF-4)
   - camels_ru_attributes.csv     HydroATLAS physiographic attributes
   - camels_ru_signatures.csv     Hydrological signatures
-  - camels_ru_water_level/       Daily water level CSVs
+  - camels_ru_water_level.nc     Daily water level time series (NetCDF-4)
 
 Usage:
     pixi run python scripts/package_dataset.py
@@ -429,26 +429,183 @@ def _update_gauge_summary_with_forcing_notes(forcing_notes: dict[str, str]) -> N
         )
 
 
-def package_water_level() -> None:
-    """Copy water level CSVs to release directory."""
-    print("Packaging water level...")
-    out_dir = OUTPUT_DIR / "camels_ru_water_level"
-    out_dir.mkdir(parents=True, exist_ok=True)
+_LEVEL_HEIGHTS_FILE = DATA_DIR / "AisLevelCsv" / "gauge_heights.csv"
+_LEVEL_GTS_HEIGHTS_FILE = DATA_DIR / "AisLevelGTSCsv" / "GTS_heights.csv"
 
-    # Get gauge IDs that have watersheds
-    ws = gpd.read_file(GEOM_DIR / "camels_watersheds.gpkg")
-    ws_ids = set(ws.gauge_id.astype(str))
 
-    count = 0
-    for src_dir in [LEVEL_DIR, LEVEL_GTS_DIR]:
-        if not src_dir.exists():
+def _load_gauge_zero_heights() -> dict[str, float]:
+    """Load per-gauge zero-post elevations (m above BHS-77) from both source tables.
+
+    Returns a single merged ``{gauge_id: height_m}`` mapping covering both the
+    river network (``AisLevelCsv/gauge_heights.csv``) and the reservoir /
+    hydropower network (``AisLevelGTSCsv/GTS_heights.csv``). Gauges missing
+    from both tables are absent from the dict and receive NaN downstream.
+    """
+    heights: dict[str, float] = {}
+    for path in (_LEVEL_HEIGHTS_FILE, _LEVEL_GTS_HEIGHTS_FILE):
+        if not path.exists():
             continue
-        for f in sorted(src_dir.glob("*.csv")):
-            if f.stem in ws_ids:
-                shutil.copy2(f, out_dir / f.name)
-                count += 1
+        df = pd.read_csv(path)
+        # Unnamed index column in gauge_heights.csv vs. named gauge_id in GTS_heights.csv
+        id_col = "gauge_id" if "gauge_id" in df.columns else df.columns[0]
+        for gid, h in zip(df[id_col].astype(str), df["height"], strict=False):
+            if pd.notna(h):
+                heights[gid] = float(h)
+    return heights
 
-    print(f"  {count} gauge files -> {out_dir.name}/")
+
+def package_water_level() -> None:
+    """Build water-level NetCDF from per-gauge CSVs.
+
+    Produces a single ``gauge × time`` NetCDF mirroring the discharge layout:
+
+    - ``water_level_cm``: stage above gauge zero-post (native AIS GMVO ``lvl_sm``)
+    - ``water_level_mbs``: absolute elevation in meters above BHS-77, computed as
+      ``water_level_cm / 100 + gauge_zero_m``; NaN for gauges without a
+      known zero-post elevation
+    - ``gauge_zero_m`` (per-gauge 1D): zero-post elevation in m above BHS-77
+    - ``gauge_type`` (per-gauge 1D): 0 = river, 1 = reservoir / hydropower
+
+    No A–F quality grading is applied to water-level data; users should assess
+    per-gauge completeness before use.
+    """
+    print("Packaging water level...")
+
+    # Remove legacy CSV-per-gauge folder from prior releases to keep the
+    # bundle single-source-of-truth and avoid stale files in SHA256SUMS.
+    legacy_dir = OUTPUT_DIR / "camels_ru_water_level"
+    if legacy_dir.exists() and legacy_dir.is_dir():
+        shutil.rmtree(legacy_dir)
+        print(f"  removed legacy folder: {legacy_dir.name}/")
+
+    ws = gpd.read_file(GEOM_DIR / "camels_watersheds.gpkg")
+    ws_ids = sorted(ws.gauge_id.astype(str).unique())
+    dates = pd.date_range(PERIOD_START, PERIOD_END, freq="D")
+    n_dates = len(dates)
+    n_gauges = len(ws_ids)
+
+    heights = _load_gauge_zero_heights()
+
+    lvl_cm = np.full((n_gauges, n_dates), np.nan, dtype=np.float32)
+    gauge_zero_m = np.full(n_gauges, np.nan, dtype=np.float32)
+    gauge_type = np.full(n_gauges, -1, dtype=np.int8)  # -1 = no file found
+
+    n_river = 0
+    n_reservoir = 0
+    for i, gid in enumerate(ws_ids):
+        river_file = LEVEL_DIR / f"{gid}.csv"
+        gts_file = LEVEL_GTS_DIR / f"{gid}.csv"
+        if river_file.exists():
+            src = river_file
+            gauge_type[i] = 0
+            n_river += 1
+        elif gts_file.exists():
+            src = gts_file
+            gauge_type[i] = 1
+            n_reservoir += 1
+        else:
+            continue
+
+        df = pd.read_csv(src, index_col="date", parse_dates=True)
+        if "lvl_sm" in df.columns:
+            sub = df["lvl_sm"].reindex(dates)
+            valid = sub.notna()
+            lvl_cm[i, valid.values] = sub[valid].values.astype(np.float32)
+
+        if gid in heights:
+            gauge_zero_m[i] = np.float32(heights[gid])
+
+    # Absolute elevation (m above BHS-77) = stage (cm) / 100 + zero-post (m)
+    lvl_mbs = (lvl_cm / 100.0) + gauge_zero_m[:, np.newaxis]
+
+    ds = xr.Dataset(
+        {
+            "water_level_cm": (
+                ["gauge", "time"],
+                lvl_cm,
+                {
+                    "long_name": "Daily water level (stage above gauge zero-post)",
+                    "units": "cm",
+                    "source": "AIS GMVO / Roshydromet",
+                    "comment": (
+                        "Relative stage reading in centimetres, measured from the "
+                        "gauge zero-post as reported by AIS GMVO. For absolute "
+                        "elevation above BHS-77 use water_level_mbs."
+                    ),
+                },
+            ),
+            "water_level_mbs": (
+                ["gauge", "time"],
+                lvl_mbs.astype(np.float32),
+                {
+                    "long_name": "Daily water level (absolute elevation, BHS-77)",
+                    "units": "m",
+                    "source": "AIS GMVO / Roshydromet + gauge_heights",
+                    "comment": (
+                        "Absolute water-surface elevation in metres above the "
+                        "Baltic Height System 1977 (BHS-77), computed as "
+                        "water_level_cm / 100 + gauge_zero_m. NaN where the "
+                        "zero-post elevation is unknown."
+                    ),
+                },
+            ),
+            "gauge_zero_m": (
+                ["gauge"],
+                gauge_zero_m,
+                {
+                    "long_name": "Elevation of the gauge zero-post (BHS-77)",
+                    "units": "m",
+                    "source": "AIS GMVO gauge_heights.csv + GTS_heights.csv",
+                },
+            ),
+            "gauge_type": (
+                ["gauge"],
+                gauge_type,
+                {
+                    "long_name": "Gauge classification",
+                    "flag_values": np.array([0, 1], dtype=np.int8),
+                    "flag_meanings": "river reservoir_or_hydropower",
+                },
+            ),
+        },
+        coords={
+            "gauge": ws_ids,
+            "time": dates,
+        },
+        attrs={
+            "title": "CAMELS-RU daily water level",
+            "Conventions": "CF-1.8",
+            "source": "AIS GMVO / Roshydromet",
+            "period": f"{PERIOD_START} to {PERIOD_END}",
+            "datum": "Baltic Height System 1977 (BHS-77)",
+            "grading": (
+                "No A-F quality grade is assigned to water-level data; "
+                "users should assess per-gauge completeness before use."
+            ),
+            "gap_fill_method": (
+                "Second-order polynomial interpolation: gaps ≤6 days "
+                "(river gauges) or ≤15 days (reservoir/hydropower gauges). "
+                "Longer gaps retained as NaN."
+            ),
+        },
+    )
+    out = OUTPUT_DIR / "camels_ru_water_level.nc"
+    ds.to_netcdf(
+        out,
+        encoding={
+            "water_level_cm": {"dtype": "float32", "zlib": True, "complevel": 4},
+            "water_level_mbs": {"dtype": "float32", "zlib": True, "complevel": 4},
+            "gauge_zero_m": {"dtype": "float32", "zlib": True, "complevel": 4},
+            "gauge_type": {"dtype": "int8", "zlib": True, "complevel": 4},
+        },
+    )
+    n_with_mbs = int(np.isfinite(gauge_zero_m).sum())
+    n_with_data = n_river + n_reservoir
+    print(
+        f"  {n_with_data}/{n_gauges} gauges with data "
+        f"({n_river} river, {n_reservoir} reservoir/hydropower); "
+        f"{n_with_mbs} with zero-post elevation -> {out.name}"
+    )
 
 
 def _run(cmd: list[str], label: str) -> None:
