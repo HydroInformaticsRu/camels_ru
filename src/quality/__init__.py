@@ -32,8 +32,11 @@ from .data_loader import (
 from .meteo_response import (
     calculate_event_response,
     calculate_pq_cross_correlation,
+    calculate_temperature_aware_response_metrics,
+    calculate_temperature_partitioned_input,
     detect_dead_years,
     detect_precipitation_events,
+    detect_temperature_aware_dead_years,
 )
 from .quality_flags import FlagSeverity, QualityFlag, get_flag_severity
 from .quality_grader import (
@@ -62,7 +65,10 @@ __all__ = [
     "detect_precipitation_events",
     "calculate_event_response",
     "calculate_pq_cross_correlation",
+    "calculate_temperature_partitioned_input",
+    "calculate_temperature_aware_response_metrics",
     "detect_dead_years",
+    "detect_temperature_aware_dead_years",
     # Anomaly detection
     "detect_constant_periods",
     "detect_implausible_spikes",

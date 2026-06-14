@@ -7,7 +7,7 @@ eligible gauge under each of the three precipitation products
 on a single Budyko diagram with the water-limit, energy-limit, and Budyko
 (1974) theoretical curves overlaid.
 
-Output: paper/images/fig_budyko.png
+Output: paper/images/fig_budyko.png and, when present, paper/overleaf/images/fig_budyko.png
 
 Inputs:
 - release/CAMELS_RU_v1.0/camels_ru_discharge.nc  (Q, mm/d)
@@ -34,6 +34,11 @@ import xarray as xr
 sys.path.append(str(Path(__file__).parent.parent))
 from src.hydro.period_based_metrics import split_by_period  # noqa: E402
 from src.utils.logger import setup_logger  # noqa: E402
+from src.utils.paper_analysis_scope import (  # noqa: E402
+    PAPER_ANALYSIS_EXCLUSION_NOTE,
+    is_paper_analysis_excluded_gauge_id,
+    paper_analysis_scope_summary,
+)
 
 log = setup_logger("BudykoFigure", log_file="logs/budyko_figure.log")
 
@@ -47,6 +52,7 @@ PRODUCTS = {
 PET_DIR = ROOT / "data/CAMELS_RU/parsed_meteo/gleam"
 PET_COL = "potential_evaporation"
 OUT_PNG = ROOT / "paper/images/fig_budyko.png"
+OVERLEAF_OUT_PNG = ROOT / "paper/overleaf/images/fig_budyko.png"
 
 
 def _annual_ratios(
@@ -144,12 +150,17 @@ def _plot(df: pd.DataFrame) -> None:
     #   Energy limit: AET <= PET   -> evap_index <= aridity      (45-degree y=x for x<1)
     #   Combined physical envelope: evap_index <= min(1, aridity)
     x = np.linspace(0.01, 5.0, 400)
-    energy_line = np.minimum(x, 1.0)
+    envelope_line = np.minimum(x, 1.0)
     water_line = np.ones_like(x)
     budyko = _budyko_curve(x)
 
     ax.plot(
-        x, energy_line, color="#AA2222", linestyle="--", linewidth=1.0, label="Energy limit (AET ≤ PET)"
+        x,
+        envelope_line,
+        color="#AA2222",
+        linestyle="--",
+        linewidth=1.0,
+        label="Physical envelope (AET ≤ min(PET, P))",
     )
     ax.plot(x, water_line, color="#333333", linestyle=":", linewidth=1.0, label="Water limit (AET ≤ P)")
     ax.plot(x, budyko, color="#222222", linestyle="-", linewidth=1.2, label="Budyko (1974) curve")
@@ -188,8 +199,12 @@ def _plot(df: pd.DataFrame) -> None:
 
     OUT_PNG.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
+    if OVERLEAF_OUT_PNG.parent.exists():
+        fig.savefig(OVERLEAF_OUT_PNG, dpi=300, bbox_inches="tight")
     plt.close(fig)
     log.info(f"Saved {OUT_PNG}")
+    if OVERLEAF_OUT_PNG.exists():
+        log.info(f"Saved {OVERLEAF_OUT_PNG}")
 
 
 def _summary_table(df: pd.DataFrame) -> None:
@@ -244,10 +259,21 @@ def main() -> None:
     ws["gauge_id"] = ws["gauge_id"].astype(str)
     small = set(ws.loc[ws["area_km2"] < 50_000, "gauge_id"])
 
+    scope = paper_analysis_scope_summary(gauges)
+    log.info(
+        f"Paper-analysis gauge-ID scope: include {scope.n_included}, "
+        f"exclude {scope.n_excluded} (ID length >= {scope.excluded_min_id_length})"
+    )
+    log.info(PAPER_ANALYSIS_EXCLUSION_NOTE)
+
     valid_idx = [
-        i for i, g in enumerate(gauges) if g in small and np.isfinite(discharge[i]).sum() >= 365 * 5
+        i
+        for i, g in enumerate(gauges)
+        if not is_paper_analysis_excluded_gauge_id(g)
+        and g in small
+        and np.isfinite(discharge[i]).sum() >= 365 * 5
     ]
-    log.info(f"{len(valid_idx)} gauges pass area and discharge-length filters")
+    log.info(f"{len(valid_idx)} gauges pass gauge-ID, area, and discharge-length filters")
 
     results: list[dict] = []
     with ProcessPoolExecutor(max_workers=12) as exe:

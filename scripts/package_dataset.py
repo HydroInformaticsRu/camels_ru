@@ -1,6 +1,6 @@
 """Package CAMELS-RU dataset for Zenodo release.
 
-Creates the release directory structure described in Table 4 of the ESSD paper:
+Creates the release directory structure described in Table 4 of the CAMELS-RU manuscript:
   - camels_ru_boundaries.gpkg    Watershed boundaries (GeoPackage)
   - camels_ru_discharge.nc       Daily discharge time series (NetCDF-4)
   - camels_ru_forcing.nc         Meteorological forcing (NetCDF-4)

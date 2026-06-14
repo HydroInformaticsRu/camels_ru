@@ -1,0 +1,752 @@
+{
+  "/home/dmbrmv/Development/camels_ru/app/main.py": {
+    "mtime": 1764571323.0615482,
+    "ast_hash": "e75fad8d05ff91f8f8a0ef4b6fa503ab",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/src/analysis/__init__.py": {
+    "mtime": 1758807115.7479472,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/src/analysis/classification.py": {
+    "mtime": 1764571306.3034153,
+    "ast_hash": "23c54989300de35802da6acbddf55158",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/src/state/__init__.py": {
+    "mtime": 1758807115.7479472,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/src/state/persistence.py": {
+    "mtime": 1764571282.1822217,
+    "ast_hash": "8f3e056f14db754b8200f04c983039e8",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/src/plots/__init__.py": {
+    "mtime": 1758807115.7479472,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/src/plots/spatial_map.py": {
+    "mtime": 1764571300.881372,
+    "ast_hash": "97cad298b0a5aa08d0f9e082cfa4f435",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/src/plots/series_plot.py": {
+    "mtime": 1764571297.5613453,
+    "ast_hash": "6a657f64f6423400862f819c478527dd",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/src/utils/logger.py": {
+    "mtime": 1764571267.3771012,
+    "ast_hash": "3548a4529c83dedca6b49a6ced7330d1",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/src/review/__init__.py": {
+    "mtime": 1758807115.7479472,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/src/review/counts.py": {
+    "mtime": 1764571286.5012565,
+    "ast_hash": "e780898e32b24dfb1fe03f1d6069aa1a",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/src/review/metrics.py": {
+    "mtime": 1764571289.7302825,
+    "ast_hash": "0a247983fac4d13e48173e95eff0436f",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/src/storage/__init__.py": {
+    "mtime": 1758813046.1901302,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/src/storage/directories.py": {
+    "mtime": 1764571272.9581468,
+    "ast_hash": "2f22b7379f6ada3b2cddec47ca7181ef",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/docs/literature/large_sample_hydrology_papers/metadata.json": {
+    "mtime": 1781340644.308916,
+    "ast_hash": "03de87db8a832834a2f9ed8dd92d549e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/docs/literature/camels_essd_papers/metadata.json": {
+    "mtime": 1781340630.935919,
+    "ast_hash": "6c580153b26b8bac1643502a1f02a8de",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/docs/literature/camels_hess_papers/metadata.json": {
+    "mtime": 1781340635.0790355,
+    "ast_hash": "74bb5a4c42f6177ed30537eca927c049",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/notebooks/TiffsMP.py": {
+    "mtime": 1773684139.4374335,
+    "ast_hash": "5219f046f6ff5d57440479dc23b6b105",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/notebooks/03_ForcingsFinal.py": {
+    "mtime": 1781448090.9600542,
+    "ast_hash": "8497f854713ebe98801986844188a052",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/notebooks/WatershedsMP.py": {
+    "mtime": 1773684217.9946914,
+    "ast_hash": "83c8f2e1e637935e878acd0e63708892",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/notebooks/02_HydrologicalFinal.py": {
+    "mtime": 1781449077.0368512,
+    "ast_hash": "a876990821143840e2e2761d6eb5d822",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/notebooks/04_ZenodoDataset.py": {
+    "mtime": 1773406226.9385955,
+    "ast_hash": "000abe04b536a054e6dce53304162c23",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/notebooks/00_DataDescription.py": {
+    "mtime": 1781448062.0411806,
+    "ast_hash": "f9a4b2c5a2062374d3b86631a3b4f374",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/notebooks/01_HydroAtlasFinal.py": {
+    "mtime": 1781447013.176119,
+    "ast_hash": "e122e1ea44bdd33268769a09eb3d2036",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/ParseAisHData.py": {
+    "mtime": 1773177465.5116072,
+    "ast_hash": "68d2e66b28c0f17916c1c2b45a03d007",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/ParseAisCompound.py": {
+    "mtime": 1773179923.0937035,
+    "ast_hash": "b6fb4dc14865e20ebe98b71140ef1705",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/detect_nesting.py": {
+    "mtime": 1773683928.7779987,
+    "ast_hash": "6628ba094928a75adc2e9b1a33af2523",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/regenerate_paper_maps.py": {
+    "mtime": 1781344495.9040143,
+    "ast_hash": "05a507b5418f0613850c1a81ade78b37",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/aggregate_watersheds.py": {
+    "mtime": 1773482898.6564384,
+    "ast_hash": "5060aa8edbd0de7884c904b6bfeca62d",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/ParseAisQData.py": {
+    "mtime": 1773177474.6966794,
+    "ast_hash": "3ea4a631c5b257a0c616450d7af30085",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/build_paper_latex.py": {
+    "mtime": 1781353186.1750731,
+    "ast_hash": "0f03654c9a918b8e3fd4009a10f8b641",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/create_signatures_final.py": {
+    "mtime": 1764713292.7786896,
+    "ast_hash": "bf0e8285612cb1ae41089f8be10b3eee",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/hydro_atlas_converter.py": {
+    "mtime": 1773082318.9452822,
+    "ast_hash": "22450882024d6b3a6259b3e3707ba008",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/compare_temperature_aware_qc.py": {
+    "mtime": 1778246488.754026,
+    "ast_hash": "970d4307688d76d7fc2109875bbca16e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/gleam_loader.py": {
+    "mtime": 1769623724.0907168,
+    "ast_hash": "512ce2c5f95dd8b990dd905677689e0d",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/create_paper_signatures.py": {
+    "mtime": 1776509304.852418,
+    "ast_hash": "8f20b2d386f023d529155e7e95dc95b3",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/create_signatures_csv.py": {
+    "mtime": 1764712696.0096176,
+    "ast_hash": "c79645e904feceeb0bdfe79afe0bcd92",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/package_dataset.py": {
+    "mtime": 1781344494.1840038,
+    "ast_hash": "58494c7fbb6fbd3d5fdf41c5c19e0601",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/generate_budyko_figure.py": {
+    "mtime": 1781447177.7556515,
+    "ast_hash": "6d98f964c24957a0cf98dcbf4d3680ff",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/validate_grdc.py": {
+    "mtime": 1773937668.0871398,
+    "ast_hash": "757a40976106a5cbe52644d763a79d95",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/split_gleam_monthly.py": {
+    "mtime": 1773683965.5714796,
+    "ast_hash": "eefb4804e404ee690424a8794ba06b8e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/verify_macros.py": {
+    "mtime": 1781448111.493791,
+    "ast_hash": "e4d94a8d9a466c41ea7632295884819e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/create_year_grades.py": {
+    "mtime": 1773930334.5334334,
+    "ast_hash": "6460479e9936927264a396a7af51e746",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/aggregate_signatures.py": {
+    "mtime": 1764712696.087618,
+    "ast_hash": "2e7b4e62a9acf45a9666c38148060d7c",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/check_et_adequacy.py": {
+    "mtime": 1776508904.36496,
+    "ast_hash": "862375ac0d9bd42912a6d0775fc9605f",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/fill_meteo_gaps.py": {
+    "mtime": 1776693430.6880677,
+    "ast_hash": "4d5dda4a6a86af6fbbfddf8b3433a930",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/fetch_literature_papers.py": {
+    "mtime": 1781338757.357804,
+    "ast_hash": "7a626464dae9738324954208825e12a3",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/GradeCompound.py": {
+    "mtime": 1778245613.985006,
+    "ast_hash": "49ef4649a6b681fc8c0fb7890a82a028",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/load_era5_land.py": {
+    "mtime": 1760008054.7785501,
+    "ast_hash": "880306dba151d9fe214616466315401a",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/create_forcing_netcdf.py": {
+    "mtime": 1764704880.6283524,
+    "ast_hash": "a0da1bcf8894626b28e3e9a055a446a9",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/inspect_era5_problem_gauges.py": {
+    "mtime": 1776466079.770647,
+    "ast_hash": "e65ee4c165626131205e277e0f14b508",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/hydro/__init__.py": {
+    "mtime": 1769623724.0917168,
+    "ast_hash": "88c3a792ea33263e246f871bb54e1b43",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/hydro/base_flow.py": {
+    "mtime": 1776426130.6496587,
+    "ast_hash": "77ee8118469f9844f0190d3de1b3c0fa",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/hydro/flow_timing.py": {
+    "mtime": 1773611443.8086119,
+    "ast_hash": "efbc121a54f0511a62ce78c3c91a9ba8",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/hydro/flow_indices.py": {
+    "mtime": 1769623724.092717,
+    "ast_hash": "24a04b11cd12a4f5a8e808879ff63f74",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/hydro/period_based_metrics.py": {
+    "mtime": 1769623724.0937169,
+    "ast_hash": "c8a0833ba626e2addf93118e70c5db0a",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/hydro/parallel_metrics.py": {
+    "mtime": 1760100840.5990143,
+    "ast_hash": "c9cceba0140231f4e3c4a3237b2c9000",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/hydro/flow_extremes.py": {
+    "mtime": 1769623724.092717,
+    "ast_hash": "63cdab897cccce9d5459b25d4a0fbbd4",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/hydro/flow_duration.py": {
+    "mtime": 1769623724.092717,
+    "ast_hash": "9a947349b14bcdaadad89c41218cbce3",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/hydro/flow_variability.py": {
+    "mtime": 1769623724.092717,
+    "ast_hash": "c4b7d5ac2c323bed5d536a932d38263b",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/quality/__init__.py": {
+    "mtime": 1778245601.0309095,
+    "ast_hash": "d59e6bf303c2f50e35db3ed9c4978f53",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/quality/data_loader.py": {
+    "mtime": 1773154827.3474474,
+    "ast_hash": "8da697f60252af817cc10e0c83c65b17",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/quality/climatology.py": {
+    "mtime": 1774474420.6262724,
+    "ast_hash": "36ec5b1beb0f85410078d14e57323b97",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/quality/meteo_response.py": {
+    "mtime": 1778245578.3237405,
+    "ast_hash": "d482356f9e71ef3b3547525800867b02",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/quality/quality_flags.py": {
+    "mtime": 1778245532.0486467,
+    "ast_hash": "b9ae723dc544f5ab463553f14faffd17",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/quality/quality_grader.py": {
+    "mtime": 1778246406.4279766,
+    "ast_hash": "dc0a4a18e37c14fe8c698a0813951d66",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/quality/anomaly_detection.py": {
+    "mtime": 1774474406.5012355,
+    "ast_hash": "ba3da7b9e28cbc8131b1c2c974e6926b",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/meteo/water_balance.py": {
+    "mtime": 1760364274.5365915,
+    "ast_hash": "011d929d1905672f34d91b570e3b7033",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/meteo/seasonal_stats.py": {
+    "mtime": 1769623724.0937169,
+    "ast_hash": "13e5a2814bb2028b52e58a291f5d2fef",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/meteo/__init__.py": {
+    "mtime": 1769623724.0937169,
+    "ast_hash": "7e16e2b9590e33a28d72f5ebeb557109",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/meteo/climate_indices.py": {
+    "mtime": 1774474420.117271,
+    "ast_hash": "556a7ee6d0c0a9547534fc573b8bef8e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/meteo/temperature.py": {
+    "mtime": 1774474328.3530302,
+    "ast_hash": "470f394e4153bbdb78f097b5b2d40baa",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/meteo/aggregation.py": {
+    "mtime": 1774474377.66316,
+    "ast_hash": "bd4f4c24dfd78cc357d5e2a2e52534c5",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/meteo/era5_land_loader.py": {
+    "mtime": 1774474325.965024,
+    "ast_hash": "97fdb6b187d91a79fd78405c32dead3d",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/meteo/extremes.py": {
+    "mtime": 1769623724.0937169,
+    "ast_hash": "5db8e43fc41f4d65e3018ca86944a3fd",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/static/cluster_tools.py": {
+    "mtime": 1774474363.3681226,
+    "ast_hash": "bea1608203f6ff88ec42879b6d0a04be",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/static/hydro_atlas_analysis.py": {
+    "mtime": 1773611456.406701,
+    "ast_hash": "cc950a0cd726ca918be82dbaa6cdcc4d",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/static/hydro_atlas_reader.py": {
+    "mtime": 1773154827.3494475,
+    "ast_hash": "0d07d86da79989f9c958f99bb39491bc",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/timeseries_stats/__init__.py": {
+    "mtime": 1769623724.095717,
+    "ast_hash": "b939e186ccbf89cc8e122df3c1fc5be1",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/timeseries_stats/trends.py": {
+    "mtime": 1774474426.7742884,
+    "ast_hash": "83d33a5f40a24895ba32abbbdd264b9c",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/timeseries_stats/homogeneity.py": {
+    "mtime": 1774474425.6102853,
+    "ast_hash": "e134b6f09f3b674294277a121e5a9d0d",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/timeseries_stats/change_points.py": {
+    "mtime": 1774474424.6292827,
+    "ast_hash": "d9421d478babf439037aa69c10c8501c",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/data_processing/gdal_processing.py": {
+    "mtime": 1773684343.9066868,
+    "ast_hash": "7789c64e63f4eec8b2d7a20089d825c0",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/data_processing/nc_proc.py": {
+    "mtime": 1769623724.0917168,
+    "ast_hash": "a33a6c2091319fde585cdaeede41d233",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/data_processing/ais.py": {
+    "mtime": 1773178195.1619987,
+    "ast_hash": "435988e29f2001007efed376515c4854",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/data_processing/geom_functions.py": {
+    "mtime": 1774474313.0299897,
+    "ast_hash": "8def91ef43ed243c20c47877084a0c9d",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/plots/paper_maps.py": {
+    "mtime": 1781344495.5100615,
+    "ast_hash": "45efffa091c456f7bb10f4f4191cb481",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/plots/continuous_maps.py": {
+    "mtime": 1769623724.0947168,
+    "ast_hash": "72a191d06d7d91377cd6a3f5319d42bd",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/plots/maps.py": {
+    "mtime": 1769623724.0947168,
+    "ast_hash": "273f1328221e285581c43196f93e28a8",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/utils/logger.py": {
+    "mtime": 1774474273.8668854,
+    "ast_hash": "053ed7438b39f0afd994328802183db2",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/README.md": {
+    "mtime": 1781449143.9620342,
+    "ast_hash": "2707bfd123d84ddae9da57f68abf6219",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/CLAUDE_REFERENCE.md": {
+    "mtime": 1781449149.4955492,
+    "ast_hash": "3f8d71f760df72b48cee1ed243158a4c",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/templates/done.html": {
+    "mtime": 1760376536.0811343,
+    "ast_hash": "cf63c532652f5ae8027616641c77a28f",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/app/templates/index.html": {
+    "mtime": 1760376536.0821345,
+    "ast_hash": "95c7516bd1915a5c1d86293aaeedf8c9",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/.github/workflows/ci.yml": {
+    "mtime": 1774473829.8026254,
+    "ast_hash": "a326c4001a6d1c8951f5981f83d84280",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/.github/workflows/auto-assign.yml": {
+    "mtime": 1774473808.3985598,
+    "ast_hash": "9ec95ee7393dfe7e1173443010fd1169",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/README.md": {
+    "mtime": 1781353184.1715639,
+    "ast_hash": "9ea4f587c73d37196ceaa15cd1934970",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/manuscript.md": {
+    "mtime": 1781451118.5976043,
+    "ast_hash": "beb2b30ff3dbe2fc51093afc1ba2fc32",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/docs/literature/large_sample_hydrology_papers/README.md": {
+    "mtime": 1781340644.3090901,
+    "ast_hash": "eb9ea39003e25b6b209a9549aa141763",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/docs/literature/camels_essd_papers/README.md": {
+    "mtime": 1781342511.507575,
+    "ast_hash": "09dd3361921a2e8a3d4d422ba2cdb47e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/docs/literature/camels_hess_papers/README.md": {
+    "mtime": 1781340635.0792565,
+    "ast_hash": "709e84f8ccaae37c7fefca61f0ee4e31",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/forcings_correlations_spatial_maps.png": {
+    "mtime": 1773853377.0,
+    "ast_hash": "ceaf9a99ada9a990074f36e8120cd402",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/geo_cluster_heatmap_15.png": {
+    "mtime": 1773853378.0,
+    "ast_hash": "d8c1a6bc29660db2c1f852c1164a0243",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/size_distribution_final.png": {
+    "mtime": 1773853378.0,
+    "ast_hash": "edb47488d023a6edda03922ede2ab623",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_precip_comparison.png": {
+    "mtime": 1781447424.7216427,
+    "ast_hash": "c29f859fe96e8ae76b9abdeb54f89140",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_cluster_pca.png": {
+    "mtime": 1781447461.4332738,
+    "ast_hash": "55306e702818e4c7cbe77b15fde0f67c",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/forcings_trends_spatial_maps.png": {
+    "mtime": 1773853377.0,
+    "ast_hash": "17eb5d9c74a1ab91b60a7f70fb76d728",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_water_balance.png": {
+    "mtime": 1781447426.3086257,
+    "ast_hash": "ce2e7ed69202042e85a17cea80c301a2",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/geo_hierarchical_15clusters_map.png": {
+    "mtime": 1773853378.0,
+    "ast_hash": "673212f53cbdb2f4d2adb25483e40e93",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/figure10.png": {
+    "mtime": 1773853378.0,
+    "ast_hash": "0aad268671b45fbfd33e9fc8a04bdb97",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_budyko.png": {
+    "mtime": 1781447527.827714,
+    "ast_hash": "c8fc0cb8dc0c0531644caa059b442524",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/hydro_clusters_15_map.png": {
+    "mtime": 1773853378.0,
+    "ast_hash": "237f0c30e8e0acee9b90dfb63c4e896e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/water_balance_spatial_maps.png": {
+    "mtime": 1773853378.0,
+    "ast_hash": "89b6503edb3510a994ff72060bffc821",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/dendrogram_ward_15_hydro_clusters.png": {
+    "mtime": 1773853378.0,
+    "ast_hash": "53c1ee43d8db23a3ba18fd7def50c2cd",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/meteorological_metrics_multiplot_8panels.png": {
+    "mtime": 1773853378.0,
+    "ast_hash": "1b9d2c822e8dcdb3d5dccfd2aa7a0acc",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_hydro_signatures.png": {
+    "mtime": 1773853378.0,
+    "ast_hash": "6d796926c5a5fd83488c5118744e77de",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/watershed_size_distribution.png": {
+    "mtime": 1773853378.0,
+    "ast_hash": "adce777dba45beb461050f034047e152",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_cluster_heatmap.png": {
+    "mtime": 1781447461.2682755,
+    "ast_hash": "b92bf4fbebec1a97aeeaaecb07669bf6",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/discharge_quality_pie.png": {
+    "mtime": 1773853378.0,
+    "ast_hash": "760feb77be2e9b15635ee2db58cd96cf",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_regime_map.png": {
+    "mtime": 1781450030.3576915,
+    "ast_hash": "22c23392075d6fae19eac0fb465eeb30",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/correlations_multiplot.png": {
+    "mtime": 1773853379.0,
+    "ast_hash": "7bda2bcb7fb3479dea20914eb43a6c06",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/discharge_characteristics.png": {
+    "mtime": 1773853379.0,
+    "ast_hash": "28b1041ac4a52daa1c604683ebec04f3",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/geo_dendrogram_ward_15_clusters.png": {
+    "mtime": 1773853378.0,
+    "ast_hash": "019f02c3b62bd5f5996b88d8fe954de8",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/hydrological_metrics_multiplot_8panels.png": {
+    "mtime": 1773853379.0,
+    "ast_hash": "6f18e994ee0ef7aa76fffe301e4c53b5",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_gauge_network.png": {
+    "mtime": 1781447453.1993527,
+    "ast_hash": "21ece10d634b7b21f2b48d42d1aecc4d",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/geo_pca_15_clusters.png": {
+    "mtime": 1773853379.0,
+    "ast_hash": "d5fa4e4d8da548b8e8aad1dfab4b6017",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/trend_categories_map.png": {
+    "mtime": 1773853379.0,
+    "ast_hash": "3f3dcecf00783783b55da57759a47105",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/trends_multiplot_sens_slope.png": {
+    "mtime": 1773853379.0,
+    "ast_hash": "d53eb577c413ec54bf8df79d0f5ff77c",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/figure20.png": {
+    "mtime": 1773853379.0,
+    "ast_hash": "e53ae6b7e2a769b1e0175d6061b5268a",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_hydro_characteristics.png": {
+    "mtime": 1781447453.578349,
+    "ast_hash": "972fc817e6e64cccf3069a0ce436a250",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/hydrograph_clusters_15.png": {
+    "mtime": 1773853379.0,
+    "ast_hash": "a918acb8f4e01320e65ee7bcb7364612",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/geo_cluster_metrics_summary_15.png": {
+    "mtime": 1773853379.0,
+    "ast_hash": "f030768d9e53c862a3aef766a2708203",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_cluster_map.png": {
+    "mtime": 1781447461.531273,
+    "ast_hash": "afbb5f41021db84d55452ed808b85206",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/water_level_characteristics.png": {
+    "mtime": 1773853379.0,
+    "ast_hash": "219ede2e1235fd02b169afa8fcf0b98f",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/trends_correlations_scatter.png": {
+    "mtime": 1773853379.0,
+    "ast_hash": "5dc805aa09bda5b3c50d454cb35a6d62",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/geo_cluster_radar_15_profiles.png": {
+    "mtime": 1773853379.0,
+    "ast_hash": "7d08e895a1c7294d8bd1850c2e5b3e9e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_hydro_signatures_2.png": {
+    "mtime": 1781450065.3902955,
+    "ast_hash": "6a7efbf43441ed815f75993ee504d3a2",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/metrics_by_geo_cluster_boxplots.png": {
+    "mtime": 1773853380.0,
+    "ast_hash": "cf99e57efa22bc188f1db26ad4d24255",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_regime_hydrographs.png": {
+    "mtime": 1781450029.8036819,
+    "ast_hash": "3ff96c2481b495c6b7ebf1f4ccb1f96e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_hydro_signatures_1.png": {
+    "mtime": 1781450061.6872323,
+    "ast_hash": "e6694f9cf9ad99f42d0beb8532b5b295",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_forcing_correlations.png": {
+    "mtime": 1781447432.3615623,
+    "ast_hash": "9c77abf992ff2f3bf78593c5bf467e9d",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/meteorological_boxplots_by_geo_cluster.png": {
+    "mtime": 1773853379.0,
+    "ast_hash": "feb63bc286e5e9ba89baa9997050a65d",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/discharge_quality_distribution.png": {
+    "mtime": 1773853380.0,
+    "ast_hash": "4f785340c2b2722a288f2dc60b2ce584",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/data_coverage_summary.png": {
+    "mtime": 1773853380.0,
+    "ast_hash": "a7e2f76a7d45045acb1a6f169941eefb",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_quality_assessment.png": {
+    "mtime": 1781447453.9263456,
+    "ast_hash": "5a1d94c52a40d4b5f1f99542093927a3",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/hess_quality_audit.py": {
+    "mtime": 1781451032.3001456,
+    "ast_hash": "b5037b5e86f43fd3d9aefda58e2dc5a3",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/analysis/gauge_id_audit.py": {
+    "mtime": 1781445704.3478866,
+    "ast_hash": "d14c9f6e5f13e9fc0e94d671af6de20f",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/analysis/__marimo__/session/gauge_id_audit.py.json": {
+    "mtime": 1781445830.6191647,
+    "ast_hash": "b76c8bfe37b3ce48d0083b2f73d16cac",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/reports/gauge_id_audit.html": {
+    "mtime": 1781445830.6230953,
+    "ast_hash": "cdf3329689d12de6dee74bbee2ff88b8",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/src/utils/paper_analysis_scope.py": {
+    "mtime": 1781446970.878795,
+    "ast_hash": "51950a90e671dfd95f00d58f94f97ddd",
+    "semantic_hash": ""
+  }
+}

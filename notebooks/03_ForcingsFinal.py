@@ -1,4 +1,4 @@
-"""CAMELS-RU Meteorological Forcings — ESSD Paper 1.
+"""CAMELS-RU meteorological forcing diagnostics for the HESS manuscript.
 
 Produces publication-quality figures for Section 4 (forcings description):
   - fig_precip_comparison.png     — 3-panel map: ERA5/MSWEP/GPCP mean annual P
@@ -29,6 +29,11 @@ import pandas as pd
 
 sys.path.append(str(Path(__file__).parent.parent))
 from src.plots.paper_maps import continuous_multiplot
+from src.utils.paper_analysis_scope import (
+    PAPER_ANALYSIS_EXCLUSION_NOTE,
+    filter_paper_analysis_index,
+    paper_analysis_scope_summary,
+)
 
 gpd.options.io_engine = "pyogrio"
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -111,7 +116,19 @@ ws_gdf = gpd.read_file(GEOM_DIR / "camels_watersheds.gpkg")
 ws_gdf.set_index("gauge_id", inplace=True)
 ws_gdf.index = ws_gdf.index.astype(str)
 
-print(f"Loaded {len(gauge_gdf)} gauge locations, {len(ws_gdf)} watersheds")
+release_scope = paper_analysis_scope_summary(gauge_gdf.index)
+gauge_gdf = filter_paper_analysis_index(gauge_gdf)
+ws_gdf = filter_paper_analysis_index(ws_gdf)
+
+print(
+    f"Loaded {release_scope.n_total} release gauge locations, {len(ws_gdf)} paper-analysis watersheds"
+)
+print(
+    "Paper-analysis gauge-ID scope: "
+    f"include {release_scope.n_included}, exclude {release_scope.n_excluded} "
+    f"(ID length >= {release_scope.excluded_min_id_length})"
+)
+print(PAPER_ANALYSIS_EXCLUSION_NOTE)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # LOAD PRECIPITATION (ERA5-Land, MSWEP, GPCP)
@@ -395,6 +412,7 @@ for ax, metric, title in zip(
     axes_p,
     ["era5_mean_annual_mm", "mswep_mean_annual_mm", "gpcp_mean_annual_mm"],
     ["(a) ERA5-Land", "(b) MSWEP v2.8", "(c) GPCP v3.3"],
+    strict=True,
 ):
     from src.plots.paper_maps import _set_extent_from_data  # noqa: E402
 
@@ -431,10 +449,10 @@ cb = fig_precip.colorbar(
 )
 cb.set_ticks(_bin_edges.tolist())
 cb.set_ticklabels([str(int(v)) for v in _bin_edges])
-cb.set_label("mm/yr", fontsize=11)
+cb.set_label("mm yr⁻¹", fontsize=11)
 cb.ax.tick_params(labelsize=10)
 
-fig_precip.suptitle("Mean Annual Precipitation (mm/yr)", fontsize=14, fontweight="bold")
+fig_precip.suptitle("Mean Annual Precipitation (mm yr⁻¹)", fontsize=14, fontweight="bold", y=1.02)
 fig_precip.savefig(IMAGE_DIR / "fig_precip_comparison.png", dpi=300, bbox_inches="tight")
 plt.close(fig_precip)
 print("\nSaved fig_precip_comparison.png")
@@ -446,7 +464,7 @@ print("\nSaved fig_precip_comparison.png")
 fig_wb = continuous_multiplot(
     plot_gdf,
     metrics=["era5_qp_ratio", "era5_et_proxy_mm"],
-    titles=["(a) Runoff Ratio (Q/P)", "(b) ET Proxy (P \u2212 Q, mm/yr)"],
+    titles=["(a) Runoff Ratio (Q/P)", "(b) ET Proxy (P \u2212 Q, mm yr\u207b\u00b9)"],
     ncols=2,
     panel_size=(7.5, 5.5),
     cmap_name="RdYlBu_r",
@@ -458,7 +476,7 @@ fig_wb = continuous_multiplot(
     suptitle="Water Balance (ERA5-Land precipitation)",
     colorbar_labels={
         "era5_qp_ratio": "Q/P",
-        "era5_et_proxy_mm": "mm/yr",
+        "era5_et_proxy_mm": "mm yr⁻¹",
     },
     background_gdf=_ne_land,
 )
@@ -522,15 +540,15 @@ for ax, (ds_a, ds_b, _label) in zip(axes, pairs_plot, strict=True):
     ax.text(
         0.05,
         0.95,
-        f"r = {r_val:.3f}\nbias = {bias:+.0f} mm/yr",
+        f"r = {r_val:.3f}\nbias = {bias:+.0f} mm yr⁻¹",
         transform=ax.transAxes,
         va="top",
         fontsize=11,
         bbox={"boxstyle": "round,pad=0.3", "facecolor": "white", "alpha": 0.8},
     )
 
-    ax.set_xlabel(f"{ds_a} (mm/yr)")
-    ax.set_ylabel(f"{ds_b} (mm/yr)")
+    ax.set_xlabel(f"{ds_a} (mm yr⁻¹)")
+    ax.set_ylabel(f"{ds_b} (mm yr⁻¹)")
     ax.set_title(f"{ds_a} vs {ds_b}", fontsize=13, fontweight="bold", loc="left")
     ax.set_aspect("equal")
     ax.grid(alpha=0.15, linestyle="--")
@@ -616,7 +634,7 @@ print(table2.to_string(index=False))
 # ══════════════════════════════════════════════════════════════════════════════
 
 print("\n" + "=" * 70)
-print("FORCINGS ANALYSIS COMPLETE (Paper 1 — dataset description only)")
+print("FORCINGS ANALYSIS COMPLETE (CAMELS-RU manuscript diagnostics)")
 print("=" * 70)
 print(f"  Figures saved to: {IMAGE_DIR}")
 print(f"  Tables saved to:  {TABLE_DIR}")

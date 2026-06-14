@@ -1,14 +1,20 @@
 # CAMELS-RU Paper
 
-**Target journal:** Earth System Science Data (ESSD)
+**Target journal:** Hydrology and Earth System Sciences (HESS)
 
 ## Structure
 
 ```
 paper/
-├── manuscript.md       # Full paper in GitHub-flavored Markdown
-├── images/             # All figures (PNG)
-├── latex/              # Original LaTeX source (for final ESSD submission)
+├── overleaf/           # Active collaborative manuscript source (nested Overleaf git repo; ignored by parent repo)
+│   ├── main.tex
+│   ├── macros.tex
+│   ├── refs.bib
+│   ├── sections/
+│   └── tables/
+├── manuscript.md       # Legacy Markdown snapshot/context; not canonical unless explicitly revived
+├── images/             # Figure generation outputs mirrored into overleaf/images/ when used by the manuscript
+├── latex/              # Legacy generated LaTeX snapshot from the Markdown-era workflow
 │   ├── main.tex
 │   ├── macros.tex
 │   ├── refs.bib
@@ -20,13 +26,13 @@ paper/
 
 ## Editing
 
-Edit `manuscript.md` directly. GitHub renders it with full formatting (tables, math, images).
+The active collaborative manuscript source is the Overleaf git clone at `paper/overleaf/` in local working copies. Treat `manuscript.md` and `paper/latex/` as legacy Markdown-era context unless explicitly revived.
 
-For collaborative review, use GitHub Pull Requests with line-level comments.
+Use Overleaf comments and nested-repo diffs for manuscript review. Use parent-repo pull requests for code, data-processing, release, and documentation changes.
 
 ## Figures
 
-All figures are in `images/`. Referenced in the manuscript as `![Figure N](images/filename.png)`.
+Canonical manuscript figures live in `paper/overleaf/images/`. Figure-generation scripts may write first to `paper/images/`; copy or script-sync any manuscript-used figure into `paper/overleaf/images/` before building or pushing Overleaf.
 
 Figures referenced in the manuscript:
 
@@ -38,15 +44,16 @@ Figures referenced in the manuscript:
 | 4 | `fig_precip_comparison.png` | Precipitation spatial comparison |
 | 5 | `fig_forcing_correlations.png` | Inter-dataset scatter plots |
 | 6 | `fig_water_balance.png` | Runoff ratio and ET proxy |
-| 7 | `fig_hydro_signatures_1.png` | Magnitude/baseflow signatures |
-| 8 | `fig_hydro_signatures_2.png` | Timing/variability signatures |
+| 7 | `fig_budyko.png` | Budyko consistency check |
+| 8 | `fig_hydro_signatures_1.png` | Magnitude/baseflow signatures |
+| 9 | `fig_hydro_signatures_2.png` | Timing/variability signatures |
 
 Additional figures available in `images/` for supplementary material.
 
-## Building LaTeX (for final submission)
+## Building the canonical manuscript
 
 ```bash
-cd latex/
+cd paper/overleaf
 latexmk -pdf main.tex
 ```
 
@@ -65,4 +72,4 @@ The manuscript went through 4 rounds of automated peer review (4 independent Opu
 
 ## Key Numbers
 
-All numbers in `manuscript.md` were verified against source code and recomputation on 2026-03-19. The LaTeX source in `latex/` is a snapshot from the original conversion; `manuscript.md` is the source of truth.
+Current manuscript numbers must be verified against `release/CAMELS_RU_v1.0/` and reflected in `paper/overleaf/macros.tex`. The older `manuscript.md` and `paper/latex/` values are not authoritative.

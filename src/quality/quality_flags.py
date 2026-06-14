@@ -35,6 +35,9 @@ class QualityFlag(Enum):
     VERY_LOW_PQ_CORRELATION = "very_low_pq_correlation"  # max_cross_corr < 0.2
     LOW_PQ_CORRELATION = "low_pq_correlation"  # max_cross_corr < 0.4
     LOW_FLASHINESS = "low_flashiness"  # flashiness_index < 0.02
+    NO_EFFECTIVE_WATER_RESPONSE = "no_effective_water_response"
+    VERY_LOW_EFFECTIVE_WATER_CORRELATION = "very_low_effective_water_correlation"
+    LOW_EFFECTIVE_WATER_CORRELATION = "low_effective_water_correlation"
 
     # Statistical anomaly flags
     CONSTANT_VALUE = "constant_value"  # Sensor stuck (>30 days constant)
@@ -66,6 +69,12 @@ _FLAG_SEVERITY: dict[QualityFlag, FlagSeverity] = {
     QualityFlag.VERY_LOW_PQ_CORRELATION: FlagSeverity.MINOR,  # Minor - expected for nival catchments
     QualityFlag.LOW_PQ_CORRELATION: FlagSeverity.MINOR,  # Minor - expected in continental climates
     QualityFlag.LOW_FLASHINESS: FlagSeverity.MINOR,  # Minor - large catchments have low flashiness
+    # Temperature-aware rain + snowmelt response flags. Still minor because
+    # the degree-day snowpack proxy is a screening heuristic, not a calibrated
+    # process model.
+    QualityFlag.NO_EFFECTIVE_WATER_RESPONSE: FlagSeverity.MINOR,
+    QualityFlag.VERY_LOW_EFFECTIVE_WATER_CORRELATION: FlagSeverity.MINOR,
+    QualityFlag.LOW_EFFECTIVE_WATER_CORRELATION: FlagSeverity.MINOR,
     # Anomaly flags
     QualityFlag.CONSTANT_VALUE: FlagSeverity.MAJOR,  # Downgraded - short constant periods may be natural
     QualityFlag.IMPLAUSIBLE_SPIKE: FlagSeverity.MINOR,  # Downgraded - spikes may be real flood events

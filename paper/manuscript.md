@@ -1,3 +1,5 @@
+<!-- Legacy Markdown snapshot. Active collaborative manuscript source: paper/overleaf/ (Overleaf git clone). -->
+
 # CAMELS-RU: A Large-Sample Hydroclimatic Dataset for 3,353 Russian Catchments
 
 **Dmitrii V. Abramov** ^1^ [ORCID: 0000-0003-2682-8722]
@@ -17,7 +19,7 @@ Each of the 3,353 watershed boundaries was manually verified against official Ro
 Fifteen hydrological signatures are released for 1,845 catchments (after removing 17 small-basin anomalies; main-text statistics and the signature maps in Figures 8 and 9 use a 1,716-gauge strict-completeness subset, see Sect. 3.5) and characterize discharge magnitude, variability, timing, extremes, and climate–water-balance consistency, including a Budyko aridity/evaporative pair.
 Water-balance sanity checks against ERA5-Land precipitation yield runoff ratios ≤ 1 for 98.6% of catchments (median 0.260), an upper-bound closure consistent with (but inflated by) the known ERA5-Land high-latitude wet bias (Sect. 4).
 No prior CAMELS-standard dataset covers the Russian Federation (Table 1); the global Caravan compilation (Kratzert et al., 2023) reuses existing regional CAMELS derivatives and excludes Russian gauges.
-The dataset is available at *[DOI: to be assigned upon Zenodo upload]*.
+The release bundle is staged for Zenodo archiving; the DOI will be inserted after upload.
 
 ---
 
@@ -53,12 +55,7 @@ The closure of the AIS GMVO public data platform in 2025 adds urgency to preserv
 
 ### 1.3 Objectives
 
-Our objectives are to:
-
-1. document data acquisition, processing, and quality control;
-2. compute hydrological signatures that characterize discharge across Russian catchments;
-3. validate meteorological forcing through inter-dataset comparisons and water-balance consistency; and
-4. provide open-access data records following FAIR principles (Wilkinson et al., 2016).
+This paper documents the acquisition, processing, and quality control of the underlying records, computes hydrological signatures that characterize discharge behavior across Russian catchments, validates the meteorological forcing through inter-dataset comparison and water-balance consistency checks, and releases the resulting data records under FAIR principles (Wilkinson et al., 2016).
 
 
 ---
@@ -79,7 +76,7 @@ Boreal taiga dominates in the north (up to 95% forest), while southern steppe ca
 Soils range between clay-rich Chernozems in agricultural lowlands and sandy Podzols in permafrost terrain.
 
 ![Figure 1](images/fig_gauge_network.png)
-**Figure 1.** (a) Spatial distribution of 3,353 catchments colored by discharge quality grade (A–F, blue to red; triangles denote hydropower stations; "ungraded" markers (n=1,286) comprise 1,183 catchments with a delineated boundary but no discharge record and 103 discharge-bearing gauges with too few assessed years to assign an overall grade). (b) Catchment size distribution. Higher gauge density in European Russia and southern Siberia reflects Roshydromet's operational network.
+**Figure 1.** (a) Spatial distribution of the 3,201 paper-analysis catchments colored by discharge quality grade (A–F, blue to red; "ungraded" markers (n=1,134) comprise 1,031 catchments with a delineated boundary but no discharge record and 103 discharge-bearing gauges with too few assessed years to assign an overall grade). The 152 seven-character reservoir/hydropower gauge IDs remain in the release but are omitted from paper-analysis maps and summary distributions. (b) Catchment size distribution for the same paper-analysis scope. Higher gauge density in European Russia and southern Siberia reflects Roshydromet's operational network.
 
 ---
 
@@ -93,12 +90,7 @@ Daily discharge and water level observations were obtained from the Automated In
 The database provides stage-discharge records for approximately 3,000 active gauging stations across Russia.
 After delineation, 3,353 unique watershed boundaries were produced. Of these, 2,170 have discharge records and 2,989 have water level records (2,158 have both, yielding 3,001 unique gauge locations with at least one variable; the remaining 352 watersheds have delineated boundaries and physiographic attributes but no hydrological time series in the current release).
 
-Selection criteria:
-
-- Minimum 10 years of available records between 2008–2023
-- Data completeness ≥ 95% with ≤ 2 minor quality flags for high-quality subset (849 Grade A gauges)
-- Quality flags indicating operational sensors and regular maintenance
-
+Gauges were retained when they provide at least 10 years of records within 2008–2023 and their quality flags indicate operational sensors and regular maintenance; the high-quality subset (849 Grade A gauges) additionally requires data completeness ≥ 95% with at most two minor quality flags.
 Quality tiers are assigned by the automated grading procedure described below: *decent quality* gauges receive overall grades A–C; the *high-quality* subset comprises Grade A gauges (≥ 95% completeness, ≤ 2 minor flags).
 Overall, 87% of discharge gauges meet the decent quality threshold, with the high-quality subset comprising 849 gauges (detailed data organization in Sect. 5).
 
@@ -107,17 +99,17 @@ The 2008–2023 period was selected because systematic digitization and standard
 #### 3.1.2 Quality Control
 
 Each discharge time series was assessed through a quality control procedure operating at annual (hydrological year) resolution.
-The procedure evaluates four categories of quality metrics:
+The procedure evaluates four categories of quality metrics.
 
-1. **Anomaly detection:** Outliers flagged when values exceed 8 robust standard deviations (median absolute deviation, MAD × 1.4826) from a 30-day centered rolling median; the rationale for the 8σ cutoff is given below. Constant-value periods (> 30 consecutive days) flagged separately. Negative discharge values rejected.
+Anomaly detection flags outliers when values exceed 8 robust standard deviations (median absolute deviation, MAD × 1.4826) from a 30-day centered rolling median; the rationale for the 8σ cutoff is given below. Constant-value periods (> 30 consecutive days) are flagged separately, and negative discharge values are rejected.
 
-2. **Climatology checks:** Each year compared against a day-of-year climatology (mean across all years). Metrics include Pearson correlation with climatology, normalized RMSE, and amplitude ratio (peak discharge / climatological peak). For catchments with seasonal flow regimes (75th-percentile peak ratio ≥ 10), years with peak ratio < 30% of the gauge's 75th-percentile peak ratio are flagged as critical failures, targeting sensor malfunction rather than genuine low-flow years. Stable-regime catchments are exempted from this check.
+Climatology checks compare each year against a day-of-year climatology (mean across all years) using the Pearson correlation with the climatology, normalized RMSE, and amplitude ratio (peak discharge / climatological peak). For catchments with seasonal flow regimes (75th-percentile peak ratio ≥ 10), years with peak ratio < 30% of the gauge's 75th-percentile peak ratio are flagged as critical failures, targeting sensor malfunction rather than genuine low-flow years; stable-regime catchments are exempted from this check.
 
-3. **Meteorological response:** Precipitation events (> 5 mm d⁻¹) are matched against discharge response within a 7-day window (10% increase threshold). Cross-correlation between daily P and Q computed at lags 0–14 days to identify the dominant response time. The Richards–Baker flashiness index quantifies flow variability. Thresholds are set conservatively low (cross-correlation > 0.1, event response rate > 20%) to avoid penalizing snowmelt-dominated catchments where precipitation–discharge coupling is inherently weak.
+Meteorological-response checks match precipitation events (> 5 mm d⁻¹) against discharge response within a 7-day window (10% increase threshold) and compute the cross-correlation between daily P and Q at lags 0–14 days to identify the dominant response time, with the Richards–Baker flashiness index quantifying flow variability. Thresholds are set conservatively low (cross-correlation > 0.1, event response rate > 20%) to avoid penalizing snowmelt-dominated catchments where precipitation–discharge coupling is inherently weak.
 
-4. **Gap-filling:** Gaps ≤ 6 days interpolated using second-order polynomial interpolation; longer gaps retained as missing. Interpolated values producing negative discharge set to missing.
+Gap-filling interpolates gaps of at most 6 days using second-order polynomial interpolation and retains longer gaps as missing; interpolated values producing negative discharge are set to missing.
 
-Each year is graded A–D or F (grade E omitted to avoid ambiguity with "Excellent" in common grading conventions) based on flag severity (critical, major, minor; 18 flags defined, 16 active — two variance-based flags are disabled because annual discharge variance varies naturally in snowmelt-dominated catchments). The grade is assigned as:
+Each year is graded A–D or F (grade E omitted to avoid ambiguity with "Excellent" in common grading conventions) based on flag severity (critical, major, minor; 21 flag types are defined in code, of which the release-default grading evaluates 16 active flags, with two variance flags and three optional temperature-aware effective-water flags disabled by default). The grade is assigned as:
 
 | Grade | Condition (applied top-down; first match wins) |
 |-------|-----------|
@@ -126,7 +118,7 @@ Each year is graded A–D or F (grade E omitted to avoid ambiguity with "Excelle
 | C | 1 major flag, or ≥ 5 minor flags, or completeness < 85% |
 | B | ≥ 3 minor flags (< 5), or completeness < 95% |
 | A | ≤ 2 minor flags and completeness ≥ 95% |
-Gauge-level grades aggregate year-level results with a strict Grade A rule: a gauge receives overall Grade A only if every assessed hydro-year is individually graded A. For grades B–D, the mode of non-F year grades is used, capped by (i) the fraction of usable years — usable fraction < 50% caps at D, < 70% caps at C — and (ii) the fraction of F-graded years, which caps at B once the F fraction exceeds 30% to prevent high headline grades at gauges with frequent critical failures.
+Gauge-level grades aggregate year-level results with a strict Grade A rule: a gauge receives overall Grade A only if every assessed hydro-year is individually graded A. For grades B–D, the mode of non-F year grades is used, capped by (i) the fraction of usable years (a usable fraction below 50% caps the grade at D, below 70% at C) and (ii) the fraction of F-graded years, which caps the grade at B once the F fraction exceeds 30%, preventing high headline grades at gauges with frequent critical failures.
 Gauges with overall grade A–C are classified as *decent quality* (87% of discharge gauges); grades D–F as *poor*.
 The resulting grade distribution and data completeness by grade are shown in Figure 2; discharge and water level characteristics by grade are summarized in Figure 3.
 
@@ -153,23 +145,21 @@ No automated quality grading (A–F) was applied to water level data; users shou
 
 #### 3.2.1 ERA5-Land Temperature
 
-Air-temperature forcing (mean, minimum, maximum; °C) was derived from ERA5-Land reanalysis (Muñoz-Sabater et al., 2021), which provides 0.1° (~9 km) hourly data aggregated to daily resolution. Basin-averaged temperature was computed with a two-branch aggregation that switches on a 150 km² area threshold: catchments below 150 km² use fractional-area weighting of ERA5-Land grid cells intersecting the watershed boundary (weights normalised to unity); catchments at or above 150 km² use a simple spatial mean of grid cells whose footprint touches the boundary (`all_touched=True` clip), because partial-cell edge effects become negligible once a basin spans many grid cells. Temperatures are reported on the native ERA5-Land geometry without elevation correction; users requiring elevation-adjusted temperatures for high-relief basins should apply a lapse-rate correction downstream using the `ele_mt_uav` attribute (Table 2). ERA5-Land precipitation (mean annual 826 mm yr⁻¹) is retained internally for cross-validation (Sect. 4.1) but is not distributed in the release, where MSWEP v2.8 serves as the primary precipitation product.
+Air-temperature forcing (mean, minimum, maximum; °C) was derived from ERA5-Land reanalysis (Muñoz-Sabater et al., 2021), which provides 0.1° (~9 km) hourly data aggregated to daily resolution. Basin-averaged temperature was computed with a two-branch aggregation that switches on a 150 km² area threshold: catchments below 150 km² use fractional-area weighting of ERA5-Land grid cells intersecting the watershed boundary (weights normalised to unity); catchments at or above 150 km² use a simple spatial mean of grid cells whose footprint touches the boundary (`all_touched=True` clip), because partial-cell edge effects become negligible once a basin spans many grid cells. Temperatures are reported on the native ERA5-Land geometry without elevation correction; users requiring elevation-adjusted temperatures for high-relief basins should apply a lapse-rate correction downstream using the `ele_mt_uav` attribute (Table 2). ERA5-Land precipitation (mean annual 827 mm yr⁻¹ in the paper-analysis gauge-ID scope) is retained internally for cross-validation (Sect. 4.1) but is not distributed in the release, where MSWEP v2.8 serves as the primary precipitation product.
 
 #### 3.2.2 GLEAM Potential Evapotranspiration
 
-Potential evapotranspiration (PET, mm d⁻¹) was taken from GLEAM4 (Miralles et al., 2025), which provides daily land-surface evaporation fields at 0.1° resolution based on a modified Priestley–Taylor formulation scaled by a multiplicative evaporative-stress factor, with forcing drawn from satellite observations and reanalysis meteorology. We use the `potential_evaporation` variable (which represents reference-surface potential evaporation) and aggregate to catchment scale using the same two-branch procedure as for temperature (Sect. 3.2.1). GLEAM's independent forcing chain avoids the self-consistency issues that arise when PET is taken from the same reanalysis product that supplies precipitation (Sect. 4.1.2). Approximately 2.4% of the released `pet` values are slightly negative (minimum −0.19 mm d⁻¹), reflecting wintertime condensation at high latitudes in GLEAM's formulation; users requiring a strictly non-negative PET should clip values below zero.
+Potential evapotranspiration (PET, mm d⁻¹) was taken from GLEAM4 (Miralles et al., 2025), which provides daily land-surface evaporation fields at 0.1° resolution based on a modified Priestley–Taylor formulation scaled by a multiplicative evaporative-stress factor, with forcing drawn from satellite observations and reanalysis meteorology. We use the `potential_evaporation` variable (which represents reference-surface potential evaporation) and aggregate to catchment scale using the same two-branch procedure as for temperature (Sect. 3.2.1). GLEAM's independent forcing chain avoids the self-consistency issues that arise when PET is taken from the same reanalysis product that supplies precipitation (Sect. 4.1.2). Approximately 2.4% of the released `pet` values are slightly negative (minimum −0.19 mm d⁻¹), which in GLEAM's formulation corresponds to wintertime condensation at high latitudes; users requiring a strictly non-negative PET should clip values below zero.
 
 #### 3.2.3 MSWEP Precipitation
 
-Precipitation data were sourced from Multi-Source Weighted-Ensemble Precipitation (MSWEP) version 2.8 (Beck et al., 2019), a global precipitation dataset merging gauge observations, satellite estimates, and reanalysis data at 0.1° resolution.
-Mean annual precipitation: 608 mm yr⁻¹ across CAMELS-RU catchments.
-MSWEP outperforms reanalysis-only products in gauge-sparse and snowfall-dominated regions (Beck et al., 2019).
-Daily precipitation (mm d⁻¹) aggregated to catchment scale using the two-branch procedure described in Sect. 3.2.1.
+Precipitation data were sourced from Multi-Source Weighted-Ensemble Precipitation (MSWEP) version 2.8 (Beck et al., 2019), a global product that merges gauge observations, satellite estimates, and reanalysis data at 0.1° resolution and outperforms reanalysis-only products in gauge-sparse and snowfall-dominated regions (Beck et al., 2019).
+Daily precipitation (mm d⁻¹) was aggregated to catchment scale using the two-branch procedure described in Sect. 3.2.1, giving a mean annual precipitation of 609 mm yr⁻¹ in the paper-analysis gauge-ID scope.
 
 #### 3.2.4 Inter-Dataset Validation
 
 Three precipitation products (ERA5-Land, MSWEP v2.8, GPCP v3.3) were cross-validated to assess forcing reliability.
-Daily correlations range from r = 0.58 (ERA5-Land vs. GPCP) to r = 0.83 (ERA5-Land vs. MSWEP), with systematic differences in annual totals reflecting different data sources and spatial resolutions (see Sect. 4).
+Daily correlations range from r = 0.57 (ERA5-Land vs. GPCP) to r = 0.83 (ERA5-Land vs. MSWEP), with systematic differences in annual totals that trace to the products' different data sources and spatial resolutions (see Sect. 4).
 
 #### 3.2.5 Gap-Filling
 
@@ -187,7 +177,7 @@ Per-gauge fill provenance is traceable through three artefacts: the `gap_fill_me
 
 #### 3.3.1 Base Delineation
 
-Initial catchment boundaries delineated using the MERIT Hydro digital elevation model (DEM; Yamazaki et al., 2019) (3-arcsecond, ~90 m resolution globally) and associated flow direction/accumulation grids.
+Initial catchment boundaries were delineated using the MERIT Hydro digital elevation model (DEM; Yamazaki et al., 2019) (3-arcsecond, ~90 m resolution globally) and associated flow direction/accumulation grids.
 MERIT Hydro reduces elevation errors in flat and forested terrain compared to earlier global DEMs by incorporating satellite altimetry and river network constraints.
 
 Gauge coordinates were snapped to the nearest high-accumulation pixel on the MERIT Hydro flow network; candidate pixels were accepted when their upstream drainage area fell within ±20% of the Roshydromet-reported catchment area.
@@ -195,29 +185,13 @@ Watershed delineation used the standard D8 flow routing algorithm, after which e
 
 #### 3.3.2 Manual Expert Verification
 
-Every watershed boundary (3,353 catchments) was manually verified and adjusted by a hydrographic expert using:
-
-- High-resolution satellite imagery (Google Earth, Sentinel-2 10 m)
-- MERIT Hydro river network overlay
-- Official Roshydromet topographic maps (1:100,000 scale)
-- Local terrain knowledge and hydrographic principles
-
-Manual adjustments corrected:
-
-- DEM artifacts in flat terrain (West Siberian Lowland, river deltas)
-- Flow direction errors at confluences and braided reaches
-- Canal diversions and reservoirs altering natural drainage
-- Karst hydrology and subsurface flow contributions
+Every watershed boundary (3,353 catchments) was manually verified and adjusted by a hydrographic expert against high-resolution satellite imagery (Google Earth, Sentinel-2 10 m), the MERIT Hydro river network overlay, official Roshydromet topographic maps (1:100,000 scale), and local terrain knowledge.
+Manual adjustments corrected DEM artifacts in flat terrain (West Siberian Lowland, river deltas), flow-direction errors at confluences and braided reaches, canal diversions and reservoirs that alter natural drainage, and boundaries affected by karst hydrology and subsurface flow contributions.
 
 #### 3.3.3 Validation Against Official Data
 
-Comparison with official Roshydromet catchment areas, computed on the 3,011 of 3,353 catchments with a reported reference area, yielded:
-
-- Mean absolute areal error: 5.1% (trimmed mean over |error| ≤ 100%, excluding 26 pathological gauges in karst or canal-modified basins)
-- Median absolute areal error: 1.4%
-- 77% of catchments within 5% error
-- 87% of catchments within 10% error
-- Largest errors (> 15%) occur in complex karst terrain (Ural Mountains) and anthropogenically modified basins (irrigation canals, inter-basin transfers)
+Comparison with official Roshydromet catchment areas, computed on the 3,011 of 3,353 catchments with a reported reference area, yielded a mean absolute areal error of 5.1% (trimmed mean over |error| ≤ 100%, excluding 26 pathological gauges in karst or canal-modified basins) and a median of 1.4%, with 77% of catchments within 5% error and 87% within 10%.
+The largest errors (> 15%) occur in complex karst terrain (Ural Mountains) and in anthropogenically modified basins with irrigation canals or inter-basin transfers.
 
 For comparison, Lehner et al. (2008) and Yamazaki et al. (2019) report 10–15% mean areal errors from automated delineation in flat and permafrost terrain.
 
@@ -231,7 +205,7 @@ HydroATLAS v1.0 uses HydroBASINS Level 12 as its smallest geographic unit (~10 k
 The full attribute set is provided in the released CSV file.
 
 Table 2 lists a recommended primary subset of 22 attributes selected by retaining upstream-aggregated annual variables and removing 12 features with pairwise |r| > 0.7 (e.g., slope correlated with elevation; aridity index redundant with precipitation and potential evapotranspiration, PET).
-All removed attributes — including aridity index, slope, temperature, and soil properties — remain available in the full released attribute file for users who need them.
+All removed attributes, including aridity index, slope, temperature, and soil properties, remain available in the full released attribute file for users who need them.
 
 **Table 2.** Static catchment attributes derived from HydroATLAS v1.0 (22 primary subset). The full set of 288 attributes is provided in the released CSV.
 
@@ -267,18 +241,14 @@ All removed attributes — including aridity index, slope, temperature, and soil
 We computed 15 hydrological signatures (Table 3) characterizing discharge magnitude, variability, timing, extremes, and climate–water-balance consistency (the Budyko aridity and evaporative pair; Budyko, 1974), following established methodologies (Sawicz et al., 2011; McMillan et al., 2017).
 Signatures were computed only for catchments smaller than 50,000 km² (to avoid spatial averaging in very large basins) that also meet the per-year completeness criterion (> 70% for at least 5 hydrological years).
 This yields **N = 1,716 gauges** for magnitude, variability, baseflow, and extreme signatures, and **N = 1,641 gauges** for the half-flow date, which requires the stricter > 82% annual completeness (≥ 300 days).
-The released `camels_ru_signatures.csv` (per gauge × per hydrological year) and `camels_ru_signatures_summary.csv` (multi-year averages per gauge) additionally include 146 gauges that pass the area and ≥ 5-year discharge filters but use a less strict per-year completeness accounting (operating on the release-level `camels_ru_discharge.nc` rather than on intermediate processed records), yielding 1,862 rows total in the per-gauge CSV (and 1,655 rows for half-flow date, which retains the ≥ 82% annual-completeness requirement); these extra gauges are retained for transparency but are excluded from the N = 1,716 / 1,641 main-text summary statistics and figures.
-Separately, 17 very small catchments (< 50 km²) yield implausibly large specific discharge (q_mean > 20 mm d⁻¹), likely reflecting rating-curve extrapolation errors or underestimated drainage areas at the small-basin end of the MERIT Hydro delineation; these are flagged `is_anomalous = True` in the per-gauge CSV and removed before computing the released `camels_ru_signatures_summary.csv` (which therefore reports n_gauges = 1,845 for most signatures and 1,643 for half-flow date; cf. §5.1).
+The released `camels_ru_signatures.csv` stores one catchment-characteristic row per gauge after averaging valid hydrological years. It includes 146 gauges that pass the area and ≥ 5-year discharge filters under a less strict per-year completeness accounting, which operates on the release-level `camels_ru_discharge.nc` rather than on intermediate processed records. The file therefore holds 1,862 rows in total (1,655 with half-flow date, which retains the ≥ 82% annual-completeness requirement). These extra gauges are retained for transparency but are excluded from the N = 1,716 / 1,641 main-text summary statistics and figures.
+Separately, 17 very small catchments (< 50 km²) yield implausibly large specific discharge (q_mean > 20 mm d⁻¹), most plausibly caused by rating-curve extrapolation errors or underestimated drainage areas at the small-basin end of the MERIT Hydro delineation; these are flagged `is_anomalous = True` in the per-gauge CSV and excluded when computing the released `camels_ru_signatures_summary.csv` summary-statistics table (which therefore reports n_gauges = 1,845 for most signatures and 1,643 for half-flow date; cf. §5.1).
 
-Signatures were computed separately for individual hydrological years (October–September) and then averaged to produce catchment-characteristic values.
-Key methodological choices:
+Signatures were computed separately for individual hydrological years (October–September) and then averaged to produce catchment-characteristic values. Several methodological choices deserve note.
 
-- Runoff ratio uses ERA5-Land precipitation as denominator; ratios are higher with MSWEP (median 0.40) or GPCP (median 0.35) due to their lower annual precipitation totals. Note that the released `camels_ru_signatures_summary.csv` reports an ERA5-Land runoff-ratio median of 0.343 over the small-basin signature subset (1,804 catchments after `is_anomalous` removal), which differs from the §4.1.2 median of 0.260 computed over the ~2,070 discharge-bearing catchments with paired annual Q and P — small basins systematically have higher runoff ratios than large ones because of lower transit-time evapotranspiration losses
-- Flow duration curve (FDC) slope computed as [ln(Q₃₃) − ln(Q₆₆)] / (66 − 33) × 100 where Qₚ is discharge at the p-th exceedance percentile; positive values indicate steeper curves (note: sign convention opposite to Sawicz et al., 2011)
-- Baseflow index (BFI) computed as the mean of an ensemble of 1,000 Lyne–Hollick digital filter (Nathan and McMahon, 1990) runs with α ~ U[0.9, 0.98] (3-pass, with 30 reflected boundary points at each end to reduce edge effects), following Euser et al. (2013)
-- Half-flow date requires > 82% annual completeness (≥ 300 days) because partial years can shift the cumulative midpoint
-- Richards–Baker flashiness index: Σ|Qᵢ − Qᵢ₋₁| / ΣQᵢ, dimensionless measure of day-to-day flow variability
-- High-flow and low-flow durations: mean consecutive days above 2× median (high) or below 0.2× mean (low) discharge
+The runoff ratio uses ERA5-Land precipitation as denominator; ratios are higher with MSWEP (median 0.40) or GPCP (median 0.35) because of their lower annual precipitation totals. The released `camels_ru_signatures_summary.csv` reports an ERA5-Land runoff-ratio median of 0.343 over the small-basin signature subset (1,804 catchments after `is_anomalous` removal), which differs from the §4.1.2 median of 0.260 computed over the ~2,070 discharge-bearing catchments with paired annual Q and P; small basins systematically have higher runoff ratios than large ones because of lower transit-time evapotranspiration losses.
+
+The flow duration curve (FDC) slope is computed as [ln(Q₃₃) − ln(Q₆₆)] / (66 − 33) × 100, where Qₚ is discharge at the p-th exceedance percentile; positive values indicate steeper curves, a sign convention opposite to Sawicz et al. (2011). The baseflow index (BFI) is the mean of an ensemble of 1,000 Lyne–Hollick digital filter (Nathan and McMahon, 1990) runs with α ~ U[0.9, 0.98] (3-pass, with 30 reflected boundary points at each end to reduce edge effects), following Euser et al. (2013). The half-flow date requires > 82% annual completeness (≥ 300 days) because partial years can shift the cumulative midpoint. The Richards–Baker flashiness index, Σ|Qᵢ − Qᵢ₋₁| / ΣQᵢ, is a dimensionless measure of day-to-day flow variability, and the high-flow and low-flow durations are the mean consecutive days above 2× median discharge and below 0.2× mean discharge, respectively.
 
 **Table 3.** Hydrological signatures computed for CAMELS-RU catchments.
 
@@ -315,32 +285,27 @@ Key methodological choices:
 
 #### 4.1.1 Inter-Dataset Correlations
 
-Daily precipitation time series from three global products (ERA5-Land, MSWEP v2.8, GPCP v3.3) show agreement across 3,353 catchments. Daily statistics (spatial mean ± s.d. of per-catchment values, n = 3,353) and the corresponding per-catchment annual biases shown in Figure 5 are:
-
-- ERA5-Land vs. MSWEP: r = 0.83 ± 0.06, mean daily bias +0.83 mm d⁻¹; per-catchment annual bias +229 mm yr⁻¹ (ERA5-Land wetter)
-- ERA5-Land vs. GPCP: r = 0.58 ± 0.12, mean daily bias +0.68 mm d⁻¹; per-catchment annual bias +182 mm yr⁻¹ (ERA5-Land wetter)
-- MSWEP vs. GPCP: r = 0.73 ± 0.15, mean daily bias −0.14 mm d⁻¹; per-catchment annual bias −47 mm yr⁻¹ (MSWEP drier)
+Daily precipitation time series from three global products (ERA5-Land, MSWEP v2.8, GPCP v3.3) show agreement across the 3,201 catchments in the paper-analysis gauge-ID scope. In daily statistics (spatial mean ± s.d. of per-catchment values, n = 3,201 for MSWEP–GPCP and n = 3,194 for pairs involving ERA5-Land after pairwise valid-day filtering), ERA5-Land agrees most closely with MSWEP (r = 0.83 ± 0.06, mean daily bias +0.84 mm d⁻¹; per-catchment annual bias +230 mm yr⁻¹, ERA5-Land wetter), followed by MSWEP against GPCP (r = 0.73 ± 0.15, daily bias −0.14 mm d⁻¹; annual bias −47 mm yr⁻¹, MSWEP drier) and ERA5-Land against GPCP (r = 0.57 ± 0.12, daily bias +0.69 mm d⁻¹; annual bias +183 mm yr⁻¹, ERA5-Land wetter). The corresponding per-catchment annual biases are shown in Figure 5.
 
 Daily biases and annual biases are computed from different unit aggregations and need not scale by 365: daily biases average over every catchment-day pair, while annual biases average the catchment-mean annual totals across catchments. The two are reported together so that readers can match the text to Figure 5.
 
-ERA5-Land and MSWEP show the highest daily agreement (r = 0.83); correlations with GPCP are lower (r = 0.58 to 0.73). GPCP's 0.5° grid averages over sub-grid variability that the 0.1° products resolve, and the three products draw on different source data.
-Systematic biases in annual totals reflect different data assimilation approaches. Summary statistics below characterize the *spatial* distribution of basin-mean annual precipitation across all 3,353 catchments (each catchment's mean was first computed over 2008–2023 and then aggregated across catchments):
+The lower correlations with GPCP arise because its 0.5° grid averages over sub-grid variability that the 0.1° products resolve, and because the three products draw on different source data and assimilation approaches. Summary statistics below characterize the *spatial* distribution of basin-mean annual precipitation across the 3,201 paper-analysis catchments (each catchment's mean was first computed over 2008–2023 and then aggregated across catchments):
 
 | Dataset | Mean (mm yr⁻¹) | Std (mm yr⁻¹) | Spatial CV (%) |
 |---------|---------------|---------------|-----------------|
-| ERA5-Land | 826 | 263 | 31.8 |
-| MSWEP | 608 | 214 | 35.2 |
-| GPCP | 644 | 198 | 30.7 |
+| ERA5-Land | 827 | 268 | 32.4 |
+| MSWEP | 609 | 217 | 35.6 |
+| GPCP | 644 | 200 | 31.1 |
 
 ERA5 precipitation is a model forecast product, and its prognostic cloud microphysics scheme tends to overestimate snowfall at high latitudes (Wang et al., 2019; Lavers et al., 2022) (Figure 4).
-ERA5-Land (826 mm yr⁻¹) exceeds MSWEP (608 mm yr⁻¹) by 218 mm yr⁻¹ in basin-averaged means (229 mm yr⁻¹ per-catchment annual bias; Figure 5), and exceeds GPCP (644 mm yr⁻¹) by 182 mm yr⁻¹ in basin-averaged means (also 182 mm yr⁻¹ per-catchment annual bias; Figure 5).
-MSWEP and GPCP differ by only 36 mm yr⁻¹ in basin-averaged means (47 mm yr⁻¹ per-catchment annual bias), identifying ERA5-Land as the outlier.
+ERA5-Land (827 mm yr⁻¹) exceeds MSWEP (609 mm yr⁻¹) by 218 mm yr⁻¹ in basin-averaged means (230 mm yr⁻¹ per-catchment annual bias; Figure 5), and exceeds GPCP (644 mm yr⁻¹) by 183 mm yr⁻¹ in basin-averaged means (also 183 mm yr⁻¹ per-catchment annual bias; Figure 5).
+MSWEP and GPCP differ by only 35 mm yr⁻¹ in basin-averaged means (47 mm yr⁻¹ per-catchment annual bias), identifying ERA5-Land as the outlier.
 
 ![Figure 4](images/fig_precip_comparison.png)
-**Figure 4.** Spatial distribution of mean annual precipitation from three global products (ERA5-Land, MSWEP v2.8, GPCP v3.3) across CAMELS-RU catchments. ERA5-Land shows systematically higher values, particularly in mountainous and northern regions.
+**Figure 4.** Spatial distribution of mean annual precipitation from three global products (ERA5-Land, MSWEP v2.8, GPCP v3.3) across the 3,201 CAMELS-RU paper-analysis catchments. The 152 long-ID reservoir/hydropower gauges are retained in the release but omitted from this analysis map. ERA5-Land shows systematically higher values, particularly in mountainous and northern regions.
 
 ![Figure 5](images/fig_forcing_correlations.png)
-**Figure 5.** Inter-dataset precipitation agreement: scatter plots of mean annual precipitation (mm yr⁻¹) for each catchment. Annotations show Pearson r and mean bias for the annual values. Note that daily correlations (reported in text) differ from these annual correlations.
+**Figure 5.** Inter-dataset precipitation agreement: scatter plots of mean annual precipitation (mm yr⁻¹) for each paper-analysis catchment. Annotations show Pearson r and mean bias for the annual values. Note that daily correlations (reported in text) differ from these annual correlations.
 
 #### 4.1.2 Water Balance Consistency
 
@@ -357,40 +322,35 @@ Because ERA5-Land supplies both precipitation and temperature (PET is drawn inde
 With ERA5-Land precipitation, 98.6% of catchments yield Q/P ≤ 1 (median 0.260; Figure 6).
 This high closure rate is an upper-bound sanity check rather than a validation of discharge or catchment boundaries: because ERA5-Land is known to overestimate high-latitude snowfall, its Q/P denominator is inflated, and a low Q/P > 1 rate is in part a tautology given the wet bias.
 The 29 ERA5-Land exceptions (1.4%) are concentrated in small catchments with possible area errors or groundwater imports.
-MSWEP, which has lower annual totals, produces Q/P > 1 for 5.5% of catchments (114 gauges); these exceptions are more informative and may reflect precipitation underestimation in high-discharge regions, watershed boundary errors, or unaccounted lateral flows.
+MSWEP, which has lower annual totals, produces Q/P > 1 for 5.5% of catchments (114 gauges); these exceptions are more informative and may indicate precipitation underestimation in high-discharge regions, watershed boundary errors, or unaccounted lateral flows.
 
-Seasonal runoff ratios (ERA5-Land) reveal expected snowmelt dominance:
-
-- Winter (DJF): Q/P = 0.15 (snow storage phase)
-- Spring (MAM): Q/P = 0.48 (snowmelt release, 3.2× winter)
-- Summer (JJA): Q/P = 0.18 (high evapotranspiration)
-- Autumn (SON): Q/P = 0.25 (declining ET, moderate flow)
+Seasonal runoff ratios (ERA5-Land) follow the expected snowmelt rhythm: Q/P is lowest in winter during snow storage (DJF, 0.15), peaks with snowmelt release in spring (MAM, 0.48, 3.2× the winter value), drops under high summer evapotranspiration (JJA, 0.18), and recovers moderately in autumn as evapotranspiration declines (SON, 0.25).
 
 ![Figure 6](images/fig_water_balance.png)
-**Figure 6.** Water balance components across CAMELS-RU catchments: (a) runoff ratio (Q/P) and (b) evapotranspiration proxy (P−Q). ERA5-Land precipitation yields Q/P ≤ 1 for 98.6% of catchments. Only catchments with discharge observations are plotted; precipitation-only stations are omitted.
+**Figure 6.** Water balance components across CAMELS-RU paper-analysis catchments: (a) runoff ratio (Q/P) and (b) evapotranspiration proxy (P−Q). ERA5-Land precipitation yields Q/P ≤ 1 for 98.6% of catchments. Only catchments with discharge observations are plotted; precipitation-only stations are omitted.
 
 #### 4.1.3 Budyko Consistency Check and ET Adequacy
 
 The Q/P ratios of Sect. 4.1.2 become a stronger water-balance diagnostic once GLEAM4 PET (Sect. 3.2.2) is incorporated.
 Under the long-term water-balance assumption `P = Q + AET` (treating multi-year storage change as negligible), AET is bounded above by PET (energy limit, AET ≤ PET) and by P (water limit, AET ≤ P).
 We compute per-hydrological-year aridity index (PET / P) and evaporative index ((P − Q) / P), taken as the mean of annual ratios over ≥ 5 common Q–P–PET hydrological years, for the 1,862 catchments passing the area and discharge-record filters of Sect. 3.5 under each of the three precipitation products (Figure 7).
-Valid Budyko indices are obtained for 1,821 catchments with ERA5-Land and 1,862 each with MSWEP and GPCP; the small ERA5-Land shortfall reflects roughly 40 gauges where the ERA5-Land precipitation series fails the ≥ 5 common-year requirement when paired with both Q and PET.
+Valid Budyko indices are obtained for 1,821 catchments with ERA5-Land and 1,862 each with MSWEP and GPCP; the small ERA5-Land shortfall comes from roughly 40 gauges where the ERA5-Land precipitation series fails the ≥ 5 common-year requirement when paired with both Q and PET.
 
 Across products the median aridity index sits near unity (PET/P = 0.92 ERA5-Land, 1.02 MSWEP, 0.92 GPCP), placing the typical Russian catchment at the humid–arid transition; the corresponding evaporative-index medians (0.66 / 0.61 / 0.66) indicate that about two-thirds of precipitation returns to the atmosphere as AET in the long-term mean.
-Energy-limit excursions (evaporative_index > aridity_index, equivalent to AET > PET in per-year ratios) affect 8.0% of ERA5-Land catchments (146 gauges), 2.0% under MSWEP (37 gauges), and 3.4% under GPCP (63 gauges); the higher ERA5-Land rate is consistent with the product's known precipitation wet bias, which inflates `(P − Q)` without a matching change in PET.
-Closure violations (Q > P, evaporative_index < 0) affect 4.5% / 6.6% / 7.6% of catchments across the three products; the symmetric pattern — ERA5-Land has fewer closure violations but more energy-limit excursions, while MSWEP and GPCP show the opposite — mirrors the direction of the precipitation bias.
+Energy-limit excursions (evaporative_index > aridity_index, equivalent to AET > PET in per-year ratios) affect 8.0% of ERA5-Land catchments (146 gauges), 2.0% under MSWEP (37 gauges), and 3.4% under GPCP (63 gauges); the higher ERA5-Land rate is the expected signature of the product's precipitation wet bias, which inflates `(P − Q)` without a matching change in PET.
+Closure violations (Q > P, evaporative_index < 0) affect 4.5% / 6.6% / 7.6% of catchments across the three products. The pattern is symmetric: ERA5-Land has fewer closure violations but more energy-limit excursions, while MSWEP and GPCP show the opposite, in line with the direction of each product's precipitation bias.
 GLEAM4 ingests no precipitation forcing from ERA5-Land, MSWEP, or GPCP, so the diagnostic is independent on the precipitation side; GLEAM4 PET is computed via Priestley–Taylor with radiation and air-temperature inputs derived in part from ERA5, so independence from ERA5-Land is only partial.
 
-A complementary direct check on the magnitude of evapotranspiration uses GLEAM4's actual-evaporation field rather than its potential counterpart, on the 1,789 catchments with paired discharge, all three precipitation products, GLEAM PET, and GLEAM AET valid (the slightly tighter sample reflects the additional `area ≥ 50 km²` filter applied to remove anomalous small-basin records).
+A complementary direct check on the magnitude of evapotranspiration uses GLEAM4's actual-evaporation field rather than its potential counterpart, on the 1,789 catchments with paired discharge, all three precipitation products, GLEAM PET, and GLEAM AET valid (the slightly tighter sample results from the additional `area ≥ 50 km²` filter applied to remove anomalous small-basin records).
 Long-term annual GLEAM AET has median 442 mm yr⁻¹ (IQR 377–504 across the network), within published estimates for Russia and consistent with the median GLEAM PET of 645 mm yr⁻¹.
 The water-balance AET estimate AET_wb = ⟨P⟩ − ⟨Q⟩ in long-term annual terms has medians of 625, 347, and 424 mm yr⁻¹ under ERA5-Land, MSWEP, and GPCP respectively, giving median AET_wb / AET_GLEAM ratios of 1.39, 0.76, and 0.94.
-Stated in absolute terms, ERA5-Land implies an AET that exceeds GLEAM PET in 44.9% of catchments — physically impossible in long-term mean without unaccounted import — whereas MSWEP and GPCP exceed GLEAM PET in only 1.5% and 2.9% of catchments.
+Stated in absolute terms, ERA5-Land implies an AET that exceeds GLEAM PET in 44.9% of catchments (physically impossible in the long-term mean without unaccounted import), whereas MSWEP and GPCP exceed GLEAM PET in only 1.5% and 2.9% of catchments.
 Both diagnostics point to the same precipitation-side bias and quantify it in mm yr⁻¹, motivating the choice of MSWEP over ERA5-Land as the released precipitation forcing in CAMELS-RU.
 
 The aridity and evaporative indices under ERA5-Land are provided per-gauge in `camels_ru_signatures.csv` as `aridity_index` and `evaporative_index` (Table 3).
 
 ![Figure 7](images/fig_budyko.png)
-**Figure 7.** Budyko consistency check for 1,862 catchments passing the signature-computation filters (Sect. 3.5; valid indices in 1,821 with ERA5-Land, 1,862 each with MSWEP and GPCP). Aridity index PET/P (x-axis; GLEAM4 PET) against evaporative index (P − Q)/P (y-axis), with one point per gauge per precipitation product. Reference lines: red dashed energy limit (AET ≤ PET; envelope min(1, PET/P)), dotted water limit (AET ≤ P at y = 1), and the Budyko (1974) theoretical curve. ERA5-Land catchments cluster systematically above the energy line in the humid regime (PET/P < 1), reflecting the product's known precipitation wet bias.
+**Figure 7.** Budyko consistency check for 1,862 catchments passing the signature-computation filters (Sect. 3.5; valid indices in 1,821 with ERA5-Land, 1,862 each with MSWEP and GPCP). Aridity index PET/P (x-axis; GLEAM4 PET) against evaporative index (P − Q)/P (y-axis), with one point per gauge per precipitation product. Reference lines: red dashed combined physical envelope (AET ≤ min(PET, P), shown as min(1, PET/P)), dotted water limit (AET ≤ P at y = 1), and the Budyko (1974) theoretical curve. ERA5-Land catchments cluster systematically above the energy-limited part of the envelope in the humid regime (PET/P < 1), consistent with the product's known precipitation wet bias.
 
 #### 4.1.4 Precipitation–Discharge Relationship
 
@@ -399,18 +359,14 @@ Linear regression of annual discharge vs. annual precipitation quantifies the ma
 $$Q_{\text{annual}} = \alpha + \beta \times P_{\text{annual}}$$
 
 Per-gauge linear regression of annual discharge on annual ERA5-Land precipitation yields a median slope β = 0.290 (mean: 0.332), indicating that on average a 1 mm yr⁻¹ increase in annual precipitation corresponds to a 0.29 mm yr⁻¹ increase in discharge.
-The sub-unity slope reflects evapotranspiration buffering and storage changes that dampen the precipitation signal; 2.0% of catchments exceed β = 1.0, concentrated in karst terrain where groundwater imports from adjacent basins may supplement local precipitation inputs.
+The sub-unity slope arises from evapotranspiration buffering and storage changes that dampen the precipitation signal; 2.0% of catchments exceed β = 1.0, concentrated in karst terrain where groundwater imports from adjacent basins may supplement local precipitation inputs.
 
-MSWEP yields a steeper median slope (β = 0.446; 9.7% of catchments > 1), consistent with its lower mean annual precipitation producing a stronger marginal response.
+MSWEP yields a steeper median slope (β = 0.446; 9.7% of catchments > 1), a direct consequence of its lower mean annual precipitation, which strengthens the marginal response.
 
 ### 4.2 Discharge Quality Control
 
-The 849 high-quality discharge subset undergoes the following validation:
-
-- Physical plausibility: negative discharge values are rejected at parse time; the release contains no negative Q values.
-- Mass balance consistency: water-balance residuals (P − Q − ET proxy) are reported per-gauge in the attribute file so that users can screen for non-closing catchments.
-
-Median data completeness: 97.5% (2008–2023), with gaps ≤ 6 days filled by second-order polynomial interpolation (5.2% of station-days); longer gaps are retained as missing to preserve autocorrelation structure.
+The 849-gauge high-quality discharge subset passes two further checks. Physical plausibility is enforced at parse time, where negative discharge values are rejected, so the release contains no negative Q values. Mass-balance consistency is supported by per-gauge water-balance residuals (P − Q − ET proxy) reported in the attribute file, which let users screen for non-closing catchments.
+Median data completeness is 97.5% (2008–2023), with gaps ≤ 6 days filled by second-order polynomial interpolation (5.2% of station-days); longer gaps are retained as missing to preserve autocorrelation structure.
 
 #### 4.2.1 Consistency Cross-Check Against GRDC Re-Exports
 
@@ -425,7 +381,7 @@ No alternative discharge archive exists that would permit independent observatio
 
 Figures 8 and 9 show spatial patterns of key hydrological signatures for the 1,716 gauges with at least 5 complete hydrological years (out of 2,170 with discharge data); the remaining discharge gauges are omitted from these maps.
 Mean annual discharge is highest in mountain headwaters and humid northern forests.
-BFI is high in temperate forests (0.6–0.7) and low in permafrost regions (0.2–0.3), reflecting differences in infiltration capacity.
+BFI is high in temperate forests (0.6–0.7) and low in permafrost regions (0.2–0.3), tracking the contrast in infiltration capacity.
 Half-flow date shows a latitudinal gradient from early spring snowmelt in the south to late summer in the permafrost zone.
 
 ![Figure 8](images/fig_hydro_signatures_1.png)
@@ -437,11 +393,7 @@ Half-flow date shows a latitudinal gradient from early spring snowmelt in the so
 ### 4.3 Watershed Boundary Accuracy
 
 As detailed in Sect. 3.3, manual verification of all 3,353 boundaries achieved a mean areal error of 5.1% (median 1.4%) against official Roshydromet data over the 3,011 catchments with a reference area (77% within 5%, 87% within 10%).
-The largest improvements over automated delineation occurred in:
-
-- Low-relief floodplains (West Siberian Lowland): DEM artifacts corrected using satellite imagery
-- Permafrost regions: Subsurface flow paths verified with expert knowledge
-- Regulated systems: Reservoir operations and diversions mapped from infrastructure databases
+The largest improvements over automated delineation occurred in low-relief floodplains (West Siberian Lowland), where DEM artifacts were corrected against satellite imagery; in permafrost regions, where subsurface flow paths were verified with expert knowledge; and in regulated systems, where reservoir operations and diversions were mapped from infrastructure databases.
 
 Per-catchment areal-error statistics are released alongside each boundary in `camels_ru_boundaries.gpkg` so that users can filter by delineation quality for analyses sensitive to catchment area.
 
@@ -465,19 +417,19 @@ The released signatures CSV (Sect. 3.5) covers 1,862 catchments, of which 17 are
 ### 5.2 Dataset Structure
 
 Table 4 summarizes the released files.
-All NetCDF files include CF-compliant metadata with per-variable `units`, `long_name`, and `source` attributes; missing values are encoded as NaN. The `quality_flag` variable in `camels_ru_discharge.nc` distinguishes observed values (0) from missing values (3); gap-filled values (≤ 6 days, second-order polynomial) are written in place of the originals and are not flagged separately — users needing a strict observed-only subset should cross-reference `camels_ru_year_grades.csv` and filter to years graded A.
+All NetCDF files include CF-compliant metadata with per-variable `units`, `long_name`, and `source` attributes; missing values are encoded as NaN. The `quality_flag` variable in `camels_ru_discharge.nc` distinguishes observed values (0) from missing values (3); gap-filled values (≤ 6 days, second-order polynomial) are written in place of the originals and are not flagged separately; users needing a strict observed-only subset should cross-reference `camels_ru_year_grades.csv` and filter to years graded A.
 
-**Table 4.** Dataset file structure. Total uncompressed size approximately 1.5 GB; gzipped release archive approximately 0.55 GB.
+**Table 4.** Dataset file structure. Total uncompressed size approximately 1.25 GB (1,252,148,680 bytes); gzipped release archive size will be recorded after the final Zenodo upload package is created.
 
 | File | Format | Key variables |
 |------|--------|---------------|
 | `README.md` | Markdown | Release notes, file descriptions, and citation information |
 | `camels_ru_boundaries.gpkg` | GPKG | 3,353 polygons with area, centroid, areal-error columns |
 | `camels_ru_discharge.nc` | NetCDF-4 | `discharge_mm` (mm d⁻¹), `discharge_m3s` (m³ s⁻¹), `quality_flag` (0 = observed, 3 = missing); 3,353 × 5,844 d with 2,170 gauges carrying observations |
-| `camels_ru_forcing.nc` | NetCDF-4 | `precip_mswep` (MSWEP v2.8, mm d⁻¹), `temp_mean/min/max` (ERA5-Land, °C), `pet` (GLEAM4, mm d⁻¹); 3,353 × 5,844 d, 100% coverage (temperature gaps filled for 24 gauges — see Sect. 3.2.5) |
+| `camels_ru_forcing.nc` | NetCDF-4 | `precip_mswep` (MSWEP v2.8, mm d⁻¹), `temp_mean/min/max` (ERA5-Land, °C), `pet` (GLEAM4, mm d⁻¹); 3,353 × 5,844 d, 100% coverage (temperature gaps filled for 24 gauges; see Sect. 3.2.5) |
 | `camels_ru_attributes.csv` | CSV | 288 HydroATLAS attributes (22 primary subset); 3,339 catchments (see Sect. 3.4 on the 14 sub-HydroBASINS catchments without coverage) |
-| `camels_ru_signatures.csv` | CSV | 15 hydrological signatures per gauge × per hydrological year (includes Budyko aridity and evaporative indices) |
-| `camels_ru_signatures_summary.csv` | CSV | 15 catchment-characteristic (multi-year-averaged) signatures per gauge |
+| `camels_ru_signatures.csv` | CSV | 15 catchment-characteristic hydrological signatures per gauge (multi-year averages; includes Budyko aridity and evaporative indices) |
+| `camels_ru_signatures_summary.csv` | CSV | Per-signature summary statistics across non-anomalous gauges |
 | `camels_ru_year_grades.csv` | CSV | Per-gauge × per-hydro-year quality grade (A–F) |
 | `camels_ru_gauge_summary.csv` | CSV | Overall grade, year counts, recommendation, `forcing_note` per discharge gauge |
 | `camels_ru_forcing_notes.csv` | CSV | Per-gauge fill provenance for the 24 gauges with gap-filled ERA5 temperature (Sect. 3.2.5) |
@@ -485,35 +437,35 @@ All NetCDF files include CF-compliant metadata with per-variable `units`, `long_
 
 ### 5.3 Usage Notes
 
-- **Filter by per-year grades before modeling.** For modeling applications, users should consult `camels_ru_year_grades.csv` and filter out individual years with grades D or F, even for gauges with overall grade A or B. This prevents low-quality years in validation windows from corrupting model performance metrics.
-- **Quality flags in `camels_ru_discharge.nc`** are encoded as described in §5.2. For a strict observed-only subset, cross-reference `camels_ru_year_grades.csv` and retain only years graded A.
-- **Runoff ratios depend on the precipitation product.** ERA5-Land, MSWEP, and GPCP give materially different Q/P medians (Sect. 4.1.2); choose the product whose assumptions match your application.
+For modeling applications, users should consult `camels_ru_year_grades.csv` and filter out individual years graded D or F, even for gauges with overall grade A or B; this prevents low-quality years in validation windows from corrupting model performance metrics.
+Quality flags in `camels_ru_discharge.nc` are encoded as described in §5.2; for a strict observed-only subset, cross-reference `camels_ru_year_grades.csv` and retain only years graded A.
+Runoff ratios depend on the precipitation product: ERA5-Land, MSWEP, and GPCP give materially different Q/P medians (Sect. 4.1.2), so the product should be chosen to match the assumptions of the application at hand.
 
-The dataset is publicly available under CC BY 4.0 license at *[DOI: to be assigned upon Zenodo upload]*.
+The dataset will be publicly available under a CC BY 4.0 license after Zenodo upload and DOI assignment.
 Processing code is available at https://github.com/HydroInformaticsRu/camels_ru.
 
 ### 5.4 Limitations
 
-- **Short temporal coverage:** The 16-year record (2008–2023) constrains multi-decadal trend analysis and captures only one phase of low-frequency climate variability.
-- **Single DEM product:** Watershed boundaries derived from MERIT Hydro; manual verification mitigates DEM artifacts, but boundary accuracy in flat or karst terrain remains limited by the underlying elevation data.
-- **Nested catchments:** Spatial analysis shows that the majority of gauges are nested within at least one larger catchment, with nesting depths up to 58 levels in major river systems (e.g., Ob basin). The summary statistics reported in this paper (e.g., medians across the 1,716-gauge signature set) are unweighted gauge aggregates and therefore oversample upstream headwaters relative to their independent drainage area; area-weighted or nesting-aware aggregation is left to downstream users. Users must account for nesting to avoid double-counting discharge or overstating sample independence.
-- **Attribute temporal mismatch:** HydroATLAS attributes are based on circa-2000 global datasets; land cover and population density may have shifted during 2008–2023.
-- **Stationarity assumption:** All hydrological signatures assume stationary catchment behavior, which may not hold for basins undergoing rapid land use change or permafrost degradation.
-- **Limited independent discharge validation:** Comparison against the GRDC archive (Sect. 4.2.1) confirms processing correctness but shares the same Roshydromet source data, so it does not constitute independent observational validation. No alternative discharge data source exists for Russia during the 2008–2023 period.
-- **Rating-curve uncertainty:** Stage-discharge ratings carry 10–20% uncertainty at high and low flows, which propagates into discharge magnitudes and water-balance residuals.
-- **ERA5-Land circularity:** Water-balance closure uses ERA5-Land precipitation, which also serves as forcing input, limiting the independence of this consistency check. ERA5-Land precipitation is known to overestimate high-latitude snowfall (Sect. 4); MSWEP may underestimate solid precipitation in the same regions.
-- **Gauge network bias:** Arctic permafrost-dominated catchments and Pacific-draining basins are underrepresented relative to their geographic extent; western European Russia is correspondingly overrepresented.
-- **Water level data:** Water level records undergo basic QC (zero replacement, gap interpolation) but lack the automated A–F quality grading applied to discharge data. Users should assess per-gauge completeness before use.
-- **Data source continuity:** The AIS GMVO platform, which served as the primary data source, ceased public operation in 2025. CAMELS-RU thus serves as a preservation archive for these discharge and water level records.
+The 16-year record (2008–2023) constrains multi-decadal trend analysis and captures only one phase of low-frequency climate variability.
+The gauge network itself is uneven: Arctic permafrost-dominated catchments and Pacific-draining basins are underrepresented relative to their geographic extent, while western European Russia is correspondingly overrepresented.
+The majority of gauges are also nested within at least one larger catchment, with nesting depths up to 58 levels in major river systems such as the Ob basin.
+The summary statistics reported in this paper (e.g., medians across the 1,716-gauge signature set) are unweighted gauge aggregates and therefore oversample upstream headwaters relative to their independent drainage area; area-weighted or nesting-aware aggregation is left to downstream users, who must account for nesting to avoid double-counting discharge or overstating sample independence.
+
+Watershed boundaries derive from a single DEM product, MERIT Hydro. Manual verification mitigates DEM artifacts, but boundary accuracy in flat or karst terrain remains limited by the underlying elevation data.
+HydroATLAS attributes are based on circa-2000 global datasets, so land cover and population density may have shifted during 2008–2023.
+All hydrological signatures additionally assume stationary catchment behavior, which may not hold for basins undergoing rapid land-use change or permafrost degradation.
+
+Several limits on validation independence deserve emphasis.
+The GRDC comparison (Sect. 4.2.1) confirms processing correctness but shares the same Roshydromet source data, so it does not constitute independent observational validation; no alternative discharge data source exists for Russia during the 2008–2023 period.
+Stage–discharge ratings carry 10–20% uncertainty at high and low flows, which propagates into discharge magnitudes and water-balance residuals.
+The water-balance closure check uses ERA5-Land precipitation, which also serves as forcing input, limiting the independence of that diagnostic; ERA5-Land precipitation is known to overestimate high-latitude snowfall (Sect. 4), while MSWEP may underestimate solid precipitation in the same regions.
+
+Finally, water level records undergo basic QC (zero replacement, gap interpolation) but lack the automated A–F quality grading applied to discharge data, so users should assess per-gauge completeness before use.
+The AIS GMVO platform, which served as the primary data source, ceased public operation in 2025; CAMELS-RU therefore also functions as a preservation archive for these discharge and water level records.
 
 ### 5.5 Future Updates
 
-Planned dataset enhancements include:
-
-- Extension of temporal coverage using historical records from institute archives and OCR-digitized observation books (from the 1950s to present for a subset of gauges)
-- Integration of additional discharge gauges with delineated watersheds
-- Expansion of the hydropower/reservoir gauge network: additional reservoir gauges with delineated watersheds await meteorological forcing extraction and attribute computation
-- Addition of remotely sensed variables (NDVI, snow cover extent) as dynamic attributes
+Planned enhancements include extending temporal coverage with historical records from institute archives and OCR-digitized observation books (from the 1950s to present for a subset of gauges), integrating additional discharge gauges with delineated watersheds, and expanding the hydropower/reservoir gauge network, for which additional reservoir gauges with delineated watersheds await meteorological forcing extraction and attribute computation. Remotely sensed variables such as NDVI and snow cover extent are planned as dynamic attributes.
 
 ---
 
@@ -524,18 +476,18 @@ The 849-gauge Grade A subset achieves median data completeness of 97.5%, and eve
 Fifteen hydrological signatures released for 1,845 catchments (1,862 in the per-gauge file, 17 flagged `is_anomalous`) vary broadly across the network: median q_mean 0.695 mm d⁻¹ (range 0.003–8.35), BFI 0.556 (0.191–0.903), and median half-flow date in early May (day 214 of the hydrological year).
 A Budyko diagnostic combined with a direct AET-adequacy check against GLEAM4 actual evaporation quantifies the ERA5-Land precipitation wet bias: under ERA5-Land 8.0% of catchments violate the per-year energy limit AET ≤ PET, versus 2.0% under MSWEP and 3.4% under GPCP.
 In absolute mm yr⁻¹ terms, water-balance AET exceeds GLEAM PET in 44.9% of catchments under ERA5-Land, versus 1.5% under MSWEP and 2.9% under GPCP, supporting the choice of MSWEP as the released precipitation forcing (Sect. 4.1.3).
-Pairwise daily correlations across the three precipitation products (ERA5-Land 826 mm yr⁻¹, MSWEP v2.8 608 mm yr⁻¹, GPCP v3.3 644 mm yr⁻¹) span r = 0.58–0.83.
+Pairwise daily correlations across the three precipitation products in the paper-analysis gauge-ID scope (ERA5-Land 827 mm yr⁻¹, MSWEP v2.8 609 mm yr⁻¹, GPCP v3.3 644 mm yr⁻¹) span r = 0.57–0.83.
 Systematic differences in annual totals are traceable to ERA5-Land's known high-latitude precipitation bias.
-ERA5-Land-based runoff ratios ≤ 1 for 98.6% of catchments (median 0.260) are an upper-bound water-balance sanity check rather than independent validation of discharge.
+ERA5-Land-based runoff ratios ≤ 1 for 98.6% of paper-analysis catchments with discharge observations (median 0.260) are an upper-bound water-balance sanity check rather than independent validation of discharge.
 
-With a cumulative drainage area of ~17.1 million km², CAMELS-RU covers the largest landmass previously absent from the global CAMELS network, and is publicly available under CC BY 4.0 (see Code and Data Availability).
+With a cumulative drainage area of ~17.1 million km², CAMELS-RU covers the largest landmass previously absent from the global CAMELS network; the release bundle is staged for public CC BY 4.0 archiving (see Code and Data Availability).
 
 ---
 
 ## Data Availability
 
-The CAMELS-RU dataset (v1.0) is permanently archived on Zenodo at *[DOI: to be assigned upon Zenodo upload]* under a CC BY 4.0 license.
-The archive contains daily discharge and water level time series, meteorological forcing (ERA5-Land temperature, MSWEP v2.8 precipitation, GLEAM4 potential evapotranspiration), physiographic attributes (HydroATLAS v1.0), and computed hydrological signatures in NetCDF-4, GeoPackage, and CSV formats (approximately 1.5 GB uncompressed, 0.55 GB gzipped).
+The CAMELS-RU dataset (v1.0) release bundle is prepared for Zenodo archiving under a CC BY 4.0 license; the DOI will be inserted after upload.
+The archive contains daily discharge and water level time series, meteorological forcing (ERA5-Land temperature, MSWEP v2.8 precipitation, GLEAM4 potential evapotranspiration), physiographic attributes (HydroATLAS v1.0), and computed hydrological signatures in NetCDF-4, GeoPackage, and CSV formats (approximately 1.25 GB uncompressed; final compressed archive size to be recorded after packaging).
 
 ## Code Availability
 

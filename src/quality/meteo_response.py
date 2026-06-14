@@ -273,6 +273,245 @@ def calculate_flashiness_index(discharge: pd.Series) -> float:
     return float(daily_changes.sum() / total_flow)
 
 
+def calculate_temperature_partitioned_input(
+    precipitation: pd.Series,
+    temperature: pd.Series,
+    snow_temp_threshold: float = 0.0,
+    melt_temp_threshold: float = 0.0,
+    melt_factor: float = 3.0,
+) -> pd.DataFrame:
+    """Partition precipitation into rain/snow and estimate meltwater input.
+
+    This is a simple degree-day snowpack proxy for QC screening. It is not a
+    calibrated snow model. Precipitation falling at or below the snow
+    threshold is stored in a snowpack bucket. When temperature is above the
+    melt threshold, snowmelt is released at up to ``melt_factor * T`` mm/day.
+
+    Args:
+        precipitation: Daily precipitation series (mm/day).
+        temperature: Daily mean temperature series (deg C).
+        snow_temp_threshold: Temperature at or below which precipitation is
+            treated as snow.
+        melt_temp_threshold: Temperature above which the snow bucket melts.
+        melt_factor: Degree-day melt factor (mm/deg C/day).
+
+    Returns:
+        DataFrame with columns rain_input, snow_input, melt_input,
+        effective_input, and snowpack_proxy.
+    """
+    if not isinstance(precipitation.index, pd.DatetimeIndex):
+        raise ValueError("Precipitation must have datetime index")
+    if not isinstance(temperature.index, pd.DatetimeIndex):
+        raise ValueError("Temperature must have datetime index")
+
+    combined = pd.DataFrame({"precipitation": precipitation, "temperature": temperature}).sort_index()
+
+    rain_values: list[float] = []
+    snow_values: list[float] = []
+    melt_values: list[float] = []
+    effective_values: list[float] = []
+    snowpack_values: list[float] = []
+    snowpack = 0.0
+
+    for precip, temp in combined[["precipitation", "temperature"]].itertuples(index=False):
+        if pd.isna(precip) or pd.isna(temp):
+            rain_values.append(np.nan)
+            snow_values.append(np.nan)
+            melt_values.append(np.nan)
+            effective_values.append(np.nan)
+            snowpack_values.append(snowpack)
+            continue
+
+        precip = max(float(precip), 0.0)
+        temp = float(temp)
+
+        if temp <= snow_temp_threshold:
+            rain = 0.0
+            snow = precip
+        else:
+            rain = precip
+            snow = 0.0
+
+        snowpack += snow
+        if temp > melt_temp_threshold and snowpack > 0:
+            potential_melt = melt_factor * (temp - melt_temp_threshold)
+            melt = min(snowpack, max(potential_melt, 0.0))
+            snowpack -= melt
+        else:
+            melt = 0.0
+
+        rain_values.append(rain)
+        snow_values.append(snow)
+        melt_values.append(melt)
+        effective_values.append(rain + melt)
+        snowpack_values.append(snowpack)
+
+    return pd.DataFrame(
+        {
+            "rain_input": rain_values,
+            "snow_input": snow_values,
+            "melt_input": melt_values,
+            "effective_input": effective_values,
+            "snowpack_proxy": snowpack_values,
+        },
+        index=combined.index,
+    )
+
+
+def calculate_temperature_aware_response_metrics(
+    discharge: pd.Series,
+    precipitation: pd.Series,
+    temperature: pd.Series,
+    input_threshold_mm: float = 5.0,
+    lag_window: int = 14,
+    snow_fraction_threshold: float = 0.25,
+    melt_factor: float = 3.0,
+) -> dict:
+    """Calculate response to rain plus degree-day snowmelt input.
+
+    Args:
+        discharge: Daily discharge series (mm/day).
+        precipitation: Daily precipitation series (mm/day).
+        temperature: Daily mean temperature series (deg C).
+        input_threshold_mm: Event threshold for effective water input.
+        lag_window: Response lag window in days.
+        snow_fraction_threshold: Snowfall fraction threshold used to mark a
+            year as snow-influenced.
+        melt_factor: Degree-day melt factor passed to the snowpack proxy.
+
+    Returns:
+        Dictionary with effective-input response metrics.
+    """
+    water_input = calculate_temperature_partitioned_input(
+        precipitation=precipitation,
+        temperature=temperature,
+        melt_factor=melt_factor,
+    )
+    effective_input = water_input["effective_input"]
+
+    response = calculate_event_response(
+        discharge=discharge,
+        precipitation=effective_input,
+        lag_window=lag_window,
+        threshold_mm=input_threshold_mm,
+    )
+    correlation = calculate_pq_cross_correlation(
+        precipitation=effective_input,
+        discharge=discharge,
+        max_lag=lag_window,
+    )
+
+    total_precip = precipitation.dropna().clip(lower=0).sum()
+    snow_input = water_input["snow_input"].dropna().sum()
+    snow_fraction = snow_input / total_precip if total_precip > 0 else np.nan
+
+    return {
+        "event_response_rate": response["event_response_rate"],
+        "n_events": response["n_events"],
+        "n_responsive": response["n_responsive"],
+        "mean_response_ratio": response["mean_response_ratio"],
+        "max_cross_correlation": correlation["max_cross_correlation"],
+        "optimal_lag_days": correlation["optimal_lag_days"],
+        "snow_fraction": float(snow_fraction) if not np.isnan(snow_fraction) else np.nan,
+        "rain_total": float(water_input["rain_input"].dropna().sum()),
+        "snow_total": float(snow_input),
+        "melt_total": float(water_input["melt_input"].dropna().sum()),
+        "effective_input_total": float(effective_input.dropna().sum()),
+        "is_snow_influenced": bool(
+            not np.isnan(snow_fraction) and snow_fraction >= snow_fraction_threshold
+        ),
+    }
+
+
+def detect_temperature_aware_dead_years(  # noqa: C901
+    discharge: pd.Series,
+    precipitation: pd.Series,
+    temperature: pd.Series,
+    hydro_year_start_month: int = 10,
+    min_cross_correlation: float = 0.1,
+    min_event_response_rate: float = 0.2,
+    min_flashiness: float = 0.01,
+    snow_fraction_threshold: float = 0.25,
+    input_threshold_mm: float = 5.0,
+    lag_window: int = 14,
+    melt_factor: float = 3.0,
+) -> dict[int, list[QualityFlag]]:
+    """Detect weak response using temperature-aware effective water input.
+
+    The direct P-Q check is replaced by an effective-water check:
+    rain at T > 0 deg C plus degree-day snowmelt from a simple snowpack
+    bucket. This avoids penalizing cold-season precipitation that is stored as
+    snow rather than immediately appearing in discharge.
+
+    Returns:
+        Dictionary mapping year to list of quality flags.
+    """
+    if not isinstance(discharge.index, pd.DatetimeIndex):
+        logger.error("Discharge must have datetime index")
+        return {}
+
+    valid_q = discharge.dropna()
+    if len(valid_q) == 0:
+        return {}
+
+    if hydro_year_start_month > 1:
+        hydro_years = valid_q.index.year.copy()
+        hydro_years = hydro_years.where(valid_q.index.month < hydro_year_start_month, hydro_years + 1)
+        years = sorted(set(hydro_years))
+    else:
+        years = sorted(set(valid_q.index.year))
+
+    flags_by_year: dict[int, list[QualityFlag]] = {}
+
+    for year in years:
+        if hydro_year_start_month > 1:
+            start_date = pd.Timestamp(year=year - 1, month=hydro_year_start_month, day=1)
+            end_date = pd.Timestamp(year=year, month=hydro_year_start_month, day=1) - pd.Timedelta(
+                days=1
+            )
+        else:
+            start_date = pd.Timestamp(year=year, month=1, day=1)
+            end_date = pd.Timestamp(year=year, month=12, day=31)
+
+        year_q = discharge.loc[start_date:end_date]
+        year_p = precipitation.loc[start_date:end_date]
+        year_t = temperature.loc[start_date:end_date]
+
+        if len(year_q.dropna()) < 30 or len(year_p.dropna()) < 30 or len(year_t.dropna()) < 30:
+            continue
+
+        metrics = calculate_temperature_aware_response_metrics(
+            discharge=year_q,
+            precipitation=year_p,
+            temperature=year_t,
+            input_threshold_mm=input_threshold_mm,
+            lag_window=lag_window,
+            snow_fraction_threshold=snow_fraction_threshold,
+            melt_factor=melt_factor,
+        )
+        flags: list[QualityFlag] = []
+
+        max_corr = metrics["max_cross_correlation"]
+        if not np.isnan(max_corr):
+            if max_corr < min_cross_correlation:
+                flags.append(QualityFlag.VERY_LOW_EFFECTIVE_WATER_CORRELATION)
+            elif max_corr < 0.2:
+                flags.append(QualityFlag.LOW_EFFECTIVE_WATER_CORRELATION)
+
+        response_rate = metrics["event_response_rate"]
+        if not np.isnan(response_rate) and response_rate < min_event_response_rate:
+            flags.append(QualityFlag.NO_EFFECTIVE_WATER_RESPONSE)
+
+        flashiness = calculate_flashiness_index(year_q)
+        if not np.isnan(flashiness) and flashiness < min_flashiness:
+            flags.append(QualityFlag.LOW_FLASHINESS)
+
+        if flags:
+            flags_by_year[year] = flags
+
+    return flags_by_year
+
+
 def detect_dead_years(  # noqa: C901
     discharge: pd.Series,
     precipitation: pd.Series,

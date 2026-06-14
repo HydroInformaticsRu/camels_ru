@@ -117,7 +117,7 @@ def _reflect_series(discharge: np.ndarray, reflect_points: int) -> np.ndarray:
         Reflected discharge array
     """
     if len(discharge) - 1 <= reflect_points:
-        return discharge.copy()
+        return discharge.astype(np.float64)
 
     q_reflect = np.full(len(discharge) + 2 * reflect_points, np.nan, dtype=np.float64)
 

@@ -1,4 +1,4 @@
-"""Projected plotting for ESSD Paper 1 figures.
+"""Projected plotting for CAMELS-RU manuscript figures.
 
 Spatial plotting using Albers Equal-Area Conic projection (Cartopy)
 optimised for the Russian territory.
@@ -107,6 +107,50 @@ def _set_extent_from_data(ax: Axes, gdf: gpd.GeoDataFrame, pad: float = 0.08) ->
     ax.set_ylim(ymin - ypad, ymax + ypad)
 
 
+def _hide_frame(ax: Axes) -> None:
+    """Hide the rectangular frame around a GeoAxes while preserving gridlines."""
+    try:
+        ax.spines["geo"].set_visible(False)
+    except KeyError:
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+
+def _add_graticule(
+    ax: Axes,
+    *,
+    lon_step: int = 20,
+    lat_step: int = 10,
+    draw_labels: bool = True,
+    label_size: int = 6,
+) -> None:
+    """Add a subtle lat/lon graticule to a GeoAxes.
+
+    Meridians every *lon_step* degrees and parallels every *lat_step* degrees
+    are drawn as thin, light-grey dashed lines underneath the data layer.
+    Labels (bottom/left only) are rendered at *label_size* points when
+    *draw_labels* is True.
+    """
+    gl = ax.gridlines(
+        crs=_DATA_CRS,
+        draw_labels=draw_labels,
+        linewidth=0.4,
+        color="#888888",
+        alpha=0.45,
+        linestyle=(0, (2, 3)),
+        zorder=1.5,
+        xlocs=list(range(0, 181, lon_step)),
+        ylocs=list(range(30, 81, lat_step)),
+    )
+    if draw_labels:
+        gl.top_labels = False
+        gl.right_labels = False
+        gl.xlabel_style = {"size": label_size, "color": "#555555"}
+        gl.ylabel_style = {"size": label_size, "color": "#555555"}
+
+
 def _auto_bins(values: np.ndarray, n_bins: int = 6) -> np.ndarray:
     """Generate evenly-spaced bin edges from data range."""
     vmin, vmax = float(np.nanmin(values)), float(np.nanmax(values))
@@ -168,8 +212,9 @@ def scatter_map(
     Axes
     """
     # Set extent from data, then draw background clipped to it
-    ax.axis("off")
+    _hide_frame(ax)
     _set_extent_from_data(ax, gdf)
+    _add_graticule(ax)
 
     if background_gdf is not None:
         aea_proj4 = get_russia_projection().proj4_init
@@ -344,7 +389,7 @@ def continuous_multiplot(
         axes[row, col].set_visible(False)
 
     if suptitle:
-        fig.suptitle(suptitle, fontsize=14, fontweight="bold")
+        fig.suptitle(suptitle, fontsize=14, fontweight="bold", y=1.04)
 
     return fig
 
@@ -400,8 +445,9 @@ def categorical_map(
     -------
     Axes
     """
-    ax.axis("off")
+    _hide_frame(ax)
     _set_extent_from_data(ax, gdf)
+    _add_graticule(ax)
 
     if background_gdf is not None:
         aea_proj4 = get_russia_projection().proj4_init

@@ -1,4 +1,4 @@
-"""Regenerate only the map figures used in the ESSD manuscript.
+"""Regenerate only the map figures used in the CAMELS-RU manuscript.
 
 Runs the three notebooks (00, 02, 03) that produce spatial map figures.
 No heavy computation is repeated — this just re-renders existing data.

@@ -17,8 +17,26 @@ build/
 ._*
 
 # Large files and data
+data
 data/
-docs/
+docs/*
+!docs/literature/
+docs/literature/*
+!docs/literature/camels_hess_papers/
+docs/literature/camels_hess_papers/*
+!docs/literature/camels_hess_papers/README.md
+!docs/literature/camels_hess_papers/metadata.json
+!docs/literature/camels_hess_papers/*.bib
+!docs/literature/camels_essd_papers/
+docs/literature/camels_essd_papers/*
+!docs/literature/camels_essd_papers/README.md
+!docs/literature/camels_essd_papers/metadata.json
+!docs/literature/camels_essd_papers/*.bib
+!docs/literature/large_sample_hydrology_papers/
+docs/literature/large_sample_hydrology_papers/*
+!docs/literature/large_sample_hydrology_papers/README.md
+!docs/literature/large_sample_hydrology_papers/metadata.json
+!docs/literature/large_sample_hydrology_papers/*.bib
 logs/
 results/
 *.csv
@@ -41,8 +59,10 @@ htmlcov/
 .pixi/*
 !.pixi/config.toml
 
-# LaTeX source (kept locally for eventual ESSD submission, regenerated from markdown)
+# LaTeX source (kept locally; Overleaf clone is the active manuscript artifact)
 paper/latex/
+paper/overleaf
+paper/overleaf/
 
 # Legacy LaTeX path (old structure, fully removed)
 paper/LaTeX/

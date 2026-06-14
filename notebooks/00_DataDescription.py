@@ -1,4 +1,4 @@
-"""CAMELS-RU Data Description — ESSD Paper 1.
+"""CAMELS-RU data description figures for the HESS manuscript.
 
 Produces publication-quality figures for Sections 2, 5.1–5.3:
   - fig_gauge_network.png      (Sec 2: study area, gauge network, catchment sizes)
@@ -10,7 +10,8 @@ Design choices:
   - Boxplots instead of overlapping histograms (class imbalance handled)
   - No pie charts (discouraged in geoscience journals)
   - No country borders or basemap (politically sensitive)
-  - Hydropower stations (gauge_id ≥ 7 chars) annotated with triangle markers
+  - Gauge IDs with seven or more characters are retained in the release but
+    excluded from the manuscript-analysis figures and paper-facing summaries
 """
 
 from pathlib import Path
@@ -18,6 +19,7 @@ import sys
 import warnings
 
 import geopandas as gpd
+from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -26,6 +28,13 @@ sys.path.append(str(Path(__file__).parent.parent))
 from src.static.hydro_atlas_analysis import (  # noqa: E402
     categorize_catchment_size,
     get_size_categories,
+)
+from src.utils.paper_analysis_scope import (  # noqa: E402
+    PAPER_ANALYSIS_EXCLUDED_MIN_ID_LENGTH,
+    PAPER_ANALYSIS_EXCLUSION_NOTE,
+    filter_paper_analysis_index,
+    is_paper_analysis_excluded_gauge_id,
+    paper_analysis_scope_summary,
 )
 
 gpd.options.io_engine = "pyogrio"
@@ -56,7 +65,7 @@ GRADE_COLORS = {
     "ungraded": "#BBBBBB",  # grey
 }
 GRADE_ORDER = ["A", "B", "C", "D", "F", "ungraded"]
-HYDRO_ID_MIN_LEN = 7  # gauge_id == 7 chars → hydropower/reservoir station (GTS network)
+HYDRO_ID_MIN_LEN = PAPER_ANALYSIS_EXCLUDED_MIN_ID_LENGTH
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -110,7 +119,7 @@ def grade_boxplot(
         flierprops={"markersize": 2, "alpha": 0.3},
         medianprops={"color": "black", "linewidth": 1.5},
     )
-    for patch, color in zip(bp["boxes"], plot_colors):
+    for patch, color in zip(bp["boxes"], plot_colors, strict=False):
         patch.set_facecolor(color)
         patch.set_alpha(0.7)
 
@@ -145,9 +154,15 @@ def grade_boxplot(
 
 ws = gpd.read_file(GEOM_DIR / "camels_watersheds.gpkg")
 ws.set_index("gauge_id", inplace=True)
+ws.index = ws.index.astype(str)
 
 gauge = gpd.read_file(GEOM_DIR / "camels_gauges.gpkg")
 gauge.set_index("gauge_id", inplace=True)
+gauge.index = gauge.index.astype(str)
+
+release_scope = paper_analysis_scope_summary(ws.index)
+ws = filter_paper_analysis_index(ws)
+gauge = filter_paper_analysis_index(gauge)
 
 quality_df = pd.read_csv(COMPOUND_DIR / "quality_summary.csv")
 quality_df["gauge_id"] = quality_df["gauge_id"].astype(str)
@@ -163,9 +178,14 @@ gauge["grade"] = gauge.index.map(
 )
 gauge["is_hydropower"] = gauge.index.str.len() >= HYDRO_ID_MIN_LEN
 
-print(f"Total watersheds: {len(ws)}")
-print(f"Total gauges:     {len(gauge)}")
-print(f"Hydropower (ID≥{HYDRO_ID_MIN_LEN} chars): {gauge['is_hydropower'].sum()}")
+print(f"Total release watersheds: {release_scope.n_total}")
+print(f"Paper-analysis watersheds: {len(ws)}")
+print(f"Paper-analysis gauges:     {len(gauge)}")
+print(
+    f"Gauge-ID excluded from paper analyses (ID≥{HYDRO_ID_MIN_LEN} chars): "
+    f"{release_scope.n_excluded}"
+)
+print(PAPER_ANALYSIS_EXCLUSION_NOTE)
 
 print("\n=== Grade Distribution ===")
 for grade, count in gauge["grade"].value_counts().reindex(GRADE_ORDER).items():
@@ -190,6 +210,8 @@ level_stats = []
 
 for csv_path in compound_files:
     gid = csv_path.stem
+    if is_paper_analysis_excluded_gauge_id(gid):
+        continue
     df = pd.read_csv(csv_path, index_col="date", parse_dates=True)
     grade = quality_df.loc[gid, "overall_grade"] if gid in quality_df.index else np.nan
     grade_label = grade if pd.notna(grade) else "ungraded"
@@ -299,23 +321,25 @@ for grade in reversed(GRADE_ORDER):
         )
 
 ax_map.set_title("(a) Gauge network", fontsize=13, fontweight="bold", loc="left")
-# Reverse legend so Grade A appears first; add hydropower marker
-from matplotlib.lines import Line2D
-
+# Reverse legend so Grade A appears first; add hydropower marker only if any remain in scope
 handles, labels = ax_map.get_legend_handles_labels()
-hp_handle = Line2D(
-    [],
-    [],
-    marker="^",
-    color="none",
-    markerfacecolor="#888888",
-    markeredgecolor="black",
-    markersize=6,
-    linestyle="None",
-    label=f"Hydropower (n={gauge['is_hydropower'].sum()})",
-)
-all_handles = handles[::-1] + [hp_handle]
-all_labels = labels[::-1] + [hp_handle.get_label()]
+all_handles = handles[::-1]
+all_labels = labels[::-1]
+n_hydro_in_scope = int(gauge["is_hydropower"].sum())
+if n_hydro_in_scope:
+    hp_handle = Line2D(
+        [],
+        [],
+        marker="^",
+        color="none",
+        markerfacecolor="#888888",
+        markeredgecolor="black",
+        markersize=6,
+        linestyle="None",
+        label=f"Hydropower (n={n_hydro_in_scope})",
+    )
+    all_handles.append(hp_handle)
+    all_labels.append(hp_handle.get_label())
 ax_map.legend(
     all_handles,
     all_labels,
@@ -344,7 +368,7 @@ ax_hist.set_title("(b) Size distribution", fontsize=13, fontweight="bold", loc="
 ax_hist.grid(alpha=0.15, axis="x", linestyle="--")
 ax_hist.invert_yaxis()
 
-for bar, cnt in zip(bars, size_counts.values):
+for bar, cnt in zip(bars, size_counts.values, strict=False):
     ax_hist.text(
         cnt + 20,
         bar.get_y() + bar.get_height() / 2,
@@ -376,10 +400,15 @@ grade_boxplot(
 )
 grade_boxplot(axes[0, 2], q_df, "q_cv", "CV", "(c) Discharge variability")
 
-# Bottom row — Water levels (hydropower stations excluded)
+# Bottom row — Water levels (gauge-ID-excluded stations removed from paper-analysis scope)
 lvl_no_hp = lvl_df[~lvl_df["is_hydropower"]]
 n_hp = lvl_df["is_hydropower"].sum()
-print(f"  Excluding {n_hp} hydropower stations from level panels")
+print(
+    f"  Gauge-ID exclusion already removed {release_scope.n_excluded} release stations "
+    "from level panels"
+)
+if n_hp:
+    print(f"  Excluding {n_hp} additional hydropower stations from level panels")
 
 grade_boxplot(axes[1, 0], lvl_no_hp, "n_years", "Years", "(d) Record length (H)")
 grade_boxplot(axes[1, 1], lvl_no_hp, "mean_lvl_sm", "cm", "(e) Mean water level")
@@ -437,7 +466,7 @@ axes[0, 0].legend(fontsize=9, loc="upper right")
 axes[0, 0].grid(alpha=0.15, axis="y", linestyle="--")
 
 # Count labels on Q bars
-for bar, val in zip(bars_q, grade_q.values):
+for bar, val in zip(bars_q, grade_q.values, strict=False):
     if val > 50:
         axes[0, 0].text(
             bar.get_x() + bar.get_width() / 2,
@@ -464,7 +493,7 @@ bp = axes[0, 1].boxplot(
     flierprops={"markersize": 2, "alpha": 0.3},
     medianprops={"color": "black", "linewidth": 1.5},
 )
-for patch, grade in zip(bp["boxes"], q_labels):
+for patch, grade in zip(bp["boxes"], q_labels, strict=False):
     patch.set_facecolor(GRADE_COLORS[grade])
     patch.set_alpha(0.7)
 axes[0, 1].set_ylabel("Missing discharge data (%)")
@@ -490,7 +519,7 @@ bars_ov = axes[1, 0].barh(
     edgecolor="black",
     linewidth=0.5,
 )
-for bar, val in zip(bars_ov, overlap_counts):
+for bar, val in zip(bars_ov, overlap_counts, strict=False):
     axes[1, 0].text(
         bar.get_width() + 20,
         bar.get_y() + bar.get_height() / 2,
@@ -509,16 +538,16 @@ ax_tbl.axis("off")
 
 n_full = int(quality_df["has_full_coverage"].sum())
 n_graded = int(quality_df["overall_grade"].notna().sum())
-n_hp = int(gauge["is_hydropower"].sum())
 
 summary_data = [
-    ["Total catchments", f"{len(ws):,}"],
+    ["Release catchments", f"{release_scope.n_total:,}"],
+    ["Paper-analysis catchments", f"{len(ws):,}"],
+    ["Gauge-ID excluded", f"{release_scope.n_excluded:,}"],
     ["With discharge (Q)", f"{len(q_df):,}"],
     ["With water level (H)", f"{len(lvl_df):,}"],
     ["Both Q & H", f"{len(both_ids):,}"],
     ["Grade A (Q)", f"{int(grade_q.get('A', 0)):,}"],
     ["Full coverage 2008\u20132023", f"{n_full:,}"],
-    ["Hydropower stations", f"{n_hp}"],
     ["Graded / discharge", f"{n_graded:,} / {len(q_df):,}"],
 ]
 
@@ -543,8 +572,10 @@ plt.close(fig)
 print("Saved: fig_quality_assessment.png")
 
 # ── Console summary ──────────────────────────────────────────────────────────
-print("\n=== Data Coverage Summary ===")
-print(f"Watersheds:        {len(ws_ids)}")
+print("\n=== Data Coverage Summary (paper-analysis gauge-ID scope) ===")
+print(f"Release watersheds: {release_scope.n_total}")
+print(f"Gauge-ID excluded:  {release_scope.n_excluded}")
+print(f"Watersheds:         {len(ws_ids)}")
 print(f"With discharge:    {len(q_ids)}")
 print(f"With levels:       {len(lvl_ids)}")
 print(f"Both Q & H:        {len(both_ids)}")

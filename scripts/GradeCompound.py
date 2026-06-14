@@ -13,6 +13,7 @@ Output:
 """
 
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -23,9 +24,11 @@ from quality import QualityGrade, assess_gauge_quality
 
 COMPOUND_DIR = Path("data/CAMELS_RU/HydroData/Compound")
 MSWEP_DIR = Path("data/CAMELS_RU/parsed_meteo/mswep")
+ERA5_LAND_DIR = Path("data/CAMELS_RU/parsed_meteo/era5_land")
 
 HYDRO_YEAR_START_MONTH = 10
 MIN_YEARS_FOR_ASSESSMENT = 3
+USE_TEMPERATURE_AWARE_RESPONSE = os.getenv("CAMELS_RU_TEMP_AWARE_QC", "0") == "1"
 
 
 def load_precipitation(gauge_id: str) -> pd.Series | None:
@@ -39,9 +42,21 @@ def load_precipitation(gauge_id: str) -> pd.Series | None:
     return None
 
 
+def load_temperature(gauge_id: str) -> pd.Series | None:
+    """Load ERA5-Land mean temperature for a gauge."""
+    temp_file = ERA5_LAND_DIR / f"{gauge_id}.csv"
+    if not temp_file.exists():
+        return None
+    df = pd.read_csv(temp_file, index_col="date", parse_dates=True)
+    if "t_mean" in df.columns:
+        return df["t_mean"]
+    return None
+
+
 def grade_compound(
     compound: pd.DataFrame,
     gauge_id: str,
+    use_temperature_aware_response: bool = USE_TEMPERATURE_AWARE_RESPONSE,
 ) -> tuple[pd.DataFrame, str | None, dict[int, str]]:
     """Run quality assessment and add a per-day grade column.
 
@@ -58,13 +73,16 @@ def grade_compound(
         return compound, None, {}
 
     precipitation = load_precipitation(gauge_id)
+    temperature = load_temperature(gauge_id) if use_temperature_aware_response else None
 
     year_results, summary = assess_gauge_quality(
         discharge=discharge,
         precipitation=precipitation,
+        temperature=temperature,
         gauge_id=gauge_id,
         hydro_year_start_month=HYDRO_YEAR_START_MONTH,
         min_years=MIN_YEARS_FOR_ASSESSMENT,
+        use_temperature_aware_response=use_temperature_aware_response,
     )
 
     if not year_results:

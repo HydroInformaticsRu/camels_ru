@@ -1,4 +1,4 @@
-"""CAMELS-RU Catchment Attributes & Clustering — ESSD Paper 1.
+"""CAMELS-RU catchment attributes and clustering for the HESS manuscript.
 
 Produces figures for Section 6 (catchment attributes) and Section 7.3
 (brief benchmark classification as a usage example).
@@ -44,6 +44,11 @@ from src.static.hydro_atlas_analysis import (
     get_cluster_markers,
     name_cluster,
 )
+from src.utils.paper_analysis_scope import (
+    PAPER_ANALYSIS_EXCLUSION_NOTE,
+    filter_paper_analysis_index,
+    paper_analysis_scope_summary,
+)
 
 gpd.options.io_engine = "pyogrio"
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -82,15 +87,27 @@ AREA_LIMIT_KM2 = 50_000  # HydroATLAS features average out in very large basins
 
 ws = gpd.read_file(GEOM_DIR / "camels_watersheds.gpkg")
 ws.set_index("gauge_id", inplace=True)
+ws.index = ws.index.astype(str)
 
 gauge = gpd.read_file(GEOM_DIR / "camels_gauges.gpkg")
 gauge.set_index("gauge_id", inplace=True)
+gauge.index = gauge.index.astype(str)
+
+release_scope = paper_analysis_scope_summary(ws.index)
+ws = filter_paper_analysis_index(ws)
+gauge = filter_paper_analysis_index(gauge)
 
 # Filter to catchments where HydroATLAS attributes are meaningful
 ws_filtered = ws.loc[ws["area_km2"] < AREA_LIMIT_KM2]
 gauge_filtered = gauge.loc[ws_filtered.index.intersection(gauge.index)]
 
-print(f"Total catchments: {len(ws)}")
+print(f"Total release catchments: {release_scope.n_total}")
+print(
+    "Paper-analysis gauge-ID scope: "
+    f"include {release_scope.n_included}, exclude {release_scope.n_excluded} "
+    f"(ID length >= {release_scope.excluded_min_id_length})"
+)
+print(PAPER_ANALYSIS_EXCLUSION_NOTE)
 print(f"After <{AREA_LIMIT_KM2:,} km² filter: {len(ws_filtered)}")
 
 # ── Load HydroATLAS attributes ──────────────────────────────────────────────

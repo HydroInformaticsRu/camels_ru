@@ -20,7 +20,12 @@ from .climatology import (
     detect_flat_years,
     detect_seasonal_signal,
 )
-from .meteo_response import calculate_flashiness_index, detect_dead_years
+from .meteo_response import (
+    calculate_flashiness_index,
+    calculate_temperature_aware_response_metrics,
+    detect_dead_years,
+    detect_temperature_aware_dead_years,
+)
 from .quality_flags import FlagSeverity, QualityFlag, get_flag_severity
 
 logger = logging.getLogger(__name__)
@@ -219,6 +224,8 @@ def assess_gauge_quality(  # noqa: C901
     gauge_id: str = "unknown",
     hydro_year_start_month: int = 10,
     min_years: int = 3,
+    temperature: pd.Series | None = None,
+    use_temperature_aware_response: bool = False,
 ) -> tuple[list[YearQualityResult], GaugeQualitySummary]:
     """Perform comprehensive quality assessment for a gauge.
 
@@ -228,6 +235,9 @@ def assess_gauge_quality(  # noqa: C901
         gauge_id: Gauge identifier for reporting.
         hydro_year_start_month: Start month of hydrological year.
         min_years: Minimum years required for assessment.
+        temperature: Optional mean air temperature time series (deg C).
+        use_temperature_aware_response: If True, replace direct P-Q response
+            flags with a rain + degree-day snowmelt effective-water check.
 
     Returns:
         Tuple of (list of YearQualityResult, GaugeQualitySummary).
@@ -320,7 +330,14 @@ def assess_gauge_quality(  # noqa: C901
         max_amplitude_ratio=5.0,  # Raised - large years can be valid
     )
 
-    if precipitation is not None:
+    if precipitation is not None and temperature is not None and use_temperature_aware_response:
+        meteo_flags = detect_temperature_aware_dead_years(
+            discharge,
+            precipitation,
+            temperature,
+            hydro_year_start_month,
+        )
+    elif precipitation is not None:
         meteo_flags = detect_dead_years(discharge, precipitation, hydro_year_start_month)
     else:
         meteo_flags = {}
@@ -395,7 +412,18 @@ def assess_gauge_quality(  # noqa: C901
             year_q = discharge.loc[start_date:end_date]
             year_p = precipitation.loc[start_date:end_date]
 
-            if len(year_q.dropna()) >= 30 and len(year_p.dropna()) >= 30:
+            if (
+                temperature is not None
+                and use_temperature_aware_response
+                and len(year_q.dropna()) >= 30
+                and len(year_p.dropna()) >= 30
+            ):
+                year_t = temperature.loc[start_date:end_date]
+                if len(year_t.dropna()) >= 30:
+                    response = calculate_temperature_aware_response_metrics(year_q, year_p, year_t)
+                    event_response_rate = response["event_response_rate"]
+                    max_pq_corr = response["max_cross_correlation"]
+            elif len(year_q.dropna()) >= 30 and len(year_p.dropna()) >= 30:
                 response = calculate_event_response(year_q, year_p)
                 event_response_rate = response["event_response_rate"]
 

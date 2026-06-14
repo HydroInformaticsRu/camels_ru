@@ -1,4 +1,4 @@
-"""CAMELS-RU Hydrological Signatures — ESSD Paper 1.
+"""CAMELS-RU hydrological signatures for the HESS manuscript.
 
 Produces publication-quality figures for Section 5.4 (hydrological signatures):
     fig_hydro_signatures.png    — 8-panel map of key hydrological metrics
@@ -8,7 +8,7 @@ Produces publication-quality figures for Section 5.4 (hydrological signatures):
 Tables:
     paper/tables/overall_hydro_statistics.csv
 
-Paper 1 scope: dataset description only. Trend analysis is reserved for Paper 2.
+Manuscript scope: dataset description and validation. Trend analysis is reserved for future work.
 """
 
 from __future__ import annotations
@@ -30,6 +30,11 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from src.hydro.parallel_metrics import calculate_metrics_parallel
 from src.plots.paper_maps import categorical_map, continuous_multiplot
+from src.utils.paper_analysis_scope import (
+    PAPER_ANALYSIS_EXCLUSION_NOTE,
+    filter_paper_analysis_index,
+    paper_analysis_scope_summary,
+)
 
 gpd.options.io_engine = "pyogrio"
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -76,11 +81,11 @@ KEY_METRICS: list[str] = [
 ]
 
 METRIC_TITLES: list[str] = [
-    "Mean discharge (mm/day)",
-    "Q95 (mm/day)",
-    "Q05 (mm/day)",
+    "Mean discharge (mm d⁻¹)",
+    "Q95 (mm d⁻¹)",
+    "Q05 (mm d⁻¹)",
     "Baseflow index",
-    "Mean half flow date (day of year)",
+    "Mean half flow date (day of hydrological year)",
     "FDC slope",
     "High flow frequency (%)",
     "Low flow frequency (%)",
@@ -123,15 +128,27 @@ def convert_q_cms_to_mm_day(q_cms: pd.Series, area_km2: float) -> pd.Series:
 print("Loading geometry...")
 ws = gpd.read_file(GEOM_DIR / "camels_watersheds.gpkg")
 ws.set_index("gauge_id", inplace=True)
+ws.index = ws.index.astype(str)
 
 gauge = gpd.read_file(GEOM_DIR / "camels_gauges.gpkg")
 gauge.set_index("gauge_id", inplace=True)
+gauge.index = gauge.index.astype(str)
+
+release_scope = paper_analysis_scope_summary(ws.index)
+ws = filter_paper_analysis_index(ws)
+gauge = filter_paper_analysis_index(gauge)
 
 # Filter watersheds to reasonable size (large basins average out signatures)
 ws = ws.loc[ws["area_km2"] < AREA_LIMIT_KM2]
 gauge = gauge.loc[gauge.index.intersection(ws.index)]
 
-print(f"Watersheds: {len(ws)}  |  Gauges: {len(gauge)}")
+print(
+    f"Release watersheds: {release_scope.n_total}  |  "
+    f"Paper-analysis watersheds: {release_scope.n_included}  |  "
+    f"Gauge-ID excluded: {release_scope.n_excluded}"
+)
+print(PAPER_ANALYSIS_EXCLUSION_NOTE)
+print(f"Watersheds after <{AREA_LIMIT_KM2:,} km² filter: {len(ws)}  |  Gauges: {len(gauge)}")
 
 # Load cluster assignments from NB01 (geophysical clusters for context)
 cluster_df = pd.read_csv(
@@ -405,7 +422,7 @@ bins_2 = {k: bin_intervals[k] for k in metrics_2}
 fig_sig1 = continuous_multiplot(
     gdf=gauge_analysis,
     metrics=metrics_1,
-    titles=[f"({c}) {t}" for c, t in zip("abcd", titles_1)],
+    titles=[f"({c}) {t}" for c, t in zip("abcd", titles_1, strict=True)],
     ncols=2,
     panel_size=(8.0, 5.0),
     cmap_name="RdYlBu_r",
@@ -422,13 +439,17 @@ print("  Saved fig_hydro_signatures_1.png")
 fig_sig2 = continuous_multiplot(
     gdf=gauge_analysis,
     metrics=metrics_2,
-    titles=[f"({c}) {t}" for c, t in zip("efgh", titles_2)],
+    titles=[f"({c}) {t}" for c, t in zip("efgh", titles_2, strict=True)],
     ncols=2,
     panel_size=(8.0, 5.0),
     cmap_name="RdYlBu_r",
     bin_intervals=bins_2,
     marker_size=8,
-    suptitle=f"Hydrological Signatures: Timing, Variability, and Extremes (n={len(gauge_analysis)})",
+    suptitle=(
+        f"Hydrological Signatures: Timing, Variability, and Extremes "
+        f"(n={len(gauge_analysis)}; half-flow date n="
+        f"{int(gauge_analysis['mean_half_flow_date'].notna().sum())})"
+    ),
     show_nan=True,
     background_gdf=_ne_land,
 )
