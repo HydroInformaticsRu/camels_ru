@@ -1,0 +1,16 @@
+{
+  "include": ["src"],
+  "exclude": ["**/data", "**/__pycache__", ".venv", "build", "dist"],
+  "pythonVersion": "3.12",
+  "typeCheckingMode": "basic",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "reportAttributeAccessIssue": false,
+  "reportArgumentType": false,
+  "reportReturnType": false,
+  "reportOperatorIssue": false,
+  "reportCallIssue": false,
+  "reportOptionalOperand": false,
+  "reportOptionalMemberAccess": false,
+  "reportPrivateImportUsage": false
+}

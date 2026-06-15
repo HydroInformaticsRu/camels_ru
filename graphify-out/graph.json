@@ -4,6 +4,204 @@
   "graph": {},
   "nodes": [
     {
+      "label": "pyright.smoke.json",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L1",
+      "id": "pyright_smoke_json",
+      "community": 75,
+      "norm_label": "pyright.smoke.json"
+    },
+    {
+      "label": "include",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L2",
+      "id": "camels_ru_pyright_smoke_include",
+      "community": 75,
+      "norm_label": "include"
+    },
+    {
+      "label": "exclude",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L3",
+      "id": "camels_ru_pyright_smoke_exclude",
+      "community": 75,
+      "norm_label": "exclude"
+    },
+    {
+      "label": "pythonVersion",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L4",
+      "id": "camels_ru_pyright_smoke_pythonversion",
+      "community": 75,
+      "norm_label": "pythonversion"
+    },
+    {
+      "label": "typeCheckingMode",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L5",
+      "id": "camels_ru_pyright_smoke_typecheckingmode",
+      "community": 75,
+      "norm_label": "typecheckingmode"
+    },
+    {
+      "label": "reportMissingImports",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L6",
+      "id": "camels_ru_pyright_smoke_reportmissingimports",
+      "community": 75,
+      "norm_label": "reportmissingimports"
+    },
+    {
+      "label": "reportMissingTypeStubs",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L7",
+      "id": "camels_ru_pyright_smoke_reportmissingtypestubs",
+      "community": 75,
+      "norm_label": "reportmissingtypestubs"
+    },
+    {
+      "label": "reportAttributeAccessIssue",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L8",
+      "id": "camels_ru_pyright_smoke_reportattributeaccessissue",
+      "community": 75,
+      "norm_label": "reportattributeaccessissue"
+    },
+    {
+      "label": "reportArgumentType",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L9",
+      "id": "camels_ru_pyright_smoke_reportargumenttype",
+      "community": 75,
+      "norm_label": "reportargumenttype"
+    },
+    {
+      "label": "reportReturnType",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L10",
+      "id": "camels_ru_pyright_smoke_reportreturntype",
+      "community": 75,
+      "norm_label": "reportreturntype"
+    },
+    {
+      "label": "reportOperatorIssue",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L11",
+      "id": "camels_ru_pyright_smoke_reportoperatorissue",
+      "community": 75,
+      "norm_label": "reportoperatorissue"
+    },
+    {
+      "label": "reportCallIssue",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L12",
+      "id": "camels_ru_pyright_smoke_reportcallissue",
+      "community": 75,
+      "norm_label": "reportcallissue"
+    },
+    {
+      "label": "reportOptionalOperand",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L13",
+      "id": "camels_ru_pyright_smoke_reportoptionaloperand",
+      "community": 75,
+      "norm_label": "reportoptionaloperand"
+    },
+    {
+      "label": "reportOptionalMemberAccess",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L14",
+      "id": "camels_ru_pyright_smoke_reportoptionalmemberaccess",
+      "community": 75,
+      "norm_label": "reportoptionalmemberaccess"
+    },
+    {
+      "label": "reportPrivateImportUsage",
+      "file_type": "code",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L15",
+      "id": "camels_ru_pyright_smoke_reportprivateimportusage",
+      "community": 75,
+      "norm_label": "reportprivateimportusage"
+    },
+    {
+      "label": "pyright.strict-paper.json",
+      "file_type": "code",
+      "source_file": "pyright.strict-paper.json",
+      "source_location": "L1",
+      "id": "pyright_strict_paper_json",
+      "community": 90,
+      "norm_label": "pyright.strict-paper.json"
+    },
+    {
+      "label": "include",
+      "file_type": "code",
+      "source_file": "pyright.strict-paper.json",
+      "source_location": "L2",
+      "id": "camels_ru_pyright_strict_paper_include",
+      "community": 90,
+      "norm_label": "include"
+    },
+    {
+      "label": "exclude",
+      "file_type": "code",
+      "source_file": "pyright.strict-paper.json",
+      "source_location": "L3",
+      "id": "camels_ru_pyright_strict_paper_exclude",
+      "community": 90,
+      "norm_label": "exclude"
+    },
+    {
+      "label": "pythonVersion",
+      "file_type": "code",
+      "source_file": "pyright.strict-paper.json",
+      "source_location": "L4",
+      "id": "camels_ru_pyright_strict_paper_pythonversion",
+      "community": 90,
+      "norm_label": "pythonversion"
+    },
+    {
+      "label": "typeCheckingMode",
+      "file_type": "code",
+      "source_file": "pyright.strict-paper.json",
+      "source_location": "L5",
+      "id": "camels_ru_pyright_strict_paper_typecheckingmode",
+      "community": 90,
+      "norm_label": "typecheckingmode"
+    },
+    {
+      "label": "reportMissingImports",
+      "file_type": "code",
+      "source_file": "pyright.strict-paper.json",
+      "source_location": "L6",
+      "id": "camels_ru_pyright_strict_paper_reportmissingimports",
+      "community": 90,
+      "norm_label": "reportmissingimports"
+    },
+    {
+      "label": "reportMissingTypeStubs",
+      "file_type": "code",
+      "source_file": "pyright.strict-paper.json",
+      "source_location": "L7",
+      "id": "camels_ru_pyright_strict_paper_reportmissingtypestubs",
+      "community": 90,
+      "norm_label": "reportmissingtypestubs"
+    },
+    {
       "label": "main.py",
       "file_type": "code",
       "source_file": "app/main.py",
@@ -1161,7 +1359,7 @@
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L1",
       "id": "notebooks_03_forcingsfinal_py",
-      "community": 75,
+      "community": 2,
       "norm_label": "03_forcingsfinal.py"
     },
     {
@@ -1170,7 +1368,7 @@
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L77",
       "id": "notebooks_03_forcingsfinal_load_csv_series",
-      "community": 75,
+      "community": 2,
       "norm_label": "load_csv_series()"
     },
     {
@@ -1179,7 +1377,7 @@
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L77",
       "id": "notebooks_03_forcingsfinal_py_path",
-      "community": 75,
+      "community": 2,
       "norm_label": "path"
     },
     {
@@ -1188,7 +1386,7 @@
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L77",
       "id": "notebooks_03_forcingsfinal_py_str",
-      "community": 75,
+      "community": 2,
       "norm_label": "str"
     },
     {
@@ -1197,7 +1395,7 @@
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L77",
       "id": "notebooks_03_forcingsfinal_py_series",
-      "community": 75,
+      "community": 2,
       "norm_label": "series"
     },
     {
@@ -1206,7 +1404,7 @@
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L90",
       "id": "notebooks_03_forcingsfinal_annual_mean_precip",
-      "community": 75,
+      "community": 2,
       "norm_label": "annual_mean_precip()"
     },
     {
@@ -1215,7 +1413,7 @@
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L90",
       "id": "notebooks_03_forcingsfinal_py_float",
-      "community": 75,
+      "community": 2,
       "norm_label": "float"
     },
     {
@@ -1224,7 +1422,7 @@
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L98",
       "id": "notebooks_03_forcingsfinal_annual_cv_precip",
-      "community": 75,
+      "community": 2,
       "norm_label": "annual_cv_precip()"
     },
     {
@@ -1233,7 +1431,7 @@
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L1",
       "id": "notebooks_03_forcingsfinal_rationale_1",
-      "community": 75,
+      "community": 2,
       "norm_label": "camels-ru meteorological forcing diagnostics for the hess manuscript.  produces"
     },
     {
@@ -1242,7 +1440,7 @@
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L78",
       "id": "notebooks_03_forcingsfinal_rationale_78",
-      "community": 75,
+      "community": 2,
       "norm_label": "load a single-column time series from csv, returning none on failure."
     },
     {
@@ -1251,7 +1449,7 @@
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L91",
       "id": "notebooks_03_forcingsfinal_rationale_91",
-      "community": 75,
+      "community": 2,
       "norm_label": "mean annual precipitation total (mm/yr) over the analysis period."
     },
     {
@@ -1260,7 +1458,7 @@
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L99",
       "id": "notebooks_03_forcingsfinal_rationale_99",
-      "community": 75,
+      "community": 2,
       "norm_label": "coefficient of variation of annual precipitation totals."
     },
     {
@@ -1458,7 +1656,7 @@
       "source_file": "notebooks/02_HydrologicalFinal.py",
       "source_location": "L1",
       "id": "notebooks_02_hydrologicalfinal_py",
-      "community": 80,
+      "community": 2,
       "norm_label": "02_hydrologicalfinal.py"
     },
     {
@@ -1467,7 +1665,7 @@
       "source_file": "notebooks/02_HydrologicalFinal.py",
       "source_location": "L100",
       "id": "notebooks_02_hydrologicalfinal_cluster_sort_key",
-      "community": 80,
+      "community": 2,
       "norm_label": "_cluster_sort_key()"
     },
     {
@@ -1476,7 +1674,7 @@
       "source_file": "notebooks/02_HydrologicalFinal.py",
       "source_location": "L100",
       "id": "notebooks_02_hydrologicalfinal_py_str",
-      "community": 80,
+      "community": 2,
       "norm_label": "str"
     },
     {
@@ -1485,7 +1683,7 @@
       "source_file": "notebooks/02_HydrologicalFinal.py",
       "source_location": "L100",
       "id": "notebooks_02_hydrologicalfinal_py_int",
-      "community": 80,
+      "community": 2,
       "norm_label": "int"
     },
     {
@@ -1494,7 +1692,7 @@
       "source_file": "notebooks/02_HydrologicalFinal.py",
       "source_location": "L106",
       "id": "notebooks_02_hydrologicalfinal_convert_q_cms_to_mm_day",
-      "community": 80,
+      "community": 2,
       "norm_label": "convert_q_cms_to_mm_day()"
     },
     {
@@ -1503,7 +1701,7 @@
       "source_file": "notebooks/02_HydrologicalFinal.py",
       "source_location": "L106",
       "id": "notebooks_02_hydrologicalfinal_py_series",
-      "community": 80,
+      "community": 2,
       "norm_label": "series"
     },
     {
@@ -1512,7 +1710,7 @@
       "source_file": "notebooks/02_HydrologicalFinal.py",
       "source_location": "L106",
       "id": "notebooks_02_hydrologicalfinal_py_float",
-      "community": 80,
+      "community": 2,
       "norm_label": "float"
     },
     {
@@ -1521,7 +1719,7 @@
       "source_file": "notebooks/02_HydrologicalFinal.py",
       "source_location": "L1",
       "id": "notebooks_02_hydrologicalfinal_rationale_1",
-      "community": 80,
+      "community": 2,
       "norm_label": "camels-ru hydrological signatures for the hess manuscript.  produces publication"
     },
     {
@@ -1530,7 +1728,7 @@
       "source_file": "notebooks/02_HydrologicalFinal.py",
       "source_location": "L101",
       "id": "notebooks_02_hydrologicalfinal_rationale_101",
-      "community": 80,
+      "community": 2,
       "norm_label": "extract numeric cluster id from 'cluster n' string for sorting."
     },
     {
@@ -1539,7 +1737,7 @@
       "source_file": "notebooks/02_HydrologicalFinal.py",
       "source_location": "L107",
       "id": "notebooks_02_hydrologicalfinal_rationale_107",
-      "community": 80,
+      "community": 2,
       "norm_label": "convert discharge from m3/s to mm/day.      parameters     ----------     q_cms"
     },
     {
@@ -1827,7 +2025,7 @@
       "source_file": "notebooks/00_DataDescription.py",
       "source_location": "L1",
       "id": "notebooks_00_datadescription_py",
-      "community": 82,
+      "community": 91,
       "norm_label": "00_datadescription.py"
     },
     {
@@ -1836,7 +2034,7 @@
       "source_file": "notebooks/00_DataDescription.py",
       "source_location": "L80",
       "id": "notebooks_00_datadescription_grade_boxplot",
-      "community": 82,
+      "community": 91,
       "norm_label": "grade_boxplot()"
     },
     {
@@ -1845,7 +2043,7 @@
       "source_file": "notebooks/00_DataDescription.py",
       "source_location": "L1",
       "id": "notebooks_00_datadescription_rationale_1",
-      "community": 82,
+      "community": 91,
       "norm_label": "camels-ru data description figures for the hess manuscript.  produces publicatio"
     },
     {
@@ -1854,7 +2052,7 @@
       "source_file": "notebooks/00_DataDescription.py",
       "source_location": "L90",
       "id": "notebooks_00_datadescription_rationale_90",
-      "community": 82,
+      "community": 91,
       "norm_label": "boxplot of *column* grouped by grade, with optional hydropower overlay.      whe"
     },
     {
@@ -2020,6 +2218,114 @@
       "norm_label": "replace zeros with seasonal median, interpolate short gaps."
     },
     {
+      "label": "water_level_completeness_summary.py",
+      "file_type": "code",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L1",
+      "id": "scripts_water_level_completeness_summary_py",
+      "community": 89,
+      "norm_label": "water_level_completeness_summary.py"
+    },
+    {
+      "label": "_type_label()",
+      "file_type": "code",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L47",
+      "id": "scripts_water_level_completeness_summary_type_label",
+      "community": 89,
+      "norm_label": "_type_label()"
+    },
+    {
+      "label": "object",
+      "file_type": "code",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L47",
+      "id": "scripts_water_level_completeness_summary_py_object",
+      "community": 89,
+      "norm_label": "object"
+    },
+    {
+      "label": "str",
+      "file_type": "code",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L47",
+      "id": "scripts_water_level_completeness_summary_py_str",
+      "community": 89,
+      "norm_label": "str"
+    },
+    {
+      "label": "_build_completeness_table()",
+      "file_type": "code",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L55",
+      "id": "scripts_water_level_completeness_summary_build_completeness_table",
+      "community": 89,
+      "norm_label": "_build_completeness_table()"
+    },
+    {
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L55",
+      "id": "scripts_water_level_completeness_summary_py_dataframe",
+      "community": 89,
+      "norm_label": "dataframe"
+    },
+    {
+      "label": "_plot_summary()",
+      "file_type": "code",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L123",
+      "id": "scripts_water_level_completeness_summary_plot_summary",
+      "community": 89,
+      "norm_label": "_plot_summary()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L203",
+      "id": "scripts_water_level_completeness_summary_main",
+      "community": 89,
+      "norm_label": "main()"
+    },
+    {
+      "label": "Return a readable gauge-type label from the NetCDF flag value.",
+      "file_type": "rationale",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L48",
+      "id": "scripts_water_level_completeness_summary_rationale_48",
+      "community": 89,
+      "norm_label": "return a readable gauge-type label from the netcdf flag value."
+    },
+    {
+      "label": "Compute per-gauge completeness and summary rows from water-level NetCDF.",
+      "file_type": "rationale",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L56",
+      "id": "scripts_water_level_completeness_summary_rationale_56",
+      "community": 89,
+      "norm_label": "compute per-gauge completeness and summary rows from water-level netcdf."
+    },
+    {
+      "label": "Plot water-level completeness distribution and type counts.",
+      "file_type": "rationale",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L124",
+      "id": "scripts_water_level_completeness_summary_rationale_124",
+      "community": 89,
+      "norm_label": "plot water-level completeness distribution and type counts."
+    },
+    {
+      "label": "Write water-level completeness CSV, LaTeX summary, and figure.",
+      "file_type": "rationale",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L204",
+      "id": "scripts_water_level_completeness_summary_rationale_204",
+      "community": 89,
+      "norm_label": "write water-level completeness csv, latex summary, and figure."
+    },
+    {
       "label": "ParseAisCompound.py",
       "file_type": "code",
       "source_file": "scripts/ParseAisCompound.py",
@@ -2108,6 +2414,492 @@
       "id": "scripts_parseaiscompound_rationale_50",
       "community": 55,
       "norm_label": "build compound hydro file for a single gauge.      returns none if neither disch"
+    },
+    {
+      "label": "stratify_water_balance_violations.py",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L1",
+      "id": "scripts_stratify_water_balance_violations_py",
+      "community": 46,
+      "norm_label": "stratify_water_balance_violations.py"
+    },
+    {
+      "label": "_pct()",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L79",
+      "id": "scripts_stratify_water_balance_violations_pct",
+      "community": 46,
+      "norm_label": "_pct()"
+    },
+    {
+      "label": "int",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L79",
+      "id": "scripts_stratify_water_balance_violations_py_int",
+      "community": 46,
+      "norm_label": "int"
+    },
+    {
+      "label": "float",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L79",
+      "id": "scripts_stratify_water_balance_violations_py_float",
+      "community": 46,
+      "norm_label": "float"
+    },
+    {
+      "label": "_as_bool()",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L84",
+      "id": "scripts_stratify_water_balance_violations_as_bool",
+      "community": 46,
+      "norm_label": "_as_bool()"
+    },
+    {
+      "label": "Series",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L84",
+      "id": "scripts_stratify_water_balance_violations_py_series",
+      "community": 46,
+      "norm_label": "series"
+    },
+    {
+      "label": "_ordered_pct_bin()",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L91",
+      "id": "scripts_stratify_water_balance_violations_ordered_pct_bin",
+      "community": 46,
+      "norm_label": "_ordered_pct_bin()"
+    },
+    {
+      "label": "Categorical",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L91",
+      "id": "categorical",
+      "community": 46,
+      "norm_label": "categorical"
+    },
+    {
+      "label": "_add_strata()",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L107",
+      "id": "scripts_stratify_water_balance_violations_add_strata",
+      "community": 46,
+      "norm_label": "_add_strata()"
+    },
+    {
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L107",
+      "id": "scripts_stratify_water_balance_violations_py_dataframe",
+      "community": 46,
+      "norm_label": "dataframe"
+    },
+    {
+      "label": "_load_inputs()",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L140",
+      "id": "scripts_stratify_water_balance_violations_load_inputs",
+      "community": 46,
+      "norm_label": "_load_inputs()"
+    },
+    {
+      "label": "_scope_mask()",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L180",
+      "id": "scripts_stratify_water_balance_violations_scope_mask",
+      "community": 46,
+      "norm_label": "_scope_mask()"
+    },
+    {
+      "label": "str",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L180",
+      "id": "scripts_stratify_water_balance_violations_py_str",
+      "community": 46,
+      "norm_label": "str"
+    },
+    {
+      "label": "_median_or_nan()",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L195",
+      "id": "scripts_stratify_water_balance_violations_median_or_nan",
+      "community": 46,
+      "norm_label": "_median_or_nan()"
+    },
+    {
+      "label": "_rows_for_stratum()",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L200",
+      "id": "scripts_stratify_water_balance_violations_rows_for_stratum",
+      "community": 46,
+      "norm_label": "_rows_for_stratum()"
+    },
+    {
+      "label": "object",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L200",
+      "id": "scripts_stratify_water_balance_violations_py_object",
+      "community": 46,
+      "norm_label": "object"
+    },
+    {
+      "label": "build_summary()",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L261",
+      "id": "scripts_stratify_water_balance_violations_build_summary",
+      "community": 46,
+      "norm_label": "build_summary()"
+    },
+    {
+      "label": "_plot_metric()",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L284",
+      "id": "scripts_stratify_water_balance_violations_plot_metric",
+      "community": 46,
+      "norm_label": "_plot_metric()"
+    },
+    {
+      "label": "Axes",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L284",
+      "id": "scripts_stratify_water_balance_violations_py_axes",
+      "community": 46,
+      "norm_label": "axes"
+    },
+    {
+      "label": "plot_summary()",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L334",
+      "id": "scripts_stratify_water_balance_violations_plot_summary",
+      "community": 46,
+      "norm_label": "plot_summary()"
+    },
+    {
+      "label": "_write_notes()",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L384",
+      "id": "scripts_stratify_water_balance_violations_write_notes",
+      "community": 46,
+      "norm_label": "_write_notes()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L446",
+      "id": "scripts_stratify_water_balance_violations_main",
+      "community": 46,
+      "norm_label": "main()"
+    },
+    {
+      "label": "Return a percentage, preserving NaN for empty denominators.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L80",
+      "id": "scripts_stratify_water_balance_violations_rationale_80",
+      "community": 46,
+      "norm_label": "return a percentage, preserving nan for empty denominators."
+    },
+    {
+      "label": "Coerce bool/string bool columns from CSV to a Boolean Series.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L85",
+      "id": "scripts_stratify_water_balance_violations_rationale_85",
+      "community": 46,
+      "norm_label": "coerce bool/string bool columns from csv to a boolean series."
+    },
+    {
+      "label": "Bin percentage-like HydroATLAS proxy values into compact labels.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L92",
+      "id": "scripts_stratify_water_balance_violations_rationale_92",
+      "community": 46,
+      "norm_label": "bin percentage-like hydroatlas proxy values into compact labels."
+    },
+    {
+      "label": "Add area and HydroATLAS-proxy strata to a per-gauge diagnostic table.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L108",
+      "id": "scripts_stratify_water_balance_violations_rationale_108",
+      "community": 46,
+      "norm_label": "add area and hydroatlas-proxy strata to a per-gauge diagnostic table."
+    },
+    {
+      "label": "Load per-gauge HESS audit outputs and merge HydroATLAS proxy columns.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L141",
+      "id": "scripts_stratify_water_balance_violations_rationale_141",
+      "community": 46,
+      "norm_label": "load per-gauge hess audit outputs and merge hydroatlas proxy columns."
+    },
+    {
+      "label": "Return the row mask for a named manuscript-analysis scope.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L181",
+      "id": "scripts_stratify_water_balance_violations_rationale_181",
+      "community": 46,
+      "norm_label": "return the row mask for a named manuscript-analysis scope."
+    },
+    {
+      "label": "Build summary rows for one scope x stratum group.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L208",
+      "id": "scripts_stratify_water_balance_violations_rationale_208",
+      "community": 46,
+      "norm_label": "build summary rows for one scope x stratum group."
+    },
+    {
+      "label": "Create a long water-balance stratification summary table.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L262",
+      "id": "scripts_stratify_water_balance_violations_rationale_262",
+      "community": 46,
+      "norm_label": "create a long water-balance stratification summary table."
+    },
+    {
+      "label": "Draw one grouped-bar panel for a categorical stratum diagnostic.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L293",
+      "id": "scripts_stratify_water_balance_violations_rationale_293",
+      "community": 46,
+      "norm_label": "draw one grouped-bar panel for a categorical stratum diagnostic."
+    },
+    {
+      "label": "Write the HESS water-balance strata figure.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L335",
+      "id": "scripts_stratify_water_balance_violations_rationale_335",
+      "community": 46,
+      "norm_label": "write the hess water-balance strata figure."
+    },
+    {
+      "label": "Write a compact reviewer-facing interpretation note.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L385",
+      "id": "scripts_stratify_water_balance_violations_rationale_385",
+      "community": 46,
+      "norm_label": "write a compact reviewer-facing interpretation note."
+    },
+    {
+      "label": "Build CSV, LaTeX, notes, and figure outputs.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L447",
+      "id": "scripts_stratify_water_balance_violations_rationale_447",
+      "community": 46,
+      "norm_label": "build csv, latex, notes, and figure outputs."
+    },
+    {
+      "label": "plot_hess_subset_flow.py",
+      "file_type": "code",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L1",
+      "id": "scripts_plot_hess_subset_flow_py",
+      "community": 49,
+      "norm_label": "plot_hess_subset_flow.py"
+    },
+    {
+      "label": "_subset_count()",
+      "file_type": "code",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L38",
+      "id": "scripts_plot_hess_subset_flow_subset_count",
+      "community": 49,
+      "norm_label": "_subset_count()"
+    },
+    {
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L38",
+      "id": "scripts_plot_hess_subset_flow_py_dataframe",
+      "community": 49,
+      "norm_label": "dataframe"
+    },
+    {
+      "label": "str",
+      "file_type": "code",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L38",
+      "id": "scripts_plot_hess_subset_flow_py_str",
+      "community": 49,
+      "norm_label": "str"
+    },
+    {
+      "label": "int",
+      "file_type": "code",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L38",
+      "id": "scripts_plot_hess_subset_flow_py_int",
+      "community": 49,
+      "norm_label": "int"
+    },
+    {
+      "label": "_dam_count()",
+      "file_type": "code",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L46",
+      "id": "scripts_plot_hess_subset_flow_dam_count",
+      "community": 49,
+      "norm_label": "_dam_count()"
+    },
+    {
+      "label": "_box()",
+      "file_type": "code",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L54",
+      "id": "scripts_plot_hess_subset_flow_box",
+      "community": 49,
+      "norm_label": "_box()"
+    },
+    {
+      "label": "Axes",
+      "file_type": "code",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L54",
+      "id": "scripts_plot_hess_subset_flow_py_axes",
+      "community": 49,
+      "norm_label": "axes"
+    },
+    {
+      "label": "float",
+      "file_type": "code",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L54",
+      "id": "scripts_plot_hess_subset_flow_py_float",
+      "community": 49,
+      "norm_label": "float"
+    },
+    {
+      "label": "_arrow()",
+      "file_type": "code",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L107",
+      "id": "scripts_plot_hess_subset_flow_arrow",
+      "community": 49,
+      "norm_label": "_arrow()"
+    },
+    {
+      "label": "_draw_column()",
+      "file_type": "code",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L123",
+      "id": "scripts_plot_hess_subset_flow_draw_column",
+      "community": 49,
+      "norm_label": "_draw_column()"
+    },
+    {
+      "label": "plot_subset_flow()",
+      "file_type": "code",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L147",
+      "id": "scripts_plot_hess_subset_flow_plot_subset_flow",
+      "community": 49,
+      "norm_label": "plot_subset_flow()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L284",
+      "id": "scripts_plot_hess_subset_flow_main",
+      "community": 49,
+      "norm_label": "main()"
+    },
+    {
+      "label": "Return an integer count from subset_flow.csv.",
+      "file_type": "rationale",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L39",
+      "id": "scripts_plot_hess_subset_flow_rationale_39",
+      "community": 49,
+      "norm_label": "return an integer count from subset_flow.csv."
+    },
+    {
+      "label": "Return an integer count from dam_filter_summary.csv.",
+      "file_type": "rationale",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L47",
+      "id": "scripts_plot_hess_subset_flow_rationale_47",
+      "community": 49,
+      "norm_label": "return an integer count from dam_filter_summary.csv."
+    },
+    {
+      "label": "Draw one labelled rounded box.",
+      "file_type": "rationale",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L64",
+      "id": "scripts_plot_hess_subset_flow_rationale_64",
+      "community": 49,
+      "norm_label": "draw one labelled rounded box."
+    },
+    {
+      "label": "Draw a flow arrow between boxes.",
+      "file_type": "rationale",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L108",
+      "id": "scripts_plot_hess_subset_flow_rationale_108",
+      "community": 49,
+      "norm_label": "draw a flow arrow between boxes."
+    },
+    {
+      "label": "Draw one vertical flow column and return node centres.",
+      "file_type": "rationale",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L130",
+      "id": "scripts_plot_hess_subset_flow_rationale_130",
+      "community": 49,
+      "norm_label": "draw one vertical flow column and return node centres."
+    },
+    {
+      "label": "Render the subset-flow figure.",
+      "file_type": "rationale",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L148",
+      "id": "scripts_plot_hess_subset_flow_rationale_148",
+      "community": 49,
+      "norm_label": "render the subset-flow figure."
+    },
+    {
+      "label": "Load audit CSVs and write the HESS subset-flow figure.",
+      "file_type": "rationale",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L285",
+      "id": "scripts_plot_hess_subset_flow_rationale_285",
+      "community": 49,
+      "norm_label": "load audit csvs and write the hess subset-flow figure."
     },
     {
       "label": "detect_nesting.py",
@@ -3492,7 +4284,7 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L586",
       "id": "scripts_hess_quality_audit_gauge_ids_from_frame",
-      "community": 85,
+      "community": 94,
       "norm_label": "_gauge_ids_from_frame()"
     },
     {
@@ -3501,7 +4293,7 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L586",
       "id": "scripts_hess_quality_audit_py_geodataframe",
-      "community": 85,
+      "community": 94,
       "norm_label": "geodataframe"
     },
     {
@@ -3537,7 +4329,7 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L683",
       "id": "scripts_hess_quality_audit_build_paper_analysis_scope",
-      "community": 85,
+      "community": 82,
       "norm_label": "_build_paper_analysis_scope()"
     },
     {
@@ -3582,7 +4374,7 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L1215",
       "id": "scripts_hess_quality_audit_build_budyko_aet",
-      "community": 83,
+      "community": 82,
       "norm_label": "_build_budyko_aet()"
     },
     {
@@ -3654,7 +4446,7 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L587",
       "id": "scripts_hess_quality_audit_rationale_587",
-      "community": 85,
+      "community": 94,
       "norm_label": "extract gauge ids from a tabular source without assuming lower-case headers."
     },
     {
@@ -3690,7 +4482,7 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L686",
       "id": "scripts_hess_quality_audit_rationale_686",
-      "community": 85,
+      "community": 82,
       "norm_label": "write the gauge-id-only exclusion used by manuscript analyses."
     },
     {
@@ -3735,7 +4527,7 @@
       "source_file": "scripts/create_paper_signatures.py",
       "source_location": "L1",
       "id": "scripts_create_paper_signatures_py",
-      "community": 6,
+      "community": 30,
       "norm_label": "create_paper_signatures.py"
     },
     {
@@ -4331,6 +5123,213 @@
       "id": "scripts_package_dataset_rationale_676",
       "community": 12,
       "norm_label": "parse cli args and orchestrate the full zenodo-bundle build pipeline."
+    },
+    {
+      "label": "summarize_hess_representativeness.py",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L1",
+      "id": "scripts_summarize_hess_representativeness_py",
+      "community": 77,
+      "norm_label": "summarize_hess_representativeness.py"
+    },
+    {
+      "label": "_numeric()",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L39",
+      "id": "scripts_summarize_hess_representativeness_numeric",
+      "community": 77,
+      "norm_label": "_numeric()"
+    },
+    {
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L39",
+      "id": "scripts_summarize_hess_representativeness_py_dataframe",
+      "community": 77,
+      "norm_label": "dataframe"
+    },
+    {
+      "label": "str",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L39",
+      "id": "scripts_summarize_hess_representativeness_py_str",
+      "community": 77,
+      "norm_label": "str"
+    },
+    {
+      "label": "Series",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L39",
+      "id": "scripts_summarize_hess_representativeness_py_series",
+      "community": 77,
+      "norm_label": "series"
+    },
+    {
+      "label": "_count_pct()",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L46",
+      "id": "scripts_summarize_hess_representativeness_count_pct",
+      "community": 77,
+      "norm_label": "_count_pct()"
+    },
+    {
+      "label": "int",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L46",
+      "id": "scripts_summarize_hess_representativeness_py_int",
+      "community": 77,
+      "norm_label": "int"
+    },
+    {
+      "label": "float",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L46",
+      "id": "scripts_summarize_hess_representativeness_py_float",
+      "community": 77,
+      "norm_label": "float"
+    },
+    {
+      "label": "_add_threshold_rows()",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L52",
+      "id": "scripts_summarize_hess_representativeness_add_threshold_rows",
+      "community": 77,
+      "norm_label": "_add_threshold_rows()"
+    },
+    {
+      "label": "object",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L52",
+      "id": "scripts_summarize_hess_representativeness_py_object",
+      "community": 77,
+      "norm_label": "object"
+    },
+    {
+      "label": "build_representativeness_stats()",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L82",
+      "id": "scripts_summarize_hess_representativeness_build_representativeness_stats",
+      "community": 77,
+      "norm_label": "build_representativeness_stats()"
+    },
+    {
+      "label": "build_attribute_selection()",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L133",
+      "id": "scripts_summarize_hess_representativeness_build_attribute_selection",
+      "community": 77,
+      "norm_label": "build_attribute_selection()"
+    },
+    {
+      "label": "_value_float()",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L183",
+      "id": "scripts_summarize_hess_representativeness_value_float",
+      "community": 77,
+      "norm_label": "_value_float()"
+    },
+    {
+      "label": "write_notes()",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L191",
+      "id": "scripts_summarize_hess_representativeness_write_notes",
+      "community": 77,
+      "norm_label": "write_notes()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L256",
+      "id": "scripts_summarize_hess_representativeness_main",
+      "community": 77,
+      "norm_label": "main()"
+    },
+    {
+      "label": "Return a numeric column, preserving NaN for absent fields.",
+      "file_type": "rationale",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L40",
+      "id": "scripts_summarize_hess_representativeness_rationale_40",
+      "community": 77,
+      "norm_label": "return a numeric column, preserving nan for absent fields."
+    },
+    {
+      "label": "Return count and percent of True values.",
+      "file_type": "rationale",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L47",
+      "id": "scripts_summarize_hess_representativeness_rationale_47",
+      "community": 77,
+      "norm_label": "return count and percent of true values."
+    },
+    {
+      "label": "Append reviewer-facing threshold statistics.",
+      "file_type": "rationale",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L53",
+      "id": "scripts_summarize_hess_representativeness_rationale_53",
+      "community": 77,
+      "norm_label": "append reviewer-facing threshold statistics."
+    },
+    {
+      "label": "Compute compact cold-region and hydroclimatic representativeness stats.",
+      "file_type": "rationale",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L83",
+      "id": "scripts_summarize_hess_representativeness_rationale_83",
+      "community": 77,
+      "norm_label": "compute compact cold-region and hydroclimatic representativeness stats."
+    },
+    {
+      "label": "Document the 22 retained primary attributes and correlated drops.",
+      "file_type": "rationale",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L134",
+      "id": "scripts_summarize_hess_representativeness_rationale_134",
+      "community": 77,
+      "norm_label": "document the 22 retained primary attributes and correlated drops."
+    },
+    {
+      "label": "Return a numeric metric value from the stats table.",
+      "file_type": "rationale",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L184",
+      "id": "scripts_summarize_hess_representativeness_rationale_184",
+      "community": 77,
+      "norm_label": "return a numeric metric value from the stats table."
+    },
+    {
+      "label": "Write Markdown and LaTeX snippets for manuscript drafting.",
+      "file_type": "rationale",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L192",
+      "id": "scripts_summarize_hess_representativeness_rationale_192",
+      "community": 77,
+      "norm_label": "write markdown and latex snippets for manuscript drafting."
+    },
+    {
+      "label": "Build HESS representativeness and primary-attribute artefacts.",
+      "file_type": "rationale",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L257",
+      "id": "scripts_summarize_hess_representativeness_rationale_257",
+      "community": 77,
+      "norm_label": "build hess representativeness and primary-attribute artefacts."
     },
     {
       "label": "generate_budyko_figure.py",
@@ -5499,7 +6498,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L1",
       "id": "scripts_create_forcing_netcdf_py",
-      "community": 47,
+      "community": 85,
       "norm_label": "create_forcing_netcdf.py"
     },
     {
@@ -5508,7 +6507,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L41",
       "id": "scripts_create_forcing_netcdf_load_gauge_data",
-      "community": 47,
+      "community": 85,
       "norm_label": "load_gauge_data()"
     },
     {
@@ -5517,7 +6516,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L41",
       "id": "scripts_create_forcing_netcdf_py_str",
-      "community": 47,
+      "community": 85,
       "norm_label": "str"
     },
     {
@@ -5526,7 +6525,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L41",
       "id": "scripts_create_forcing_netcdf_py_path",
-      "community": 47,
+      "community": 85,
       "norm_label": "path"
     },
     {
@@ -5535,7 +6534,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L41",
       "id": "scripts_create_forcing_netcdf_py_ndarray",
-      "community": 47,
+      "community": 85,
       "norm_label": "ndarray"
     },
     {
@@ -5544,7 +6543,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L102",
       "id": "scripts_create_forcing_netcdf_process_single_gauge",
-      "community": 47,
+      "community": 85,
       "norm_label": "process_single_gauge()"
     },
     {
@@ -5553,7 +6552,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L118",
       "id": "scripts_create_forcing_netcdf_get_gauge_list",
-      "community": 47,
+      "community": 85,
       "norm_label": "get_gauge_list()"
     },
     {
@@ -5562,7 +6561,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L140",
       "id": "scripts_create_forcing_netcdf_create_forcing_netcdf",
-      "community": 47,
+      "community": 85,
       "norm_label": "create_forcing_netcdf()"
     },
     {
@@ -5571,7 +6570,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L330",
       "id": "scripts_create_forcing_netcdf_main",
-      "community": 47,
+      "community": 85,
       "norm_label": "main()"
     },
     {
@@ -5580,7 +6579,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L48",
       "id": "scripts_create_forcing_netcdf_rationale_48",
-      "community": 47,
+      "community": 85,
       "norm_label": "load meteorological data for a single gauge.      args:         gauge_id: gauge"
     },
     {
@@ -5589,7 +6588,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L103",
       "id": "scripts_create_forcing_netcdf_rationale_103",
-      "community": 47,
+      "community": 85,
       "norm_label": "worker function for parallel processing.      args:         args: tuple of (gaug"
     },
     {
@@ -5598,7 +6597,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L119",
       "id": "scripts_create_forcing_netcdf_rationale_119",
-      "community": 47,
+      "community": 85,
       "norm_label": "get list of gauge ids with both mswep and era5-land data.      args:         msw"
     },
     {
@@ -5607,7 +6606,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L143",
       "id": "scripts_create_forcing_netcdf_rationale_143",
-      "community": 47,
+      "community": 85,
       "norm_label": "create netcdf file from gauge data.      args:         gauge_ids: list of gauge"
     },
     {
@@ -5616,7 +6615,7 @@
       "source_file": "scripts/create_forcing_netcdf.py",
       "source_location": "L331",
       "id": "scripts_create_forcing_netcdf_rationale_331",
-      "community": 47,
+      "community": 85,
       "norm_label": "main execution function."
     },
     {
@@ -6165,7 +7164,7 @@
       "source_file": "src/hydro/flow_indices.py",
       "source_location": "L1",
       "id": "src_hydro_flow_indices_py",
-      "community": 30,
+      "community": 92,
       "norm_label": "flow_indices.py"
     },
     {
@@ -6318,7 +7317,7 @@
       "source_file": "src/hydro/flow_indices.py",
       "source_location": "L1",
       "id": "hydro_flow_indices_rationale_1",
-      "community": 30,
+      "community": 92,
       "norm_label": "comprehensive hydrological indices for flow characterization.  this module provi"
     },
     {
@@ -6588,7 +7587,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L1",
       "id": "src_hydro_parallel_metrics_py",
-      "community": 46,
+      "community": 2,
       "norm_label": "parallel_metrics.py"
     },
     {
@@ -6597,7 +7596,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L21",
       "id": "hydro_parallel_metrics_calculate_metrics_worker",
-      "community": 46,
+      "community": 2,
       "norm_label": "_calculate_metrics_worker()"
     },
     {
@@ -6606,7 +7605,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L21",
       "id": "src_hydro_parallel_metrics_py_str",
-      "community": 46,
+      "community": 2,
       "norm_label": "str"
     },
     {
@@ -6615,7 +7614,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L21",
       "id": "src_hydro_parallel_metrics_py_series",
-      "community": 46,
+      "community": 2,
       "norm_label": "series"
     },
     {
@@ -6624,7 +7623,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L21",
       "id": "src_hydro_parallel_metrics_py_int",
-      "community": 46,
+      "community": 2,
       "norm_label": "int"
     },
     {
@@ -6633,7 +7632,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L21",
       "id": "src_hydro_parallel_metrics_py_float",
-      "community": 46,
+      "community": 2,
       "norm_label": "float"
     },
     {
@@ -6642,7 +7641,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L60",
       "id": "hydro_parallel_metrics_calculate_metrics_parallel",
-      "community": 46,
+      "community": 2,
       "norm_label": "calculate_metrics_parallel()"
     },
     {
@@ -6651,7 +7650,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L60",
       "id": "src_hydro_parallel_metrics_py_index",
-      "community": 46,
+      "community": 2,
       "norm_label": "index"
     },
     {
@@ -6660,7 +7659,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L60",
       "id": "src_hydro_parallel_metrics_py_bool",
-      "community": 46,
+      "community": 2,
       "norm_label": "bool"
     },
     {
@@ -6669,7 +7668,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L159",
       "id": "hydro_parallel_metrics_calculate_metrics_batched",
-      "community": 46,
+      "community": 2,
       "norm_label": "calculate_metrics_batched()"
     },
     {
@@ -6678,7 +7677,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L1",
       "id": "hydro_parallel_metrics_rationale_1",
-      "community": 46,
+      "community": 2,
       "norm_label": "parallel computation of hydrological metrics for multiple gauges.  this module p"
     },
     {
@@ -6687,7 +7686,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L30",
       "id": "hydro_parallel_metrics_rationale_30",
-      "community": 46,
+      "community": 2,
       "norm_label": "worker function for parallel metric calculation.      args:         gauge_id: un"
     },
     {
@@ -6696,7 +7695,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L71",
       "id": "hydro_parallel_metrics_rationale_71",
-      "community": 46,
+      "community": 2,
       "norm_label": "calculate comprehensive metrics for multiple gauges in parallel.      uses multi"
     },
     {
@@ -6705,7 +7704,7 @@
       "source_file": "src/hydro/parallel_metrics.py",
       "source_location": "L170",
       "id": "hydro_parallel_metrics_rationale_170",
-      "community": 46,
+      "community": 2,
       "norm_label": "calculate metrics in batches for better memory management.      useful when proc"
     },
     {
@@ -6966,7 +7965,7 @@
       "source_file": "src/hydro/flow_duration.py",
       "source_location": "L1",
       "id": "src_hydro_flow_duration_py",
-      "community": 30,
+      "community": 24,
       "norm_label": "flow_duration.py"
     },
     {
@@ -7110,7 +8109,7 @@
       "source_file": "src/hydro/flow_duration.py",
       "source_location": "L1",
       "id": "hydro_flow_duration_rationale_1",
-      "community": 30,
+      "community": 24,
       "norm_label": "flow duration curve analysis for hydrological characterization.  this module pro"
     },
     {
@@ -7209,7 +8208,7 @@
       "source_file": "src/hydro/flow_variability.py",
       "source_location": "L1",
       "id": "src_hydro_flow_variability_py",
-      "community": 30,
+      "community": 92,
       "norm_label": "flow_variability.py"
     },
     {
@@ -7362,7 +8361,7 @@
       "source_file": "src/hydro/flow_variability.py",
       "source_location": "L1",
       "id": "hydro_flow_variability_rationale_1",
-      "community": 30,
+      "community": 92,
       "norm_label": "flow variability analysis for hydrological characterization.  this module provid"
     },
     {
@@ -9288,7 +10287,7 @@
       "source_file": "src/meteo/__init__.py",
       "source_location": "L1",
       "id": "src_meteo_init_py",
-      "community": 17,
+      "community": 10,
       "norm_label": "__init__.py"
     },
     {
@@ -9297,7 +10296,7 @@
       "source_file": "src/meteo/__init__.py",
       "source_location": "L1",
       "id": "meteo_init_rationale_1",
-      "community": 17,
+      "community": 10,
       "norm_label": "meteorological analysis package for camels-ru dataset.  this package provides co"
     },
     {
@@ -10917,7 +11916,7 @@
       "source_file": "src/static/hydro_atlas_analysis.py",
       "source_location": "L216",
       "id": "static_hydro_atlas_analysis_get_size_categories",
-      "community": 22,
+      "community": 91,
       "norm_label": "get_size_categories()"
     },
     {
@@ -11034,7 +12033,7 @@
       "source_file": "src/static/hydro_atlas_analysis.py",
       "source_location": "L217",
       "id": "static_hydro_atlas_analysis_rationale_217",
-      "community": 22,
+      "community": 91,
       "norm_label": "return ordered list of size category labels.      returns:         list of size"
     },
     {
@@ -11313,7 +12312,7 @@
       "source_file": "src/timeseries_stats/__init__.py",
       "source_location": "L1",
       "id": "src_timeseries_stats_init_py",
-      "community": 4,
+      "community": 23,
       "norm_label": "__init__.py"
     },
     {
@@ -11322,7 +12321,7 @@
       "source_file": "src/timeseries_stats/__init__.py",
       "source_location": "L1",
       "id": "timeseries_stats_init_rationale_1",
-      "community": 4,
+      "community": 23,
       "norm_label": "time series statistics package for camels-ru dataset.  this package provides uni"
     },
     {
@@ -12312,7 +13311,7 @@
       "source_file": "src/data_processing/nc_proc.py",
       "source_location": "L1",
       "id": "src_data_processing_nc_proc_py",
-      "community": 77,
+      "community": 80,
       "norm_label": "nc_proc.py"
     },
     {
@@ -12321,7 +13320,7 @@
       "source_file": "src/data_processing/nc_proc.py",
       "source_location": "L19",
       "id": "data_processing_nc_proc_nc_by_extent",
-      "community": 77,
+      "community": 80,
       "norm_label": "nc_by_extent()"
     },
     {
@@ -12330,7 +13329,7 @@
       "source_file": "src/data_processing/nc_proc.py",
       "source_location": "L19",
       "id": "src_data_processing_nc_proc_py_dataset",
-      "community": 77,
+      "community": 80,
       "norm_label": "dataset"
     },
     {
@@ -12339,7 +13338,7 @@
       "source_file": "src/data_processing/nc_proc.py",
       "source_location": "L19",
       "id": "src_data_processing_nc_proc_py_polygon",
-      "community": 77,
+      "community": 80,
       "norm_label": "polygon"
     },
     {
@@ -12348,7 +13347,7 @@
       "source_file": "src/data_processing/nc_proc.py",
       "source_location": "L19",
       "id": "src_data_processing_nc_proc_py_float",
-      "community": 77,
+      "community": 80,
       "norm_label": "float"
     },
     {
@@ -12357,7 +13356,7 @@
       "source_file": "src/data_processing/nc_proc.py",
       "source_location": "L19",
       "id": "src_data_processing_nc_proc_py_str",
-      "community": 77,
+      "community": 80,
       "norm_label": "str"
     },
     {
@@ -12366,7 +13365,7 @@
       "source_file": "src/data_processing/nc_proc.py",
       "source_location": "L55",
       "id": "data_processing_nc_proc_aggregation_definer",
-      "community": 77,
+      "community": 80,
       "norm_label": "aggregation_definer()"
     },
     {
@@ -12402,7 +13401,7 @@
       "source_file": "src/data_processing/nc_proc.py",
       "source_location": "L20",
       "id": "data_processing_nc_proc_rationale_20",
-      "community": 77,
+      "community": 80,
       "norm_label": "select net_cdf by extent of given shape. return masked net_cdf.      args:"
     },
     {
@@ -12411,7 +13410,7 @@
       "source_file": "src/data_processing/nc_proc.py",
       "source_location": "L56",
       "id": "data_processing_nc_proc_rationale_56",
-      "community": 77,
+      "community": 80,
       "norm_label": "determine aggregation method (sum or mean) for a variable based on dataset and v"
     },
     {
@@ -12708,7 +13707,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L47",
       "id": "src_data_processing_geom_functions_py_float",
-      "community": 49,
+      "community": 47,
       "norm_label": "float"
     },
     {
@@ -12717,7 +13716,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L68",
       "id": "data_processing_geom_functions_find_float_len",
-      "community": 49,
+      "community": 47,
       "norm_label": "find_float_len()"
     },
     {
@@ -12726,7 +13725,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L68",
       "id": "src_data_processing_geom_functions_py_bool",
-      "community": 49,
+      "community": 47,
       "norm_label": "bool"
     },
     {
@@ -12807,7 +13806,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L159",
       "id": "data_processing_geom_functions_find_extent",
-      "community": 77,
+      "community": 80,
       "norm_label": "find_extent()"
     },
     {
@@ -12825,7 +13824,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L197",
       "id": "data_processing_geom_functions_round_nearest",
-      "community": 77,
+      "community": 80,
       "norm_label": "round_nearest()"
     },
     {
@@ -12879,7 +13878,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L287",
       "id": "data_processing_geom_functions_rot_m",
-      "community": 49,
+      "community": 47,
       "norm_label": "rot_m()"
     },
     {
@@ -12888,7 +13887,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L287",
       "id": "src_data_processing_geom_functions_py_ndarray",
-      "community": 49,
+      "community": 47,
       "norm_label": "ndarray"
     },
     {
@@ -12897,7 +13896,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L293",
       "id": "data_processing_geom_functions_get_square_vertices",
-      "community": 49,
+      "community": 47,
       "norm_label": "get_square_vertices()"
     },
     {
@@ -12906,7 +13905,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L315",
       "id": "data_processing_geom_functions_point_distance",
-      "community": 49,
+      "community": 47,
       "norm_label": "point_distance()"
     },
     {
@@ -12915,7 +13914,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L327",
       "id": "data_processing_geom_functions_inside_mask",
-      "community": 49,
+      "community": 47,
       "norm_label": "inside_mask()"
     },
     {
@@ -13005,7 +14004,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L69",
       "id": "data_processing_geom_functions_rationale_69",
-      "community": 49,
+      "community": 47,
       "norm_label": "return true if number has at least two digits after decimal point.      (name ke"
     },
     {
@@ -13059,7 +14058,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L160",
       "id": "data_processing_geom_functions_rationale_160",
-      "community": 77,
+      "community": 80,
       "norm_label": "determine extent [min_lon, max_lon, min_lat, max_lat] snapped to grid resolution"
     },
     {
@@ -13068,7 +14067,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L198",
       "id": "data_processing_geom_functions_rationale_198",
-      "community": 77,
+      "community": 80,
       "norm_label": "round x to nearest multiple of a while preserving reasonable decimal precision."
     },
     {
@@ -13095,7 +14094,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L288",
       "id": "data_processing_geom_functions_rationale_288",
-      "community": 49,
+      "community": 47,
       "norm_label": "return 2x2 rotation matrix for angle alpha (radians)."
     },
     {
@@ -13104,7 +14103,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L294",
       "id": "data_processing_geom_functions_rationale_294",
-      "community": 49,
+      "community": 47,
       "norm_label": "return vertices (4x2) of a rotated square.      parameters     ----------     ce"
     },
     {
@@ -13113,7 +14112,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L316",
       "id": "data_processing_geom_functions_rationale_316",
-      "community": 49,
+      "community": 47,
       "norm_label": "great-circle distance (haversine) between two points given in radians.      retu"
     },
     {
@@ -13122,7 +14121,7 @@
       "source_file": "src/data_processing/geom_functions.py",
       "source_location": "L328",
       "id": "data_processing_geom_functions_rationale_328",
-      "community": 49,
+      "community": 47,
       "norm_label": "check if point (x,y) strictly inside bounding box (x1,y1,x2,y2)."
     },
     {
@@ -13220,7 +14219,7 @@
       "file_type": "code",
       "source_file": "src/plots/paper_maps.py",
       "source_location": "L97",
-      "id": "axes",
+      "id": "src_plots_paper_maps_py_axes",
       "community": 2,
       "norm_label": "axes"
     },
@@ -13833,7 +14832,7 @@
       "source_file": "src/utils/logger.py",
       "source_location": "L1",
       "id": "src_utils_logger_py",
-      "community": 30,
+      "community": 92,
       "norm_label": "logger.py"
     },
     {
@@ -13995,7 +14994,7 @@
       "source_file": "src/utils/logger.py",
       "source_location": "L1",
       "id": "src_utils_logger_py_utils_logger_rationale_1",
-      "community": 30,
+      "community": 92,
       "norm_label": "logging utility.  centralized, idempotent logging setup for the logging providin"
     },
     {
@@ -14157,7 +15156,7 @@
       "source_file": "src/utils/paper_analysis_scope.py",
       "source_location": "L51",
       "id": "utils_paper_analysis_scope_is_paper_analysis_excluded_gauge_id",
-      "community": 85,
+      "community": 82,
       "norm_label": "is_paper_analysis_excluded_gauge_id()"
     },
     {
@@ -14166,7 +15165,7 @@
       "source_file": "src/utils/paper_analysis_scope.py",
       "source_location": "L51",
       "id": "src_utils_paper_analysis_scope_py_bool",
-      "community": 85,
+      "community": 82,
       "norm_label": "bool"
     },
     {
@@ -14184,7 +15183,7 @@
       "source_file": "src/utils/paper_analysis_scope.py",
       "source_location": "L68",
       "id": "utils_paper_analysis_scope_filter_paper_analysis_index",
-      "community": 74,
+      "community": 77,
       "norm_label": "filter_paper_analysis_index()"
     },
     {
@@ -14265,7 +15264,7 @@
       "source_file": "src/utils/paper_analysis_scope.py",
       "source_location": "L52",
       "id": "utils_paper_analysis_scope_rationale_52",
-      "community": 85,
+      "community": 82,
       "norm_label": "return whether one gauge id is excluded from manuscript analyses."
     },
     {
@@ -14283,7 +15282,7 @@
       "source_file": "src/utils/paper_analysis_scope.py",
       "source_location": "L69",
       "id": "utils_paper_analysis_scope_rationale_69",
-      "community": 74,
+      "community": 77,
       "norm_label": "filter an index-keyed dataframe/geodataframe to manuscript-analysis gauges."
     },
     {
@@ -15007,6 +16006,123 @@
       "norm_label": "references"
     },
     {
+      "label": "Return a percentage, preserving NaN for empty denominators.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L79",
+      "community": 46,
+      "norm_label": "return a percentage, preserving nan for empty denominators.",
+      "id": "scripts_stratify_water_balance_violations_rationale_79"
+    },
+    {
+      "label": "Coerce bool/string bool columns from CSV to a Boolean Series.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L84",
+      "community": 46,
+      "norm_label": "coerce bool/string bool columns from csv to a boolean series.",
+      "id": "scripts_stratify_water_balance_violations_rationale_84"
+    },
+    {
+      "label": "Bin percentage-like HydroATLAS proxy values into compact labels.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L91",
+      "community": 46,
+      "norm_label": "bin percentage-like hydroatlas proxy values into compact labels.",
+      "id": "scripts_stratify_water_balance_violations_rationale_91"
+    },
+    {
+      "label": "Add area and HydroATLAS-proxy strata to a per-gauge diagnostic table.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L107",
+      "community": 46,
+      "norm_label": "add area and hydroatlas-proxy strata to a per-gauge diagnostic table.",
+      "id": "scripts_stratify_water_balance_violations_rationale_107"
+    },
+    {
+      "label": "Load per-gauge HESS audit outputs and merge HydroATLAS proxy columns.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L140",
+      "community": 46,
+      "norm_label": "load per-gauge hess audit outputs and merge hydroatlas proxy columns.",
+      "id": "scripts_stratify_water_balance_violations_rationale_140"
+    },
+    {
+      "label": "Return the row mask for a named manuscript-analysis scope.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L180",
+      "community": 46,
+      "norm_label": "return the row mask for a named manuscript-analysis scope.",
+      "id": "scripts_stratify_water_balance_violations_rationale_180"
+    },
+    {
+      "label": "Build summary rows for one scope x stratum group.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L207",
+      "community": 46,
+      "norm_label": "build summary rows for one scope x stratum group.",
+      "id": "scripts_stratify_water_balance_violations_rationale_207"
+    },
+    {
+      "label": "Create a long water-balance stratification summary table.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L261",
+      "community": 46,
+      "norm_label": "create a long water-balance stratification summary table.",
+      "id": "scripts_stratify_water_balance_violations_rationale_261"
+    },
+    {
+      "label": "Draw one product-comparison line panel for a stratum group.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L291",
+      "community": 46,
+      "norm_label": "draw one product-comparison line panel for a stratum group.",
+      "id": "scripts_stratify_water_balance_violations_rationale_291"
+    },
+    {
+      "label": "Write the HESS water-balance strata figure.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L315",
+      "community": 46,
+      "norm_label": "write the hess water-balance strata figure.",
+      "id": "scripts_stratify_water_balance_violations_rationale_315"
+    },
+    {
+      "label": "Write a compact reviewer-facing interpretation note.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L365",
+      "community": 46,
+      "norm_label": "write a compact reviewer-facing interpretation note.",
+      "id": "scripts_stratify_water_balance_violations_rationale_365"
+    },
+    {
+      "label": "Build CSV, LaTeX, notes, and figure outputs.",
+      "file_type": "rationale",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L427",
+      "community": 46,
+      "norm_label": "build csv, latex, notes, and figure outputs.",
+      "id": "scripts_stratify_water_balance_violations_rationale_427"
+    },
+    {
+      "label": "Axes",
+      "file_type": "code",
+      "source_file": "src/plots/paper_maps.py",
+      "source_location": "L97",
+      "community": 2,
+      "norm_label": "axes",
+      "id": "axes"
+    },
+    {
       "label": "One preflight check result.",
       "file_type": "rationale",
       "source_file": "scripts/hess_quality_audit.py",
@@ -15047,7 +16163,7 @@
       "file_type": "rationale",
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L586",
-      "community": 85,
+      "community": 94,
       "norm_label": "extract gauge ids from a tabular source without assuming lower-case headers.",
       "id": "scripts_hess_quality_audit_rationale_586"
     },
@@ -15083,7 +16199,7 @@
       "file_type": "rationale",
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L685",
-      "community": 85,
+      "community": 82,
       "norm_label": "write the gauge-id-only exclusion used by manuscript analyses.",
       "id": "scripts_hess_quality_audit_rationale_685"
     },
@@ -15128,7 +16244,7 @@
       "file_type": "rationale",
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L73",
-      "community": 75,
+      "community": 2,
       "norm_label": "load a single-column time series from csv, returning none on failure.",
       "id": "notebooks_03_forcingsfinal_rationale_73"
     },
@@ -15137,7 +16253,7 @@
       "file_type": "rationale",
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L86",
-      "community": 75,
+      "community": 2,
       "norm_label": "mean annual precipitation total (mm/yr) over the analysis period.",
       "id": "notebooks_03_forcingsfinal_rationale_86"
     },
@@ -15146,7 +16262,7 @@
       "file_type": "rationale",
       "source_file": "notebooks/03_ForcingsFinal.py",
       "source_location": "L94",
-      "community": 75,
+      "community": 2,
       "norm_label": "coefficient of variation of annual precipitation totals.",
       "id": "notebooks_03_forcingsfinal_rationale_94"
     },
@@ -15155,7 +16271,7 @@
       "file_type": "rationale",
       "source_file": "notebooks/02_HydrologicalFinal.py",
       "source_location": "L96",
-      "community": 80,
+      "community": 2,
       "norm_label": "extract numeric cluster id from 'cluster n' string for sorting.",
       "id": "notebooks_02_hydrologicalfinal_rationale_96"
     },
@@ -15164,7 +16280,7 @@
       "file_type": "rationale",
       "source_file": "notebooks/02_HydrologicalFinal.py",
       "source_location": "L102",
-      "community": 80,
+      "community": 2,
       "norm_label": "convert discharge from m3/s to mm/day.      parameters     ----------     q_cms",
       "id": "notebooks_02_hydrologicalfinal_rationale_102"
     },
@@ -15173,7 +16289,7 @@
       "file_type": "rationale",
       "source_file": "notebooks/00_DataDescription.py",
       "source_location": "L81",
-      "community": 82,
+      "community": 91,
       "norm_label": "boxplot of *column* grouped by grade, with optional hydropower overlay.      whe",
       "id": "notebooks_00_datadescription_rationale_81"
     },
@@ -15218,7 +16334,7 @@
       "file_type": "rationale",
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L576",
-      "community": 85,
+      "community": 94,
       "norm_label": "extract gauge ids from a tabular source without assuming lower-case headers.",
       "id": "scripts_hess_quality_audit_rationale_576"
     },
@@ -15353,7 +16469,7 @@
       "file_type": "rationale",
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L567",
-      "community": 85,
+      "community": 94,
       "norm_label": "extract gauge ids from a tabular source without assuming lower-case headers.",
       "id": "scripts_hess_quality_audit_rationale_567"
     },
@@ -15683,6 +16799,206 @@
     }
   ],
   "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_exclude",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_include",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_pythonversion",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_reportargumenttype",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_reportattributeaccessissue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_reportcallissue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_reportmissingimports",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_reportmissingtypestubs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_reportoperatorissue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_reportoptionalmemberaccess",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_reportoptionaloperand",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_reportprivateimportusage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_reportreturntype",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.smoke.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "pyright_smoke_json",
+      "target": "camels_ru_pyright_smoke_typecheckingmode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.strict-paper.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "pyright_strict_paper_json",
+      "target": "camels_ru_pyright_strict_paper_exclude",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.strict-paper.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "pyright_strict_paper_json",
+      "target": "camels_ru_pyright_strict_paper_include",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.strict-paper.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "pyright_strict_paper_json",
+      "target": "camels_ru_pyright_strict_paper_pythonversion",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.strict-paper.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "pyright_strict_paper_json",
+      "target": "camels_ru_pyright_strict_paper_reportmissingimports",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.strict-paper.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "pyright_strict_paper_json",
+      "target": "camels_ru_pyright_strict_paper_reportmissingtypestubs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pyright.strict-paper.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "pyright_strict_paper_json",
+      "target": "camels_ru_pyright_strict_paper_typecheckingmode",
+      "confidence_score": 1.0
+    },
     {
       "relation": "imports",
       "context": "import",
@@ -19446,6 +20762,174 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L55",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_py",
+      "target": "scripts_water_level_completeness_summary_build_completeness_table"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L203",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_py",
+      "target": "scripts_water_level_completeness_summary_main"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L123",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_py",
+      "target": "scripts_water_level_completeness_summary_plot_summary"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_py",
+      "target": "scripts_water_level_completeness_summary_type_label"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L27",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_py",
+      "target": "utils_paper_analysis_scope_is_paper_analysis_excluded_gauge_id"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L69",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_build_completeness_table",
+      "target": "scripts_water_level_completeness_summary_type_label"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L48",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_rationale_48",
+      "target": "scripts_water_level_completeness_summary_type_label"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_type_label",
+      "target": "scripts_water_level_completeness_summary_py_object"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_type_label",
+      "target": "scripts_water_level_completeness_summary_py_str"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L55",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_build_completeness_table",
+      "target": "scripts_water_level_completeness_summary_py_dataframe"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L206",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_main",
+      "target": "scripts_water_level_completeness_summary_build_completeness_table"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L56",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_rationale_56",
+      "target": "scripts_water_level_completeness_summary_build_completeness_table"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L123",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_plot_summary",
+      "target": "scripts_water_level_completeness_summary_py_dataframe"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L210",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_main",
+      "target": "scripts_water_level_completeness_summary_plot_summary"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L124",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_rationale_124",
+      "target": "scripts_water_level_completeness_summary_plot_summary"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/water_level_completeness_summary.py",
+      "source_location": "L204",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_water_level_completeness_summary_rationale_204",
+      "target": "scripts_water_level_completeness_summary_main"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "scripts/ParseAisCompound.py",
       "source_location": "L49",
       "weight": 1.0,
@@ -19536,6 +21020,1154 @@
       "confidence_score": 1.0,
       "source": "scripts_parseaiscompound_rationale_50",
       "target": "scripts_parseaiscompound_build_compound"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L106",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_py",
+      "target": "scripts_stratify_water_balance_violations_add_strata"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L83",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_py",
+      "target": "scripts_stratify_water_balance_violations_as_bool"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L260",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_py",
+      "target": "scripts_stratify_water_balance_violations_build_summary"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L139",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_py",
+      "target": "scripts_stratify_water_balance_violations_load_inputs"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L426",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_py",
+      "target": "scripts_stratify_water_balance_violations_main"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L194",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_py",
+      "target": "scripts_stratify_water_balance_violations_median_or_nan"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L90",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_py",
+      "target": "scripts_stratify_water_balance_violations_ordered_pct_bin"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L78",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_py",
+      "target": "scripts_stratify_water_balance_violations_pct"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L283",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_py",
+      "target": "scripts_stratify_water_balance_violations_plot_metric"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L314",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_py",
+      "target": "scripts_stratify_water_balance_violations_plot_summary"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L199",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_py",
+      "target": "scripts_stratify_water_balance_violations_rows_for_stratum"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L179",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_py",
+      "target": "scripts_stratify_water_balance_violations_scope_mask"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L364",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_py",
+      "target": "scripts_stratify_water_balance_violations_write_notes"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L78",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_pct",
+      "target": "scripts_stratify_water_balance_violations_py_float"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L78",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_pct",
+      "target": "scripts_stratify_water_balance_violations_py_int"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L79",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_79",
+      "target": "scripts_stratify_water_balance_violations_pct"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L80",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_80",
+      "target": "scripts_stratify_water_balance_violations_pct"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L231",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rows_for_stratum",
+      "target": "scripts_stratify_water_balance_violations_pct"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L194",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_median_or_nan",
+      "target": "scripts_stratify_water_balance_violations_py_float"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L83",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_as_bool",
+      "target": "scripts_stratify_water_balance_violations_py_series"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L157",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_load_inputs",
+      "target": "scripts_stratify_water_balance_violations_as_bool"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L84",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_84",
+      "target": "scripts_stratify_water_balance_violations_as_bool"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L85",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_85",
+      "target": "scripts_stratify_water_balance_violations_as_bool"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L194",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_median_or_nan",
+      "target": "scripts_stratify_water_balance_violations_py_series"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L90",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_ordered_pct_bin",
+      "target": "scripts_stratify_water_balance_violations_py_series"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L179",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_scope_mask",
+      "target": "scripts_stratify_water_balance_violations_py_series"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L116",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_add_strata",
+      "target": "scripts_stratify_water_balance_violations_ordered_pct_bin"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L90",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_ordered_pct_bin",
+      "target": "categorical"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L91",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_91",
+      "target": "scripts_stratify_water_balance_violations_ordered_pct_bin"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L92",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_92",
+      "target": "scripts_stratify_water_balance_violations_ordered_pct_bin"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L156",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_load_inputs",
+      "target": "categorical"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L106",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_add_strata",
+      "target": "scripts_stratify_water_balance_violations_py_dataframe"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L159",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_load_inputs",
+      "target": "scripts_stratify_water_balance_violations_add_strata"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L107",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_107",
+      "target": "scripts_stratify_water_balance_violations_add_strata"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L108",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_108",
+      "target": "scripts_stratify_water_balance_violations_add_strata"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L260",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_build_summary",
+      "target": "scripts_stratify_water_balance_violations_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L139",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_load_inputs",
+      "target": "scripts_stratify_water_balance_violations_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L283",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_plot_metric",
+      "target": "scripts_stratify_water_balance_violations_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L314",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_plot_summary",
+      "target": "scripts_stratify_water_balance_violations_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L199",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rows_for_stratum",
+      "target": "scripts_stratify_water_balance_violations_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L179",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_scope_mask",
+      "target": "scripts_stratify_water_balance_violations_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L364",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_write_notes",
+      "target": "scripts_stratify_water_balance_violations_py_dataframe"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L429",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_main",
+      "target": "scripts_stratify_water_balance_violations_load_inputs"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L140",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_140",
+      "target": "scripts_stratify_water_balance_violations_load_inputs"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L141",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_141",
+      "target": "scripts_stratify_water_balance_violations_load_inputs"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L180",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_180",
+      "target": "scripts_stratify_water_balance_violations_scope_mask"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L181",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_181",
+      "target": "scripts_stratify_water_balance_violations_scope_mask"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L209",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rows_for_stratum",
+      "target": "scripts_stratify_water_balance_violations_scope_mask"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L179",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_scope_mask",
+      "target": "scripts_stratify_water_balance_violations_py_str"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L283",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_plot_metric",
+      "target": "scripts_stratify_water_balance_violations_py_str"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L199",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rows_for_stratum",
+      "target": "scripts_stratify_water_balance_violations_py_str"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L244",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rows_for_stratum",
+      "target": "scripts_stratify_water_balance_violations_median_or_nan"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L271",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_build_summary",
+      "target": "scripts_stratify_water_balance_violations_rows_for_stratum"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L207",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_207",
+      "target": "scripts_stratify_water_balance_violations_rows_for_stratum"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L208",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_208",
+      "target": "scripts_stratify_water_balance_violations_rows_for_stratum"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L199",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rows_for_stratum",
+      "target": "scripts_stratify_water_balance_violations_py_object"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L430",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_main",
+      "target": "scripts_stratify_water_balance_violations_build_summary"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L261",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_261",
+      "target": "scripts_stratify_water_balance_violations_build_summary"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L262",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_262",
+      "target": "scripts_stratify_water_balance_violations_build_summary"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L283",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_plot_metric",
+      "target": "scripts_stratify_water_balance_violations_py_axes"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L318",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_plot_summary",
+      "target": "scripts_stratify_water_balance_violations_plot_metric"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L291",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_291",
+      "target": "scripts_stratify_water_balance_violations_plot_metric"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L293",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_293",
+      "target": "scripts_stratify_water_balance_violations_plot_metric"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L456",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_main",
+      "target": "scripts_stratify_water_balance_violations_plot_summary"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L315",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_315",
+      "target": "scripts_stratify_water_balance_violations_plot_summary"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L335",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_335",
+      "target": "scripts_stratify_water_balance_violations_plot_summary"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L457",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_main",
+      "target": "scripts_stratify_water_balance_violations_write_notes"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L365",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_365",
+      "target": "scripts_stratify_water_balance_violations_write_notes"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L385",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_385",
+      "target": "scripts_stratify_water_balance_violations_write_notes"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L427",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_427",
+      "target": "scripts_stratify_water_balance_violations_main"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/stratify_water_balance_violations.py",
+      "source_location": "L447",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_stratify_water_balance_violations_rationale_447",
+      "target": "scripts_stratify_water_balance_violations_main"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L107",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_py",
+      "target": "scripts_plot_hess_subset_flow_arrow"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L54",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_py",
+      "target": "scripts_plot_hess_subset_flow_box"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_py",
+      "target": "scripts_plot_hess_subset_flow_dam_count"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L123",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_py",
+      "target": "scripts_plot_hess_subset_flow_draw_column"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L284",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_py",
+      "target": "scripts_plot_hess_subset_flow_main"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L147",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_py",
+      "target": "scripts_plot_hess_subset_flow_plot_subset_flow"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L38",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_py",
+      "target": "scripts_plot_hess_subset_flow_subset_count"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L152",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_plot_subset_flow",
+      "target": "scripts_plot_hess_subset_flow_subset_count"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_rationale_39",
+      "target": "scripts_plot_hess_subset_flow_subset_count"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L38",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_subset_count",
+      "target": "scripts_plot_hess_subset_flow_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L38",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_subset_count",
+      "target": "scripts_plot_hess_subset_flow_py_int"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L38",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_subset_count",
+      "target": "scripts_plot_hess_subset_flow_py_str"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_dam_count",
+      "target": "scripts_plot_hess_subset_flow_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L147",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_plot_subset_flow",
+      "target": "scripts_plot_hess_subset_flow_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L54",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_box",
+      "target": "scripts_plot_hess_subset_flow_py_str"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_dam_count",
+      "target": "scripts_plot_hess_subset_flow_py_str"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L123",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_draw_column",
+      "target": "scripts_plot_hess_subset_flow_py_str"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L54",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_box",
+      "target": "scripts_plot_hess_subset_flow_py_int"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_dam_count",
+      "target": "scripts_plot_hess_subset_flow_py_int"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L123",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_draw_column",
+      "target": "scripts_plot_hess_subset_flow_py_int"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L196",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_plot_subset_flow",
+      "target": "scripts_plot_hess_subset_flow_dam_count"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_rationale_47",
+      "target": "scripts_plot_hess_subset_flow_dam_count"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L54",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_box",
+      "target": "scripts_plot_hess_subset_flow_py_axes"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L54",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_box",
+      "target": "scripts_plot_hess_subset_flow_py_float"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L140",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_draw_column",
+      "target": "scripts_plot_hess_subset_flow_box"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L64",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_rationale_64",
+      "target": "scripts_plot_hess_subset_flow_box"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L107",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_arrow",
+      "target": "scripts_plot_hess_subset_flow_py_axes"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L123",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_draw_column",
+      "target": "scripts_plot_hess_subset_flow_py_axes"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L107",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_arrow",
+      "target": "scripts_plot_hess_subset_flow_py_float"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L123",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_draw_column",
+      "target": "scripts_plot_hess_subset_flow_py_float"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L143",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_draw_column",
+      "target": "scripts_plot_hess_subset_flow_arrow"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L244",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_plot_subset_flow",
+      "target": "scripts_plot_hess_subset_flow_arrow"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L108",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_rationale_108",
+      "target": "scripts_plot_hess_subset_flow_arrow"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L242",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_plot_subset_flow",
+      "target": "scripts_plot_hess_subset_flow_draw_column"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L130",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_rationale_130",
+      "target": "scripts_plot_hess_subset_flow_draw_column"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L292",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_main",
+      "target": "scripts_plot_hess_subset_flow_plot_subset_flow"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L148",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_rationale_148",
+      "target": "scripts_plot_hess_subset_flow_plot_subset_flow"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/plot_hess_subset_flow.py",
+      "source_location": "L285",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_plot_hess_subset_flow_rationale_285",
+      "target": "scripts_plot_hess_subset_flow_main"
     },
     {
       "relation": "contains",
@@ -22401,9 +25033,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_py",
-      "target": "utils_paper_analysis_scope_filter_paper_analysis_index",
-      "confidence_score": 1.0
+      "target": "utils_paper_analysis_scope_filter_paper_analysis_index"
     },
     {
       "relation": "imports",
@@ -22464,9 +25096,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L86",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_rationale_86",
-      "target": "scripts_hess_quality_audit_preflightrow",
-      "confidence_score": 1.0
+      "target": "scripts_hess_quality_audit_preflightrow"
     },
     {
       "relation": "references",
@@ -23242,9 +25874,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L162",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_rationale_162",
-      "target": "scripts_hess_quality_audit_hydroclimate_worker",
-      "confidence_score": 1.0
+      "target": "scripts_hess_quality_audit_hydroclimate_worker"
     },
     {
       "relation": "references",
@@ -23602,9 +26234,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L560",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_rationale_560",
-      "target": "scripts_hess_quality_audit_normalize_id_header",
-      "confidence_score": 1.0
+      "target": "scripts_hess_quality_audit_normalize_id_header"
     },
     {
       "relation": "references",
@@ -23676,9 +26308,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L565",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_rationale_565",
-      "target": "scripts_hess_quality_audit_find_gauge_id_column",
-      "confidence_score": 1.0
+      "target": "scripts_hess_quality_audit_find_gauge_id_column"
     },
     {
       "relation": "calls",
@@ -23749,9 +26381,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L587",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_rationale_587",
-      "target": "scripts_hess_quality_audit_gauge_ids_from_frame",
-      "confidence_score": 1.0
+      "target": "scripts_hess_quality_audit_gauge_ids_from_frame"
     },
     {
       "relation": "calls",
@@ -23800,9 +26432,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L593",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_rationale_593",
-      "target": "scripts_hess_quality_audit_gauge_ids_from_csv",
-      "confidence_score": 1.0
+      "target": "scripts_hess_quality_audit_gauge_ids_from_csv"
     },
     {
       "relation": "calls",
@@ -23862,9 +26494,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L601",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_rationale_601",
-      "target": "scripts_hess_quality_audit_gauge_ids_from_netcdf",
-      "confidence_score": 1.0
+      "target": "scripts_hess_quality_audit_gauge_ids_from_netcdf"
     },
     {
       "relation": "calls",
@@ -23923,9 +26555,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L611",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_rationale_611",
-      "target": "scripts_hess_quality_audit_build_gauge_id_length_audit",
-      "confidence_score": 1.0
+      "target": "scripts_hess_quality_audit_build_gauge_id_length_audit"
     },
     {
       "relation": "calls",
@@ -23976,9 +26608,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L686",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_rationale_686",
-      "target": "scripts_hess_quality_audit_build_paper_analysis_scope",
-      "confidence_score": 1.0
+      "target": "scripts_hess_quality_audit_build_paper_analysis_scope"
     },
     {
       "relation": "calls",
@@ -24037,9 +26669,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L756",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_rationale_756",
-      "target": "scripts_hess_quality_audit_convert_q_cms_to_mm_day",
-      "confidence_score": 1.0
+      "target": "scripts_hess_quality_audit_convert_q_cms_to_mm_day"
     },
     {
       "relation": "calls",
@@ -24059,9 +26691,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L798",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_build_strict_subset_trace",
-      "target": "utils_paper_analysis_scope_filter_paper_analysis_index",
-      "confidence_score": 1.0
+      "target": "utils_paper_analysis_scope_filter_paper_analysis_index"
     },
     {
       "relation": "calls",
@@ -24120,9 +26752,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L761",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_rationale_761",
-      "target": "scripts_hess_quality_audit_build_strict_subset_trace",
-      "confidence_score": 1.0
+      "target": "scripts_hess_quality_audit_build_strict_subset_trace"
     },
     {
       "relation": "calls",
@@ -24191,9 +26823,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L914",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_rationale_914",
-      "target": "scripts_hess_quality_audit_build_dam_excluded_analytics",
-      "confidence_score": 1.0
+      "target": "scripts_hess_quality_audit_build_dam_excluded_analytics"
     },
     {
       "relation": "calls",
@@ -24296,9 +26928,9 @@
       "source_file": "scripts/hess_quality_audit.py",
       "source_location": "L1424",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_hess_quality_audit_rationale_1424",
-      "target": "scripts_hess_quality_audit_main",
-      "confidence_score": 1.0
+      "target": "scripts_hess_quality_audit_main"
     },
     {
       "relation": "rationale_for",
@@ -25677,6 +28309,452 @@
       "confidence_score": 1.0,
       "source": "scripts_package_dataset_rationale_676",
       "target": "scripts_package_dataset_main"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L52",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_py",
+      "target": "scripts_summarize_hess_representativeness_add_threshold_rows"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L133",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_py",
+      "target": "scripts_summarize_hess_representativeness_build_attribute_selection"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L82",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_py",
+      "target": "scripts_summarize_hess_representativeness_build_representativeness_stats"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_py",
+      "target": "scripts_summarize_hess_representativeness_count_pct"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L256",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_py",
+      "target": "scripts_summarize_hess_representativeness_main"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_py",
+      "target": "scripts_summarize_hess_representativeness_numeric"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L183",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_py",
+      "target": "scripts_summarize_hess_representativeness_value_float"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L191",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_py",
+      "target": "scripts_summarize_hess_representativeness_write_notes"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L27",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_py",
+      "target": "utils_paper_analysis_scope_filter_paper_analysis_index"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L67",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_add_threshold_rows",
+      "target": "scripts_summarize_hess_representativeness_numeric"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L137",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_build_attribute_selection",
+      "target": "scripts_summarize_hess_representativeness_numeric"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L107",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_build_representativeness_stats",
+      "target": "scripts_summarize_hess_representativeness_numeric"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_numeric",
+      "target": "scripts_summarize_hess_representativeness_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_numeric",
+      "target": "scripts_summarize_hess_representativeness_py_series"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_numeric",
+      "target": "scripts_summarize_hess_representativeness_py_str"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L40",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_rationale_40",
+      "target": "scripts_summarize_hess_representativeness_numeric"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L52",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_add_threshold_rows",
+      "target": "scripts_summarize_hess_representativeness_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L133",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_build_attribute_selection",
+      "target": "scripts_summarize_hess_representativeness_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L82",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_build_representativeness_stats",
+      "target": "scripts_summarize_hess_representativeness_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L183",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_value_float",
+      "target": "scripts_summarize_hess_representativeness_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L191",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_write_notes",
+      "target": "scripts_summarize_hess_representativeness_py_dataframe"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L52",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_add_threshold_rows",
+      "target": "scripts_summarize_hess_representativeness_py_str"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L183",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_value_float",
+      "target": "scripts_summarize_hess_representativeness_py_str"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_count_pct",
+      "target": "scripts_summarize_hess_representativeness_py_series"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L69",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_add_threshold_rows",
+      "target": "scripts_summarize_hess_representativeness_count_pct"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_count_pct",
+      "target": "scripts_summarize_hess_representativeness_py_float"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_count_pct",
+      "target": "scripts_summarize_hess_representativeness_py_int"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_rationale_47",
+      "target": "scripts_summarize_hess_representativeness_count_pct"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L183",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_value_float",
+      "target": "scripts_summarize_hess_representativeness_py_float"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L52",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_add_threshold_rows",
+      "target": "scripts_summarize_hess_representativeness_py_object"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L94",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_build_representativeness_stats",
+      "target": "scripts_summarize_hess_representativeness_add_threshold_rows"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L53",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_rationale_53",
+      "target": "scripts_summarize_hess_representativeness_add_threshold_rows"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L262",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_main",
+      "target": "scripts_summarize_hess_representativeness_build_representativeness_stats"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L83",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_rationale_83",
+      "target": "scripts_summarize_hess_representativeness_build_representativeness_stats"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L263",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_main",
+      "target": "scripts_summarize_hess_representativeness_build_attribute_selection"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L134",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_rationale_134",
+      "target": "scripts_summarize_hess_representativeness_build_attribute_selection"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L184",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_rationale_184",
+      "target": "scripts_summarize_hess_representativeness_value_float"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L193",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_write_notes",
+      "target": "scripts_summarize_hess_representativeness_value_float"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L268",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_main",
+      "target": "scripts_summarize_hess_representativeness_write_notes"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L192",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_rationale_192",
+      "target": "scripts_summarize_hess_representativeness_write_notes"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L260",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_main",
+      "target": "utils_paper_analysis_scope_filter_paper_analysis_index"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/summarize_hess_representativeness.py",
+      "source_location": "L257",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_summarize_hess_representativeness_rationale_257",
+      "target": "scripts_summarize_hess_representativeness_main"
     },
     {
       "relation": "imports",
@@ -47134,6 +50212,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "plots_paper_maps_set_extent_from_data",
+      "target": "src_plots_paper_maps_py_axes"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/plots/paper_maps.py",
+      "source_location": "L97",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "plots_paper_maps_set_extent_from_data",
       "target": "src_plots_paper_maps_py_float"
     },
     {
@@ -47156,7 +50245,7 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "plots_paper_maps_add_graticule",
-      "target": "axes"
+      "target": "src_plots_paper_maps_py_axes"
     },
     {
       "relation": "references",
@@ -47167,7 +50256,7 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "plots_paper_maps_categorical_map",
-      "target": "axes"
+      "target": "src_plots_paper_maps_py_axes"
     },
     {
       "relation": "references",
@@ -47178,7 +50267,7 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "plots_paper_maps_hide_frame",
-      "target": "axes"
+      "target": "src_plots_paper_maps_py_axes"
     },
     {
       "relation": "references",
@@ -47189,7 +50278,7 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "plots_paper_maps_scatter_map",
-      "target": "axes"
+      "target": "src_plots_paper_maps_py_axes"
     },
     {
       "relation": "references",
@@ -47269,6 +50358,17 @@
       "target": "plots_paper_maps_hide_frame"
     },
     {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/plots/paper_maps.py",
+      "source_location": "L110",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "plots_paper_maps_hide_frame",
+      "target": "axes"
+    },
+    {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/plots/paper_maps.py",
@@ -47288,6 +50388,17 @@
       "confidence_score": 1.0,
       "source": "plots_paper_maps_scatter_map",
       "target": "plots_paper_maps_hide_frame"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/plots/paper_maps.py",
+      "source_location": "L121",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "plots_paper_maps_add_graticule",
+      "target": "axes"
     },
     {
       "relation": "references",
@@ -47486,6 +50597,17 @@
     },
     {
       "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/plots/paper_maps.py",
+      "source_location": "L162",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "plots_paper_maps_scatter_map",
+      "target": "axes"
+    },
+    {
+      "relation": "references",
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "src/plots/paper_maps.py",
@@ -47537,6 +50659,17 @@
       "confidence_score": 1.0,
       "source": "plots_paper_maps_rationale_310",
       "target": "plots_paper_maps_continuous_multiplot"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/plots/paper_maps.py",
+      "source_location": "L397",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "plots_paper_maps_categorical_map",
+      "target": "axes"
     },
     {
       "relation": "rationale_for",
@@ -49916,5 +53049,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "23dd02ee5a9a660511a5143676a0c0123d2bd3fe"
+  "built_at_commit": "2db972bdd654fb9b65ecaa19489446169edc5743"
 }

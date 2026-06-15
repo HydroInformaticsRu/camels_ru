@@ -1,16 +1,16 @@
-# Graph Report - camels_ru  (2026-06-14)
+# Graph Report - camels_ru  (2026-06-15)
 
 ## Corpus Check
-- 98 files · ~2,563,913 words
+- 104 files · ~2,583,018 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1742 nodes · 3231 edges · 89 communities (85 shown, 4 thin omitted)
+- 1866 nodes · 3423 edges · 94 communities (90 shown, 4 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 69 edges (avg confidence: 0.57)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `23dd02ee`
+- Built from commit: `2db972bd`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -94,6 +94,11 @@
 - [[_COMMUNITY_Community 86|Community 86]]
 - [[_COMMUNITY_Community 87|Community 87]]
 - [[_COMMUNITY_Community 88|Community 88]]
+- [[_COMMUNITY_Community 89|Community 89]]
+- [[_COMMUNITY_Community 90|Community 90]]
+- [[_COMMUNITY_Community 91|Community 91]]
+- [[_COMMUNITY_Community 92|Community 92]]
+- [[_COMMUNITY_Community 94|Community 94]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `QualityFlag` - 41 edges
@@ -122,7 +127,7 @@
 ## Import Cycles
 - 1-file cycle: `src/meteo/era5_land_loader.py -> src/meteo/era5_land_loader.py`
 
-## Communities (89 total, 4 thin omitted)
+## Communities (94 total, 4 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -133,16 +138,16 @@ Cohesion: 0.06
 Nodes (52): create_mosaic(), create_tif_get_area(), flood_extent_tiles(), gdal_extent_clipper(), get_point_height_from_dem(), Clip and reproject a GeoTIFF file to a desired extent and EPSG code.      This f, Return the paths for .tiff files of elevation and flow direction in a given fold, Generate a VRT mosaic from a collection of GeoTIFF tiles.      Args:         fil (+44 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.17
-Nodes (26): Axes, _add_graticule(), _auto_bins(), categorical_map(), continuous_multiplot(), get_russia_projection(), _hide_frame(), Projected plotting for CAMELS-RU manuscript figures.  Spatial plotting using Alb (+18 more)
+Cohesion: 0.05
+Nodes (65): Axes, calculate_metrics_batched(), calculate_metrics_parallel(), _calculate_metrics_worker(), Parallel computation of hydrological metrics for multiple gauges.  This module p, Calculate metrics in batches for better memory management.      Useful when proc, Worker function for parallel metric calculation.      Args:         gauge_id: Un, Calculate comprehensive metrics for multiple gauges in parallel.      Uses multi (+57 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.06
 Nodes (48): ais_merger(), _clean_cell(), _df_from_observations(), discharge_to_csv(), _interpolate_dots(), level_to_csv(), _process_year_block(), AIS GMVO data parsing utilities.  Parses discharge and water level exports from (+40 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.08
-Nodes (40): calculate_recession_constant(), calculate_trend_statistics(), load_discharge_series(), load_precipitation_series(), main(), process_single_gauge(), float, int (+32 more)
+Cohesion: 0.09
+Nodes (39): calculate_recession_constant(), calculate_trend_statistics(), load_discharge_series(), load_precipitation_series(), main(), process_single_gauge(), float, int (+31 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.04
@@ -165,8 +170,8 @@ Cohesion: 0.06
 Nodes (52): apply_citation_map(), apply_macros(), _ascii_fold(), demote_section_heading(), _extract_braced_field(), insert_section_labels(), main(), parse_bib_authors() (+44 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.11
-Nodes (24): calculate_drought_indices(), DroughtIndices, Climate and drought indices for meteorological analysis.  This module provides c, Fit gamma distribution and calculate SPI., Fit Pearson Type III distribution and calculate SPI., Calculate Standardized Precipitation Evapotranspiration Index (SPEI).          A, Calculate various drought and climate indices., Calculate PET using Thornthwaite method (simplified). (+16 more)
+Cohesion: 0.10
+Nodes (25): calculate_drought_indices(), DroughtIndices, Climate and drought indices for meteorological analysis.  This module provides c, Fit gamma distribution and calculate SPI., Fit Pearson Type III distribution and calculate SPI., Calculate Standardized Precipitation Evapotranspiration Index (SPEI).          A, Calculate various drought and climate indices., Calculate PET using Thornthwaite method (simplified). (+17 more)
 
 ### Community 11 - "Community 11"
 Cohesion: 0.11
@@ -193,8 +198,8 @@ Cohesion: 0.14
 Nodes (30): build_include_globs(), connect_sftp(), download_file(), ensure_parent_dir(), filter_paths(), human_bytes(), inspect_local_file(), _listdir_attr_recursive() (+22 more)
 
 ### Community 17 - "Community 17"
-Cohesion: 0.11
-Nodes (22): Meteorological analysis package for CAMELS-RU dataset.  This package provides co, calculate_temperature_metrics(), Temperature analysis for meteorological time series.  This module provides compr, Calculate seasonal temperature statistics.          Returns:             DataFra, Identify extreme temperature events.          Args:             cold_threshold:, Comprehensive temperature analysis for meteorological time series., Calculate consecutive days meeting a condition., Calculate growing and heating degree days.          Args:             base_temp: (+14 more)
+Cohesion: 0.12
+Nodes (21): calculate_temperature_metrics(), Temperature analysis for meteorological time series.  This module provides compr, Calculate seasonal temperature statistics.          Returns:             DataFra, Identify extreme temperature events.          Args:             cold_threshold:, Comprehensive temperature analysis for meteorological time series., Calculate consecutive days meeting a condition., Calculate growing and heating degree days.          Args:             base_temp:, Initialize temperature analysis.          Args:             temperature_data: Te (+13 more)
 
 ### Community 18 - "Community 18"
 Cohesion: 0.14
@@ -213,16 +218,16 @@ Cohesion: 0.15
 Nodes (27): aggregate_large_watershed(), aggregate_small_watershed(), aggregate_watershed(), compute_fractional_weights(), _detect_time_coord(), _get_or_compute_weights(), get_unit_conversion(), _iter_aggregatable_data_vars() (+19 more)
 
 ### Community 22 - "Community 22"
-Cohesion: 0.12
-Nodes (26): CAMELS-RU catchment attributes and clustering for the HESS manuscript.  Produces, DataFrame, float, Index, int, Series, str, categorize_catchment_size() (+18 more)
+Cohesion: 0.13
+Nodes (24): CAMELS-RU catchment attributes and clustering for the HESS manuscript.  Produces, DataFrame, float, Index, int, Series, str, categorize_catchment_size() (+16 more)
 
 ### Community 23 - "Community 23"
-Cohesion: 0.16
-Nodes (18): Any, DataArray, float, int, Series, str, ChangePointDetection, detect_change_points() (+10 more)
+Cohesion: 0.15
+Nodes (19): Any, DataArray, float, int, Series, str, ChangePointDetection, detect_change_points() (+11 more)
 
 ### Community 24 - "Community 24"
-Cohesion: 0.14
-Nodes (18): calculate_fdc_metrics(), calculate_flow_regime_classification(), FlowDurationCurve, Get FDC curve data for plotting.          Returns:             DataFrame with ex, Calculate comprehensive FDC-based metrics.      Args:         discharge: Dischar, Classify flow regime based on FDC characteristics.      Args:         discharge:, Flow Duration Curve analysis and metrics calculation.      This class provides c, Initialize FDC with discharge data.          Args:             discharge: Discha (+10 more)
+Cohesion: 0.13
+Nodes (19): calculate_fdc_metrics(), calculate_flow_regime_classification(), FlowDurationCurve, Flow Duration Curve analysis for hydrological characterization.  This module pro, Get FDC curve data for plotting.          Returns:             DataFrame with ex, Calculate comprehensive FDC-based metrics.      Args:         discharge: Dischar, Classify flow regime based on FDC characteristics.      Args:         discharge:, Flow Duration Curve analysis and metrics calculation.      This class provides c (+11 more)
 
 ### Community 25 - "Community 25"
 Cohesion: 0.13
@@ -245,8 +250,8 @@ Cohesion: 0.14
 Nodes (21): Enum, count_flags_by_severity(), get_flag_severity(), has_critical_flag(), QualityFlag, Quality flag definitions for discharge assessment.  This module defines quality, Count flags by their severity level.      Args:         flags: List of quality f, Check if any flag has critical severity.      Args:         flags: List of quali (+13 more)
 
 ### Community 30 - "Community 30"
-Cohesion: 0.14
-Nodes (23): Flow Duration Curve analysis for hydrological characterization.  This module pro, Flow extremes analysis for hydrological characterization.  This module provides, Comprehensive hydrological indices for flow characterization.  This module provi, Flow variability analysis for hydrological characterization.  This module provid, Hydrological analysis package for CAMELS-RU dataset.  This package provides comp, aggregate_period_metrics(), calculate_comprehensive_metrics(), calculate_period_metrics() (+15 more)
+Cohesion: 0.19
+Nodes (19): Flow extremes analysis for hydrological characterization.  This module provides, Hydrological analysis package for CAMELS-RU dataset.  This package provides comp, aggregate_period_metrics(), calculate_comprehensive_metrics(), calculate_period_metrics(), calculate_runoff_ratio(), _nan_metrics(), Period-based hydrological metrics calculation.  This module provides period-base (+11 more)
 
 ### Community 31 - "Community 31"
 Cohesion: 0.17
@@ -309,20 +314,20 @@ Cohesion: 0.19
 Nodes (15): grade_compound(), load_precipitation(), load_temperature(), bool, DataFrame, int, Path, Series (+7 more)
 
 ### Community 46 - "Community 46"
-Cohesion: 0.25
-Nodes (13): calculate_metrics_batched(), calculate_metrics_parallel(), _calculate_metrics_worker(), Parallel computation of hydrological metrics for multiple gauges.  This module p, Calculate metrics in batches for better memory management.      Useful when proc, Worker function for parallel metric calculation.      Args:         gauge_id: Un, Calculate comprehensive metrics for multiple gauges in parallel.      Uses multi, bool (+5 more)
+Cohesion: 0.07
+Nodes (45): Categorical, _add_strata(), _as_bool(), build_summary(), _load_inputs(), main(), _median_or_nan(), _ordered_pct_bin() (+37 more)
 
 ### Community 47 - "Community 47"
-Cohesion: 0.25
-Nodes (13): create_forcing_netcdf(), get_gauge_list(), load_gauge_data(), main(), process_single_gauge(), ndarray, Path, str (+5 more)
+Cohesion: 0.19
+Nodes (13): find_float_len(), get_square_vertices(), inside_mask(), point_distance(), Return 2x2 rotation matrix for angle alpha (radians)., Return vertices (4x2) of a rotated square.      Parameters     ----------     ce, Great-circle distance (Haversine) between two points given in radians.      Retu, Check if point (x,y) strictly inside bounding box (x1,y1,x2,y2). (+5 more)
 
 ### Community 48 - "Community 48"
 Cohesion: 0.15
 Nodes (12): Acknowledgments, CAMELS-RU: A Large-Sample Hydroclimatic Dataset for 3,353 Russian Catchments, Citation, Contact, Data Access, Data Processing Pipeline, Dataset Summary, Installation (+4 more)
 
 ### Community 49 - "Community 49"
-Cohesion: 0.19
-Nodes (13): find_float_len(), get_square_vertices(), inside_mask(), point_distance(), Return 2x2 rotation matrix for angle alpha (radians)., Return vertices (4x2) of a rotated square.      Parameters     ----------     ce, Great-circle distance (Haversine) between two points given in radians.      Retu, Check if point (x,y) strictly inside bounding box (x1,y1,x2,y2). (+5 more)
+Cohesion: 0.20
+Nodes (19): _arrow(), _box(), _dam_count(), _draw_column(), main(), plot_subset_flow(), Axes, DataFrame (+11 more)
 
 ### Community 50 - "Community 50"
 Cohesion: 0.23
@@ -369,48 +374,48 @@ Cohesion: 0.50
 Nodes (3): main(), Regenerate only the map figures used in the CAMELS-RU manuscript.  Runs the thre, Run each notebook sequentially.
 
 ### Community 74 - "Community 74"
-Cohesion: 0.15
-Nodes (20): DataFrame, Index, object, Series, str, _as_string_index(), filter_paper_analysis_column(), filter_paper_analysis_index() (+12 more)
+Cohesion: 0.16
+Nodes (18): DataFrame, Index, object, Series, str, _as_string_index(), filter_paper_analysis_column(), paper_analysis_exclusion_mask() (+10 more)
 
 ### Community 75 - "Community 75"
-Cohesion: 0.18
-Nodes (14): annual_cv_precip(), annual_mean_precip(), load_csv_series(), float, Path, Series, str, CAMELS-RU meteorological forcing diagnostics for the HESS manuscript.  Produces (+6 more)
+Cohesion: 0.13
+Nodes (14): exclude, include, pythonVersion, reportArgumentType, reportAttributeAccessIssue, reportCallIssue, reportMissingImports, reportMissingTypeStubs (+6 more)
 
 ### Community 76 - "Community 76"
 Cohesion: 0.31
 Nodes (13): calculate_annual_totals(), calculate_runoff_coefficient(), calculate_volume_relationship(), calculate_water_balance_metrics(), Water balance and precipitation-discharge relationship analysis.  This module pr, Calculate volume-based relationships between precipitation and discharge.      A, Calculate comprehensive water balance metrics.      Args:         precipitation_, Calculate annual total values from daily time series.      Args:         series: (+5 more)
 
 ### Community 77 - "Community 77"
-Cohesion: 0.18
-Nodes (12): find_extent(), Determine extent [min_lon, max_lon, min_lat, max_lat] snapped to grid resolution, Round x to nearest multiple of a while preserving reasonable decimal precision., round_nearest(), aggregation_definer(), nc_by_extent(), Select net_cdf by extent of given shape. Return masked net_cdf.      Args:, Determine aggregation method (sum or mean) for a variable based on dataset and v (+4 more)
+Cohesion: 0.14
+Nodes (24): _add_threshold_rows(), build_attribute_selection(), build_representativeness_stats(), _count_pct(), main(), _numeric(), DataFrame, float (+16 more)
 
 ### Community 78 - "Community 78"
 Cohesion: 0.33
 Nodes (5): cells, metadata, marimo_version, script_metadata_hash, version
 
 ### Community 80 - "Community 80"
-Cohesion: 0.17
-Nodes (11): _cluster_sort_key(), convert_q_cms_to_mm_day(), float, int, Series, str, CAMELS-RU hydrological signatures for the HESS manuscript.  Produces publication, Extract numeric cluster ID from 'Cluster N' string for sorting. (+3 more)
+Cohesion: 0.18
+Nodes (12): find_extent(), Determine extent [min_lon, max_lon, min_lat, max_lat] snapped to grid resolution, Round x to nearest multiple of a while preserving reasonable decimal precision., round_nearest(), aggregation_definer(), nc_by_extent(), Select net_cdf by extent of given shape. Return masked net_cdf.      Args:, Determine aggregation method (sum or mean) for a variable based on dataset and v (+4 more)
 
 ### Community 81 - "Community 81"
 Cohesion: 0.14
 Nodes (14): _find_gauge_id_column(), _gauge_ids_from_csv(), _normalize_id_header(), Index, Normalize a candidate gauge-ID field name for case/spacing variants., Return the gauge identifier column, accepting capitalization variants only., Normalize a candidate gauge-ID field name for case/spacing variants., Normalize a candidate gauge-ID field name for case/spacing variants. (+6 more)
 
 ### Community 82 - "Community 82"
-Cohesion: 0.40
-Nodes (4): grade_boxplot(), CAMELS-RU data description figures for the HESS manuscript.  Produces publicatio, Boxplot of *column* grouped by grade, with optional hydropower overlay.      Whe, Boxplot of *column* grouped by grade, with optional hydropower overlay.      Whe
+Cohesion: 0.29
+Nodes (7): _build_budyko_aet(), _build_paper_analysis_scope(), Write the gauge-ID-only exclusion used by manuscript analyses., Write the gauge-ID-only exclusion used by manuscript analyses., bool, is_paper_analysis_excluded_gauge_id(), Return whether one gauge ID is excluded from manuscript analyses.
 
 ### Community 83 - "Community 83"
-Cohesion: 0.24
-Nodes (13): _annual_mean_mm_yr(), _annual_ratios(), _build_budyko_aet(), _hydroclimate_worker(), _pct(), float, int, ndarray (+5 more)
+Cohesion: 0.26
+Nodes (12): _annual_mean_mm_yr(), _annual_ratios(), _hydroclimate_worker(), _pct(), float, int, ndarray, Series (+4 more)
 
 ### Community 84 - "Community 84"
 Cohesion: 0.21
 Nodes (12): _build_dam_excluded_analytics(), _build_subset_flow(), _load_release(), _parse_macro_int(), Any, str, Build HESS-facing summaries that exclude dam-regulated gauges by default.      C, Build HESS-facing summaries that exclude dam-regulated gauges by default.      C (+4 more)
 
 ### Community 85 - "Community 85"
-Cohesion: 0.17
-Nodes (12): _build_paper_analysis_scope(), _gauge_ids_from_frame(), GeoDataFrame, Extract gauge IDs from a tabular source without assuming lower-case headers., Extract gauge IDs from a tabular source without assuming lower-case headers., Extract gauge IDs from a tabular source without assuming lower-case headers., Extract gauge IDs from a tabular source without assuming lower-case headers., Write the gauge-ID-only exclusion used by manuscript analyses. (+4 more)
+Cohesion: 0.25
+Nodes (13): create_forcing_netcdf(), get_gauge_list(), load_gauge_data(), main(), process_single_gauge(), ndarray, Path, str (+5 more)
 
 ### Community 86 - "Community 86"
 Cohesion: 0.17
@@ -424,8 +429,28 @@ Nodes (10): _build_gauge_id_length_audit(), _gauge_ids_from_netcdf(), Write gaug
 Cohesion: 0.50
 Nodes (4): PreflightRow, One preflight check result., One preflight check result., One preflight check result.
 
+### Community 89 - "Community 89"
+Cohesion: 0.23
+Nodes (11): _build_completeness_table(), main(), _plot_summary(), DataFrame, object, str, Plot water-level completeness distribution and type counts., Write water-level completeness CSV, LaTeX summary, and figure. (+3 more)
+
+### Community 90 - "Community 90"
+Cohesion: 0.29
+Nodes (6): exclude, include, pythonVersion, reportMissingImports, reportMissingTypeStubs, typeCheckingMode
+
+### Community 91 - "Community 91"
+Cohesion: 0.29
+Nodes (6): grade_boxplot(), CAMELS-RU data description figures for the HESS manuscript.  Produces publicatio, Boxplot of *column* grouped by grade, with optional hydropower overlay.      Whe, Boxplot of *column* grouped by grade, with optional hydropower overlay.      Whe, get_size_categories(), Return ordered list of size category labels.      Returns:         List of size
+
+### Community 92 - "Community 92"
+Cohesion: 0.40
+Nodes (3): Comprehensive hydrological indices for flow characterization.  This module provi, Flow variability analysis for hydrological characterization.  This module provid, Logging utility.  Centralized, idempotent logging setup for the logging providin
+
+### Community 94 - "Community 94"
+Cohesion: 0.33
+Nodes (6): _gauge_ids_from_frame(), GeoDataFrame, Extract gauge IDs from a tabular source without assuming lower-case headers., Extract gauge IDs from a tabular source without assuming lower-case headers., Extract gauge IDs from a tabular source without assuming lower-case headers., Extract gauge IDs from a tabular source without assuming lower-case headers.
+
 ## Knowledge Gaps
-- **191 isolated node(s):** `Request`, `HTMLResponse`, `RedirectResponse`, `DataFrame`, `Logger` (+186 more)
+- **218 isolated node(s):** `include`, `exclude`, `pythonVersion`, `typeCheckingMode`, `reportMissingImports` (+213 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -433,16 +458,16 @@ Nodes (4): PreflightRow, One preflight check result., One preflight check result
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `split_by_period()` connect `Community 30` to `Community 6`, `Community 39`?**
-  _High betweenness centrality (0.052) - this node is a cross-community bridge._
-- **Why does `paper_analysis_scope_summary()` connect `Community 74` to `Community 39`, `Community 75`, `Community 80`, `Community 82`, `Community 50`, `Community 85`, `Community 22`, `Community 59`?**
-  _High betweenness centrality (0.037) - this node is a cross-community bridge._
-- **Why does `calculate_comprehensive_metrics()` connect `Community 30` to `Community 4`, `Community 46`, `Community 6`?**
-  _High betweenness centrality (0.031) - this node is a cross-community bridge._
+  _High betweenness centrality (0.077) - this node is a cross-community bridge._
+- **Why does `paper_analysis_scope_summary()` connect `Community 74` to `Community 2`, `Community 39`, `Community 59`, `Community 82`, `Community 50`, `Community 22`, `Community 91`?**
+  _High betweenness centrality (0.053) - this node is a cross-community bridge._
+- **Why does `calculate_comprehensive_metrics()` connect `Community 30` to `Community 2`, `Community 4`, `Community 6`?**
+  _High betweenness centrality (0.030) - this node is a cross-community bridge._
 - **Are the 30 inferred relationships involving `QualityFlag` (e.g. with `GaugeQualitySummary` and `QualityGrade`) actually correct?**
   _`QualityFlag` has 30 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 2 inferred relationships involving `assess_gauge_quality()` (e.g. with `run_temperature_aware_qc()` and `grade_compound()`) actually correct?**
   _`assess_gauge_quality()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 7 inferred relationships involving `FlowVariability` (e.g. with `DatetimeIndex` and `float`) actually correct?**
   _`FlowVariability` has 7 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `Request`, `HTMLResponse`, `RedirectResponse` to the rest of the system?**
-  _806 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `include`, `exclude`, `pythonVersion` to the rest of the system?**
+  _876 weakly-connected nodes found - possible documentation gaps or missing edges._

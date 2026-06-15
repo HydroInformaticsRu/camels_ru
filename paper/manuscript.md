@@ -471,8 +471,8 @@ Planned enhancements include extending temporal coverage with historical records
 
 ## 6 Conclusions
 
-CAMELS-RU consolidates 2,170 discharge gauges and 2,989 water-level gauges under a uniform per-hydro-year quality grading rubric.
-The 849-gauge Grade A subset achieves median data completeness of 97.5%, and every one of the 3,353 watershed boundaries was manually verified, giving a mean areal error of 5.1% (median 1.4%) against official Roshydromet data.
+CAMELS-RU consolidates 2,170 discharge gauges with per-hydro-year A--F quality grading and 2,989 water-level gauges with record-level completeness/QC metadata.
+The discharge archive includes an 849-gauge Grade A subset with median data completeness of 97.5%, and every one of the 3,353 watershed boundaries was manually verified, giving a mean areal error of 5.1% (median 1.4%) against official Roshydromet data.
 Fifteen hydrological signatures released for 1,845 catchments (1,862 in the per-gauge file, 17 flagged `is_anomalous`) vary broadly across the network: median q_mean 0.695 mm d⁻¹ (range 0.003–8.35), BFI 0.556 (0.191–0.903), and median half-flow date in early May (day 214 of the hydrological year).
 A Budyko diagnostic combined with a direct AET-adequacy check against GLEAM4 actual evaporation quantifies the ERA5-Land precipitation wet bias: under ERA5-Land 8.0% of catchments violate the per-year energy limit AET ≤ PET, versus 2.0% under MSWEP and 3.4% under GPCP.
 In absolute mm yr⁻¹ terms, water-balance AET exceeds GLEAM PET in 44.9% of catchments under ERA5-Land, versus 1.5% under MSWEP and 2.9% under GPCP, supporting the choice of MSWEP as the released precipitation forcing (Sect. 4.1.3).

@@ -740,13 +740,58 @@
     "semantic_hash": ""
   },
   "/home/dmbrmv/Development/camels_ru/reports/gauge_id_audit.html": {
-    "mtime": 1781445830.6230953,
-    "ast_hash": "cdf3329689d12de6dee74bbee2ff88b8",
+    "mtime": 1781452194.7408047,
+    "ast_hash": "91f433c248abc72ae7693259804a42a5",
     "semantic_hash": ""
   },
   "/home/dmbrmv/Development/camels_ru/src/utils/paper_analysis_scope.py": {
     "mtime": 1781446970.878795,
     "ast_hash": "51950a90e671dfd95f00d58f94f97ddd",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/water_level_completeness_summary.py": {
+    "mtime": 1781514242.364699,
+    "ast_hash": "810f3338ad8a7a2ee2b3bbdf19e0ec3e",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/plot_hess_subset_flow.py": {
+    "mtime": 1781513475.2115645,
+    "ast_hash": "eaefc6aec97edaba6ea3ce3e00510c7b",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_subset_flow.png": {
+    "mtime": 1781513475.7985713,
+    "ast_hash": "820b5caf161dc75af2bd6ef8ffdeb61c",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_water_level_completeness.png": {
+    "mtime": 1781514321.4925027,
+    "ast_hash": "6a29324995c51caf0e047e12fa549b58",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/stratify_water_balance_violations.py": {
+    "mtime": 1781518090.663539,
+    "ast_hash": "99594f5bb4ad614efafc466c7f368792",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/paper/images/fig_water_balance_strata.png": {
+    "mtime": 1781518613.0288992,
+    "ast_hash": "6e6f8b5a1048b849d64754ff41824291",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/scripts/summarize_hess_representativeness.py": {
+    "mtime": 1781518324.5129948,
+    "ast_hash": "ee6740987500975f50ae7bbb8943245c",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/pyright.smoke.json": {
+    "mtime": 1781520730.5537658,
+    "ast_hash": "4a99f06eddfec47a60163bf3e9f6811d",
+    "semantic_hash": ""
+  },
+  "/home/dmbrmv/Development/camels_ru/pyright.strict-paper.json": {
+    "mtime": 1781520740.4788823,
+    "ast_hash": "b6abc0606ff9523ff40e89d39af897d7",
     "semantic_hash": ""
   }
 }
