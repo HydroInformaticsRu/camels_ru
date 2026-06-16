@@ -9,16 +9,22 @@ Run: pixi run python scripts/verify_macros.py
 from __future__ import annotations
 
 from pathlib import Path
+import re
 import sys
 
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+from scipy.stats import spearmanr
 import xarray as xr
 
 REPO = Path(__file__).resolve().parents[1]
-if str(REPO) not in sys.path:
-    sys.path.insert(0, str(REPO))
+SCRIPTS = Path(__file__).resolve().parent
+for _p in (REPO, SCRIPTS):
+    if str(_p) not in sys.path:
+        sys.path.insert(0, str(_p))
+
+from coldregion_robustness import T_SPLIT, load_subset, shape_stats  # noqa: E402
 
 from src.utils.paper_analysis_scope import (  # noqa: E402
     is_paper_analysis_excluded_gauge_id,
@@ -26,6 +32,7 @@ from src.utils.paper_analysis_scope import (  # noqa: E402
 )
 
 RELEASE = REPO / "release" / "CAMELS_RU_v1.0"
+RESULTS_HESS = REPO / "results" / "hess_quality"
 PAPER = REPO / "paper"
 MACROS = PAPER / "overleaf" / "macros.tex"
 
@@ -35,10 +42,117 @@ def section(title: str) -> None:
     print(f"\n{'=' * 70}\n{title}\n{'=' * 70}")
 
 
+_FAILURES: list[str] = []
+
+
 def kv(label: str, paper: str, actual: str, match: bool | None = None) -> None:
-    """Print a labelled paper-versus-data comparison row."""
+    """Print a labelled paper-versus-data comparison row; record drifts for the exit code."""
     mark = "OK " if match else ("DRIFT" if match is False else "  ? ")
     print(f"[{mark}] {label:40s}  paper={paper:25s}  actual={actual}")
+    if match is False:
+        _FAILURES.append(label)
+
+
+def parse_macros() -> dict[str, str]:
+    r"""Parse ``\newcommand{\name}{value}`` definitions from macros.tex into {name: value}."""
+    text = MACROS.read_text(encoding="utf-8")
+    pattern = r"\\newcommand\{\\([A-Za-z]+)\}\{((?:[^{}]|\{[^{}]*\})*)\}"
+    return {m.group(1): m.group(2) for m in re.finditer(pattern, text)}
+
+
+def macro_num(raw: str) -> float:
+    r"""Extract the leading signed number from a macro value (strips {,}, \%, units, \xspace)."""
+    s = raw.replace("\\xspace", "").replace("\\%", "").replace("{,}", "").replace(",", "")
+    s = s.replace("−", "-")  # unicode minus -> ASCII
+    m = re.search(r"[+-]?\d+(?:\.\d+)?", s)
+    return float(m.group(0)) if m else float("nan")
+
+
+def check_macro(macros: dict[str, str], name: str, actual: float, fmt: str = "{:.1f}") -> None:
+    """Compare the macros.tex value of ``name`` against a freshly computed value (3-way lock)."""
+    exp_s = fmt.format(macro_num(macros.get(name, "nan")))
+    act_s = fmt.format(actual)
+    kv(name, exp_s, act_s, match=(exp_s == act_s))
+
+
+def check_val(label: str, expected: str, actual: str) -> None:
+    """Gate a hardcoded in-text value (no macro) against the recomputed value."""
+    kv(label, expected, actual, match=(expected == actual))
+
+
+def check_aet_macros(macros: dict[str, str]) -> None:
+    """Reconcile the AET>PET headline macros + in-text Budyko trios against the audit table."""
+    section("BUDYKO / AET ADEQUACY (results/hess_quality/budyko_aet_table.csv)")
+    table = RESULTS_HESS / "budyko_aet_table.csv"
+    if not table.exists():
+        print("  SKIP — budyko_aet_table.csv absent (gitignored); run scripts/hess_quality_audit.py")
+        return
+    budyko = pd.read_csv(table).set_index("product")
+    era5, mswep, gpcp = budyko.loc["ERA5-Land"], budyko.loc["MSWEP"], budyko.loc["GPCP"]
+    check_macro(macros, "aetgtpeterafive", float(era5["aet_wb_gt_pet_pct"]), "{:.1f}")
+    check_macro(macros, "aetgtpetmswep", float(mswep["aet_wb_gt_pet_pct"]), "{:.1f}")
+    check_macro(macros, "aetgtpetgpcp", float(gpcp["aet_wb_gt_pet_pct"]), "{:.1f}")
+    check_macro(macros, "naetcheckgauges", float(era5["aet_area_ge_50_n"]), "{:.0f}")
+    # In-text hardcoded trios (§5.4, no macro) — gate against the audit table so they cannot drift.
+    check_val(
+        "in-text energy-viol E/M/G %",
+        "8.0/2.0/3.4",
+        f"{era5['energy_violation_pct']:.1f}/"
+        f"{mswep['energy_violation_pct']:.1f}/{gpcp['energy_violation_pct']:.1f}",
+    )
+    check_val(
+        "in-text aridity median E/M/G",
+        "0.92/1.02/0.92",
+        f"{era5['median_aridity_index']:.2f}/"
+        f"{mswep['median_aridity_index']:.2f}/{gpcp['median_aridity_index']:.2f}",
+    )
+    check_val(
+        "in-text evaporative median E/M/G",
+        "0.65/0.61/0.66",
+        f"{era5['median_evaporative_index']:.2f}/"
+        f"{mswep['median_evaporative_index']:.2f}/{gpcp['median_evaporative_index']:.2f}",
+    )
+
+
+def check_coldregion_macros(macros: dict[str, str]) -> None:
+    """Reconcile the §4.3 cold-region macros against a fresh recompute + the committed verdict."""
+    section("COLD-REGION ROBUSTNESS (coldregion_robustness.py + verdict.txt)")
+    cr = load_subset()
+    warm = cr[cr["tmp_dc_uyr"] >= T_SPLIT]
+    cold = cr[cr["tmp_dc_uyr"] < T_SPLIT]
+    cr_shape = shape_stats(cr["prm_pc_use"], cr["baseflow_index"])
+    rho_warm = float(spearmanr(warm["prm_pc_use"], warm["baseflow_index"])[0])
+    rho_cold = float(spearmanr(cold["prm_pc_use"], cold["baseflow_index"])[0])
+    # 9 of 10 cold-region macros recompute from release; the Eckhardt agreement needs the
+    # (gitignored) verdict, so guard it for fresh clones rather than crashing.
+    check_macro(macros, "ncoldregiongauges", len(cr), "{:.0f}")
+    check_macro(macros, "ncoldregionwarm", len(warm), "{:.0f}")
+    check_macro(macros, "ncoldregioncold", len(cold), "{:.0f}")
+    check_macro(macros, "bfipermafrostbaseline", cr_shape["baseline_med"], "{:.2f}")
+    check_macro(macros, "bfipermafrostpeak", cr_shape["peak_med"], "{:.2f}")
+    check_macro(macros, "bfipermafrosthigh", cr_shape["high_med"], "{:.2f}")
+    check_macro(macros, "rhopermafrostwarm", rho_warm, "{:.2f}")
+    check_macro(macros, "rhopermafrostcold", rho_cold, "{:.2f}")
+    verdict_path = RESULTS_HESS / "coldregion_robustness_verdict.txt"
+    if verdict_path.exists():
+        m_agree = re.search(r"agreement\s*=\s*([+-]?\d+\.\d+)", verdict_path.read_text())
+        agreement = float(m_agree.group(1)) if m_agree else float("nan")
+        check_macro(macros, "bfieckhardtagreement", agreement, "{:.2f}")
+    else:
+        print(
+            "  SKIP bfieckhardtagreement — verdict.txt absent (gitignored); run coldregion_robustness.py"
+        )
+
+
+def report_drift_summary() -> None:
+    """Print the drift summary; exit non-zero if any checked macro drifted from the data."""
+    section("DRIFT SUMMARY")
+    if _FAILURES:
+        print(f"  {len(_FAILURES)} drift(s): {', '.join(_FAILURES)}")
+        print(f"\nCross-reference with {MACROS.relative_to(REPO)}")
+        sys.exit(1)
+    print("  No drift — all checked macros reproduce from release + audit artifacts.")
+    print(f"\nDone. Cross-reference with {MACROS.relative_to(REPO)}")
 
 
 def main() -> None:
@@ -386,6 +500,10 @@ def main() -> None:
             gb = tarball.stat().st_size / 1024**3
             print(f"  {tarball.name}: {gb:.2f} GB gzipped")
 
+    macros = parse_macros()
+    check_aet_macros(macros)
+    check_coldregion_macros(macros)
+
     section("AUTHORITATIVE VALUES FOR MACROS.TEX")
     print(f"  ntotal               = {n_attrs:,} (3,339 HydroATLAS-covered catchments)")
     print("                         OR 3,353 if 'total delineated' is intended")
@@ -402,8 +520,7 @@ def main() -> None:
     print(f"  nsigngauges          = {n_sig_clean:,}")
     print(f"  archive size (unc.)  = {total_gb:.2f} GB")
 
-    print("\n" + "=" * 70)
-    print(f"Done. Cross-reference with {MACROS.relative_to(REPO)}")
+    report_drift_summary()
 
 
 if __name__ == "__main__":
