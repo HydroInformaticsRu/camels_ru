@@ -1,0 +1,17 @@
+COLD-REGION PERMAFROST-BFI ROBUSTNESS VERDICT
+================================================
+subset n = 1525 (Grade A/B, dam-excluded, non-anomalous)
+
+Inverted-U (peak > baseline AND peak > high):
+  Lyne-Hollick : True  (baseline 0.541 / peak 0.642 / high 0.538)
+  Eckhardt     : True  (baseline 0.753 / peak 0.777 / high 0.742)
+
+Sign reversal across -5 degC (warm rho>0 AND cold rho<0):
+  Lyne-Hollick : True  (warm +0.244 / cold -0.349)
+  Eckhardt     : True  (warm +0.252 / cold -0.364)
+
+Spearman(LH, Eckhardt) BFI agreement = +0.581
+
+KILL-SWITCH:
+  inverted-U survives Eckhardt? YES
+  sign reversal survives Eckhardt? YES -> reversal may stay in §4 body

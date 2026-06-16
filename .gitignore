@@ -38,9 +38,15 @@ docs/literature/large_sample_hydrology_papers/*
 !docs/literature/large_sample_hydrology_papers/metadata.json
 !docs/literature/large_sample_hydrology_papers/*.bib
 logs/
-results/
+results/*
+!results/hess_quality/
+results/hess_quality/*
 *.csv
 !configs/*.csv
+# Track the tiny audit artifacts that verify_macros.py reads (GLEAM-dependent, not
+# regenerable without the external drive) so the macro lock runs on a fresh clone.
+!results/hess_quality/budyko_aet_table.csv
+!results/hess_quality/coldregion_robustness_verdict.txt
 
 # Virtual environments
 .venv/
