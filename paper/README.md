@@ -44,9 +44,10 @@ Figures referenced in the manuscript:
 | 4 | `fig_precip_comparison.png` | Precipitation spatial comparison |
 | 5 | `fig_forcing_correlations.png` | Inter-dataset scatter plots |
 | 6 | `fig_water_balance.png` | Runoff ratio and ET proxy |
-| 7 | `fig_budyko.png` | Budyko consistency check |
-| 8 | `fig_hydro_signatures_1.png` | Magnitude/baseflow signatures |
-| 9 | `fig_hydro_signatures_2.png` | Timing/variability signatures |
+| 7 | `fig_water_balance_strata.png` | Physical-consistency failure strata |
+| 8 | `fig_budyko.png` | Budyko consistency check |
+| 9 | `fig_hydro_signatures_1.png` | Magnitude/baseflow signatures |
+| 10 | `fig_hydro_signatures_2.png` | Timing/variability signatures |
 
 Additional figures available in `images/` for supplementary material.
 

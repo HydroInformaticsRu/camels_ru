@@ -189,7 +189,7 @@ def _plot(df: pd.DataFrame) -> None:
     ax.text(0.5, 1.38, "HUMID  (PET < P)", fontsize=8, color="#555555", ha="center")
     ax.text(2.2, 1.38, "ARID  (PET > P)", fontsize=8, color="#555555", ha="center")
     ax.text(0.04, 1.08, "above water limit (Q < 0: impossible)", fontsize=7, color="#AA2222")
-    ax.text(0.04, -0.22, "below zero (Q > P: closure violation)", fontsize=7, color="#AA2222")
+    ax.text(0.04, -0.22, "below zero: (P−Q)/P < 0", fontsize=7, color="#AA2222")
     ax.grid(alpha=0.2, linestyle="--")
     ax.legend(loc="upper right", fontsize=9, framealpha=0.9)
     ax.set_title(
@@ -231,14 +231,14 @@ def _summary_table(df: pd.DataFrame) -> None:
         above_water = (sub["evaporative_index"] > 1.0).sum()
         # Combined envelope violation: above min(1, aridity)
         above_envelope = (sub["evaporative_index"] > np.minimum(sub["aridity_index"], 1.0)).sum()
-        # Closure violation Q > P
+        # Negative evaporative-index closure: mean annual (P-Q)/P < 0.
         closure_viol = (sub["evaporative_index"] < 0.0).sum()
         log.info(f"  {product:10s}  n={n:5d}  median PET/P={ai_med:.3f}  median (P-Q)/P={ei_med:.3f}")
         log.info(
             f"             energy>PET (AET>PET): {above_energy:4d} ({100 * above_energy / n:5.1f}%)  "
             f"water>P (AET>P): {above_water:4d} ({100 * above_water / n:5.1f}%)  "
             f"envelope: {above_envelope:4d} ({100 * above_envelope / n:5.1f}%)  "
-            f"closure (Q>P): {closure_viol:4d} ({100 * closure_viol / n:5.1f}%)"
+            f"negative (P-Q)/P: {closure_viol:4d} ({100 * closure_viol / n:5.1f}%)"
         )
 
 

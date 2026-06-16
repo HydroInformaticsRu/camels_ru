@@ -350,7 +350,7 @@ def plot_summary(summary: pd.DataFrame) -> None:
         focus,
         "area_class",
         "q_gt_p_pct",
-        "Q > P by catchment area",
+        "Mean (P-Q)/P < 0 by catchment area",
         "Failure rate (% gauges)",
         "(a)",
     )
@@ -416,13 +416,13 @@ def _write_notes(summary: pd.DataFrame) -> None:
         ),
         "",
         "## Overall dam/regulation-screened rates",
-        f"- Q > P closure failures: {format_overall('q_gt_p_pct')}.",
+        f"- Negative evaporative-index closure failures [(P-Q)/P < 0]: {format_overall('q_gt_p_pct')}.",
         f"- Budyko-envelope failures: {format_overall('budyko_envelope_violation_pct')}.",
         f"- AET_wb > GLEAM PET: {format_overall('aet_wb_gt_pet_pct')}.",
         f"- AET_wb < 0: {format_overall('aet_wb_lt_zero_pct')}.",
         "",
         "## Highest descriptive strata",
-        f"- Q > P by area: {top_row('area_class', 'q_gt_p_pct')}.",
+        f"- Negative evaporative-index closure by area: {top_row('area_class', 'q_gt_p_pct')}.",
         (
             "- Budyko-envelope by snow proxy: "
             f"{top_row('snow_fraction_proxy', 'budyko_envelope_violation_pct')}."
