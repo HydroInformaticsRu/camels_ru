@@ -1,0 +1,38 @@
+---
+description: >-
+  Skill: kickoff - Produce a paste-ready prompt to start a FRESH (/clear'd) session that continues
+  the HESS paper work from committed artifacts. Use for "kickoff prompt", "prompt for next session",
+  "prompt to resume".
+alwaysApply: false
+---
+
+# Skill: kickoff
+
+Cursor adapter for the `kickoff` skill. Full procedure (single source of truth):
+`.claude/skills/kickoff/SKILL.md` in this repo.
+
+## When To Use
+
+The user is about to `/clear` and wants a self-contained prompt to resume the paper work in a new
+session. This repo has one context: finishing the HESS dataset paper.
+
+## When Not To Use
+
+Persisting session state (use `/handoff` or `/save`); executing a plan right now.
+
+## Workflow
+
+Point at the most recent committed plan/doc if one exists, else reconstruct the resume point from
+`git log` + open todos + manuscript state. Verify the branch and clean/pushed state from git — never
+guess. Check `git -C paper/overleaf status -s`; commit + push any referenced artifact (including the
+submodule pointer) first so a fresh session can see it.
+
+## Output Handling
+
+Output only the paste-ready prompt in a code block, then one line noting anything committed/pushed to
+make it durable. Reference artifacts; don't inline them. Include "already done" so work isn't redone.
+
+## Safety Constraints
+
+Do not auto-commit beyond what's needed to make referenced artifacts visible, and confirm with the
+user before pushing. Verify every concrete fact from the repo, not from recall.

@@ -1,0 +1,58 @@
+---
+description: CAMELS-RU project baseline — canonical agent guide pointer + non-negotiable correctness/operational rules. Always on.
+alwaysApply: true
+---
+
+# CAMELS-RU — Cursor Project Rules
+
+**Canonical agent guide: `AGENTS.md`** (repo root) — the cross-agent source of truth.
+Read it for the overview, file-system map, CLI/pixi commands, decision hierarchy,
+permission levels, error recovery, and the federation operating rule. Lookup tables
+(environment, paths, key numbers, forcing sources, gotchas) live in `AGENTS_REFERENCE.md`.
+This file is the always-injected subset — the rules that silently corrupt results or the
+manuscript if violated.
+
+**This repo has one track: finish the HESS paper** (Russian catchments hydroclimatic
+dataset for Hydrology and Earth System Sciences). It is a dataset + manuscript repo, not a
+modeling/calibration codebase. There is no `docs/tracks/` scaffolding.
+
+## Immutable correctness rules (violating these silently corrupts results)
+
+- **Validate CRS before every spatial op** (`to_crs`, `clip`, `intersection`, `sjoin`,
+  `rasterio.reproject`) — assert source/target CRS explicitly. A mismatch produces silently
+  wrong geometry, not an error. Paper maps use **Albers Equal-Area Conic** (commit 74c30ca).
+- **Missing data = `np.nan`**, never sentinels (`0`, `-9999`, `999.99`). Units explicit:
+  discharge m³/s, area km².
+- **Grade A = every assessed year is Grade A.** Do not relax this definition.
+- **No fabricated citations** in `paper/` — tag `[CITE]` for the user to fill. Never invent
+  references.
+- **`paper/overleaf/` is canonical** for the manuscript (nested Overleaf git repo).
+  `paper/manuscript.md` and `paper/latex/` are legacy snapshots, not canonical unless
+  explicitly revived.
+
+## Immutable operational rules
+
+- **Never `/tmp`** — temp files go in project `data/` or a project-level `.tmp/`. System
+  `/tmp` is off-limits.
+- **Use `pixi run python <script>`**, not bare `python`. Pixi config is in `pyproject.toml`
+  → `[tool.pixi.*]` (no separate `pixi.toml`).
+- **Keep `src/` lint-clean** (ruff, line-length 105; clean as of commit 4118bfb). Notebooks
+  and scripts have relaxed rules — don't relax `src/`.
+- **No placeholders** (`<region>`, `[PATH]`, `TBD`) — read the config, ask, or fail
+  explicitly.
+- **`data/` is a symlink** to an external drive that may be unplugged or stale. Verify
+  (`readlink data && ls "$(readlink data)"`) before any pipeline step that reads it; never
+  silently substitute a stale mirror.
+- **Ask before** running notebooks (`notebooks/` are long-running), editing
+  `release/CAMELS_RU_v1.0/` (Zenodo artifacts), or changing manuscript scientific claims.
+
+## Conventions
+
+- Defer to the user on hydrology decisions, quality-grading thresholds, metric selection,
+  and research direction. Apply engineering judgment to code/config/pipelines.
+- Prefer `rg` over recursive `find`/`ls`.
+
+> **Cursor is a peer reviewer / second implementer here, alongside Claude and Codex.**
+> When invoked for a cross-check, be specific and evidence-based: cite `file:line`, verify
+> against the data/source before asserting a bug, and treat reviewer output as advisory —
+> the lead agent synthesizes and verifies, not resolves by consensus.

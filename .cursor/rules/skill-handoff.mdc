@@ -1,0 +1,39 @@
+---
+description: >-
+  Skill: handoff - Thorough end-of-session context freeze so the next /clear'd session resumes the
+  HESS paper without archaeology. Use for "handoff", "freeze context", "save session state", or when
+  the session is ending.
+alwaysApply: false
+---
+
+# Skill: handoff
+
+Cursor adapter for the `handoff` skill. Full procedure (single source of truth):
+`.claude/skills/handoff/SKILL.md` in this repo.
+
+## When To Use
+
+Session is ending and the paper-work context should be frozen for next time. One context only:
+finishing the HESS dataset paper.
+
+## When Not To Use
+
+A quick mid-session checkpoint (use `/save`).
+
+## Workflow
+
+Capture current paper state + next steps + known debt into a single living `project`-type auto-memory
+entry under `~/.claude/projects/-home-dmbrmv-Development-camels-ru/memory/` (prefer updating the
+existing paper-state memory; refresh the `MEMORY.md` index). Check git (`git status -sb` parent,
+`git -C paper/overleaf status -s` manuscript) and note the state. Suggest a commit if there are
+uncommitted changes.
+
+## Output Handling
+
+Print a short confirmation: auto-memory file updated, git state (parent + manuscript) with a suggested
+commit message if dirty, and the concrete "pick up from" next action.
+
+## Safety Constraints
+
+No auto-commit, no force push — the user commits. No manuscript edits to record the handoff. No
+invented session/initiative trees — only auto-memory and git.

@@ -1,0 +1,27 @@
+---
+description: >-
+  Skill: science-judge - Orchestrates iterative refinement between science-buddy (writer) and
+  science-reviewer (critic) until publication quality threshold is reached.
+alwaysApply: false
+---
+
+# Skill: science-judge
+
+This is Cursor's native rule adapter for the Claude `science-judge` skill. Its full procedure is
+the **single source of truth** at `~/.claude/skills/science-judge/SKILL.md` in this repo (DRY — no copy is kept here).
+
+## When To Use
+
+Use when the user names `science-judge` or asks for work matching the rule description.
+
+## Workflow
+
+Read `~/.claude/skills/science-judge/SKILL.md` when the task is non-trivial. Follow the skill's intent while using
+Cursor-native tools and the current repository context. Treat Claude-specific syntax as source
+material to translate, not commands to copy blindly.
+
+## Safety Constraints
+
+Default to read-only review for external-agent calls. Do not expose secrets or credentials. Do not
+apply child-agent changes automatically. Verify with source evidence, tests, lint, type checks, or
+official documentation where relevant. Consensus is not correctness.

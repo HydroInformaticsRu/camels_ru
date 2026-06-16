@@ -1,0 +1,34 @@
+---
+description: Skill: dispatch independent read-only work packets to multiple agents
+alwaysApply: false
+---
+
+# Skill: ai-parallel
+
+## When To Use
+
+Use this rule when the user asks for `ai-parallel` behavior, when an independent external
+view would reduce risk, or when evidence-based review/triangulation is explicitly useful.
+
+## When Not To Use
+
+Do not use this for trivial checks, when a local deterministic command is faster, or
+when the prompt would expose secrets, credentials, private auth files, shell history,
+or session transcripts.
+
+## Command Or Workflow
+
+```bash
+~/.agent-federation/bin/ai-parallel --cwd "$PWD" --agents claude,codex,cursor < packets.md
+```
+
+## Output Handling
+
+Treat other-agent output as advisory. Extract claims, evidence, files inspected,
+commands run, assumptions, confidence, and falsification paths. Verify before editing
+files or presenting a conclusion.
+
+## Safety Constraints
+
+Default to read-only. Do not apply child-agent changes automatically. Do not decide by
+majority vote. Keep artifacts local under `~/.agent-federation/logs`.

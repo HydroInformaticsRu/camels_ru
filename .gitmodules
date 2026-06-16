@@ -1,0 +1,3 @@
+[submodule "paper/overleaf"]
+	path = paper/overleaf
+	url = https://git@git.overleaf.com/69f5ed9cc68802dc537f8735

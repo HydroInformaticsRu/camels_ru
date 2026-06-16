@@ -1,0 +1,36 @@
+---
+description: Truth triangulation protocol
+alwaysApply: true
+---
+
+# Truth Triangulation
+
+Truth Triangulation Protocol:
+- Use multiple agents for difficult, ambiguous, high-risk, or stale-knowledge tasks.
+- Each agent must reason independently before seeing other agents' answers.
+- Each agent must return:
+  - answer
+  - evidence
+  - files inspected
+  - commands run
+  - assumptions
+  - possible failure modes
+  - confidence
+  - how to falsify the answer
+- The parent agent must compare answers by evidence quality, not model identity.
+- Agreement increases confidence only when agents used independent evidence.
+- Disagreement is useful and must be preserved until resolved.
+- Resolve claims in this order:
+  1. deterministic tests or reproduction
+  2. source code inspection
+  3. official documentation
+  4. primary-source data
+  5. high-quality secondary sources
+  6. model judgment
+- Never conclude that a claim is true only because two models agree.
+- The final synthesis must say:
+  - what is known
+  - what is likely
+  - what is uncertain
+  - what was disproven
+  - what should be tested next

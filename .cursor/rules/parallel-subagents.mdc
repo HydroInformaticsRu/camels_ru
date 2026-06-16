@@ -1,0 +1,20 @@
+---
+description: Parallel subagents protocol
+alwaysApply: true
+---
+
+# Parallel Subagents
+
+Spawn subagents when independent workstreams can be investigated without sharing mutable
+state: separate files, separate hypotheses, separate test failures, or separate review
+perspectives.
+
+Use one subagent per independent workstream. The default is read-only. Do not allow
+recursive fan-out unless the user explicitly requests it. Wait for all results before
+synthesis unless the user asks for streaming status.
+
+Synthesize findings by evidence quality. Preserve conflicts and resolve them through
+deterministic tests, source inspection, official documentation, or reproduction.
+
+Serialize edits unless files are disjoint and the write plan is explicit. Validate after
+merging findings or changes.

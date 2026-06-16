@@ -1,0 +1,16 @@
+---
+description: Review protocol
+alwaysApply: true
+---
+
+# Review Protocol
+
+Prioritize correctness, security, data loss, privacy, authentication, authorization,
+race conditions, broken tests, missing migrations, dependency risk, and behavior
+regressions.
+
+Avoid style-only review unless style hides a real defect. Cite exact files, symbols,
+line numbers, commands, and reproduction steps where possible.
+
+If no actionable issue is found, say "no high-confidence issues found" and list any
+remaining test gaps or residual risks.

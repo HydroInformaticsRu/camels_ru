@@ -59,10 +59,9 @@ htmlcov/
 .pixi/*
 !.pixi/config.toml
 
-# LaTeX source (kept locally; Overleaf clone is the active manuscript artifact)
+# Legacy generated LaTeX snapshot (kept locally, not tracked)
 paper/latex/
-paper/overleaf
-paper/overleaf/
+# paper/overleaf is a git submodule (the Overleaf manuscript), tracked via .gitmodules
 
 # Legacy LaTeX path (old structure, fully removed)
 paper/LaTeX/
@@ -78,9 +77,13 @@ paper/paper_v2/
 .tmp/
 
 # Claude Code / AI agent config
-.claude/
-CLAUDE.md
+# Track shared agent config (skills, project settings, CLAUDE.md); keep local-only state out.
+.claude/*
+!.claude/skills/
+!.claude/settings.json
 CLAUDE.local.md
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
 
 # QGIS
 *.qgz
