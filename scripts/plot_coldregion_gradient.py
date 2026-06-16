@@ -223,7 +223,25 @@ def main() -> None:
 
     fig.tight_layout()
     RESULTS.mkdir(parents=True, exist_ok=True)
-    bm.assign(panel="A_bfi_vs_permafrost").to_csv(RESULTS / "coldregion_gradient_bins.csv", index=False)
+    # Provenance: panel-A permafrost-BFI medians + panel-C snow->AET>PET rates (the §5 ~30-65% bridge).
+    prov = [bm.assign(panel="A_bfi_vs_permafrost")]
+    if df["aet_wb_gt_pet"].notna().any():
+        srate = df.groupby(pd.cut(snow, bins=s_edges, include_lowest=True), observed=True)[
+            "aet_wb_gt_pet"
+        ].agg(["mean", "count"])
+        prov.append(
+            pd.DataFrame(
+                {
+                    "center": [iv.mid for iv in srate.index],
+                    "median": srate["mean"].to_numpy() * 100.0,
+                    "q25": np.nan,
+                    "q75": np.nan,
+                    "n": srate["count"].to_numpy(),
+                    "panel": "C_aetpet_pct_vs_snow",
+                }
+            )
+        )
+    pd.concat(prov, ignore_index=True).to_csv(RESULTS / "coldregion_gradient_bins.csv", index=False)
     for d in IMG_DIRS:
         d.mkdir(parents=True, exist_ok=True)
         fig.savefig(d / "fig_coldregion_gradient.png", bbox_inches="tight")

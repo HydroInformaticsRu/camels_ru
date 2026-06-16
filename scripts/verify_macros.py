@@ -158,6 +158,7 @@ def report_drift_summary() -> None:
 def main() -> None:
     """Run all macro consistency checks against the release bundle."""
     section("COUNTS")
+    macros = parse_macros()
 
     attrs = pd.read_csv(RELEASE / "camels_ru_attributes.csv")
     gauge_summary = pd.read_csv(RELEASE / "camels_ru_gauge_summary.csv")
@@ -304,12 +305,7 @@ def main() -> None:
     aep = boundaries["area_diff_perc"].dropna().abs()
     n_ref = len(aep)
     aep_trim = aep[aep <= 100]
-    kv(
-        "n_with_reference (of 3,353)",
-        "3,011",
-        f"{n_ref}",
-        match=n_ref == 3011,
-    )
+    check_macro(macros, "nwithreference", n_ref, "{:.0f}")
     kv(
         "meanerror (|err|<=100% trim mean)",
         "5.1%",
@@ -500,7 +496,6 @@ def main() -> None:
             gb = tarball.stat().st_size / 1024**3
             print(f"  {tarball.name}: {gb:.2f} GB gzipped")
 
-    macros = parse_macros()
     check_aet_macros(macros)
     check_coldregion_macros(macros)
 

@@ -47,6 +47,7 @@ results/hess_quality/*
 # regenerable without the external drive) so the macro lock runs on a fresh clone.
 !results/hess_quality/budyko_aet_table.csv
 !results/hess_quality/coldregion_robustness_verdict.txt
+!results/hess_quality/coldregion_gradient_bins.csv
 
 # Virtual environments
 .venv/
