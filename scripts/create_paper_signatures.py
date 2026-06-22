@@ -190,7 +190,9 @@ def main() -> None:
     parser.add_argument(
         "--precip-dir",
         type=Path,
-        default=Path("data/CAMELS_RU/parsed_meteo/era5_land"),
+        # Full ERA5-Land source (2007-2024). The previous default
+        # data/CAMELS_RU/parsed_meteo/era5_land was a STALE copy truncated at 2018-02.
+        default=Path("data/Russia/MeteoData/CamelsRU/era5_land"),
     )
     parser.add_argument("--era5-col", default="prcp")
     parser.add_argument(

@@ -45,7 +45,9 @@ DATA = ROOT / "data"
 OUT_DIR = ROOT / "results" / "hess_quality"
 
 PRODUCTS: dict[str, tuple[str, str]] = {
-    "ERA5-Land": ("data/CAMELS_RU/parsed_meteo/era5_land", "prcp"),
+    # Full ERA5-Land source (2007-2024); the old data/CAMELS_RU/parsed_meteo/era5_land
+    # copy was STALE (truncated at 2018-02).
+    "ERA5-Land": ("data/Russia/MeteoData/CamelsRU/era5_land", "prcp"),
     "MSWEP": ("data/CAMELS_RU/parsed_meteo/mswep", "precipitation"),
     "GPCP": ("data/CAMELS_RU/parsed_meteo/gpcp", "precip"),
 }
@@ -55,7 +57,9 @@ AET_COL = "actual_evaporation"
 DAM_PROXY_COL = "dor_pc_pva"
 
 REQUIRED_SOURCE_DIRS = [
-    "data/CAMELS_RU/parsed_meteo/era5_land",
+    # Full ERA5-Land source (2007-2024); the old data/CAMELS_RU/parsed_meteo/era5_land
+    # copy was STALE (truncated at 2018-02).
+    "data/Russia/MeteoData/CamelsRU/era5_land",
     "data/CAMELS_RU/parsed_meteo/mswep",
     "data/CAMELS_RU/parsed_meteo/gpcp",
     "data/CAMELS_RU/parsed_meteo/gleam",
@@ -578,9 +582,7 @@ def _find_gauge_id_column(columns: list[str] | pd.Index, source: str) -> str:
             raise KeyError(f"Ambiguous gauge identifier columns for {source}: {best}")
         return best[0]
     gauge_like = [col for col in fields if "gauge" in col.casefold()]
-    raise KeyError(
-        f"No gauge identifier column found for {source}; gauge-like fields: {gauge_like}"
-    )
+    raise KeyError(f"No gauge identifier column found for {source}; gauge-like fields: {gauge_like}")
 
 
 def _gauge_ids_from_frame(frame: pd.DataFrame | gpd.GeoDataFrame, source: str) -> tuple[pd.Series, str]:
@@ -663,12 +665,7 @@ def _build_gauge_id_length_audit(
     summary.to_csv(out_dir / "gauge_id_length_summary.csv", index=False)
 
     all_long_ids = sorted(
-        {
-            gauge_id
-            for ids in sources.values()
-            for gauge_id in ids.astype(str)
-            if len(gauge_id) >= 7
-        }
+        {gauge_id for ids in sources.values() for gauge_id in ids.astype(str) if len(gauge_id) >= 7}
     )
     long_df = pd.DataFrame({"gauge_id": all_long_ids})
     long_df["gauge_id_length"] = long_df["gauge_id"].str.len()
@@ -1092,12 +1089,9 @@ def _build_dam_excluded_analytics(
             {
                 "topic": "dam_excluded_broad_signatures",
                 "question": (
-                    "Do headline hydrological signatures change when regulated gauges "
-                    "are excluded?"
+                    "Do headline hydrological signatures change when regulated gauges are excluded?"
                 ),
-                "data_used": (
-                    "camels_ru_signatures.csv + camels_ru_attributes.csv dor_pc_pva"
-                ),
+                "data_used": ("camels_ru_signatures.csv + camels_ru_attributes.csv dor_pc_pva"),
                 "output": (
                     "dam_filter_summary.csv; dam_excluded_signature_summary.csv; "
                     "dam_excluded_gauge_ids.csv"
@@ -1111,12 +1105,9 @@ def _build_dam_excluded_analytics(
             {
                 "topic": "cold_region_representativeness",
                 "question": (
-                    "How much of the dam-excluded broad subset samples "
-                    "snow/permafrost gradients?"
+                    "How much of the dam-excluded broad subset samples snow/permafrost gradients?"
                 ),
-                "data_used": (
-                    "HydroATLAS snw_pc_uyr, prm_pc_use, tmp_dc_uyr merged to signatures"
-                ),
+                "data_used": ("HydroATLAS snw_pc_uyr, prm_pc_use, tmp_dc_uyr merged to signatures"),
                 "output": "dam_excluded_signature_summary.csv",
                 "status": "performed_as_proxy_summary",
                 "manuscript_use": (
@@ -1132,13 +1123,11 @@ def _build_dam_excluded_analytics(
                 ),
                 "data_used": "existing meteo folders + discharge.nc + GLEAM PET/AET",
                 "output": (
-                    "budyko_aet_table.csv; budyko_per_gauge_product.csv; "
-                    "aet_per_gauge_product.csv"
+                    "budyko_aet_table.csv; budyko_per_gauge_product.csv; aet_per_gauge_product.csv"
                 ),
                 "status": "performed_in_hess_quality_audit",
                 "manuscript_use": (
-                    "Central HESS science spine: forcing choice controls apparent "
-                    "water-balance realism."
+                    "Central HESS science spine: forcing choice controls apparent water-balance realism."
                 ),
             },
             {
@@ -1148,14 +1137,12 @@ def _build_dam_excluded_analytics(
                     "intermediate processing artefacts?"
                 ),
                 "data_used": (
-                    "intermediate signature/map processing outputs, not fully captured "
-                    "by release CSVs"
+                    "intermediate signature/map processing outputs, not fully captured by release CSVs"
                 ),
                 "output": strict_topic_output,
                 "status": strict_topic_status,
                 "manuscript_use": (
-                    "Needed before submission for complete traceability of "
-                    "map/sample-size claims."
+                    "Needed before submission for complete traceability of map/sample-size claims."
                 ),
             },
         ]

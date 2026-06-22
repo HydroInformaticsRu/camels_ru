@@ -96,19 +96,19 @@ def check_aet_macros(macros: dict[str, str]) -> None:
     # In-text hardcoded trios (§5.4, no macro) — gate against the audit table so they cannot drift.
     check_val(
         "in-text energy-viol E/M/G %",
-        "8.0/2.0/3.4",
+        "48.9/2.0/3.4",
         f"{era5['energy_violation_pct']:.1f}/"
         f"{mswep['energy_violation_pct']:.1f}/{gpcp['energy_violation_pct']:.1f}",
     )
     check_val(
         "in-text aridity median E/M/G",
-        "0.92/1.02/0.92",
+        "0.71/1.02/0.92",
         f"{era5['median_aridity_index']:.2f}/"
         f"{mswep['median_aridity_index']:.2f}/{gpcp['median_aridity_index']:.2f}",
     )
     check_val(
         "in-text evaporative median E/M/G",
-        "0.65/0.61/0.66",
+        "0.74/0.61/0.66",
         f"{era5['median_evaporative_index']:.2f}/"
         f"{mswep['median_evaporative_index']:.2f}/{gpcp['median_evaporative_index']:.2f}",
     )
@@ -374,9 +374,9 @@ def main() -> None:
     )
     kv(
         "nwaterbaldamfree",
-        "1,763",
+        "1,799",
         f"{int(water_balance_dam_free.sum()):,}",
-        match=int(water_balance_dam_free.sum()) == 1763,
+        match=int(water_balance_dam_free.sum()) == 1799,
     )
     kv(
         "nhalfflowdamfree",
@@ -386,7 +386,7 @@ def main() -> None:
     )
     median_expectations = {
         "mediandamfreedischarge": ("q_mean", 0.697, "{:.3f}"),
-        "mediandamfreerunoffratio": ("runoff_ratio", 0.344, "{:.3f}"),
+        "mediandamfreerunoffratio": ("runoff_ratio", 0.258, "{:.3f}"),
         "mediandamfreebaseflowindex": ("baseflow_index", 0.555, "{:.3f}"),
         "mediandamfreefdcslope": ("fdc_slope", 2.370, "{:.3f}"),
         "mediandamfreehalfflowday": ("half_flow_date", 214.0, "{:.0f}"),

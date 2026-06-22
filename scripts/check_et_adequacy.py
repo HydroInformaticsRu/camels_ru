@@ -29,7 +29,9 @@ from src.utils.logger import setup_logger  # noqa: E402
 log = setup_logger("ETAdequacy", log_file="logs/et_adequacy.log")
 
 PRODUCTS = {
-    "ERA5-Land": (ROOT / "data/CAMELS_RU/parsed_meteo/era5_land", "prcp"),
+    # Full ERA5-Land source (2007-2024); the old data/CAMELS_RU/parsed_meteo/era5_land
+    # copy was STALE (truncated at 2018-02).
+    "ERA5-Land": (ROOT / "data/Russia/MeteoData/CamelsRU/era5_land", "prcp"),
     "MSWEP": (ROOT / "data/CAMELS_RU/parsed_meteo/mswep", "precipitation"),
     "GPCP": (ROOT / "data/CAMELS_RU/parsed_meteo/gpcp", "precip"),
 }

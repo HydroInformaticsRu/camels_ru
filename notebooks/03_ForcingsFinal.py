@@ -57,7 +57,9 @@ plt.rcParams.update(
 PROJECT_ROOT = Path(__file__).parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "CAMELS_RU"
 METEO_DIR = DATA_DIR / "parsed_meteo"
-ERA5_DIR = METEO_DIR / "era5_land"
+# Full ERA5-Land source (2007-2024); METEO_DIR/era5_land was a STALE copy
+# truncated at 2018-02. MSWEP/GPCP under METEO_DIR are current and unchanged.
+ERA5_DIR = PROJECT_ROOT / "data" / "Russia" / "MeteoData" / "CamelsRU" / "era5_land"
 MSWEP_DIR = METEO_DIR / "mswep"
 GPCP_DIR = METEO_DIR / "gpcp"
 COMPOUND_DIR = DATA_DIR / "HydroData" / "Compound"
@@ -120,9 +122,7 @@ release_scope = paper_analysis_scope_summary(gauge_gdf.index)
 gauge_gdf = filter_paper_analysis_index(gauge_gdf)
 ws_gdf = filter_paper_analysis_index(ws_gdf)
 
-print(
-    f"Loaded {release_scope.n_total} release gauge locations, {len(ws_gdf)} paper-analysis watersheds"
-)
+print(f"Loaded {release_scope.n_total} release gauge locations, {len(ws_gdf)} paper-analysis watersheds")
 print(
     "Paper-analysis gauge-ID scope: "
     f"include {release_scope.n_included}, exclude {release_scope.n_excluded} "

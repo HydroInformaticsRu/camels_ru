@@ -45,7 +45,9 @@ log = setup_logger("BudykoFigure", log_file="logs/budyko_figure.log")
 ROOT = Path(__file__).parent.parent
 
 PRODUCTS = {
-    "ERA5-Land": {"dir": ROOT / "data/CAMELS_RU/parsed_meteo/era5_land", "col": "prcp"},
+    # Full ERA5-Land source (2007-2024); the old data/CAMELS_RU/parsed_meteo/era5_land
+    # copy was STALE (truncated at 2018-02).
+    "ERA5-Land": {"dir": ROOT / "data/Russia/MeteoData/CamelsRU/era5_land", "col": "prcp"},
     "MSWEP": {"dir": ROOT / "data/CAMELS_RU/parsed_meteo/mswep", "col": "precipitation"},
     "GPCP": {"dir": ROOT / "data/CAMELS_RU/parsed_meteo/gpcp", "col": "precip"},
 }
