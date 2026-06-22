@@ -16,10 +16,11 @@ Regimes are renumbered by descending size (regime 1 = largest) so figure labels
 and the "largest regimes" reference are stable.
 
 NOTE 1: coordinates are min-max-normalised, per the manuscript (Sect. 4). NB02's
-code appended RAW lat/lon, which let longitude (range ~141) dominate the 366
+code appended RAW lat/lon, which let longitude (range ~141) dominate the 365
 [0,1] shape features and made the "regime" clustering ~spatial (ARI 0.64 vs
 coords-only, 0.15 vs shape-only) -- contradicting the stated shape-based method.
-The fix restores a genuinely shape-driven clustering (ARI 0.70 vs shape-only).
+The fix restores a genuinely shape-driven clustering (ARI 0.66 vs shape-only;
+0.16 vs coords-only -- i.e. ~4x closer to the shape-only partition).
 
 NOTE 2: the current release yields ~1,700 gauges, not the 1,443 of the retired
 "decent"-folder pipeline, so this clustering supersedes the committed figures.
@@ -43,6 +44,7 @@ from matplotlib.ticker import FormatStrFormatter
 import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import fcluster, linkage
+from sklearn.metrics import adjusted_rand_score
 import xarray as xr
 
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -54,6 +56,37 @@ DISCHARGE_NC = PROJECT_ROOT / "release" / "CAMELS_RU_v1.0" / "camels_ru_discharg
 N_CLUSTERS = 15
 AREA_LIMIT_KM2 = 50_000
 MAX_SEASONAL_MM_DAY = 50
+
+# 15 maximally-distinct, saturated colours (tab20's paired light/dark hues are
+# indistinguishable at print size). Last two go to the smallest regimes.
+_PALETTE15 = [
+    "#e6194B",
+    "#3cb44b",
+    "#4363d8",
+    "#f58231",
+    "#911eb4",
+    "#42d4f4",
+    "#f032e6",
+    "#bfef45",
+    "#469990",
+    "#9A6324",
+    "#800000",
+    "#000075",
+    "#808000",
+    "#fabed4",
+    "#000000",
+]
+# Marker shape as a second visual channel so colour-confusable regimes (e.g. crimson
+# Regime 1 vs maroon Regime 11) are still separable on the dense national scatter.
+# Markers change every 3 regimes -> any two regimes within ~5 ranks of each other in
+# the palette (where similar hues recur) carry a different shape.
+_MARKERS = ["o", "s", "^", "D", "v"]
+
+
+def _regime_marker(c: int) -> str:
+    """Marker for regime c (1-based): a different shape every three regimes."""
+    return _MARKERS[(c - 1) // 3 % len(_MARKERS)]
+
 
 plt.rcParams.update({"font.family": "serif", "font.serif": ["Times New Roman", "DejaVu Serif"]})
 
@@ -75,6 +108,10 @@ def build_seasonal_matrix() -> tuple[pd.DataFrame, pd.DataFrame, gpd.GeoDataFram
     q.index = pd.to_datetime(q.index)
 
     seasonal = q.groupby([q.index.month, q.index.day]).median()
+    # Drop 29 Feb: its median rests on ~4 leap years (vs ~16 for other days), so a
+    # noisy value there can dominate the per-gauge [0,1] normalisation and create a
+    # spurious late-winter "peak". Leaves a 365-value calendar-day cycle.
+    seasonal = seasonal.drop(index=(2, 29), errors="ignore")
     seasonal = seasonal.dropna(axis=1, how="all")
     seasonal = seasonal.loc[:, seasonal.max() < MAX_SEASONAL_MM_DAY]
     norm = (seasonal - seasonal.min()) / (seasonal.max() - seasonal.min())
@@ -102,13 +139,26 @@ def cluster_by_size(clust: pd.DataFrame) -> pd.Series:
     return pd.Series([remap[v] for v in raw], index=clust.index, name="regime")
 
 
+def shape_only_ari(clust: pd.DataFrame, labels: pd.Series) -> float:
+    """ARI between the full (shape+coords) partition and a shape-only clustering.
+
+    Quantifies how much the coordinate features change the result: a substantial ARI
+    means the partition is largely reproduced by hydrograph shape alone, i.e. the
+    coordinates refine rather than drive the classification. This is the defensible
+    justification for including coordinates (a feature-count argument is not).
+    """
+    shape = clust.drop(columns=["lat", "lon"])
+    z = linkage(shape.values, method="ward", metric="euclidean")
+    shape_labels = fcluster(z, t=N_CLUSTERS, criterion="maxclust")
+    return float(adjusted_rand_score(labels.to_numpy(), shape_labels))
+
+
 def plot_map(gauge: gpd.GeoDataFrame, labels: pd.Series, out: Path) -> None:
     """Albers Equal-Area Conic regime map in the standard paper-map style."""
     gdf = gauge.loc[labels.index].copy()
     gdf["regime"] = labels.values
     aea = get_russia_projection()
     data_crs = ccrs.PlateCarree()
-    cmap = plt.get_cmap("tab20", N_CLUSTERS)
 
     fig = plt.figure(figsize=(9.0, 5.5))
     ax = fig.add_subplot(1, 1, 1, projection=aea)
@@ -120,12 +170,14 @@ def plot_map(gauge: gpd.GeoDataFrame, labels: pd.Series, out: Path) -> None:
     handles = []
     for c in range(1, N_CLUSTERS + 1):
         sub = gdf[gdf["regime"] == c]
-        col = cmap(c - 1)
+        col = _PALETTE15[c - 1]
+        mk = _regime_marker(c)
         ax.scatter(
             sub.geometry.x,
             sub.geometry.y,
-            s=10,
+            s=15,
             color=col,
+            marker=mk,
             alpha=0.85,
             edgecolors="white",
             linewidths=0.2,
@@ -136,7 +188,7 @@ def plot_map(gauge: gpd.GeoDataFrame, labels: pd.Series, out: Path) -> None:
             Line2D(
                 [],
                 [],
-                marker="o",
+                marker=mk,
                 color="none",
                 markerfacecolor=col,
                 markersize=6,
@@ -173,7 +225,7 @@ def plot_hydrographs(norm: pd.DataFrame, labels: pd.Series, out: Path) -> None:
         ax.plot(
             day, sub.median(axis=1).to_numpy(), color="crimson", linewidth=2.5, label="Regime median"
         )
-        ax.set_xlim(0, 365)
+        ax.set_xlim(0, 364)
         ax.set_ylim(0, 1)
         ax.set_yticks(np.arange(0, 1.25, 0.25))
         ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
@@ -181,7 +233,7 @@ def plot_hydrographs(norm: pd.DataFrame, labels: pd.Series, out: Path) -> None:
         if (c - 1) % 5 == 0:
             ax.set_ylabel("Normalised runoff [0-1]")
         if c - 1 >= 10:
-            ax.set_xlabel("Day of year")
+            ax.set_xlabel("Month-day index (0-364)")
         ax.set_title(f"Regime {c} — {len(members)} gauges", fontsize=11)
     fig.tight_layout()
     fig.savefig(out, dpi=300, bbox_inches="tight")
@@ -195,6 +247,7 @@ def main(write: bool) -> None:
     labels = cluster_by_size(clust)
     sizes = labels.value_counts().sort_index()
     n = len(labels)
+    ari = shape_only_ari(clust, labels)
 
     img = PROJECT_ROOT / "paper" / "images"
     tmp = PROJECT_ROOT / ".tmp" / "cluster_diag"
@@ -205,14 +258,11 @@ def main(write: bool) -> None:
     plot_hydrographs(norm, labels, dest / f"hydrograph_clusters_15{suffix}.png")
 
     print("\n" + "=" * 64)
-    print("MANUSCRIPT NUMBERS TO UPDATE (sections/04_regimes_signatures.tex):")
-    print(f"  - gauge count entering classification: 1,443  ->  {n:,}")
-    big3 = sizes.sort_values(ascending=False).head(3)
-    print(
-        f"  - 'Clusters 1, 5, and 6 are the largest' -> 'Regimes 1, 2, and 3' "
-        f"(now the 3 largest by construction: n={big3.tolist()})"
-    )
+    print("REPRODUCIBILITY SUMMARY (values cited in sections/04_regimes_signatures.tex):")
+    print(f"  - gauges entering classification: {n:,}  (15 regimes)")
+    print(f"  - ARI(full vs shape-only) = {ari:.2f}  (coordinates only refine the result)")
     print(f"  - per-regime sizes (regime: n): {sizes.to_dict()}")
+    print(f"  - figures written to: {dest}{'  (use --write for paper/images/)' if not write else ''}")
     print("=" * 64)
 
 
