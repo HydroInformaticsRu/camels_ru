@@ -286,6 +286,28 @@ def aggregate_large_watershed(
     return xr.Dataset(aggregated_vars)
 
 
+def _weights_match_grid(weights: xr.DataArray, ds_extent: xr.Dataset) -> bool:
+    """True if cached ``weights`` share ``ds_extent``'s lat/lon grid.
+
+    The weight cache is keyed by gauge_id + grid_resolution only, so a cached
+    file built against a different ERA5-Land grid (e.g. wider 2023 tiles) would
+    otherwise be reused and silently misalign in ``ds_extent.where(weights > 0)``
+    -> all-NaN. Validate the actual coordinates, not just presence.
+    """
+    try:
+        if (
+            weights.sizes.get("lat") != ds_extent.sizes["lat"]
+            or weights.sizes.get("lon") != ds_extent.sizes["lon"]
+        ):
+            return False
+        return bool(
+            np.allclose(weights.lat.values, ds_extent.lat.values, atol=1e-6)
+            and np.allclose(weights.lon.values, ds_extent.lon.values, atol=1e-6)
+        )
+    except (KeyError, AttributeError, ValueError):
+        return False
+
+
 def _get_or_compute_weights(
     cache_dir: Path | None,
     gauge_id: str,
@@ -306,8 +328,14 @@ def _get_or_compute_weights(
     weight_path.parent.mkdir(parents=True, exist_ok=True)
 
     if weight_path.exists():
-        logger.debug(f"Loading cached weights: {weight_path}")
-        return xr.open_dataarray(weight_path)
+        with xr.open_dataarray(weight_path) as cached:
+            if _weights_match_grid(cached, ds_extent):
+                logger.debug(f"Loading cached weights: {weight_path}")
+                return cached.load()
+        logger.warning(
+            f"Cached weights for gauge {gauge_id} do not match the current grid "
+            f"extent; recomputing (stale cache from a different ERA5-Land grid)."
+        )
 
     weights = compute_fractional_weights(
         watershed_geom,

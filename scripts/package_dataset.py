@@ -203,6 +203,21 @@ def _load_forcing_notes() -> dict[str, str]:
         return json.load(fh)
 
 
+def _select_era5_temp_file(gid: str, forcing_notes: dict[str, str]) -> Path:
+    """Pick the ERA5-Land temperature CSV for a gauge by fill provenance.
+
+    Returns the gap-filled CSV only when the gauge is listed in
+    ``forcing_notes`` (the authoritative fill record written by
+    ``scripts/fill_meteo_gaps.py``). Selecting by bare file existence would
+    ship a stale climatology-filled CSV left behind from an earlier run while
+    the notes -- and the per-gauge provenance shown to users -- say no fill
+    was applied. This deliberately does not consult the filesystem.
+    """
+    if gid in forcing_notes:
+        return ERA5_FILLED_DIR / f"{gid}.csv"
+    return ERA5_DIR / f"{gid}.csv"
+
+
 def _read_gauge_series(path: Path, col: str, dates: pd.DatetimeIndex) -> np.ndarray | None:
     """Read one daily column from a per-gauge forcing CSV, reindexed to ``dates``.
 
@@ -268,10 +283,9 @@ def package_forcing() -> dict[str, str]:
         if s is not None:
             precip_gpcp[i] = s
 
-        # ERA5-Land temperature — prefer filled CSV if the gauge had gaps.
-        era5_file = ERA5_FILLED_DIR / f"{gid}.csv"
-        if not era5_file.exists():
-            era5_file = ERA5_DIR / f"{gid}.csv"
+        # ERA5-Land temperature — use the filled CSV only for gauges the fill
+        # record (forcing_notes) actually lists, never by bare file existence.
+        era5_file = _select_era5_temp_file(gid, forcing_notes)
         for var, arr in (("t_mean", t_mean), ("t_min", t_min), ("t_max", t_max)):
             s = _read_gauge_series(era5_file, var, dates)
             if s is not None:

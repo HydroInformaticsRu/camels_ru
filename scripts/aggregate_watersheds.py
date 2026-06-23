@@ -93,17 +93,22 @@ def _file_month(nc_file: Path) -> set[tuple[int, int]]:
 
 
 def detect_covered_months(output_dir: Path, n_samples: int = 5) -> set[tuple[int, int]]:
-    """Detect which (year, month) pairs are already fully covered in output CSVs.
+    """Detect which (year, month) pairs already hold real data in output CSVs.
 
     Samples a few gauge CSVs and returns the intersection of their covered months,
     ensuring we only skip files that were completed for ALL gauges.
+
+    A month counts as covered only if it carries at least one non-NaN data value.
+    Reading only the ``date`` column would treat a present-but-all-NaN month (the
+    result of a broken aggregation, e.g. the 2023 stale-weight-cache failure) as
+    "covered", so a ``--resume`` run would silently skip re-aggregating it.
 
     Args:
         output_dir: Directory containing per-gauge CSV files.
         n_samples: Number of gauge CSVs to sample for coverage check.
 
     Returns:
-        Set of (year, month) tuples that are fully covered.
+        Set of (year, month) tuples that hold real data in every sampled gauge.
     """
     import pandas as pd
 
@@ -118,8 +123,11 @@ def detect_covered_months(output_dir: Path, n_samples: int = 5) -> set[tuple[int
     month_sets: list[set[tuple[int, int]]] = []
     for csv_path in sampled:
         try:
-            df = pd.read_csv(csv_path, index_col="date", parse_dates=True, usecols=["date"])
-            months = {(dt.year, dt.month) for dt in df.index}
+            df = pd.read_csv(csv_path, index_col="date", parse_dates=True)
+            # Drop rows whose every data column is NaN: a present-but-all-NaN
+            # month is NOT covered (re-aggregation must still run for it).
+            valid = df.dropna(how="all")
+            months = {(dt.year, dt.month) for dt in valid.index}
             month_sets.append(months)
         except Exception:
             continue
@@ -127,7 +135,7 @@ def detect_covered_months(output_dir: Path, n_samples: int = 5) -> set[tuple[int
     if not month_sets:
         return set()
 
-    # Intersection: only months present in ALL sampled gauges
+    # Intersection: only months with real data in ALL sampled gauges
     return set.intersection(*month_sets)
 
 
