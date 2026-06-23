@@ -37,8 +37,13 @@ LEVEL_GTS_DIR = DATA_DIR / "HydroData" / "LevelGTS"
 # because it is produced by a pipeline that serves multiple projects.
 ERA5_DIR = PROJECT_ROOT / "data" / "Russia" / "MeteoData" / "CamelsRU" / "era5_land"
 ERA5_FILLED_DIR = PROJECT_ROOT / "data" / "Russia" / "MeteoData" / "CamelsRU" / "era5_land_filled"
+# Corrected, de-accumulated ERA5-Land total precipitation (col "prcp"); the
+# authoritative source used to recompute the Sect. 5 forcing numbers. Shipped
+# as the precip_era5 intercomparison variable (MSWEP remains primary).
+ERA5_TP_DIR = PROJECT_ROOT / "data" / "Russia" / "MeteoData" / "CamelsRU" / "era5land_tp_new"
 MSWEP_DIR = DATA_DIR / "parsed_meteo" / "mswep"
 GLEAM_DIR = DATA_DIR / "parsed_meteo" / "gleam"
+GPCP_DIR = DATA_DIR / "parsed_meteo" / "gpcp"  # GPCP v3.3 (col "precip"); intercomparison variable
 ATTRS_FILE = DATA_DIR / "attributes" / "hydro_atlas_cis_camels.csv"
 
 PERIOD_START = "2008-01-01"
@@ -172,6 +177,20 @@ def _load_forcing_notes() -> dict[str, str]:
         return json.load(fh)
 
 
+def _read_gauge_series(path: Path, col: str, dates: pd.DatetimeIndex) -> np.ndarray | None:
+    """Read one daily column from a per-gauge forcing CSV, reindexed to ``dates``.
+
+    Returns a float32 array aligned to ``dates`` (NaN where the source has no
+    value for a date) or ``None`` when the file or column is absent.
+    """
+    if not path.exists():
+        return None
+    df = pd.read_csv(path, index_col="date", parse_dates=True)
+    if col not in df.columns:
+        return None
+    return df[col].reindex(dates).to_numpy(dtype=np.float32)
+
+
 def package_forcing() -> dict[str, str]:
     """Build meteorological forcing NetCDF.
 
@@ -197,47 +216,45 @@ def package_forcing() -> dict[str, str]:
         f"(from {ERA5_FILLED_DIR.name}/)"
     )
 
-    # Variables: MSWEP precip, ERA5-Land temp (mean, min, max), PET
+    # Variables: MSWEP precip (primary) + ERA5-Land/GPCP precip (intercomparison),
+    # ERA5-Land temp (mean, min, max), PET
     precip = np.full((n_gauges, n_dates), np.nan, dtype=np.float32)
+    precip_era5 = np.full((n_gauges, n_dates), np.nan, dtype=np.float32)
+    precip_gpcp = np.full((n_gauges, n_dates), np.nan, dtype=np.float32)
     t_mean = np.full((n_gauges, n_dates), np.nan, dtype=np.float32)
     t_min = np.full((n_gauges, n_dates), np.nan, dtype=np.float32)
     t_max = np.full((n_gauges, n_dates), np.nan, dtype=np.float32)
     pet = np.full((n_gauges, n_dates), np.nan, dtype=np.float32)
 
     for i, gid in enumerate(ws_ids):
-        # MSWEP precipitation
-        mswep_file = MSWEP_DIR / f"{gid}.csv"
-        if mswep_file.exists():
-            df = pd.read_csv(mswep_file, index_col="date", parse_dates=True)
-            if "precipitation" in df.columns:
-                sub = df["precipitation"].reindex(dates)
-                valid = sub.notna()
-                precip[i, valid.values] = sub[valid].values.astype(np.float32)
+        # MSWEP precipitation (primary released forcing)
+        s = _read_gauge_series(MSWEP_DIR / f"{gid}.csv", "precipitation", dates)
+        if s is not None:
+            precip[i] = s
+
+        # ERA5-Land precipitation (corrected, de-accumulated) — intercomparison only
+        s = _read_gauge_series(ERA5_TP_DIR / f"{gid}.csv", "prcp", dates)
+        if s is not None:
+            precip_era5[i] = s
+
+        # GPCP v3.3 precipitation — intercomparison only
+        s = _read_gauge_series(GPCP_DIR / f"{gid}.csv", "precip", dates)
+        if s is not None:
+            precip_gpcp[i] = s
 
         # ERA5-Land temperature — prefer filled CSV if the gauge had gaps.
         era5_file = ERA5_FILLED_DIR / f"{gid}.csv"
         if not era5_file.exists():
             era5_file = ERA5_DIR / f"{gid}.csv"
-        if era5_file.exists():
-            df = pd.read_csv(era5_file, index_col="date", parse_dates=True)
-            for var, arr in [("t_mean", t_mean), ("t_min", t_min), ("t_max", t_max)]:
-                if var in df.columns:
-                    sub = df[var].reindex(dates)
-                    valid = sub.notna()
-                    arr[i, valid.values] = sub[valid].values.astype(np.float32)
+        for var, arr in (("t_mean", t_mean), ("t_min", t_min), ("t_max", t_max)):
+            s = _read_gauge_series(era5_file, var, dates)
+            if s is not None:
+                arr[i] = s
 
         # GLEAM4 potential evaporation
-        gleam_file = GLEAM_DIR / f"{gid}.csv"
-        if gleam_file.exists():
-            df = pd.read_csv(
-                gleam_file,
-                index_col="date",
-                parse_dates=True,
-                usecols=["date", "potential_evaporation"],
-            )
-            sub = df["potential_evaporation"].reindex(dates)
-            valid = sub.notna()
-            pet[i, valid.values] = sub[valid].values.astype(np.float32)
+        s = _read_gauge_series(GLEAM_DIR / f"{gid}.csv", "potential_evaporation", dates)
+        if s is not None:
+            pet[i] = s
 
     ds = xr.Dataset(
         {
@@ -248,6 +265,35 @@ def package_forcing() -> dict[str, str]:
                     "long_name": "Precipitation (MSWEP v2.8)",
                     "units": "mm d-1",
                     "source": "MSWEP v2.8 (Beck et al., 2019)",
+                    "note": "Recommended primary precipitation forcing.",
+                },
+            ),
+            "precip_era5": (
+                ["gauge", "time"],
+                precip_era5,
+                {
+                    "long_name": "Precipitation (ERA5-Land, de-accumulated)",
+                    "units": "mm d-1",
+                    "source": "ERA5-Land (Munoz-Sabater et al., 2021)",
+                    "note": (
+                        "Corrected de-accumulated ERA5-Land total precipitation, "
+                        "provided for forcing intercomparison (manuscript Sect. 5). "
+                        "Not the recommended forcing; use precip_mswep for modelling."
+                    ),
+                },
+            ),
+            "precip_gpcp": (
+                ["gauge", "time"],
+                precip_gpcp,
+                {
+                    "long_name": "Precipitation (GPCP v3.3)",
+                    "units": "mm d-1",
+                    "source": "GPCP v3.3 (NASA MEaSUREs, doi:10.5067/MEASURES/GPCP/DATA307)",
+                    "note": (
+                        "Provided for forcing intercomparison (manuscript Sect. 5). "
+                        "0.5-degree product; coverage is sparser than MSWEP/ERA5-Land. "
+                        "Not the recommended forcing; use precip_mswep for modelling."
+                    ),
                 },
             ),
             "temp_mean": (
@@ -296,6 +342,12 @@ def package_forcing() -> dict[str, str]:
             "title": "CAMELS-RU meteorological forcing",
             "Conventions": "CF-1.8",
             "precip_source": "MSWEP v2.8 (Beck et al., 2019)",
+            "alt_precip_sources": (
+                "precip_era5 = ERA5-Land de-accumulated total precipitation (corrected); "
+                "precip_gpcp = GPCP v3.3. Both are provided for the forcing "
+                "intercomparison of manuscript Sect. 5; precip_mswep (MSWEP v2.8) "
+                "is the recommended primary forcing."
+            ),
             "temp_source": "ERA5-Land (Munoz-Sabater et al., 2021)",
             "pet_source": "GLEAM4 (Miralles et al., 2025)",
             "pet_method": "Modified Priestley-Taylor with evaporative-stress factor (GLEAM4)",

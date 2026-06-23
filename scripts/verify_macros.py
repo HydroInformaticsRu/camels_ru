@@ -96,19 +96,19 @@ def check_aet_macros(macros: dict[str, str]) -> None:
     # In-text hardcoded trios (§5.4, no macro) — gate against the audit table so they cannot drift.
     check_val(
         "in-text energy-viol E/M/G %",
-        "48.9/2.0/3.4",
+        "8.1/2.0/3.4",
         f"{era5['energy_violation_pct']:.1f}/"
         f"{mswep['energy_violation_pct']:.1f}/{gpcp['energy_violation_pct']:.1f}",
     )
     check_val(
         "in-text aridity median E/M/G",
-        "0.71/1.02/0.92",
+        "0.91/1.02/0.92",
         f"{era5['median_aridity_index']:.2f}/"
         f"{mswep['median_aridity_index']:.2f}/{gpcp['median_aridity_index']:.2f}",
     )
     check_val(
         "in-text evaporative median E/M/G",
-        "0.74/0.61/0.66",
+        "0.67/0.61/0.66",
         f"{era5['median_evaporative_index']:.2f}/"
         f"{mswep['median_evaporative_index']:.2f}/{gpcp['median_evaporative_index']:.2f}",
     )
@@ -374,9 +374,9 @@ def main() -> None:
     )
     kv(
         "nwaterbaldamfree",
-        "1,799",
+        "1,800",
         f"{int(water_balance_dam_free.sum()):,}",
-        match=int(water_balance_dam_free.sum()) == 1799,
+        match=int(water_balance_dam_free.sum()) == 1800,
     )
     kv(
         "nhalfflowdamfree",
@@ -386,7 +386,7 @@ def main() -> None:
     )
     median_expectations = {
         "mediandamfreedischarge": ("q_mean", 0.697, "{:.3f}"),
-        "mediandamfreerunoffratio": ("runoff_ratio", 0.258, "{:.3f}"),
+        "mediandamfreerunoffratio": ("runoff_ratio", 0.333, "{:.3f}"),
         "mediandamfreebaseflowindex": ("baseflow_index", 0.555, "{:.3f}"),
         "mediandamfreefdcslope": ("fdc_slope", 2.370, "{:.3f}"),
         "mediandamfreehalfflowday": ("half_flow_date", 214.0, "{:.0f}"),
@@ -405,9 +405,9 @@ def main() -> None:
     section("PAPER-ANALYSIS PRECIPITATION TABLES")
     precip_table = pd.read_csv(PAPER / "tables" / "precip_dataset_comparison.csv")
     expected_precip = {
-        "ERA5-Land": (3201, 827, 268),
+        "ERA5-Land": (3201, 705, 225),
         "MSWEP": (3201, 609, 217),
-        "GPCP": (3201, 644, 200),
+        "GPCP": (3201, 657, 206),
     }
     for _, row in precip_table.iterrows():
         dataset = str(row["Dataset"])
@@ -433,8 +433,8 @@ def main() -> None:
 
     corr_table = pd.read_csv(PAPER / "tables" / "precip_inter_dataset_corr.csv")
     expected_corr = {
-        "ERA5-Land vs MSWEP": (3194, 0.831, 0.838),
-        "ERA5-Land vs GPCP": (3194, 0.574, 0.685),
+        "ERA5-Land vs MSWEP": (3201, 0.915, 0.265),
+        "ERA5-Land vs GPCP": (3201, 0.664, 0.126),
         "MSWEP vs GPCP": (3201, 0.725, -0.138),
     }
     for _, row in corr_table.iterrows():

@@ -45,9 +45,9 @@ log = setup_logger("BudykoFigure", log_file="logs/budyko_figure.log")
 ROOT = Path(__file__).parent.parent
 
 PRODUCTS = {
-    # Full ERA5-Land source (2007-2024); the old data/CAMELS_RU/parsed_meteo/era5_land
-    # copy was STALE (truncated at 2018-02).
-    "ERA5-Land": {"dir": ROOT / "data/Russia/MeteoData/CamelsRU/era5_land", "col": "prcp"},
+    # Corrected de-accumulated ERA5-Land precip; the era5_land copy over-accumulated
+    # tp (~1.5x), inflating basin P.
+    "ERA5-Land": {"dir": ROOT / "data/Russia/MeteoData/CamelsRU/era5land_tp_new", "col": "prcp"},
     "MSWEP": {"dir": ROOT / "data/CAMELS_RU/parsed_meteo/mswep", "col": "precipitation"},
     "GPCP": {"dir": ROOT / "data/CAMELS_RU/parsed_meteo/gpcp", "col": "precip"},
 }
@@ -191,7 +191,7 @@ def _plot(df: pd.DataFrame) -> None:
     ax.text(0.5, 1.38, "HUMID  (PET < P)", fontsize=8, color="#555555", ha="center")
     ax.text(2.2, 1.38, "ARID  (PET > P)", fontsize=8, color="#555555", ha="center")
     ax.text(0.04, 1.08, "above water limit (Q < 0: impossible)", fontsize=7, color="#AA2222")
-    ax.text(0.04, -0.22, "below zero: (P−Q)/P < 0", fontsize=7, color="#AA2222")
+    ax.text(0.04, -0.22, "below zero: Q > P (more runoff than rain)", fontsize=7, color="#AA2222")
     ax.grid(alpha=0.2, linestyle="--")
     ax.legend(loc="upper right", fontsize=9, framealpha=0.9)
     ax.set_title(

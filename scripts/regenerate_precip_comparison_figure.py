@@ -34,9 +34,9 @@ from src.utils.paper_analysis_scope import paper_analysis_inclusion_mask  # noqa
 
 DATA = PROJECT_ROOT / "data" / "CAMELS_RU"
 GEOM = DATA / "geometry"
-# ERA5-Land precip: full-coverage source (2007-2024); CAMELS_RU/parsed_meteo/era5_land
-# is a stale copy truncated at 2018-02.
-ERA5_FULL = PROJECT_ROOT / "data" / "Russia" / "MeteoData" / "CamelsRU" / "era5_land"
+# ERA5-Land precip: corrected de-accumulated source (era5land_tp_new); the era5_land
+# copy over-accumulated tp (~1.5x), inflating basin P.
+ERA5_FULL = PROJECT_ROOT / "data" / "Russia" / "MeteoData" / "CamelsRU" / "era5land_tp_new"
 PRODUCTS = {
     "ERA5-Land": (ERA5_FULL, "prcp"),
     "MSWEP": (DATA / "parsed_meteo" / "mswep", "precipitation"),

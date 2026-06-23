@@ -44,9 +44,9 @@ from src.utils.paper_analysis_scope import (  # noqa: E402
 
 # ── Configuration ────────────────────────────────────────────────────────────
 PRODUCTS: dict[str, tuple[Path, str]] = {
-    # Full ERA5-Land source (2007-2024); the old parsed_meteo/era5_land copy was
-    # STALE (truncated at 2018-02).
-    "ERA5": (ROOT / "data/Russia/MeteoData/CamelsRU/era5_land", "prcp"),
+    # Corrected de-accumulated ERA5-Land precip; the era5_land copy over-accumulated
+    # tp (~1.5x), inflating basin P.
+    "ERA5": (ROOT / "data/Russia/MeteoData/CamelsRU/era5land_tp_new", "prcp"),
     "MSWEP": (ROOT / "data/CAMELS_RU/parsed_meteo/mswep", "precipitation"),
     "GPCP": (ROOT / "data/CAMELS_RU/parsed_meteo/gpcp", "precip"),
 }

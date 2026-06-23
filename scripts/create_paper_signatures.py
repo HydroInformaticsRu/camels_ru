@@ -190,9 +190,9 @@ def main() -> None:
     parser.add_argument(
         "--precip-dir",
         type=Path,
-        # Full ERA5-Land source (2007-2024). The previous default
-        # data/CAMELS_RU/parsed_meteo/era5_land was a STALE copy truncated at 2018-02.
-        default=Path("data/Russia/MeteoData/CamelsRU/era5_land"),
+        # Corrected de-accumulated ERA5-Land precip. The era5_land copy over-accumulated
+        # tp (~1.5x), inflating P and biasing runoff_ratio/aridity/evaporative; this is the fix.
+        default=Path("data/Russia/MeteoData/CamelsRU/era5land_tp_new"),
     )
     parser.add_argument("--era5-col", default="prcp")
     parser.add_argument(

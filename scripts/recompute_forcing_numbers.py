@@ -51,7 +51,10 @@ COMMON_END = "2023-12-31"
 DATA = ROOT / "data"
 PARSED_METEO = DATA / "CAMELS_RU" / "parsed_meteo"
 ERA5_STALE_DIR = PARSED_METEO / "era5_land"
-ERA5_FULL_DIR = DATA / "Russia" / "MeteoData" / "CamelsRU" / "era5_land"
+# Corrected de-accumulated ERA5-Land precip. The era5_land copy summed the 24
+# cumulative hourly tp values instead of de-accumulating, over-accumulating P by
+# ~1.5x at the basin scale; era5land_tp_new is the re-downloaded, de-accumulated fix.
+ERA5_FULL_DIR = DATA / "Russia" / "MeteoData" / "CamelsRU" / "era5land_tp_new"
 MSWEP_DIR = PARSED_METEO / "mswep"
 GPCP_DIR = PARSED_METEO / "gpcp"
 GLEAM_DIR = PARSED_METEO / "gleam"

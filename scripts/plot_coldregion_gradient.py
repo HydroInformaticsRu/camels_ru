@@ -196,7 +196,11 @@ def main() -> None:
     ax_b.set_title("(b) Sign reversal across the −5 °C line")
     ax_b.legend(loc="upper right", frameon=False)
 
-    # ---- Panel C: melt timing vs snow + ERA5-Land water-balance failure -------
+    # ---- Panel C: melt timing vs snow cover -----------------------------------
+    # The ERA5-Land AET>PET rate is single-digit and not monotonic in snow cover once
+    # precipitation is de-accumulated, so it is no longer plotted here; the apparent
+    # snow co-location in the over-accumulated data was an artifact (rates exported to
+    # coldregion_gradient_bins.csv for provenance).
     s_edges = [0, 25, 40, 50, 60, 100]
     hm = binned_median(snow, df["half_flow_date"], s_edges)
     ax_c.plot(hm["center"], hm["median"], "-o", color="#1b7837", lw=2, ms=4, label="half-flow date")
@@ -204,26 +208,13 @@ def main() -> None:
     ax_c.set_xlabel("Snow-cover extent (HydroATLAS proxy, %)")
     ax_c.set_ylabel("Half-flow date (day of hydro-year)", color="#1b7837")
     ax_c.tick_params(axis="y", labelcolor="#1b7837")
-    ax_c.set_title("(c) Melt timing; forcing failure co-locates (Sect. 5)")
-
-    ax2 = ax_c.twinx()
-    if df["aet_wb_gt_pet"].notna().any():
-        cats = pd.cut(snow, bins=s_edges, include_lowest=True)
-        rate = df.groupby(cats, observed=True)["aet_wb_gt_pet"].mean() * 100
-        centers = [iv.mid for iv in rate.index]
-        ax2.bar(
-            centers, rate.to_numpy(), width=7, color="#9970ab", alpha=0.45, label="ERA5-Land AET>PET"
-        )
-        ax2.set_ylabel("ERA5-Land AET$_{wb}$ > PET (%)", color="#762a83")
-        ax2.tick_params(axis="y", labelcolor="#762a83")
-        ax2.set_ylim(0, max(60, float(rate.max()) * 1.15))
-    lines = ax_c.get_legend_handles_labels()[0] + ax2.get_legend_handles_labels()[0]
-    labels = ax_c.get_legend_handles_labels()[1] + ax2.get_legend_handles_labels()[1]
-    ax_c.legend(lines, labels, loc="upper left", frameon=False)
+    ax_c.set_title("(c) Melt timing vs snow cover")
+    ax_c.legend(loc="upper left", frameon=False)
 
     fig.tight_layout()
     RESULTS.mkdir(parents=True, exist_ok=True)
-    # Provenance: panel-A permafrost-BFI medians + panel-C snow->AET>PET rates (the §5 ~30-65% bridge).
+    # Provenance: panel-A permafrost-BFI medians + the (no-longer-plotted) snow->AET>PET rates,
+    # retained to document that the corrected rate is single-digit and not monotonic in snow.
     prov = [bm.assign(panel="A_bfi_vs_permafrost")]
     if df["aet_wb_gt_pet"].notna().any():
         srate = df.groupby(pd.cut(snow, bins=s_edges, include_lowest=True), observed=True)[
