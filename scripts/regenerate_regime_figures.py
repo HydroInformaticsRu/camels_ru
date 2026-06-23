@@ -211,6 +211,53 @@ def plot_map(gauge: gpd.GeoDataFrame, labels: pd.Series, out: Path) -> None:
     print(f"Wrote {out}")
 
 
+def plot_map_facets(gauge: gpd.GeoDataFrame, labels: pd.Series, out: Path) -> None:
+    """Small-multiple Albers maps: one mini-map per regime, its gauges over a grey network.
+
+    Replaces the single overplotted national scatter (15 colours x 5 marker shapes), which
+    was unreadable at print size. Each facet shows one regime's spatial footprint against the
+    full classified network in light grey, so per-regime geography is legible without a legend.
+    """
+    aea = get_russia_projection()
+    data_crs = ccrs.PlateCarree()
+    gdf = gauge.loc[labels.index].copy()
+    gdf["regime"] = labels.values
+    ne = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg").to_crs(aea.proj4_init)
+
+    fig, axes = plt.subplots(3, 5, figsize=(20, 11), subplot_kw={"projection": aea})
+    axes = axes.flatten()
+    for c in range(1, N_CLUSTERS + 1):
+        ax = axes[c - 1]
+        ax.axis("off")
+        _set_extent_from_data(ax, gdf)
+        ne.plot(ax=ax, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.2, zorder=1)
+        ax.scatter(
+            gdf.geometry.x,
+            gdf.geometry.y,
+            s=2,
+            c="#DcDcDc",
+            edgecolors="none",
+            zorder=2,
+            transform=data_crs,
+        )
+        sub = gdf[gdf["regime"] == c]
+        ax.scatter(
+            sub.geometry.x,
+            sub.geometry.y,
+            s=9,
+            c=_PALETTE15[c - 1],
+            edgecolors="none",
+            alpha=0.9,
+            zorder=3,
+            transform=data_crs,
+        )
+        ax.set_title(f"Regime {c} (n={len(sub)})", fontsize=12)
+    fig.tight_layout()
+    fig.savefig(out, dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Wrote {out}")
+
+
 def plot_hydrographs(norm: pd.DataFrame, labels: pd.Series, out: Path) -> None:
     """3x5 grid of per-regime normalised seasonal hydrographs (faint gauges + median)."""
     fig, axes = plt.subplots(3, 5, figsize=(20, 10))
@@ -254,8 +301,16 @@ def main(write: bool) -> None:
     dest = img if write else tmp
     dest.mkdir(parents=True, exist_ok=True)
     suffix = "" if write else "_test"
-    plot_map(gauge, labels, dest / f"hydro_clusters_15_map{suffix}.png")
+    plot_map_facets(gauge, labels, dest / f"hydro_clusters_15_map{suffix}.png")
     plot_hydrographs(norm, labels, dest / f"hydrograph_clusters_15{suffix}.png")
+
+    if write:
+        table_dir = PROJECT_ROOT / "paper" / "tables"
+        table_dir.mkdir(parents=True, exist_ok=True)
+        labels.rename_axis("gauge_id").reset_index().to_csv(
+            table_dir / "regime_assignments.csv", index=False
+        )
+        print(f"Wrote {table_dir / 'regime_assignments.csv'}")
 
     print("\n" + "=" * 64)
     print("REPRODUCIBILITY SUMMARY (values cited in sections/04_regimes_signatures.tex):")
