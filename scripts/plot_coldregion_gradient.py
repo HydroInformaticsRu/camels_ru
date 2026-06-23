@@ -34,6 +34,21 @@ RESULTS = ROOT / "results" / "hess_quality"
 IMG_DIRS = [ROOT / "paper" / "images", ROOT / "paper" / "overleaf" / "images"]
 
 T_SPLIT = -5.0  # mean-annual-temperature regime boundary (deg C)
+N_BOOT = 2000
+# Seed matches scripts/coldregion_robustness.py so the panel-A bin-median CIs are reproducible
+# and consistent with the robustness table.
+BOOT_RNG = np.random.default_rng(1996)
+
+
+def _boot_median_ci(values: np.ndarray, n_boot: int = N_BOOT) -> tuple[float, float]:
+    """95% percentile bootstrap CI for a sample median (matches coldregion_robustness.py)."""
+    v = values[np.isfinite(values)]
+    if len(v) < 3:
+        return (np.nan, np.nan)
+    idx = BOOT_RNG.integers(0, len(v), size=(n_boot, len(v)))
+    meds = np.median(v[idx], axis=1)
+    return (float(np.percentile(meds, 2.5)), float(np.percentile(meds, 97.5)))
+
 
 mpl.rcParams.update(
     {
@@ -146,8 +161,25 @@ def main() -> None:
     sc = ax_a.scatter(pf, bfi, c=temp, cmap="RdBu_r", norm=norm, s=10, alpha=0.55, linewidths=0)
     pf_edges = [0, 5, 10, 20, 30, 50, 70, 100]
     bm = binned_median(pf, bfi, pf_edges)
+    # Bootstrap 95% CI on each bin median (estimator uncertainty, distinct from the IQR spread);
+    # makes the n-limited >70% "return to baseline" carry its uncertainty (audit: cold-arm evidence).
+    cats_a = pd.cut(pf, bins=pf_edges, include_lowest=True)
+    ci_map = {iv.mid: _boot_median_ci(sub.to_numpy()) for iv, sub in bfi.groupby(cats_a, observed=True)}
+    bm["ci_lo"] = [ci_map.get(c, (np.nan, np.nan))[0] for c in bm["center"]]
+    bm["ci_hi"] = [ci_map.get(c, (np.nan, np.nan))[1] for c in bm["center"]]
     ax_a.plot(bm["center"], bm["median"], "-o", color="black", lw=1.8, ms=4, label="binned median")
-    ax_a.fill_between(bm["center"], bm["q25"], bm["q75"], color="black", alpha=0.12)
+    ax_a.fill_between(bm["center"], bm["q25"], bm["q75"], color="black", alpha=0.12, label="IQR")
+    ax_a.errorbar(
+        bm["center"],
+        bm["median"],
+        yerr=[bm["median"] - bm["ci_lo"], bm["ci_hi"] - bm["median"]],
+        fmt="none",
+        ecolor="black",
+        elinewidth=1.1,
+        capsize=3,
+        zorder=5,
+        label="95% bootstrap CI",
+    )
     ax_a.axvline(70, ls="--", color="0.4", lw=1)
     peak = bm.loc[bm["median"].idxmax()]
     high_pf = bm.iloc[-1]
@@ -162,10 +194,11 @@ def main() -> None:
         fontsize=8,
     )
     ax_a.annotate(
-        f"returns to baseline {high_pf['median']:.2f}",
+        f"returns to baseline {high_pf['median']:.2f}\n"
+        f"[{high_pf['ci_lo']:.2f}, {high_pf['ci_hi']:.2f}], n={int(high_pf['n'])}",
         (high_pf["center"], high_pf["median"]),
         textcoords="offset points",
-        xytext=(0, -15),
+        xytext=(0, -22),
         ha="center",
         fontsize=8,
     )

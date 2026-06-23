@@ -123,13 +123,14 @@ def eckhardt_bfi_for_gauges(gauge_ids: list[str]) -> pd.Series:
     """Recompute BFI with the Eckhardt filter from released daily discharge (mm/day)."""
     ds = xr.open_dataset(RELEASE / "camels_ru_discharge.nc")
     q_all = ds["discharge_mm"]
-    avail = set(ds["gauge"].values.astype(str))
+    gc = "gauge_id" if "gauge_id" in ds.coords else "gauge"
+    avail = set(ds[gc].values.astype(str))
     out: dict[str, float] = {}
     for gid in gauge_ids:
         if gid not in avail:
             out[gid] = np.nan
             continue
-        series = q_all.sel(gauge=gid).to_numpy().astype(np.float64)
+        series = q_all.sel({gc: gid}).to_numpy().astype(np.float64)
         series = series[np.isfinite(series)]
         if len(series) < 365:
             out[gid] = np.nan

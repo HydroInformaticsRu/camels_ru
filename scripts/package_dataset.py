@@ -49,6 +49,29 @@ ATTRS_FILE = DATA_DIR / "attributes" / "hydro_atlas_cis_camels.csv"
 PERIOD_START = "2008-01-01"
 PERIOD_END = "2023-12-31"
 
+# ACDD/CF discovery metadata shared by every released NetCDF (conformance audit
+# items C4/C5/C6, docs/camels_conformance_audit.md). Values verified against the
+# manuscript author block; the Zenodo DOI is deliberately omitted until assigned
+# (no fabricated citations).
+INSTITUTION = (
+    "International Center for Corporate Data Analysis, Astana, Kazakhstan; "
+    "Water Problems Institute, Russian Academy of Sciences, Moscow, Russia"
+)
+LICENSE = "CC BY 4.0"
+REFERENCES = (
+    "Abramov et al.: CAMELS-RU dataset description (Hydrology and Earth System "
+    "Sciences, in review); processing code: "
+    "https://github.com/HydroInformaticsRu/camels_ru"
+)
+# CF discrete-sampling-geometry attributes for the per-gauge time-series id.
+_GAUGE_ID_ATTRS = {"long_name": "Gauge identifier", "cf_role": "timeseries_id"}
+_ACDD_ATTRS = {
+    "institution": INSTITUTION,
+    "references": REFERENCES,
+    "license": LICENSE,
+    "featureType": "timeSeries",
+}
+
 
 def package_boundaries() -> None:
     """Copy watershed boundaries GeoPackage."""
@@ -109,17 +132,18 @@ def package_discharge() -> None:
     ds = xr.Dataset(
         {
             "discharge_mm": (
-                ["gauge", "time"],
+                ["gauge_id", "time"],
                 q_mm,
                 {
                     "long_name": "Daily mean discharge as runoff depth",
-                    "standard_name": "runoff_flux",
+                    # No CF standard_name: 'runoff_flux' is canonically kg m-2 s-1,
+                    # not UDUNITS-convertible to the depth-rate mm d-1 (audit C2).
                     "units": "mm d-1",
                     "source": "AIS GMVO / Roshydromet",
                 },
             ),
             "discharge_m3s": (
-                ["gauge", "time"],
+                ["gauge_id", "time"],
                 q_m3s,
                 {
                     "long_name": "Daily mean discharge volume",
@@ -129,7 +153,7 @@ def package_discharge() -> None:
                 },
             ),
             "quality_flag": (
-                ["gauge", "time"],
+                ["gauge_id", "time"],
                 q_flag,
                 {
                     "long_name": "Data quality flag",
@@ -144,7 +168,7 @@ def package_discharge() -> None:
             ),
         },
         coords={
-            "gauge": ws_ids,
+            "gauge_id": ws_ids,
             "time": dates,
         },
         attrs={
@@ -153,8 +177,10 @@ def package_discharge() -> None:
             "source": "AIS GMVO / Roshydromet",
             "period": f"{PERIOD_START} to {PERIOD_END}",
             "quality_flag_values": "0=observed, 3=missing",
+            **_ACDD_ATTRS,
         },
     )
+    ds["gauge_id"].attrs = dict(_GAUGE_ID_ATTRS)
     out = OUTPUT_DIR / "camels_ru_discharge.nc"
     ds.to_netcdf(
         out,
@@ -259,7 +285,7 @@ def package_forcing() -> dict[str, str]:
     ds = xr.Dataset(
         {
             "precip_mswep": (
-                ["gauge", "time"],
+                ["gauge_id", "time"],
                 precip,
                 {
                     "long_name": "Precipitation (MSWEP v2.8)",
@@ -269,7 +295,7 @@ def package_forcing() -> dict[str, str]:
                 },
             ),
             "precip_era5": (
-                ["gauge", "time"],
+                ["gauge_id", "time"],
                 precip_era5,
                 {
                     "long_name": "Precipitation (ERA5-Land, de-accumulated)",
@@ -283,7 +309,7 @@ def package_forcing() -> dict[str, str]:
                 },
             ),
             "precip_gpcp": (
-                ["gauge", "time"],
+                ["gauge_id", "time"],
                 precip_gpcp,
                 {
                     "long_name": "Precipitation (GPCP v3.3)",
@@ -297,34 +323,40 @@ def package_forcing() -> dict[str, str]:
                 },
             ),
             "temp_mean": (
-                ["gauge", "time"],
+                ["gauge_id", "time"],
                 t_mean,
                 {
                     "long_name": "Mean daily air temperature at 2m",
+                    "standard_name": "air_temperature",
+                    "cell_methods": "time: mean",
                     "units": "degC",
                     "source": "ERA5-Land (Munoz-Sabater et al., 2021)",
                 },
             ),
             "temp_min": (
-                ["gauge", "time"],
+                ["gauge_id", "time"],
                 t_min,
                 {
                     "long_name": "Minimum daily air temperature at 2m",
+                    "standard_name": "air_temperature",
+                    "cell_methods": "time: minimum",
                     "units": "degC",
                     "source": "ERA5-Land (Munoz-Sabater et al., 2021)",
                 },
             ),
             "temp_max": (
-                ["gauge", "time"],
+                ["gauge_id", "time"],
                 t_max,
                 {
                     "long_name": "Maximum daily air temperature at 2m",
+                    "standard_name": "air_temperature",
+                    "cell_methods": "time: maximum",
                     "units": "degC",
                     "source": "ERA5-Land (Munoz-Sabater et al., 2021)",
                 },
             ),
             "pet": (
-                ["gauge", "time"],
+                ["gauge_id", "time"],
                 pet,
                 {
                     "long_name": "Potential evaporation (GLEAM4)",
@@ -337,7 +369,7 @@ def package_forcing() -> dict[str, str]:
                 },
             ),
         },
-        coords={"gauge": ws_ids, "time": dates},
+        coords={"gauge_id": ws_ids, "time": dates},
         attrs={
             "title": "CAMELS-RU meteorological forcing",
             "Conventions": "CF-1.8",
@@ -365,8 +397,10 @@ def package_forcing() -> dict[str, str]:
                 "provenance."
             ),
             "gap_fill_n_gauges_affected": len(forcing_notes),
+            **_ACDD_ATTRS,
         },
     )
+    ds["gauge_id"].attrs = dict(_GAUGE_ID_ATTRS)
     out = OUTPUT_DIR / "camels_ru_forcing.nc"
     encoding = {v: {"dtype": "float32", "zlib": True, "complevel": 4} for v in ds.data_vars}
     ds.to_netcdf(out, encoding=encoding)
@@ -540,7 +574,7 @@ def package_water_level() -> None:
 
     lvl_cm = np.full((n_gauges, n_dates), np.nan, dtype=np.float32)
     gauge_zero_m = np.full(n_gauges, np.nan, dtype=np.float32)
-    gauge_type = np.full(n_gauges, -1, dtype=np.int8)  # -1 = no file found
+    gauge_type = np.full(n_gauges, -1, dtype=np.int8)  # -1 = no water-level record (documented class)
 
     n_river = 0
     n_reservoir = 0
@@ -573,7 +607,7 @@ def package_water_level() -> None:
     ds = xr.Dataset(
         {
             "water_level_cm": (
-                ["gauge", "time"],
+                ["gauge_id", "time"],
                 lvl_cm,
                 {
                     "long_name": "Daily water level (stage above gauge zero-post)",
@@ -587,7 +621,7 @@ def package_water_level() -> None:
                 },
             ),
             "water_level_mbs": (
-                ["gauge", "time"],
+                ["gauge_id", "time"],
                 lvl_mbs.astype(np.float32),
                 {
                     "long_name": "Daily water level (absolute elevation, BHS-77)",
@@ -602,7 +636,7 @@ def package_water_level() -> None:
                 },
             ),
             "gauge_zero_m": (
-                ["gauge"],
+                ["gauge_id"],
                 gauge_zero_m,
                 {
                     "long_name": "Elevation of the gauge zero-post (BHS-77)",
@@ -611,17 +645,23 @@ def package_water_level() -> None:
                 },
             ),
             "gauge_type": (
-                ["gauge"],
+                ["gauge_id"],
                 gauge_type,
                 {
                     "long_name": "Gauge classification",
-                    "flag_values": np.array([0, 1], dtype=np.int8),
-                    "flag_meanings": "river reservoir_or_hydropower",
+                    "flag_values": np.array([-1, 0, 1], dtype=np.int8),
+                    "flag_meanings": ("no_water_level_record river reservoir_or_hydropower"),
+                    "comment": (
+                        "-1 marks gauges with no water-level series (discharge-only "
+                        "gauges on the shared 3353-gauge axis); their water_level_* "
+                        "values are NaN. It is a documented class, not a missing-data "
+                        "sentinel (audit C1)."
+                    ),
                 },
             ),
         },
         coords={
-            "gauge": ws_ids,
+            "gauge_id": ws_ids,
             "time": dates,
         },
         attrs={
@@ -639,8 +679,10 @@ def package_water_level() -> None:
                 "(river gauges) or ≤15 days (reservoir/hydropower gauges). "
                 "Longer gaps retained as NaN."
             ),
+            **_ACDD_ATTRS,
         },
     )
+    ds["gauge_id"].attrs = dict(_GAUGE_ID_ATTRS)
     out = OUTPUT_DIR / "camels_ru_water_level.nc"
     ds.to_netcdf(
         out,
