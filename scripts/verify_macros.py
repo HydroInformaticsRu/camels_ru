@@ -36,6 +36,18 @@ RESULTS_HESS = REPO / "results" / "hess_quality"
 PAPER = REPO / "paper"
 MACROS = PAPER / "overleaf" / "macros.tex"
 
+# Seven CAMELS-RU-derived columns appended to the 281 canonical HydroATLAS attributes in
+# camels_ru_attributes.csv (used to derive \nattributesfull = 281 and \nattributescols = 288).
+DERIVED_ATTR_COLS = (
+    "ws_area",
+    "acc",
+    "height_bs",
+    "lat",
+    "lon",
+    "area_fraction_used",
+    "n_hydroatlas_polygons",
+)
+
 
 def section(title: str) -> None:
     """Print a report section heading."""
@@ -260,12 +272,21 @@ def main() -> None:
         f"{n_waterlevel_analysis}",
         match=n_waterlevel_analysis == 2837,
     )
-    kv(
-        "nsignatures (rows in signatures_summary)",
-        "15",
-        f"{n_signatures_defined}",
-        match=n_signatures_defined == 15,
+    check_macro(macros, "nsignatures", float(n_signatures_defined), "{:.0f}")
+
+    # Attribute-count macros, guarded so the abstract/§3/table literals cannot drift:
+    #   \nattributescols = all CSV columns minus gauge_id (288)
+    #   \nattributesfull = those minus the 7 CAMELS-RU-derived columns (281 HydroATLAS)
+    #   \nattributes     = rows in the curated primary-subset table (22)
+    n_attr_cols_total = len(attrs.columns) - 1  # exclude gauge_id
+    n_derived_present = sum(c in attrs.columns for c in DERIVED_ATTR_COLS)
+    check_macro(macros, "nattributescols", float(n_attr_cols_total), "{:.0f}")
+    check_macro(macros, "nattributesfull", float(n_attr_cols_total - n_derived_present), "{:.0f}")
+    attr_table_text = (PAPER / "overleaf" / "tables" / "hydroatlas_attributes.tex").read_text(
+        encoding="utf-8"
     )
+    n_primary_attrs = len(re.findall(r"[a-z]{3}\\_[a-z]{2}\\_[a-z]{3}", attr_table_text))
+    check_macro(macros, "nattributes", float(n_primary_attrs), "{:.0f}")
     kv(
         "nsigngauges (signatures.csv cleaned)",
         "1,845",

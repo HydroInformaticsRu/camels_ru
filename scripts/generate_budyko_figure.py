@@ -193,7 +193,9 @@ def _plot(df: pd.DataFrame) -> None:
     ax.text(0.04, 1.08, "above water limit (Q < 0: impossible)", fontsize=7, color="#AA2222")
     ax.text(0.04, -0.22, "below zero: Q > P (more runoff than rain)", fontsize=7, color="#AA2222")
     ax.grid(alpha=0.2, linestyle="--")
-    ax.legend(loc="upper right", fontsize=9, framealpha=0.9)
+    # Lower-right corner (very arid, low evaporative index) is empty for this humid domain,
+    # so the legend there does not overlap data or the "ARID (PET > P)" annotation (upper right).
+    ax.legend(loc="lower right", fontsize=9, framealpha=0.9)
     ax.set_title(
         "Budyko consistency check — aridity vs. evaporative index by precipitation product",
         fontsize=12,
