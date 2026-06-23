@@ -8,9 +8,14 @@ Root causes (inspected 2026-04-17 via ``.tmp/inspect_era5_problem_gauges.py``):
   to synthesise a 2008–2022 time series, then splice the gauge's own (valid)
   2023 values on top.
 
-* **YEAR_2023_PARTIAL (17 gauges)** – basins fall inside the ~37 %-NaN
-  region of the under-sized 2023 ERA5-Land tiles. 2008–2022 coverage is 100 %,
-  which gives 15 donor years for DOY-climatology fill of 2023.
+* **YEAR_2023_PARTIAL (17 gauges)** – RESOLVED 2026-06-23 by re-aggregation, no
+  longer filled. These sub-5 km² basins returned all-NaN 2023 temperature because a
+  stale per-gauge weight cache (keyed by gauge + resolution, not grid shape)
+  misaligned with the widened 2023 ERA5-Land tiles (the original "under-sized tile /
+  37 % NaN" diagnosis was wrong — the ~35 % NaN is the land–sea mask, present every
+  year). Deleting the cache and re-aggregating restored real values, so this class
+  now fills nothing; the DOY-climatology path is retained only as a safety net and
+  emits a note solely when it actually fills cells.
 
 Outputs:
 
@@ -285,7 +290,7 @@ def fill_domain_edge(
             f" (shifted {ERA5_EAST_LIMIT_LON - lon_s:.1f}° west of 170°E to clear ERA5-Land ocean mask)"
         )
     note = (
-        f"ERA5 temperature filled from raw ERA5-Land at (lat {lat_s:.2f}°, "
+        f"ERA5-Land temperature filled from the raw ERA5-Land tiles at (lat {lat_s:.2f}°, "
         f"lon {lon_s:.2f}°E){shift_note} for 2008–2022; basin sits east of the "
         "locally-downloaded ERA5-Land tile domain. 2023 values retained from "
         "native basin aggregation."
@@ -295,8 +300,13 @@ def fill_domain_edge(
 
 def fill_year_2023_partial(
     gauge_id: str,
-) -> tuple[pd.DataFrame, str]:
-    """Fill 2023 temperature NaNs using 2008–2022 DOY climatology."""
+) -> tuple[pd.DataFrame, str | None]:
+    """Fill 2023 temperature NaNs using 2008–2022 DOY climatology.
+
+    Returns ``(filled_frame, note)``. ``note`` is ``None`` when no cell was
+    filled (the gauge already has complete real coverage) so the caller does not
+    record a spurious "climatology-filled" provenance entry.
+    """
     src = _read_source_csv(gauge_id)
     before_nan = {col: int(src[col].isna().sum()) for col in TEMP_COLS}
     filled, stats = _doy_climatology_fill(src, TEMP_COLS)
@@ -308,6 +318,8 @@ def fill_year_2023_partial(
             before_nan,
             after_nan,
         )
+    if sum(stats.values()) == 0:
+        return filled, None
     note = (
         "ERA5 temperature 2023 gaps DOY-climatology-filled from 2008–2022 "
         f"record (filled cells per column: {stats})."
@@ -347,7 +359,8 @@ def process_all(dry_run: bool = False) -> dict[str, dict]:
     log.info("== YEAR_2023_PARTIAL (%d gauges) ==", len(YEAR_2023_PARTIAL_GAUGES))
     for gid in YEAR_2023_PARTIAL_GAUGES:
         filled, note = fill_year_2023_partial(gid)
-        notes[gid] = note
+        if note is not None:
+            notes[gid] = note
         lat, lon = centroids.get(gid, (float("nan"), float("nan")))
         report[gid] = _summarise(gid, filled, class_="YEAR_2023_PARTIAL", centroid=(lat, lon))
         if not dry_run:

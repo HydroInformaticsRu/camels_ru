@@ -388,13 +388,14 @@ def package_forcing() -> dict[str, str]:
             "temp_units": "degC",
             "pet_units": "mm d-1",
             "gap_fill_method": (
-                "ERA5-Land temperature gaps filled for 24 gauges: DOY climatology "
-                "from 2008–2022 for 17 gauges whose 2023 tile was partial; nearest "
-                "valid land-cell near 170°E from the 2008–2022 raw tiles for 7 gauges "
-                "east of the locally-downloaded ERA5-Land tile domain. MSWEP "
-                "precipitation and GLEAM4 PET require no fill (0 % NaN). See "
-                "camels_ru_gauge_summary.csv forcing_note column for per-gauge "
-                "provenance."
+                "ERA5-Land temperature is gap-filled for 7 gauges sitting east of the "
+                "locally-downloaded ERA5-Land tile domain (~170°E): their 2008–2022 "
+                "series is spliced from the nearest valid land cell of the raw tiles, "
+                "with 2023 retained from native basin aggregation. No other temperature "
+                "fill is applied — all 2023 basin-mean temperature is real aggregation, "
+                "and MSWEP precipitation and GLEAM4 PET have 0 % NaN. See "
+                "camels_ru_gauge_summary.csv forcing_note column and "
+                "camels_ru_forcing_notes.csv for per-gauge provenance."
             ),
             "gap_fill_n_gauges_affected": len(forcing_notes),
             **_ACDD_ATTRS,

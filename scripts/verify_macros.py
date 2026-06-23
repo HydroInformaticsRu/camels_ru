@@ -242,6 +242,11 @@ def main() -> None:
         f"{n_year_grades}",
         match=n_year_grades == 2067,
     )
+
+    # ERA5-Land temperature gap-fill provenance: \nforcingfillgauges must equal the
+    # number of rows shipped in camels_ru_forcing_notes.csv (all domain-edge gauges).
+    forcing_notes = pd.read_csv(RELEASE / "camels_ru_forcing_notes.csv")
+    check_macro(macros, "nforcingfillgauges", float(len(forcing_notes)), "{:.0f}")
     kv(
         "nwaterlevel (water_level.nc gauges w/ any data)",
         "2,989",
