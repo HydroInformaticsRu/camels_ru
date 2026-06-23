@@ -156,6 +156,18 @@ def check_coldregion_macros(macros: dict[str, str]) -> None:
         )
 
 
+def check_discharge_fill_macros(macros: dict[str, str]) -> None:
+    """Lock the discharge gap-fill macros against quality_flag==1 in discharge.nc."""
+    section("DISCHARGE GAP-FILL (quality_flag in camels_ru_discharge.nc)")
+    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as qds:
+        qf = qds["quality_flag"].values
+        n_fill = int((qf == 1).sum())
+        n_present = int((qf != 3).sum())
+    fill_pct = 100.0 * n_fill / n_present if n_present else float("nan")
+    check_macro(macros, "ndischargefilldays", n_fill, "{:,.0f}")
+    check_macro(macros, "ndischargefillpct", fill_pct, "{:.2f}")
+
+
 def report_drift_summary() -> None:
     """Print the drift summary; exit non-zero if any checked macro drifted from the data."""
     section("DRIFT SUMMARY")
@@ -524,6 +536,7 @@ def main() -> None:
 
     check_aet_macros(macros)
     check_coldregion_macros(macros)
+    check_discharge_fill_macros(macros)
 
     section("AUTHORITATIVE VALUES FOR MACROS.TEX")
     print(f"  ntotal               = {n_attrs:,} (3,339 HydroATLAS-covered catchments)")

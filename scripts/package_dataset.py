@@ -32,6 +32,9 @@ GEOM_DIR = DATA_DIR / "geometry"
 DISCHARGE_DIR = DATA_DIR / "HydroData" / "Discharge"
 COMPOUND_DIR = DATA_DIR / "HydroData" / "Compound"
 LEVEL_DIR = DATA_DIR / "HydroData" / "Level"
+# Per-gauge gap-fill mask (1 = day interpolated in place by ParseAisQData) built by
+# scripts/derive_discharge_fill_mask.py; absent -> gap-fills cannot be flagged (degrade to 0).
+DISCHARGE_FILL_MASK = DATA_DIR / "HydroData" / "discharge_fill_mask.nc"
 LEVEL_GTS_DIR = DATA_DIR / "HydroData" / "LevelGTS"
 # ERA5-Land aggregation lives on the Russia-wide meteo tree, not the CAMELS-RU one,
 # because it is produced by a pipeline that serves multiple projects.
@@ -87,6 +90,43 @@ def package_boundaries() -> None:
     print(f"  {len(ws)} catchments -> {dst.name}")
 
 
+def _discharge_quality_flags(present: np.ndarray, filled: np.ndarray) -> np.ndarray:
+    """Per-day discharge quality flag: 0 observed, 1 gap-filled, 3 missing.
+
+    Args:
+        present: bool array, True where discharge.nc carries a value.
+        filled: bool array, True where that value was interpolated in place
+            (<=6-day second-order-polynomial fill from ParseAisQData).
+
+    A filled day that is somehow absent stays missing (3); flag 1 requires present.
+    """
+    flags = np.full(present.shape, 3, dtype=np.int8)  # missing
+    flags[present] = 0  # observed
+    flags[present & filled] = 1  # gap-filled (interpolated in place)
+    return flags
+
+
+def _load_fill_mask(ws_ids: list[str], dates: pd.DatetimeIndex) -> np.ndarray:
+    """Load the per-gauge gap-fill mask aligned to ``ws_ids`` x ``dates``.
+
+    Returns a (n_gauges, n_dates) bool array (True = day was gap-filled). Returns
+    all-False and warns when the mask artefact is absent, so packaging still works
+    (gap-fills simply remain unflagged, the pre-2026-06 behaviour).
+    """
+    out = np.zeros((len(ws_ids), len(dates)), dtype=bool)
+    if not DISCHARGE_FILL_MASK.exists():
+        print(f"  WARNING: {DISCHARGE_FILL_MASK.name} absent -> gap-fills will not be flagged")
+        return out
+    with xr.open_dataset(DISCHARGE_FILL_MASK) as ds:
+        da = ds["fill_mask"].copy()
+        da["gauge_id"] = da["gauge_id"].astype(str)
+        da = da.reindex(gauge_id=ws_ids, time=dates, fill_value=0)
+        out = da.to_numpy().astype(bool)
+    n_fills = int(out.sum())
+    print(f"  loaded fill mask: {n_fills:,} gap-filled gauge-days across {int(out.any(1).sum())} gauges")
+    return out
+
+
 def package_discharge() -> None:
     """Build discharge NetCDF from per-gauge CSVs."""
     print("Packaging discharge...")
@@ -102,7 +142,7 @@ def package_discharge() -> None:
     # Initialize arrays
     q_mm = np.full((n_gauges, n_dates), np.nan, dtype=np.float32)
     q_m3s = np.full((n_gauges, n_dates), np.nan, dtype=np.float32)
-    q_flag = np.full((n_gauges, n_dates), 3, dtype=np.int8)  # 3 = missing
+    present = np.zeros((n_gauges, n_dates), dtype=bool)  # True where a value is shipped
 
     for i, gid in enumerate(ws_ids):
         # Try Compound first (has q_mm_day), then raw Discharge
@@ -115,7 +155,7 @@ def package_discharge() -> None:
                 sub = df["q_mm_day"].reindex(dates)
                 valid = sub.notna()
                 q_mm[i, valid.values] = sub[valid].values.astype(np.float32)
-                q_flag[i, valid.values] = 0  # observed
+                present[i, valid.values] = True
             if "q_cms" in df.columns:
                 sub = df["q_cms"].reindex(dates)
                 valid = sub.notna()
@@ -127,7 +167,11 @@ def package_discharge() -> None:
                 sub = df[col[0]].reindex(dates)
                 valid = sub.notna()
                 q_m3s[i, valid.values] = sub[valid].values.astype(np.float32)
-                q_flag[i, valid.values] = 0
+                present[i, valid.values] = True
+
+    # Flag the <=6-day in-place gap-fills (1) separately from observed (0) / missing (3).
+    filled = _load_fill_mask(ws_ids, dates)
+    q_flag = _discharge_quality_flags(present, filled)
 
     ds = xr.Dataset(
         {
@@ -157,12 +201,14 @@ def package_discharge() -> None:
                 q_flag,
                 {
                     "long_name": "Data quality flag",
-                    "flag_values": np.array([0, 3], dtype=np.int8),
-                    "flag_meanings": "observed missing",
+                    "flag_values": np.array([0, 1, 3], dtype=np.int8),
+                    "flag_meanings": "observed gap_filled missing",
                     "description": (
-                        "0 = observed (gauge-reported; gap-fills ≤6 days via "
-                        "second-order polynomial interpolation are written in "
-                        "place and share this flag). 3 = missing."
+                        "0 = observed (gauge-reported). 1 = gap-filled (a gap of "
+                        "≤6 days interpolated in place with a second-order "
+                        "polynomial; the value is present but not an original "
+                        "observation). 3 = missing. Filter to flag == 0 for a "
+                        "strict observed-only series."
                     ),
                 },
             ),
@@ -176,7 +222,7 @@ def package_discharge() -> None:
             "Conventions": "CF-1.8",
             "source": "AIS GMVO / Roshydromet",
             "period": f"{PERIOD_START} to {PERIOD_END}",
-            "quality_flag_values": "0=observed, 3=missing",
+            "quality_flag_values": "0=observed, 1=gap_filled, 3=missing",
             **_ACDD_ATTRS,
         },
     )
