@@ -37,7 +37,7 @@ DATASET_UNITS = {
     "era5_land": {
         "source_units": "m",  # meters per day
         "target_units": "mm",  # millimeters per day
-        "conversion_factor": 100.0,  # m → mm
+        "conversion_factor": 1000.0,  # m → mm (1 m = 1000 mm)
     },
     "mswep": {
         "source_units": "mm",
