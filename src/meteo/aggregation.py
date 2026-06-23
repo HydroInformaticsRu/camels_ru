@@ -50,9 +50,12 @@ DATASET_UNITS = {
         "conversion_factor": 1.0,
     },
     "gleam": {
-        "source_units": "m",  # meters per day (ET)
+        "source_units": "mm",  # GLEAM4 PET is already mm/day in the parsed CSVs
         "target_units": "mm",
-        "conversion_factor": 1000.0,
+        # GLEAM4 native unit is mm/day -> no scaling. Must stay 1.0: if
+        # potential_evaporation were ever added to conversion_vars, a factor of
+        # 1000 would silently inflate PET 1000x (see tests/test_gleam_pet_units.py).
+        "conversion_factor": 1.0,
     },
 }
 
