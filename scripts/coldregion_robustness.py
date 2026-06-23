@@ -44,6 +44,11 @@ T_SPLIT = -5.0  # mean-annual-temperature regime boundary (deg C)
 PF_EDGES = [0, 5, 10, 20, 30, 50, 70, 100]  # permafrost-extent bins (%)
 T_SLICES = [(-15.0, -5.0), (-5.0, 0.0), (0.0, 3.0), (3.0, 6.0)]  # narrow MAT slices (deg C)
 ECKHARDT_BFI_MAX = 0.80  # standard for perennial streams, porous aquifers (Eckhardt 2005)
+LH_ALPHA_BOUNDS = [
+    0.90,
+    0.94,
+    0.98,
+]  # Lyne-Hollick alpha-sweep bounds + midpoint (released: U[0.90,0.98])
 N_BOOT = 2000
 RNG = np.random.default_rng(1996)
 
@@ -141,6 +146,41 @@ def eckhardt_bfi_for_gauges(gauge_ids: list[str]) -> pd.Series:
     return pd.Series(out, name="bfi_eckhardt")
 
 
+def lh_bfi_for_gauges_at_alphas(gauge_ids: list[str], alphas: list[float]) -> pd.DataFrame:
+    """Recompute Lyne-Hollick BFI at fixed alpha values from released daily discharge.
+
+    The released BFI is the mean over 1000 alpha~U[0.90,0.98]; recomputing at the sweep
+    bounds (and midpoint) tests whether the cold-region inverted-U is an artefact of the
+    alpha distribution or a parameter-insensitive shape. Uses the same 3-pass, 30-reflect
+    Lyne-Hollick engine that produced the released signature (src/hydro/base_flow.py).
+    """
+    import sys
+
+    sys.path.append(str(ROOT))
+    from src.hydro.base_flow import _single_bfi_calculation
+
+    ds = xr.open_dataset(RELEASE / "camels_ru_discharge.nc")
+    q_all = ds["discharge_mm"]
+    gc = "gauge_id" if "gauge_id" in ds.coords else "gauge"
+    avail = set(ds[gc].values.astype(str))
+    cols = [f"bfi_lh_a{a:g}" for a in alphas]
+    out: dict[str, dict[str, float]] = {}
+    for gid in gauge_ids:
+        rec = dict.fromkeys(cols, np.nan)
+        if gid in avail:
+            series = q_all.sel({gc: gid}).to_numpy().astype(np.float64)
+            series = series[np.isfinite(series)]
+            if len(series) >= 365:
+                for a, col in zip(alphas, cols, strict=True):
+                    bfi, _ = _single_bfi_calculation(series, a, 3, 30)
+                    rec[col] = float(bfi)
+        out[gid] = rec
+    ds.close()
+    res = pd.DataFrame.from_dict(out, orient="index")
+    res.index.name = "gauge_id"
+    return res.reset_index()
+
+
 def shape_stats(pf: pd.Series, bfi: pd.Series) -> dict[str, float]:
     """Inverted-U descriptors: baseline (0% pf), peak (30-50%), high (>70%) median BFI."""
     base = bfi[pf == 0]
@@ -154,6 +194,32 @@ def shape_stats(pf: pd.Series, bfi: pd.Series) -> dict[str, float]:
         "high_med": float(high.median()),
         "high_n": int(high.notna().sum()),
     }
+
+
+def alpha_sensitivity(
+    df: pd.DataFrame, warm: pd.DataFrame, cold: pd.DataFrame
+) -> tuple[dict[float, dict[str, float]], dict[float, tuple[float, float]]]:
+    """Inverted-U shape and warm/cold pf-BFI rho at each fixed Lyne-Hollick alpha.
+
+    Tests whether the released ensemble-mean inverted-U is a parameter-insensitive shape
+    or an artefact of the alpha distribution (Check 3 of the robustness diagnostic).
+    """
+    print("\n=== CHECK 3: Lyne-Hollick alpha-sensitivity (released filter parameter) ===")
+    print("  released BFI = mean over 1000 alpha~U[0.90,0.98]; recompute at sweep bounds:")
+    alpha_shapes: dict[float, dict[str, float]] = {}
+    alpha_revs: dict[float, tuple[float, float]] = {}
+    for a in LH_ALPHA_BOUNDS:
+        col = f"bfi_lh_a{a:g}"
+        shp = shape_stats(df["prm_pc_use"], df[col])
+        rw = spearmanr(warm["prm_pc_use"], warm[col], nan_policy="omit")[0]
+        rc = spearmanr(cold["prm_pc_use"], cold[col], nan_policy="omit")[0]
+        alpha_shapes[a] = shp
+        alpha_revs[a] = (rw, rc)
+        print(
+            f"    alpha={a:.2f}: baseline={shp['baseline_med']:.3f} peak={shp['peak_med']:.3f} "
+            f"high={shp['high_med']:.3f} | warm rho={rw:+.3f} cold rho={rc:+.3f}"
+        )
+    return alpha_shapes, alpha_revs
 
 
 def main() -> None:
@@ -210,6 +276,10 @@ def main() -> None:
         f"peak={eck_shape['peak_med']:.3f} high={eck_shape['high_med']:.3f}"
     )
 
+    # --- Check 3: Lyne-Hollick alpha-sensitivity (within the released filter) -----------
+    lh_alpha = lh_bfi_for_gauges_at_alphas(gids, LH_ALPHA_BOUNDS)
+    df = df.merge(lh_alpha, on="gauge_id", how="left")
+
     warm = df[df["tmp_dc_uyr"] >= T_SPLIT]
     cold = df[df["tmp_dc_uyr"] < T_SPLIT]
     rho_w_lh = spearmanr(warm["prm_pc_use"], warm["baseflow_index"])[0]
@@ -219,6 +289,8 @@ def main() -> None:
     print("\n  Sign reversal across -5 degC (Spearman pf-BFI):")
     print(f"    Lyne-Hollick: warm={rho_w_lh:+.3f} (n={len(warm)}) cold={rho_c_lh:+.3f} (n={len(cold)})")
     print(f"    Eckhardt    : warm={rho_w_e:+.3f}  cold={rho_c_e:+.3f}")
+
+    alpha_shapes, alpha_revs = alpha_sensitivity(df, warm, cold)
 
     for filt, col in [("eckhardt", "bfi_eckhardt")]:
         for lo, hi in T_SLICES:
@@ -260,6 +332,11 @@ def main() -> None:
         if reversal_eck
         else "NO -> drop reversal from §4 lead text"
     )
+    alpha_hump_all = all(_is_hump(alpha_shapes[a]) for a in LH_ALPHA_BOUNDS)
+    alpha_rev_all = all(alpha_revs[a][0] > 0 and alpha_revs[a][1] < 0 for a in LH_ALPHA_BOUNDS)
+    alpha_msg = (
+        "YES" if alpha_hump_all and alpha_rev_all else "NO -> ensemble mean masks alpha-sensitivity"
+    )
     verdict = [
         "COLD-REGION PERMAFROST-BFI ROBUSTNESS VERDICT",
         "=" * 48,
@@ -275,9 +352,20 @@ def main() -> None:
         "",
         f"Spearman(LH, Eckhardt) BFI agreement = {corr:+.3f}",
         "",
+        "Alpha-sensitivity (Lyne-Hollick parameter; released = mean over U[0.90,0.98]):",
+        f"  inverted-U holds at every alpha in {LH_ALPHA_BOUNDS}? {alpha_hump_all}",
+        f"  sign reversal holds at every alpha? {alpha_rev_all}",
+        *[
+            f"    alpha={a:.2f}: baseline {alpha_shapes[a]['baseline_med']:.3f} / "
+            f"peak {alpha_shapes[a]['peak_med']:.3f} / high {alpha_shapes[a]['high_med']:.3f} "
+            f"(warm {alpha_revs[a][0]:+.3f} / cold {alpha_revs[a][1]:+.3f})"
+            for a in LH_ALPHA_BOUNDS
+        ],
+        "",
         "KILL-SWITCH:",
         f"  inverted-U survives Eckhardt? {hump_msg}",
         f"  sign reversal survives Eckhardt? {rev_msg}",
+        f"  shape survives the alpha-sweep bounds? {alpha_msg}",
     ]
     verdict_txt = "\n".join(verdict)
     print("\n" + verdict_txt)

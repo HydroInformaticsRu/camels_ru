@@ -12,6 +12,14 @@ Sign reversal across -5 degC (warm rho>0 AND cold rho<0):
 
 Spearman(LH, Eckhardt) BFI agreement = +0.581
 
+Alpha-sensitivity (Lyne-Hollick parameter; released = mean over U[0.90,0.98]):
+  inverted-U holds at every alpha in [0.9, 0.94, 0.98]? True
+  sign reversal holds at every alpha? True
+    alpha=0.90: baseline 0.603 / peak 0.737 / high 0.614 (warm +0.311 / cold -0.341)
+    alpha=0.94: baseline 0.536 / peak 0.661 / high 0.544 (warm +0.267 / cold -0.354)
+    alpha=0.98: baseline 0.438 / peak 0.457 / high 0.355 (warm +0.070 / cold -0.420)
+
 KILL-SWITCH:
   inverted-U survives Eckhardt? YES
   sign reversal survives Eckhardt? YES -> reversal may stay in §4 body
+  shape survives the alpha-sweep bounds? YES
