@@ -234,7 +234,7 @@ def plot_map_facets(gauge: gpd.GeoDataFrame, labels: pd.Series, out: Path) -> No
         ax.scatter(
             gdf.geometry.x,
             gdf.geometry.y,
-            s=2,
+            s=1.5,
             c="#DcDcDc",
             edgecolors="none",
             zorder=2,
@@ -244,7 +244,7 @@ def plot_map_facets(gauge: gpd.GeoDataFrame, labels: pd.Series, out: Path) -> No
         ax.scatter(
             sub.geometry.x,
             sub.geometry.y,
-            s=9,
+            s=5,
             c=_PALETTE15[c - 1],
             edgecolors="none",
             alpha=0.9,

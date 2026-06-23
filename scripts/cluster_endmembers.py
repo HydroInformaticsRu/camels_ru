@@ -291,7 +291,7 @@ def write_map(subset, labels, profiles) -> None:
     ax.scatter(
         uncl.geometry.x,
         uncl.geometry.y,
-        s=5,
+        s=3,
         c="#D9D9D9",
         alpha=0.7,
         edgecolors="none",
@@ -305,7 +305,7 @@ def write_map(subset, labels, profiles) -> None:
         ax.scatter(
             sub.geometry.x,
             sub.geometry.y,
-            s=11,
+            s=6,
             c=col,
             alpha=0.85,
             edgecolors="white",

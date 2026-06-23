@@ -167,7 +167,7 @@ def plot_joint_map(ax, df: pd.DataFrame, gauge: gpd.GeoDataFrame) -> None:
     ax.scatter(
         g_rest.geometry.x,
         g_rest.geometry.y,
-        s=4,
+        s=2.5,
         c="#DcDcDc",
         edgecolors="none",
         zorder=2,
@@ -181,7 +181,7 @@ def plot_joint_map(ax, df: pd.DataFrame, gauge: gpd.GeoDataFrame) -> None:
         ax.scatter(
             g.geometry.x,
             g.geometry.y,
-            s=12,
+            s=7,
             c=col,
             edgecolors="white",
             linewidths=0.2,
@@ -226,9 +226,9 @@ def plot_agreement_map(ax, df: pd.DataFrame, gauge: gpd.GeoDataFrame, stats: dic
 
     cat = df.apply(status, axis=1)
     styles = {
-        "concordant": ("#117733", 11, f"Concordant (n={int((cat == 'concordant').sum())})"),
-        "discordant": ("#CC6677", 11, f"Discordant (n={int((cat == 'discordant').sum())})"),
-        "continuum": ("#BBBBBB", 5, f"Unclassified continuum (n={int((cat == 'continuum').sum())})"),
+        "concordant": ("#117733", 6, f"Concordant (n={int((cat == 'concordant').sum())})"),
+        "discordant": ("#CC6677", 6, f"Discordant (n={int((cat == 'discordant').sum())})"),
+        "continuum": ("#BBBBBB", 3, f"Unclassified continuum (n={int((cat == 'continuum').sum())})"),
     }
     handles = []
     for key in ("continuum", "discordant", "concordant"):  # continuum first = drawn underneath
