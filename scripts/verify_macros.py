@@ -24,7 +24,12 @@ for _p in (REPO, SCRIPTS):
     if str(_p) not in sys.path:
         sys.path.insert(0, str(_p))
 
-from coldregion_robustness import T_SPLIT, load_subset, shape_stats  # noqa: E402
+from coldregion_robustness import (  # noqa: E402
+    T_SPLIT,
+    boot_spearman_ci,
+    load_subset,
+    shape_stats,
+)
 
 from src.utils.paper_analysis_scope import (  # noqa: E402
     is_paper_analysis_excluded_gauge_id,
@@ -133,8 +138,8 @@ def check_coldregion_macros(macros: dict[str, str]) -> None:
     warm = cr[cr["tmp_dc_uyr"] >= T_SPLIT]
     cold = cr[cr["tmp_dc_uyr"] < T_SPLIT]
     cr_shape = shape_stats(cr["prm_pc_use"], cr["baseflow_index"])
-    rho_warm = float(spearmanr(warm["prm_pc_use"], warm["baseflow_index"])[0])
-    rho_cold = float(spearmanr(cold["prm_pc_use"], cold["baseflow_index"])[0])
+    rho_warm = float(spearmanr(warm["prm_pc_use"], warm["baseflow_index"], nan_policy="omit")[0])
+    rho_cold = float(spearmanr(cold["prm_pc_use"], cold["baseflow_index"], nan_policy="omit")[0])
     # 9 of 10 cold-region macros recompute from release; the Eckhardt agreement needs the
     # (gitignored) verdict, so guard it for fresh clones rather than crashing.
     check_macro(macros, "ncoldregiongauges", len(cr), "{:.0f}")
@@ -145,6 +150,19 @@ def check_coldregion_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "bfipermafrosthigh", cr_shape["high_med"], "{:.2f}")
     check_macro(macros, "rhopermafrostwarm", rho_warm, "{:.2f}")
     check_macro(macros, "rhopermafrostcold", rho_cold, "{:.2f}")
+    # Bootstrap CIs on the warm/cold rho (seeded, order-independent) -> lock both bounds.
+    ci_w = boot_spearman_ci(warm["prm_pc_use"].to_numpy(), warm["baseflow_index"].to_numpy())
+    ci_c = boot_spearman_ci(cold["prm_pc_use"].to_numpy(), cold["baseflow_index"].to_numpy())
+    check_val(
+        "rhopermafrostwarmci",
+        macros.get("rhopermafrostwarmci", "").replace("\\xspace", ""),
+        f"$[{ci_w[1]:+.2f}, {ci_w[2]:+.2f}]$",
+    )
+    check_val(
+        "rhopermafrostcoldci",
+        macros.get("rhopermafrostcoldci", "").replace("\\xspace", ""),
+        f"$[{ci_c[1]:+.2f}, {ci_c[2]:+.2f}]$",
+    )
     verdict_path = RESULTS_HESS / "coldregion_robustness_verdict.txt"
     if verdict_path.exists():
         m_agree = re.search(r"agreement\s*=\s*([+-]?\d+\.\d+)", verdict_path.read_text())

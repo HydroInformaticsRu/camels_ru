@@ -29,6 +29,7 @@ Outputs:
 from __future__ import annotations
 
 from pathlib import Path
+import warnings
 
 import numba
 import numpy as np
@@ -81,6 +82,33 @@ def boot_median_ci(values: np.ndarray, n_boot: int = N_BOOT) -> tuple[float, flo
     idx = RNG.integers(0, len(values), size=(n_boot, len(values)))
     meds = np.median(values[idx], axis=1)
     return (float(np.median(values)), float(np.percentile(meds, 2.5)), float(np.percentile(meds, 97.5)))
+
+
+def boot_spearman_ci(
+    x: np.ndarray, y: np.ndarray, n_boot: int = N_BOOT, seed: int = 1996
+) -> tuple[float, float, float]:
+    """Spearman rho and its 95% bootstrap CI (percentile method) over complete pairs.
+
+    Uses a *local* seeded RNG rather than the module global so the interval is
+    reproducible independent of call order, letting verify_macros recompute and
+    lock the reported value. Pairs with a NaN in either coordinate are dropped;
+    constant resamples (which Spearman returns as NaN) are excluded from the
+    percentiles.
+    """
+    x = np.asarray(x, dtype=np.float64)
+    y = np.asarray(y, dtype=np.float64)
+    ok = np.isfinite(x) & np.isfinite(y)
+    x, y = x[ok], y[ok]
+    if len(x) < 3:
+        return (np.nan, np.nan, np.nan)
+    point = float(spearmanr(x, y)[0])
+    rng = np.random.default_rng(seed)
+    idx = rng.integers(0, len(x), size=(n_boot, len(x)))
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")  # constant resamples -> NaN, filtered below
+        rhos = np.array([spearmanr(x[i], y[i])[0] for i in idx])
+    rhos = rhos[np.isfinite(rhos)]
+    return (point, float(np.percentile(rhos, 2.5)), float(np.percentile(rhos, 97.5)))
 
 
 @numba.jit(nopython=True)
@@ -282,12 +310,19 @@ def main() -> None:
 
     warm = df[df["tmp_dc_uyr"] >= T_SPLIT]
     cold = df[df["tmp_dc_uyr"] < T_SPLIT]
-    rho_w_lh = spearmanr(warm["prm_pc_use"], warm["baseflow_index"])[0]
-    rho_c_lh = spearmanr(cold["prm_pc_use"], cold["baseflow_index"])[0]
+    rho_w_lh = spearmanr(warm["prm_pc_use"], warm["baseflow_index"], nan_policy="omit")[0]
+    rho_c_lh = spearmanr(cold["prm_pc_use"], cold["baseflow_index"], nan_policy="omit")[0]
+    ci_w_lh = boot_spearman_ci(warm["prm_pc_use"].to_numpy(), warm["baseflow_index"].to_numpy())
+    ci_c_lh = boot_spearman_ci(cold["prm_pc_use"].to_numpy(), cold["baseflow_index"].to_numpy())
+    ci_w_s = f"[{ci_w_lh[1]:+.2f}, {ci_w_lh[2]:+.2f}]"
+    ci_c_s = f"[{ci_c_lh[1]:+.2f}, {ci_c_lh[2]:+.2f}]"
     rho_w_e = spearmanr(warm["prm_pc_use"], warm["bfi_eckhardt"], nan_policy="omit")[0]
     rho_c_e = spearmanr(cold["prm_pc_use"], cold["bfi_eckhardt"], nan_policy="omit")[0]
-    print("\n  Sign reversal across -5 degC (Spearman pf-BFI):")
-    print(f"    Lyne-Hollick: warm={rho_w_lh:+.3f} (n={len(warm)}) cold={rho_c_lh:+.3f} (n={len(cold)})")
+    print("\n  Sign reversal across -5 degC (Spearman pf-BFI, 95% bootstrap CI):")
+    print(
+        f"    Lyne-Hollick: warm={rho_w_lh:+.3f} (n={len(warm)}, CI {ci_w_s}) "
+        f"cold={rho_c_lh:+.3f} (n={len(cold)}, CI {ci_c_s})"
+    )
     print(f"    Eckhardt    : warm={rho_w_e:+.3f}  cold={rho_c_e:+.3f}")
 
     alpha_shapes, alpha_revs = alpha_sensitivity(df, warm, cold)
@@ -346,8 +381,9 @@ def main() -> None:
         f"  Lyne-Hollick : {inverted_u_lh}  {_shape_str(lh_shape)}",
         f"  Eckhardt     : {inverted_u_eck}  {_shape_str(eck_shape)}",
         "",
-        "Sign reversal across -5 degC (warm rho>0 AND cold rho<0):",
-        f"  Lyne-Hollick : {reversal_lh}  (warm {rho_w_lh:+.3f} / cold {rho_c_lh:+.3f})",
+        "Sign reversal across -5 degC (warm rho>0 AND cold rho<0; 95% bootstrap CI):",
+        f"  Lyne-Hollick : {reversal_lh}  (warm {rho_w_lh:+.3f} CI {ci_w_s} / "
+        f"cold {rho_c_lh:+.3f} CI {ci_c_s})",
         f"  Eckhardt     : {reversal_eck}  (warm {rho_w_e:+.3f} / cold {rho_c_e:+.3f})",
         "",
         f"Spearman(LH, Eckhardt) BFI agreement = {corr:+.3f}",

@@ -267,18 +267,20 @@ def write_map(subset, labels, profiles) -> None:
 
     aea = get_russia_projection()
     data_crs = ccrs.PlateCarree()
+    # 8 maximally-distinct hues x marker shape -> 24 unique (colour, marker) keys, so the
+    # 16 end-members never collide. The previous 10-colour list was indexed `i % len`, which
+    # wrapped and gave 6 end-members a colour identical to another's (illegible legend).
     palette = [
-        "#EE6677",
-        "#4477AA",
-        "#228833",
-        "#CCBB44",
-        "#AA3377",
-        "#66CCEE",
-        "#BB5500",
-        "#117733",
-        "#882255",
-        "#999933",
+        "#E6194B",  # red
+        "#4363D8",  # blue
+        "#3CB44B",  # green
+        "#F58231",  # orange
+        "#911EB4",  # purple
+        "#F032E6",  # magenta
+        "#9A6324",  # brown
+        "#42D4F4",  # cyan
     ]
+    markers = ["o", "^", "s"]  # circle / triangle / square -> shape disambiguates re-used hues
 
     fig = plt.figure(figsize=(9.0, 5.5))
     ax = fig.add_subplot(1, 1, 1, projection=aea)
@@ -302,11 +304,13 @@ def write_map(subset, labels, profiles) -> None:
     for i, r in profiles.iterrows():
         sub = gauge[gauge["lab"] == r["end_member"]]
         col = palette[i % len(palette)]
+        mk = markers[i // len(palette)]
         ax.scatter(
             sub.geometry.x,
             sub.geometry.y,
-            s=6,
+            s=7,
             c=col,
+            marker=mk,
             alpha=0.85,
             edgecolors="white",
             linewidths=0.2,
@@ -317,7 +321,7 @@ def write_map(subset, labels, profiles) -> None:
             Line2D(
                 [],
                 [],
-                marker="o",
+                marker=mk,
                 color="none",
                 markerfacecolor=col,
                 markersize=6,
