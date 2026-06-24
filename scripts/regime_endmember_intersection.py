@@ -115,9 +115,9 @@ def plot_heatmap(ax, df: pd.DataFrame, ari: float) -> None:
 
     im = ax.imshow(frac.values, aspect="auto", cmap="magma_r", vmin=0, vmax=1)
     ax.set_xticks(range(len(cols)))
-    ax.set_xticklabels(cols, rotation=45, ha="right", fontsize=8)
+    ax.set_xticklabels(cols, rotation=45, ha="right", fontsize=8.5)
     ax.set_yticks(range(len(ct.index)))
-    ax.set_yticklabels([f"Regime {r}" for r in ct.index], fontsize=8)
+    ax.set_yticklabels([f"Regime {r}" for r in ct.index], fontsize=8.5)
     ax.set_xlabel("Physiographic end-member", fontsize=10)
     ax.set_ylabel("Hydrograph regime", fontsize=10)
     for i in range(ct.shape[0]):
@@ -130,7 +130,7 @@ def plot_heatmap(ax, df: pd.DataFrame, ari: float) -> None:
                     str(n),
                     ha="center",
                     va="center",
-                    fontsize=6.5,
+                    fontsize=7.0,
                     color="white" if frac.values[i, j] > 0.5 else "#333333",
                 )
     cb = ax.figure.colorbar(im, ax=ax, fraction=0.025, pad=0.01)

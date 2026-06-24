@@ -108,6 +108,28 @@ _TABLE_ATTRS = {
     "kar_pc_use": "Karst (%)",
 }
 
+# Hand-reviewed final end-member names, overriding the auto-generated placeholders
+# (keyed by the deterministic auto-name). Each was checked against the per-end-member
+# attribute standouts so no label leads with an attribute that is not actually elevated;
+# approved 2026-06-24. Auto-names not listed here are kept verbatim.
+FINAL_NAMES = {
+    "High-PET / Cropland (pasture)": "Cropland / Pasture",
+    "Karst / Lake": "Karst (lowland)",
+    "Highland / Karst (high-et)": "Upland (high-AET)",
+    "Permafrost / Snow (karst, highland)": "Permafrost / Snow (upland karst)",
+    "High-PET / Cropland": "Cropland (high-PET)",
+    "Permafrost / Snow": "Permafrost / Snow (highland)",
+    "Karst / High-ET": "Karst (high-PET)",
+    "Inundated / Forested": "Floodplain (sandy)",
+    "Highland / Deep-GW": "Highland / Pasture",
+    "High-ET / High-PET": "Lowland (diffuse)",
+    "Permafrost / Snow (karst)": "Karst / Forest (upland)",
+    "Highland / Karst": "Alpine karst",
+    "Humid / High-ET": "Humid / Forested",
+    "Permafrost / Snow (forested)": "Snow / Forest (karst)",
+    # kept verbatim: "Permafrost / Snow (lake)", "Permafrost / Snow (sandy)"
+}
+
 
 def load_features() -> tuple[pd.DataFrame, list[str]]:
     """Load the physiographic+climate attribute matrix for the paper-analysis scope."""
@@ -308,7 +330,7 @@ def write_map(subset, labels, profiles) -> None:
         ax.scatter(
             sub.geometry.x,
             sub.geometry.y,
-            s=7,
+            s=9,
             c=col,
             marker=mk,
             alpha=0.85,
@@ -324,7 +346,7 @@ def write_map(subset, labels, profiles) -> None:
                 marker=mk,
                 color="none",
                 markerfacecolor=col,
-                markersize=6,
+                markersize=7.5,
                 linestyle="None",
                 label=f"{r['name']} (n={r['n']})",
             )
@@ -346,7 +368,7 @@ def write_map(subset, labels, profiles) -> None:
         handles=handles,
         loc="upper center",
         bbox_to_anchor=(0.5, -0.02),
-        fontsize=7.5,
+        fontsize=8.0,
         framealpha=0.9,
         ncol=4,
         columnspacing=1.0,
@@ -362,6 +384,7 @@ def main() -> None:
     subset, features = load_features()
     labels, probs, sil, stability = cluster(subset, features)
     profiles = build_profiles(subset, features, labels, probs)
+    profiles["name"] = profiles["name"].map(lambda n: FINAL_NAMES.get(n, n))  # hand-reviewed labels
     n_uncl = int((labels == -1).sum())
 
     print("\nEnd-members (largest first):")
