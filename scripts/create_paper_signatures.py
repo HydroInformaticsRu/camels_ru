@@ -297,6 +297,10 @@ def main() -> None:
     )
 
     df = df[["gauge_id", "area_km2", "is_anomalous", *SIGNATURE_ORDER, "n_valid_years"]]
+    # Deterministic row order so the released CSV is reproducible across rebuilds
+    # (parallel processing otherwise yields completion-order rows, which perturbs
+    # order-sensitive downstream statistics such as bootstrap resampling).
+    df = df.sort_values("gauge_id", key=lambda s: s.astype("int64"), ignore_index=True)
 
     out_per_gauge = args.output_dir / "camels_ru_signatures.csv"
     df.to_csv(out_per_gauge, index=False, float_format="%.6g")
