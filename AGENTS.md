@@ -13,9 +13,10 @@
 
 **CAMELS-RU** — a CAMELS-standard hydroclimatic dataset for 3,353 Russian catchments
 (daily discharge, water level, ERA5-Land/MSWEP/GLEAM forcing, HydroATLAS attributes,
-2008–2023). Target journal: **Hydrology and Earth System Sciences (HESS)**; ESSD is no
-longer the target, so the manuscript needs hydrological-science framing beyond
-data-description readiness.
+2008–2023). Target journal: **Earth System Science Data (ESSD)**; the paper is a data
+description article, so it needs data-descriptor framing (reusability, provenance, and
+validation) rather than a hydrological-analysis narrative. Relocated analysis lives in
+`paper/overleaf/COMPANION_DRAFT.md` for a separate companion paper.
 
 **Stack**: Python 3.12 / pixi / ruff / pyright / xarray + NetCDF / GeoPandas / FastAPI
 (quality-review app) / LaTeX (manuscript).
@@ -118,7 +119,7 @@ camels_ru/
 ├── app/                       # FastAPI quality-review web app
 ├── notebooks/                 # Analysis notebooks (long-running — ask first)
 ├── scripts/                   # CLI entry points (parsers, builders, graders)
-├── paper/                     # HESS manuscript
+├── paper/                     # ESSD manuscript
 │   ├── overleaf/              # Active manuscript source (nested Overleaf git repo)
 │   ├── manuscript.md          # Legacy Markdown snapshot — not canonical unless revived
 │   ├── latex/                 # Legacy generated LaTeX snapshot
@@ -165,7 +166,7 @@ python scripts/package_dataset.py         # Zenodo bundle
 
 When sources conflict, higher rank wins:
 
-1. `paper/overleaf/` — canonical collaborative manuscript source (reviewer-facing HESS LaTeX)
+1. `paper/overleaf/` — canonical collaborative manuscript source (reviewer-facing ESSD LaTeX)
 2. **`AGENTS.md`** — cross-agent behavioral rules (this file; the SoT)
 3. `CLAUDE.md` — Claude-Code-only runtime layer (imports this file)
 4. `AGENTS_REFERENCE.md` — technical details

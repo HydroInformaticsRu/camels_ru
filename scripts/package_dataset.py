@@ -62,8 +62,8 @@ INSTITUTION = (
 )
 LICENSE = "CC BY 4.0"
 REFERENCES = (
-    "Abramov et al.: CAMELS-RU dataset description (Hydrology and Earth System "
-    "Sciences, in review); processing code: "
+    "Abramov et al.: CAMELS-RU dataset description (Earth System Science "
+    "Data, in review); processing code: "
     "https://github.com/HydroInformaticsRu/camels_ru"
 )
 # CF discrete-sampling-geometry attributes for the per-gauge time-series id.
@@ -423,8 +423,9 @@ def package_forcing() -> dict[str, str]:
                     "units": "mm d-1",
                     "source": "GLEAM4 (Miralles et al., 2025, Sci. Data 12, 416)",
                     "method": (
-                        "Modified Priestley-Taylor scaled by a multiplicative "
-                        "evaporative-stress factor (GLEAM4)"
+                        "Penman equation from net radiation, air temperature, wind "
+                        "speed, vegetation height, and vapour pressure deficit "
+                        "(GLEAM4 v4.2a potential evaporation)"
                     ),
                 },
             ),
@@ -442,7 +443,7 @@ def package_forcing() -> dict[str, str]:
             ),
             "temp_source": "ERA5-Land (Munoz-Sabater et al., 2021)",
             "pet_source": "GLEAM4 (Miralles et al., 2025)",
-            "pet_method": "Modified Priestley-Taylor with evaporative-stress factor (GLEAM4)",
+            "pet_method": "Penman potential evaporation (GLEAM4 v4.2a)",
             "period": f"{PERIOD_START} to {PERIOD_END}",
             "precip_units": "mm d-1",
             "temp_units": "degC",

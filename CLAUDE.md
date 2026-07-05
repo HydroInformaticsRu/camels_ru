@@ -18,7 +18,7 @@
 2. Check `git status` for current state.
 3. Verify what needs to be done before making changes.
 
-**This repo has one track: finish the HESS paper.** Treat manuscript progress
+**This repo has one track: finish the ESSD paper.** Treat manuscript progress
 (`paper/overleaf/`), the dataset release, and the auto-memory below as the durable state —
 there is no multi-track scaffolding here.
 

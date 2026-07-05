@@ -78,8 +78,14 @@ def parse_macros() -> dict[str, str]:
 
 
 def macro_num(raw: str) -> float:
-    r"""Extract the leading signed number from a macro value (strips {,}, \%, units, \xspace)."""
-    s = raw.replace("\\xspace", "").replace("\\%", "").replace("{,}", "").replace(",", "")
+    r"""Extract the leading signed number from a macro value (strips {,}, \,, \%, units, \xspace)."""
+    s = (
+        raw.replace("\\xspace", "")
+        .replace("\\%", "")
+        .replace("{,}", "")
+        .replace("\\,", "")
+        .replace(",", "")
+    )
     s = s.replace("−", "-")  # unicode minus -> ASCII
     m = re.search(r"[+-]?\d+(?:\.\d+)?", s)
     return float(m.group(0)) if m else float("nan")

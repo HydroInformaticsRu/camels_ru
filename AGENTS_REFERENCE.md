@@ -18,7 +18,7 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
 | **Platform** | linux-64 |
 | **GitHub** | HydroInformaticsRu/camels_ru |
 | **Active branches** | `main` (default), `new_branch` (usual PR target) |
-| **Paper target** | Hydrology and Earth System Sciences (HESS); pivoted from ESSD |
+| **Paper target** | Earth System Science Data (ESSD); reverted from a brief HESS retarget |
 | **Dataset license** | CC BY 4.0 (data), MIT (code) |
 
 ### Per-file lint relaxations (from `pyproject.toml`)
@@ -46,7 +46,7 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
 | `app/` | FastAPI web app for visual quality review (`app/main.py`) |
 | `notebooks/` | Analysis notebooks (ruff: D, T20, S112 relaxed) |
 | `scripts/` | CLI entry points (ruff: T20 relaxed) |
-| `paper/overleaf/` | Active collaborative HESS manuscript source (nested Overleaf git repo) |
+| `paper/overleaf/` | Active collaborative ESSD manuscript source (nested Overleaf git repo) |
 | `paper/manuscript.md`, `paper/latex/` | Legacy Markdown-era manuscript context only unless explicitly revived |
 | `paper/images/` | Reprojected figures for paper |
 | `release/CAMELS_RU_v1.0/` | Zenodo release: NetCDF + CSV artifacts |
