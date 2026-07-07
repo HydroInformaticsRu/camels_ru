@@ -81,6 +81,10 @@ release/
 
 # Paper drafts (keep LaTeX source, ignore builds)
 paper/paper_v2/
+# Working drafts kept local, not shipped in the public repo
+paper/era5_correction_reframe_review.md
+paper/response_letter_ais_gmvo.md
+paper/endmember_supplement_draft.md
 .tmp/
 
 # Claude Code / AI agent config --- local-only, not shipped in the public repo.
