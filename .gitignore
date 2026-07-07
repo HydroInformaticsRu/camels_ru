@@ -83,14 +83,18 @@ release/
 paper/paper_v2/
 .tmp/
 
-# Claude Code / AI agent config
-# Track shared agent config (skills, project settings, CLAUDE.md); keep local-only state out.
-.claude/*
-!.claude/skills/
-!.claude/settings.json
+# Claude Code / AI agent config --- local-only, not shipped in the public repo.
+# AGENTS.md and CLAUDE.md stay tracked; the tooling directories do not.
+.claude/
+.cursor/
+.agents/
+.mcp.json
 CLAUDE.local.md
-.claude/settings.local.json
-.claude/scheduled_tasks.lock
+
+# Agentic build output and one-off audits --- local-only.
+graphify-out/
+analysis/
+reports/
 
 # QGIS
 *.qgz
