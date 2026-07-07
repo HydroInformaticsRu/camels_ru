@@ -37,16 +37,13 @@ Figures referenced in the manuscript:
 
 | Figure | File | Description |
 |--------|------|-------------|
-| 1 | `fig_gauge_network.png` | Gauge network map + size distribution |
-| 2 | `fig_quality_assessment.png` | Quality grade distribution |
-| 3 | `fig_hydro_characteristics.png` | Discharge/water level characteristics |
-| 4 | `fig_precip_comparison.png` | Precipitation spatial comparison |
-| 5 | `fig_forcing_correlations.png` | Inter-dataset scatter plots |
-| 6 | `fig_water_balance.png` | Runoff ratio and ET proxy |
-| 7 | `fig_water_balance_strata.png` | Physical-consistency failure strata |
-| 8 | `fig_budyko.png` | Budyko consistency check |
-| 9 | `fig_hydro_signatures_1.png` | Magnitude/baseflow signatures |
-| 10 | `fig_hydro_signatures_2.png` | Timing/variability signatures |
+| 1 | `fig_gauge_network.png` | Gauge network map + catchment-size distribution (§2) |
+| 2 | `fig_gauge_reliability.png` | Per-gauge share of Grade A years, mapped (§4) |
+| 3 | `fig_hydro_signatures_1.png` | Magnitude/baseflow signatures (§5) |
+| 4 | `fig_hydro_signatures_2.png` | Timing/variability/extreme signatures (§5) |
+| 5 | `fig_precip_comparison.png` | Precipitation-product differences (§6) |
+| 6 | `fig_budyko.png` | Budyko consistency check (§6) |
+| 7 | `fig_coldregion_gradient.png` | Example cold-region signature analysis (§8) |
 
 Additional figures available in `images/` for supplementary material.
 
@@ -58,17 +55,6 @@ latexmk -pdf main.tex
 ```
 
 Requires: `copernicus.cls` (included), `booktabs`, `threeparttable`, `xspace`.
-
-## Review History
-
-The manuscript went through 4 rounds of automated peer review (4 independent Opus agents + Codex second opinion per round):
-
-| Round | Score | Key fixes |
-|-------|-------|-----------|
-| R1 | 74 | Strict Grade A, per-year mask, paper→markdown |
-| R2 | 72 | β corrected (0.824→0.290), Q/P >1 fixed, GRDC added, sensitivities |
-| R3 | 89 | Missing Linke ref, flag count, grading logic, grammar |
-| R4 | 91 | Ref ordering, rounding, verb fragments, symbol clash |
 
 ## Key Numbers
 
