@@ -1,6 +1,6 @@
 # CAMELS-RU Paper
 
-**Target journal:** Hydrology and Earth System Sciences (HESS)
+**Target journal:** Earth System Science Data (ESSD)
 
 ## Structure
 
@@ -12,7 +12,6 @@ paper/
 │   ├── refs.bib
 │   ├── sections/
 │   └── tables/
-├── manuscript.md       # Legacy Markdown snapshot/context; not canonical unless explicitly revived
 ├── images/             # Figure generation outputs mirrored into overleaf/images/ when used by the manuscript
 ├── latex/              # Legacy generated LaTeX snapshot from the Markdown-era workflow
 │   ├── main.tex
@@ -26,7 +25,7 @@ paper/
 
 ## Editing
 
-The active collaborative manuscript source is the Overleaf git clone at `paper/overleaf/` in local working copies. Treat `manuscript.md` and `paper/latex/` as legacy Markdown-era context unless explicitly revived.
+The active collaborative manuscript source is the Overleaf git clone at `paper/overleaf/` in local working copies. Treat `paper/latex/` as legacy Markdown-era context unless explicitly revived.
 
 Use Overleaf comments and nested-repo diffs for manuscript review. Use parent-repo pull requests for code, data-processing, release, and documentation changes.
 
@@ -73,4 +72,4 @@ The manuscript went through 4 rounds of automated peer review (4 independent Opu
 
 ## Key Numbers
 
-Current manuscript numbers must be verified against `release/CAMELS_RU_v1.0/` and reflected in `paper/overleaf/macros.tex`. The older `manuscript.md` and `paper/latex/` values are not authoritative.
+Current manuscript numbers must be verified against `release/CAMELS_RU_v1.0/` and reflected in `paper/overleaf/macros.tex`. The older `paper/latex/` values are not authoritative.

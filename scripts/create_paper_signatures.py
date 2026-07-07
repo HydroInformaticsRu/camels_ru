@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate the 15 hydrological signatures declared in manuscript.md (§3.5, Table 3).
+"""Regenerate the 15 hydrological signatures declared in the manuscript (paper/overleaf, Table 3).
 
 Inputs:
 - Release discharge NetCDF (`release/CAMELS_RU_v1.0/camels_ru_discharge.nc`)
@@ -10,7 +10,7 @@ Outputs (written to `--output-dir`):
 - `camels_ru_signatures.csv` — per-gauge × 15 signatures
 - `camels_ru_signatures_summary.csv` — summary stats (n, mean, median, min, max, std) per signature
 
-Signatures produced (matching manuscript.md Table 3):
+Signatures produced (matching the manuscript signature table):
 q_mean, runoff_ratio, q_cv, fdc_slope, flashiness_index, q05, q95,
 high_flow_freq, high_flow_dur, baseflow_index, low_flow_freq, low_flow_dur, half_flow_date,
 aridity_index (PET/P, mean of per-hydro-year ratios),

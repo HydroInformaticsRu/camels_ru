@@ -5,7 +5,7 @@
 
 A CAMELS-standard hydrological dataset for the Russian Federation, covering 3,353 catchments with daily discharge, water level, meteorological forcing, physiographic attributes, and hydrological signatures (2008–2023).
 
-**Paper**: Overleaf git clone at `paper/overleaf/` is the active collaborative manuscript source; [paper/manuscript.md](paper/manuscript.md) is a legacy Markdown snapshot (target: HESS)
+**Paper**: The active collaborative manuscript source is the Overleaf git clone at `paper/overleaf/` (target: Earth System Science Data, ESSD)
 **Dataset**: release bundle staged; Zenodo DOI pending
 
 ## Dataset Summary
@@ -39,11 +39,10 @@ camels_ru/
 │   ├── plots/               # Publication-quality cartographic functions
 │   ├── static/              # HydroATLAS extraction and clustering
 │   └── utils/               # Logging and helpers
-├── scripts/                 # Data processing pipeline (16 scripts)
+├── scripts/                 # Data processing pipeline
 ├── notebooks/               # Analysis notebooks (5, with .py parallels)
-├── paper/                   # HESS manuscript assets
+├── paper/                   # ESSD manuscript assets
 │   ├── overleaf/            # Active manuscript source (nested Overleaf git repo, parent ignored)
-│   ├── manuscript.md        # Legacy Markdown snapshot/context
 │   └── images/              # Figure generation outputs mirrored into overleaf/images/ when used
 ├── app/                     # FastAPI web interface for quality review
 └── release/                 # Zenodo dataset package (gitignored)
@@ -92,7 +91,7 @@ The dataset is not included in this repository. To use the analysis tools:
 
 ## Citation
 
-Abramov, D. V.: CAMELS-RU: A Large-Sample Hydroclimatic Dataset for 3,353 Russian Catchments, Hydrol. Earth Syst. Sci. (in preparation), 2026.
+Abramov, D. V.: CAMELS-RU: A Large-Sample Hydroclimatic Dataset for 3,353 Russian Catchments, Earth Syst. Sci. Data (in preparation), 2026.
 
 ## Acknowledgments
 

@@ -121,7 +121,6 @@ camels_ru/
 ├── scripts/                   # CLI entry points (parsers, builders, graders)
 ├── paper/                     # ESSD manuscript
 │   ├── overleaf/              # Active manuscript source (nested Overleaf git repo)
-│   ├── manuscript.md          # Legacy Markdown snapshot — not canonical unless revived
 │   ├── latex/                 # Legacy generated LaTeX snapshot
 │   ├── images/                # Figures (Albers Equal-Area Conic)
 │   └── tables/                # Data tables

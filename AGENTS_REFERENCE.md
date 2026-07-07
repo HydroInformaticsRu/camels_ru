@@ -47,7 +47,7 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
 | `notebooks/` | Analysis notebooks (ruff: D, T20, S112 relaxed) |
 | `scripts/` | CLI entry points (ruff: T20 relaxed) |
 | `paper/overleaf/` | Active collaborative ESSD manuscript source (nested Overleaf git repo) |
-| `paper/manuscript.md`, `paper/latex/` | Legacy Markdown-era manuscript context only unless explicitly revived |
+| `paper/latex/` | Legacy generated LaTeX snapshot (local only, not shipped) |
 | `paper/images/` | Reprojected figures for paper |
 | `release/CAMELS_RU_v1.0/` | Zenodo release: NetCDF + CSV artifacts |
 | `data/` | Symlink to external data root (not tracked, not on all machines) |
