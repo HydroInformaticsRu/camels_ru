@@ -1,14 +1,15 @@
-"""Render the gauge-reliability map (Section 4): per-gauge share of grade-A years.
+"""Render the discharge-quality figure (Section 4): overall grade and per-gauge reliability.
 
-For every graded discharge gauge, we compute the fraction of its assessed
-hydrological years that received grade A, then plot the gauges on the same
-Albers Equal-Area map and Natural Earth basemap as the Section 2 network figure.
-The Section 2 map shows each gauge's single overall grade; this map shows how
-consistently reliable each gauge is across the record, which the overall grade
-(dominated by the worst year under the strict rule) cannot convey.
+Two stacked Albers maps of the discharge gauges of the Analysis set:
+(a) the overall A-F grade of every discharge gauge (ungraded gauges in grey), from
+    the released ``camels_ru_gauge_summary.csv``;
+(b) the share of assessed hydrological years graded A, from the released
+    ``camels_ru_year_grades.csv``, in five 20-point classes that reuse the grade palette.
 
-The reliability is derived from the released ``camels_ru_year_grades.csv`` so the
-figure reproduces from the archive alone.
+Panel (a) gives the single grade users filter on; panel (b) shows how consistently
+reliable each record is, which the overall grade (dominated by the worst year under the
+strict rule) cannot convey. Both panels reproduce from the archive plus the gauge-point
+layer used by every other map script.
 
 Usage:
     pixi run python scripts/plot_gauge_reliability.py            # test output (.tmp)
@@ -25,9 +26,11 @@ import warnings
 import cartopy.crs as ccrs
 import geopandas as gpd
 from matplotlib.colors import BoundaryNorm, ListedColormap
+from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.append(str(PROJECT_ROOT))
@@ -56,9 +59,11 @@ plt.rcParams.update(
     }
 )
 
-DATA_DIR = PROJECT_ROOT / "data" / "CAMELS_RU"
-GEOM_DIR = DATA_DIR / "geometry"
-GRADES_CSV = PROJECT_ROOT / "release" / "CAMELS_RU_v1.0" / "camels_ru_year_grades.csv"
+GEOM_DIR = PROJECT_ROOT / "data" / "CAMELS_RU" / "geometry"
+RELEASE = PROJECT_ROOT / "release" / "CAMELS_RU_v1.0"
+GRADES_CSV = RELEASE / "camels_ru_year_grades.csv"
+SUMMARY_CSV = RELEASE / "camels_ru_gauge_summary.csv"
+DISCHARGE_NC = RELEASE / "camels_ru_discharge.nc"
 OUT_NAME = "fig_gauge_reliability.png"
 PAPER_OUTPUTS = (
     PROJECT_ROOT / "paper" / "images" / OUT_NAME,
@@ -66,119 +71,188 @@ PAPER_OUTPUTS = (
 )
 TEST_OUTPUT = PROJECT_ROOT / ".tmp" / "cluster_diag" / "fig_gauge_reliability_test.png"
 
-# Discrete reliability classes on the share of grade-A years. Bin edges are equal
-# 20-point bands; the five colours reuse the Section 2 grade palette exactly
-# (F red -> A dark green) so the two quality figures read as one visual language.
+# Ordinal grade palette (A dark green -> F red, grey for ungraded), shared by both panels.
+GRADE_COLORS = {
+    "A": "#1a9850",
+    "B": "#91cf60",
+    "C": "#fee08b",
+    "D": "#fc8d59",
+    "F": "#d73027",
+    "ungraded": "#BBBBBB",
+}
+GRADE_ORDER = ["A", "B", "C", "D", "F", "ungraded"]
+
+# Discrete reliability classes on the share of grade-A years: equal 20-point bands
+# coloured with the same five grade colours (F red -> A dark green).
 BOUNDS = [0, 20, 40, 60, 80, 100]
-BIN_COLORS = ["#d73027", "#fc8d59", "#fee08b", "#91cf60", "#1a9850"]
-BIN_LABELS = ["0-20", "20-40", "40-60", "60-80", "80-100"]
+BIN_COLORS = [GRADE_COLORS[g] for g in ("F", "D", "C", "B", "A")]
 
 
-def load_reliability() -> gpd.GeoDataFrame:
-    """Load gauge points and attach the per-gauge share of grade-A years.
+def load_gauges() -> gpd.GeoDataFrame:
+    """Discharge gauges of the Analysis set with ``grade`` and ``pct_a`` columns.
 
     Returns:
-        Paper-analysis gauge points that carry at least one assessed year, with a
-        ``pct_a`` column (0-100) and an ``n_assessed`` column.
+        Gauge points for every catchment that carries discharge observations, with the
+        overall grade (``"ungraded"`` where none was assigned), the share of assessed
+        years graded A (``pct_a``, NaN when ungraded), and ``n_assessed``.
     """
     gauge = gpd.read_file(GEOM_DIR / "camels_gauges.gpkg")
     gauge.set_index("gauge_id", inplace=True)
     gauge.index = gauge.index.astype(str)
     gauge = filter_paper_analysis_index(gauge)
 
+    has_q = xr.open_dataset(DISCHARGE_NC)["discharge_m3s"].notnull().any("time").to_pandas()
+    has_q.index = has_q.index.astype(str)
+    gauge = gauge.loc[gauge.index.intersection(has_q[has_q].index)].copy()
+
+    summary = pd.read_csv(SUMMARY_CSV, dtype=str).set_index("gauge_id")
+    gauge["grade"] = gauge.index.map(summary["overall_grade"]).fillna("ungraded")
+
     grades = pd.read_csv(GRADES_CSV, dtype=str).set_index("gauge_id")
-    grades.index = grades.index.astype(str)
     year_cols = [c for c in grades.columns if c.isdigit()]
     grades = grades[year_cols]
-
     n_assessed = grades.notna().sum(axis=1)
     n_a = (grades == "A").sum(axis=1)
-    graded = n_assessed > 0
     pct_a = pd.Series(np.nan, index=grades.index)
+    graded = n_assessed > 0
     pct_a[graded] = 100.0 * n_a[graded] / n_assessed[graded]
-
     gauge["pct_a"] = gauge.index.map(pct_a)
     gauge["n_assessed"] = gauge.index.map(n_assessed)
-    gauge = gauge[gauge["pct_a"].notna()].copy()
 
-    print(f"graded gauges plotted: {len(gauge)}")
-    print(f"median share of A years: {gauge['pct_a'].median():.1f}%")
-    print(f"gauges at 100% A: {(gauge['pct_a'] >= 100).sum()}")
-    print(f"gauges at 0% A:   {(gauge['pct_a'] <= 0).sum()}")
+    print(f"discharge gauges plotted: {len(gauge)}")
+    for grade, cnt in gauge["grade"].value_counts().reindex(GRADE_ORDER).items():
+        print(f"  {grade}: {0 if pd.isna(cnt) else int(cnt)}")
+    rel = gauge["pct_a"].dropna()
+    print(f"graded gauges with reliability: {len(rel)}; median share of A years: {rel.median():.1f}%")
+    print(f"gauges at 100% A: {int((rel >= 100).sum())}; at 0% A: {int((rel <= 0).sum())}")
     return gauge
 
 
+def _basemap(ax: plt.Axes, gauge: gpd.GeoDataFrame, aea: ccrs.Projection) -> None:
+    """Shared extent and Natural Earth landmass background for one panel."""
+    ax.axis("off")
+    _set_extent_from_data(ax, gauge)
+    ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
+    ne_land.to_crs(aea.proj4_init).plot(
+        ax=ax, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.3, zorder=1
+    )
+
+
+def _panel_grades(ax: plt.Axes, gauge: gpd.GeoDataFrame, data_crs: ccrs.Projection) -> None:
+    """Panel (a): overall grade per discharge gauge, worse grades drawn on top."""
+    handles = []
+    for rank, grade in enumerate(GRADE_ORDER):
+        sub = gauge[gauge["grade"] == grade]
+        if sub.empty:
+            continue
+        z = 2 if grade == "ungraded" else 3 + rank
+        ax.scatter(
+            sub.geometry.x,
+            sub.geometry.y,
+            s=14,
+            alpha=0.85,
+            c=GRADE_COLORS[grade],
+            edgecolors="#333333",
+            linewidths=0.15,
+            zorder=z,
+            transform=data_crs,
+        )
+        handles.append(
+            Line2D(
+                [],
+                [],
+                marker="o",
+                linestyle="None",
+                markersize=6,
+                markerfacecolor=GRADE_COLORS[grade],
+                markeredgecolor="#333333",
+                markeredgewidth=0.3,
+                label=f"{grade} (n={len(sub)})",
+            )
+        )
+    ax.legend(
+        handles=handles,
+        loc="lower left",
+        fontsize=8,
+        framealpha=0.9,
+        ncol=2,
+        columnspacing=0.8,
+        handletextpad=0.4,
+    )
+    ax.set_title("(a) Overall discharge grade", fontsize=13, fontweight="bold", loc="left")
+
+
+def _panel_reliability(
+    fig: plt.Figure, ax: plt.Axes, gauge: gpd.GeoDataFrame, data_crs: ccrs.Projection
+) -> None:
+    """Panel (b): share of assessed years graded A, five discrete classes."""
+    graded = gauge[gauge["pct_a"].notna()].sort_values("pct_a", ascending=False)
+    cmap = ListedColormap(BIN_COLORS)
+    norm = BoundaryNorm(BOUNDS, cmap.N)
+    # Least-reliable gauges drawn last so they stay visible on the dense cluster.
+    sc = ax.scatter(
+        graded.geometry.x,
+        graded.geometry.y,
+        c=graded["pct_a"],
+        cmap=cmap,
+        norm=norm,
+        s=14,
+        alpha=0.95,
+        edgecolors="#333333",
+        linewidths=0.15,
+        zorder=3,
+        transform=data_crs,
+    )
+    cbar = fig.colorbar(
+        sc,
+        ax=ax,
+        orientation="horizontal",
+        boundaries=BOUNDS,
+        ticks=BOUNDS,
+        spacing="uniform",
+        drawedges=True,
+        shrink=0.55,
+        pad=0.02,
+        aspect=30,
+    )
+    cbar.set_label("Share of assessed years graded A (%)", fontsize=10)
+    cbar.dividers.set_color("white")
+    cbar.dividers.set_linewidth(1.5)
+    ax.text(
+        0.01,
+        0.02,
+        f"n = {len(graded)} graded gauges",
+        transform=ax.transAxes,
+        fontsize=9,
+        va="bottom",
+        ha="left",
+    )
+    ax.set_title("(b) Share of assessed years graded A", fontsize=13, fontweight="bold", loc="left")
+
+
 def build_figure(gauge: gpd.GeoDataFrame) -> plt.Figure:
-    """Assemble the single-panel reliability map.
+    """Assemble the two-panel discharge-quality figure.
 
     Args:
-        gauge: Gauge points carrying ``pct_a`` (share of grade-A years).
+        gauge: Discharge gauge points carrying ``grade`` and ``pct_a``.
 
     Returns:
         The assembled matplotlib Figure (caller saves/closes it).
     """
     aea = get_russia_projection()
     data_crs = ccrs.PlateCarree()
-
-    fig = plt.figure(figsize=(9.5, 6.0), constrained_layout=True)
-    ax_map = fig.add_subplot(1, 1, 1, projection=aea)
-    ax_map.axis("off")
-    _set_extent_from_data(ax_map, gauge)
-
-    ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
-    ne_land.to_crs(aea.proj4_init).plot(
-        ax=ax_map, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.3, zorder=1
+    fig, axes = plt.subplots(
+        2, 1, figsize=(9.5, 9.2), subplot_kw={"projection": aea}, constrained_layout=True
     )
-
-    cmap = ListedColormap(BIN_COLORS)
-    norm = BoundaryNorm(BOUNDS, cmap.N)
-
-    # Draw least-reliable gauges last so they stay visible on the dense cluster.
-    gauge = gauge.sort_values("pct_a", ascending=False)
-    sc = ax_map.scatter(
-        gauge.geometry.x,
-        gauge.geometry.y,
-        c=gauge["pct_a"],
-        cmap=cmap,
-        norm=norm,
-        s=20,
-        alpha=0.95,
-        edgecolors="#333333",
-        linewidths=0.2,
-        zorder=3,
-        transform=data_crs,
-    )
-
-    cbar = fig.colorbar(
-        sc,
-        ax=ax_map,
-        orientation="horizontal",
-        boundaries=BOUNDS,
-        ticks=BOUNDS,
-        spacing="uniform",
-        drawedges=True,
-        shrink=0.62,
-        pad=0.02,
-        aspect=30,
-    )
-    cbar.set_label("Share of assessed years graded A (%)", fontsize=11)
-    cbar.dividers.set_color("white")
-    cbar.dividers.set_linewidth(1.5)
-
-    ax_map.text(
-        0.01,
-        0.02,
-        f"n = {len(gauge):,} graded gauges",
-        transform=ax_map.transAxes,
-        fontsize=9,
-        va="bottom",
-        ha="left",
-    )
+    for ax in axes:
+        _basemap(ax, gauge, aea)
+    _panel_grades(axes[0], gauge, data_crs)
+    _panel_reliability(fig, axes[1], gauge, data_crs)
     return fig
 
 
 def main() -> None:
-    """Parse CLI args, build the reliability map, and write it out."""
+    """Parse CLI args, build the quality figure, and write it out."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--write",
@@ -187,9 +261,8 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    gauge = load_reliability()
+    gauge = load_gauges()
     fig = build_figure(gauge)
-
     outputs = PAPER_OUTPUTS if args.write else (TEST_OUTPUT,)
     for out in outputs:
         out.parent.mkdir(parents=True, exist_ok=True)

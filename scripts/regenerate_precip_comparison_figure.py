@@ -8,8 +8,9 @@ directly visible (panel a is strongly positive) while GPCP and MSWEP nearly agre
 (panel b near zero).
 
 Reads basin-averaged daily precipitation from data/ (mounted external drive). With
---write the figure goes to paper/images/; otherwise to .tmp/cluster_diag/. Prints the
-basin-mean of each difference for sanity against the text (~+218 and ~+35 mm/yr).
+--write the figure goes to paper/images/ and paper/overleaf/images/; otherwise to
+.tmp/cluster_diag/. Prints the basin-mean of each difference for sanity against the text
+(~+218 and ~+35 mm/yr).
 """
 
 from __future__ import annotations
@@ -108,7 +109,7 @@ def plot(df: pd.DataFrame, out: Path) -> None:
     panel = "ab"
 
     fig, axes = plt.subplots(
-        1, 2, figsize=(13, 5.0), subplot_kw={"projection": aea}, constrained_layout=True
+        1, 2, figsize=(13, 4.4), subplot_kw={"projection": aea}, constrained_layout=True
     )
     for j, (minuend, subtrahend) in enumerate(DIFFS):
         scatter_map(
@@ -118,6 +119,8 @@ def plot(df: pd.DataFrame, out: Path) -> None:
             cmap_name="RdBu_r",
             bin_edges=edges,
             marker_size=11,
+            marker_edgecolor="#444444",
+            marker_linewidth=0.2,
             colorbar=False,
             title=f"({panel[j]}) {minuend} − {subtrahend}",
             background_gdf=ne,
@@ -125,18 +128,12 @@ def plot(df: pd.DataFrame, out: Path) -> None:
 
     n = len(edges) - 1
     sm = plt.cm.ScalarMappable(norm=BoundaryNorm(edges, n), cmap=plt.get_cmap("RdBu_r", n))
-    cb = fig.colorbar(sm, ax=list(axes), orientation="horizontal", shrink=0.5, aspect=45, pad=0.03)
+    cb = fig.colorbar(sm, ax=list(axes), orientation="horizontal", shrink=0.5, aspect=45, pad=0.02)
     cb.set_ticks(edges)
     cb.set_ticklabels([("0" if e == 0 else f"{e:g}") for e in edges])
     cb.set_label("Mean annual precipitation difference (mm yr$^{-1}$)", fontsize=10)
     cb.ax.tick_params(labelsize=9)
 
-    fig.suptitle(
-        "Precipitation-product differences (relative to MSWEP v2.8)",
-        fontsize=13,
-        fontweight="bold",
-        y=1.02,
-    )
     fig.savefig(out, dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"Wrote {out}")
@@ -145,10 +142,14 @@ def plot(df: pd.DataFrame, out: Path) -> None:
 def main(write: bool) -> None:
     """Build the table, render the figure, and print sanity numbers."""
     df = build_table()
-    dest = (PROJECT_ROOT / "paper" / "images") if write else (PROJECT_ROOT / ".tmp" / "cluster_diag")
-    dest.mkdir(parents=True, exist_ok=True)
+    if write:
+        dests = [PROJECT_ROOT / "paper" / "images", PROJECT_ROOT / "paper" / "overleaf" / "images"]
+    else:
+        dests = [PROJECT_ROOT / ".tmp" / "cluster_diag"]
     suffix = "" if write else "_test"
-    plot(df, dest / f"fig_precip_comparison{suffix}.png")
+    for dest in dests:
+        dest.mkdir(parents=True, exist_ok=True)
+        plot(df, dest / f"fig_precip_comparison{suffix}.png")
 
     n_all = int(df[list(PRODUCTS)].notna().all(axis=1).sum())
     print("\n" + "=" * 64)

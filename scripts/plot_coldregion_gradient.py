@@ -197,10 +197,11 @@ def main() -> None:
         f"returns to baseline {high_pf['median']:.2f}\n"
         f"[{high_pf['ci_lo']:.2f}, {high_pf['ci_hi']:.2f}], n={int(high_pf['n'])}",
         (high_pf["center"], high_pf["median"]),
-        textcoords="offset points",
-        xytext=(0, -22),
-        ha="center",
+        xytext=(56, 0.31),
+        textcoords="data",
+        ha="left",
         fontsize=8,
+        arrowprops={"arrowstyle": "-", "lw": 0.6, "color": "0.3", "shrinkB": 3},
     )
     ax_a.set_xlabel("Permafrost extent (HydroATLAS proxy, %)")
     ax_a.set_ylabel("Baseflow index")
@@ -236,11 +237,10 @@ def main() -> None:
     # coldregion_gradient_bins.csv for provenance).
     s_edges = [0, 25, 40, 50, 60, 100]
     hm = binned_median(snow, df["half_flow_date"], s_edges)
-    ax_c.plot(hm["center"], hm["median"], "-o", color="#1b7837", lw=2, ms=4, label="half-flow date")
-    ax_c.fill_between(hm["center"], hm["q25"], hm["q75"], color="#1b7837", alpha=0.15)
+    ax_c.plot(hm["center"], hm["median"], "-o", color="#1b7837", lw=2, ms=4, label="binned median")
+    ax_c.fill_between(hm["center"], hm["q25"], hm["q75"], color="#1b7837", alpha=0.15, label="IQR")
     ax_c.set_xlabel("Snow-cover extent (HydroATLAS proxy, %)")
-    ax_c.set_ylabel("Half-flow date (day of hydro-year)", color="#1b7837")
-    ax_c.tick_params(axis="y", labelcolor="#1b7837")
+    ax_c.set_ylabel("Half-flow date (day of hydrological year)")
     ax_c.set_title("(c) Melt timing vs snow cover")
     ax_c.legend(loc="upper left", frameon=False)
 

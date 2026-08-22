@@ -230,8 +230,12 @@ def main() -> None:
 
     # Ground truth for \ndischarge: gauges in discharge.nc with any non-NaN value
     with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as qds:
-        q_has_data = (~np.isnan(qds["discharge_mm"])).any(dim="time")
+        q_present = ~np.isnan(qds["discharge_mm"])
+        q_has_data = q_present.any(dim="time")
         n_with_data = int(q_has_data.sum().values)
+        q_coord = "gauge_id" if "gauge_id" in qds.coords else "gauge"
+        q_ids = qds[q_coord].values.astype(str)
+        q_obs_days = pd.Series(q_present.sum(dim="time").values, index=q_ids)
     n_ungraded = n_with_data - n_graded
 
     with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
@@ -241,6 +245,17 @@ def main() -> None:
         wl_ids = pd.Series(wds[wl_coord].values.astype(str))
         wl_in_analysis = ~wl_ids.map(is_paper_analysis_excluded_gauge_id).to_numpy()
         n_waterlevel_analysis = int((wl_has_data.values.astype(bool) & wl_in_analysis).sum())
+
+    # Record-overlap macros (Sect. 2.2): both / any / none, and short records below the
+    # 3-year (1095 observed-day) grading prerequisite of scripts/GradeCompound.py.
+    q_flags = pd.Series(q_has_data.values.astype(bool), index=q_ids)
+    wl_flags = pd.Series(wl_has_data.values.astype(bool), index=wl_ids.to_numpy())
+    wl_flags = wl_flags.reindex(q_flags.index, fill_value=False)
+    n_any_record = int((q_flags | wl_flags).sum())
+    check_macro(macros, "nbothrecords", float((q_flags & wl_flags).sum()), "{:.0f}")
+    check_macro(macros, "nanyrecord", float(n_any_record), "{:.0f}")
+    check_macro(macros, "nnorecord", float(n_boundaries - n_any_record), "{:.0f}")
+    check_macro(macros, "nshortrecord", float((q_obs_days[q_flags] < 365 * 3).sum()), "{:.0f}")
 
     kv(
         "ntotal (boundaries.gpkg polygons)",

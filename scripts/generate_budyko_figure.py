@@ -3,8 +3,8 @@
 
 Computes aridity index (PET/P) and evaporative index ((P-Q)/P) for every
 eligible gauge under each of the three precipitation products
-(ERA5-Land, MSWEP v2.8, GPCP v3.3), then plots all three sets of points
-on a single Budyko diagram with the water-limit, energy-limit, and Budyko
+(ERA5-Land, MSWEP v2.8, GPCP v3.3), then plots each product
+in its own Budyko panel with the water-limit, energy-limit, and Budyko
 (1974) theoretical curves overlaid.
 
 Output: paper/images/fig_budyko.png and, when present, paper/overleaf/images/fig_budyko.png
@@ -144,8 +144,10 @@ def _budyko_curve(aridity: np.ndarray) -> np.ndarray:
 
 
 def _plot(df: pd.DataFrame) -> None:
-    """Render the multi-product Budyko scatter."""
-    fig, ax = plt.subplots(figsize=(8.0, 6.0), constrained_layout=True)
+    """Render the Budyko check as one panel per precipitation product."""
+    colors = {"ERA5-Land": "#EE6677", "MSWEP": "#4477AA", "GPCP": "#228833"}
+    products = ["ERA5-Land", "MSWEP", "GPCP"]
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.8), sharey=True, constrained_layout=True)
 
     # Theoretical bounds in Budyko coordinates
     #   Water  limit: AET <= P     -> evap_index <= 1            (horizontal at y=1)
@@ -156,50 +158,44 @@ def _plot(df: pd.DataFrame) -> None:
     water_line = np.ones_like(x)
     budyko = _budyko_curve(x)
 
-    ax.plot(
-        x,
-        envelope_line,
-        color="#AA2222",
-        linestyle="--",
-        linewidth=1.0,
-        label="Physical envelope (AET ≤ min(PET, P))",
-    )
-    ax.plot(x, water_line, color="#333333", linestyle=":", linewidth=1.0, label="Water limit (AET ≤ P)")
-    ax.plot(x, budyko, color="#222222", linestyle="-", linewidth=1.2, label="Budyko (1974) curve")
-
-    colors = {"ERA5-Land": "#EE6677", "MSWEP": "#4477AA", "GPCP": "#228833"}
-    # Plot in this order so ERA5 (the wet-biased outlier) is most visible on top
-    for product in ["GPCP", "MSWEP", "ERA5-Land"]:
+    for ax, panel, product in zip(axes, "abc", products, strict=True):
         sub = df[df["product"] == product].dropna(subset=["aridity_index", "evaporative_index"])
+        ax.plot(
+            x,
+            envelope_line,
+            color="#AA2222",
+            linestyle="--",
+            linewidth=1.0,
+            label="Physical envelope (AET ≤ min(PET, P))",
+        )
+        ax.plot(
+            x, water_line, color="#333333", linestyle=":", linewidth=1.0, label="Water limit (AET ≤ P)"
+        )
+        ax.plot(x, budyko, color="#222222", linestyle="-", linewidth=1.2, label="Budyko (1974) curve")
         ax.scatter(
             sub["aridity_index"],
             sub["evaporative_index"],
-            s=7,
+            s=6,
             c=colors[product],
-            alpha=0.45,
+            alpha=0.5,
             edgecolors="none",
-            label=f"{product} (n={len(sub):,})",
             zorder=2,
         )
+        ax.set_title(f"({panel}) {product} (n={len(sub)})", fontsize=11, loc="left")
+        ax.set_xlabel("Aridity index  PET / P", fontsize=11)
+        ax.set_xlim(0, 3.5)
+        ax.set_ylim(-0.3, 1.5)
+        ax.axhline(0, color="#888888", linewidth=0.5)
+        ax.axvline(1, color="#888888", linewidth=0.5, linestyle=":")
+        ax.text(0.5, 1.38, "HUMID  (PET < P)", fontsize=7, color="#555555", ha="center")
+        ax.text(2.2, 1.38, "ARID  (PET > P)", fontsize=7, color="#555555", ha="center")
+        ax.grid(alpha=0.2, linestyle="--")
 
-    ax.set_xlabel("Aridity index  PET / P", fontsize=12)
-    ax.set_ylabel("Evaporative index  (P − Q) / P", fontsize=12)
-    ax.set_xlim(0, 3.5)
-    ax.set_ylim(-0.3, 1.5)
-    ax.axhline(0, color="#888888", linewidth=0.5)
-    ax.axvline(1, color="#888888", linewidth=0.5, linestyle=":")
-    ax.text(0.5, 1.38, "HUMID  (PET < P)", fontsize=8, color="#555555", ha="center")
-    ax.text(2.2, 1.38, "ARID  (PET > P)", fontsize=8, color="#555555", ha="center")
-    ax.text(0.04, 1.08, "above water limit (Q < 0: impossible)", fontsize=7, color="#AA2222")
-    ax.text(0.04, -0.22, "below zero: Q > P (more runoff than rain)", fontsize=7, color="#AA2222")
-    ax.grid(alpha=0.2, linestyle="--")
-    # Lower-right corner (very arid, low evaporative index) is empty for this humid domain,
-    # so the legend there does not overlap data or the "ARID (PET > P)" annotation (upper right).
-    ax.legend(loc="lower right", fontsize=9, framealpha=0.9)
-    ax.set_title(
-        "Budyko consistency check — aridity vs. evaporative index by precipitation product",
-        fontsize=12,
-    )
+    axes[0].set_ylabel("Evaporative index  (P − Q) / P", fontsize=11)
+    axes[0].text(0.04, 1.06, "above water limit (Q < 0)", fontsize=7, color="#AA2222")
+    axes[0].text(0.04, -0.24, "below zero (Q > P)", fontsize=7, color="#AA2222")
+    # Lower-right corner (very arid, low evaporative index) is empty for this humid domain.
+    axes[0].legend(loc="lower right", fontsize=7, framealpha=0.9)
 
     OUT_PNG.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT_PNG, dpi=300, bbox_inches="tight")

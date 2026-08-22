@@ -123,7 +123,7 @@ def _add_graticule(
     *,
     lon_step: int = 20,
     lat_step: int = 10,
-    draw_labels: bool = True,
+    draw_labels: bool = False,
     label_size: int = 6,
 ) -> None:
     """Add a subtle lat/lon graticule to a GeoAxes.
@@ -168,6 +168,8 @@ def scatter_map(
     bin_edges: np.ndarray | list[float] | None = None,
     n_bins: int = 6,
     marker_size: int = 10,
+    marker_edgecolor: str = "none",
+    marker_linewidth: float = 0.0,
     title: str = "",
     show_nan: bool = True,
     nan_size: int = 3,
@@ -194,6 +196,10 @@ def scatter_map(
         Number of bins when auto-generating edges.
     marker_size : int
         Scatter marker size.
+    marker_edgecolor : str
+        Marker outline colour ("none" for no outline).
+    marker_linewidth : float
+        Marker outline width in points.
     title : str
         Subplot title.
     show_nan : bool
@@ -243,7 +249,8 @@ def scatter_map(
             cmap=cmap,
             norm=norm,
             s=marker_size,
-            edgecolors="none",
+            edgecolors=marker_edgecolor,
+            linewidths=marker_linewidth,
             zorder=3,
             transform=_DATA_CRS,
         )
@@ -252,9 +259,9 @@ def scatter_map(
                 sc,
                 ax=ax,
                 orientation=colorbar_orientation,
-                shrink=0.7,
-                pad=0.12 if colorbar_orientation == "horizontal" else 0.04,
-                aspect=25,
+                shrink=0.6,
+                pad=0.02 if colorbar_orientation == "horizontal" else 0.04,
+                aspect=30,
             )
             cb.set_ticks(edges.tolist())
             # Clean numeric labels: no scientific notation, no trailing zeros

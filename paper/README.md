@@ -37,13 +37,13 @@ Figures referenced in the manuscript:
 
 | Figure | File | Description |
 |--------|------|-------------|
-| 1 | `fig_gauge_network.png` | Gauge network map + catchment-size distribution (§2) |
-| 2 | `fig_gauge_reliability.png` | Per-gauge share of Grade A years, mapped (§4) |
-| 3 | `fig_hydro_signatures_1.png` | Magnitude/baseflow signatures (§5) |
-| 4 | `fig_hydro_signatures_2.png` | Timing/variability/extreme signatures (§5) |
-| 5 | `fig_precip_comparison.png` | Precipitation-product differences (§6) |
-| 6 | `fig_budyko.png` | Budyko consistency check (§6) |
-| 7 | `fig_coldregion_gradient.png` | Example cold-region signature analysis (§8) |
+| 1 | `fig_gauge_network.png` | Köppen–Geiger climate classes of the gauged catchments (forcing-derived) + catchment-size distribution (§2); `scripts/regenerate_gauge_network_figure.py --write` |
+| 2 | `fig_gauge_reliability.png` | Overall discharge grade + per-gauge share of Grade A years, mapped (§4); `scripts/plot_gauge_reliability.py --write` |
+| 3 | `fig_hydro_signatures_1.png` | Magnitude/baseflow signatures, released cleaned set (§5); `scripts/plot_signature_maps.py --write` |
+| 4 | `fig_hydro_signatures_2.png` | Timing/variability/extreme signatures, released cleaned set (§5); `scripts/plot_signature_maps.py --write` |
+| 5 | `fig_precip_comparison.png` | Precipitation-product differences (§6); `scripts/regenerate_precip_comparison_figure.py --write` |
+| 6 | `fig_budyko.png` | Budyko consistency check, one panel per product (§6); `scripts/generate_budyko_figure.py` |
+| 7 | `fig_coldregion_gradient.png` | Example cold-region signature analysis (§8); `scripts/plot_coldregion_gradient.py` |
 
 Additional figures available in `images/` for supplementary material.
 
