@@ -91,7 +91,7 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
 | Grade A definition | Every assessed year Grade A |
 | CRS for paper maps | Albers Equal-Area Conic |
 | HydroATLAS attributes | 288 (22 primary subset) |
-| Hydrological signatures | 15 metrics for 1,845 cleaned gauges (1,716 strict-completeness subset in main-text summaries) |
+| Hydrological signatures | 15 metrics for 1,845 cleaned gauges (release CSV; maps via `scripts/plot_signature_maps.py`; the former 1,716 notebook strict subset is retired) |
 | Hydrological year | Oct–Sep |
 
 ---

@@ -370,6 +370,11 @@ def main() -> None:
     )
     kv("meanarea", "78,217", f"{areas.mean():,.0f}", match=abs(areas.mean() - 78217) < 5)
     kv("medianarea", "2,817", f"{areas.median():,.0f}", match=abs(areas.median() - 2817) < 5)
+    analysis_areas = boundaries.loc[
+        boundaries["gauge_id"].astype(str).str.len() != 7, "area_km2"
+    ].dropna()
+    small_medium_pct = 100.0 * analysis_areas.between(100, 10_000).mean()
+    check_macro(parse_macros(), "smallmediumpct", small_medium_pct, "{:.0f}")
 
     section("GEOGRAPHIC EXTENT (boundaries.gpkg total_bounds)")
     minlon, minlat, maxlon, maxlat = boundaries.total_bounds
