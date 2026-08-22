@@ -120,3 +120,18 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
 - **Verify first**: `readlink data && ls "$(readlink data)" 2>&1 | head -3`. If the second
   command errors, stop and ask the user to remount before running any pipeline step that
   reads from `data/`.
+
+### Copernicus float placement: a tall `[t]` figure defers every later figure to the end
+
+- In `copernicus.cls` manuscript mode a `figure[t]` taller than roughly 70 % of the text
+  height can never be placed, and LaTeX keeps every subsequent float queued behind it, so
+  all remaining figures pile up after the references. Give tall figures `[tp]` (e.g. the
+  two-panel `fig_gauge_reliability`) and check the figure pages after each build
+  (`pdftotext -layout` per page, `pdftoppm` to view).
+
+### Figure scripts write to both image directories
+
+- Every manuscript figure script writes to `paper/images/` **and** `paper/overleaf/images/`
+  when run with `--write` (LaTeX reads only the latter via `\graphicspath`). Verify md5
+  parity of the seven manuscript figures before pushing Overleaf; a stale copy in
+  `paper/overleaf/images/` silently ships the old figure.
