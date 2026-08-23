@@ -97,7 +97,7 @@ def build_figure(
         titles=[f"({letter}) {title}" for letter, (_, title, _) in zip(letters, panels, strict=True)],
         ncols=2,
         panel_size=(8.0, 4.1),
-        cmap_name="RdYlBu_r",
+        cmap_name="viridis",  # sequential: every panel is a strictly positive quantity
         bin_intervals={c: edges for c, _, edges in panels},
         marker_size=8,
         show_nan=True,

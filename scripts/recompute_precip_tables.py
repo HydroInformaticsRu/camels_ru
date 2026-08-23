@@ -82,11 +82,16 @@ def load_csv_series(path: Path, value_col: str, date_col: str = "date") -> pd.Se
 
 
 def annual_mean_precip(series: pd.Series, end_date: str) -> float:
-    """Mean of calendar-year precip totals (mm/yr); NaN if < 365 daily records."""
+    """Mean of calendar-year precip totals (mm/yr); NaN if < 365 daily records.
+
+    Missing days (0.6 % of GPCP gauge-days) are scaled, not counted as zero: each
+    year's total is its mean daily value times its number of calendar days.
+    """
     sub = series.loc[PERIOD_START:end_date]
     if len(sub) < 365:
         return np.nan
-    return float(sub.resample("YE").sum().mean())
+    yearly = sub.resample("YE").mean() * sub.resample("YE").size()
+    return float(yearly.mean())
 
 
 def annual_cv_precip(series: pd.Series, end_date: str) -> float:
@@ -94,7 +99,7 @@ def annual_cv_precip(series: pd.Series, end_date: str) -> float:
     sub = series.loc[PERIOD_START:end_date]
     if len(sub) < 365:
         return np.nan
-    annual = sub.resample("YE").sum()
+    annual = sub.resample("YE").mean() * sub.resample("YE").size()
     return float(annual.std() / annual.mean()) if annual.mean() > 0 else np.nan
 
 

@@ -1,0 +1,4 @@
+Dataset,N gauges,Coverage (%),Mean annual P (mm/yr),Std annual P (mm/yr),Mean CV
+ERA5-Land,3201,100.0,705,225,0.14
+MSWEP,3201,100.0,609,217,0.15
+GPCP,3201,100.0,661,207,0.13

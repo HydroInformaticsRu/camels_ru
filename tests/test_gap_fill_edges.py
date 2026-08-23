@@ -16,8 +16,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from data_processing.ais import fill_short_gaps  # noqa: E402
 from scripts.package_dataset import _edge_fills  # noqa: E402
-from scripts.ParseAisQData import fill_short_gaps  # noqa: E402
 
 
 def test_edge_fills_keep_bridges_and_drop_extrapolations():

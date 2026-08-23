@@ -1,0 +1,4 @@
+Comparison,N gauges,Mean r,Median r,Std r,Mean bias (mm/day)
+ERA5-Land vs MSWEP,3201,0.915,0.918,0.048,0.265
+ERA5-Land vs GPCP,3201,0.664,0.669,0.119,0.126
+MSWEP vs GPCP,3201,0.725,0.768,0.155,-0.138

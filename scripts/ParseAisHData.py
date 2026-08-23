@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 from tqdm.auto import tqdm
 
-from data_processing.ais import ais_merger, level_to_csv
+from data_processing.ais import ais_merger, fill_short_gaps, level_to_csv
 
 LEVEL_XLS_DIR = Path("data/Russia/AISxls/levels_xls")
 LEVEL_CSV_DIR = Path("data/CAMELS_RU/AisLevelCsv")
@@ -59,16 +59,16 @@ def replace_zeros_with_seasonal(df: pd.DataFrame, column: str) -> pd.DataFrame:
     return df.drop(columns=["month", "day"])
 
 
-def interpolate_level(
-    file: Path, column: str = "lvl_sm", *, shift_negative: bool = False, interp_limit: int = 6
-) -> None:
-    """Replace zeros with seasonal median, interpolate short gaps."""
+def interpolate_level(file: Path, column: str = "lvl_sm", *, interp_limit: int = 6) -> None:
+    """Replace zeros with the seasonal median, then fill interior gaps of at most ``interp_limit`` days.
+
+    Both alterations are recovered and flagged at packaging time by
+    ``scripts/derive_water_level_fill_mask.py`` (quality_flag 2 and 1).
+    """
     df = pd.read_csv(file, index_col="date", parse_dates=True)
     df = df[~df.index.duplicated(keep="first")]
-    if shift_negative and (df[column] < 0).any():
-        df[column] -= df[column].min()
     df = replace_zeros_with_seasonal(df, column)
-    df[column] = df[column].interpolate(method="polynomial", order=2, limit=interp_limit)
+    df[column] = fill_short_gaps(df[column], max_gap=interp_limit)
     df.to_csv(file)
 
 
@@ -117,4 +117,4 @@ if __name__ == "__main__":
     )
 
     for file in tqdm(list(GTS_OUT_DIR.glob("*.csv")), desc="Interpolating GTS level files"):
-        interpolate_level(file, shift_negative=True, interp_limit=15)
+        interpolate_level(file, interp_limit=15)

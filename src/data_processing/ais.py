@@ -306,6 +306,21 @@ def level_to_csv(data_path: Path, save_folder: Path) -> dict:
 # ---------------------------------------------------------------------------
 
 
+def fill_short_gaps(series: pd.Series, max_gap: int = 6) -> pd.Series:
+    """Second-order polynomial fill of interior gaps of at most ``max_gap`` days.
+
+    ``interpolate(limit=max_gap)`` would fill the first ``max_gap`` days of every
+    gap, extrapolating into long ones; here only runs whose full length is at
+    most ``max_gap`` and that lie between observations are filled.
+    """
+    missing = series.isna()
+    run_id = (missing != missing.shift()).cumsum()
+    run_len = missing.groupby(run_id).transform("size")
+    short_gap = missing & (run_len <= max_gap)
+    interpolated = series.interpolate(method="polynomial", order=2, limit_area="inside")
+    return series.where(~short_gap, interpolated)
+
+
 def ais_merger(
     files_list: list[Path],
     save_storage: Path,

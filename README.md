@@ -91,7 +91,7 @@ The dataset is not included in this repository. To use the analysis tools:
 
 ## Citation
 
-Abramov, D. V., Maximov, Y., Tsyplenkov, A., and Moreido, V.: CAMELS-RU: hydro-meteorological time series and landscape attributes for 3,353 catchments in Russia, Earth Syst. Sci. Data (in review), 2026. See `CITATION.cff`.
+Abramov, D. V., Maximov, Y., Tsyplenkov, A., and Moreido, V.: CAMELS-RU: hydrometeorological time series and landscape attributes for 3,353 catchments in Russia, Earth Syst. Sci. Data (in review), 2026. See `CITATION.cff`.
 
 ## Acknowledgments
 

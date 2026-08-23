@@ -36,6 +36,8 @@ LEVEL_DIR = DATA_DIR / "HydroData" / "Level"
 # Per-gauge gap-fill mask (1 = day interpolated in place by ParseAisQData) built by
 # scripts/derive_discharge_fill_mask.py; absent -> gap-fills cannot be flagged (degrade to 0).
 DISCHARGE_FILL_MASK = DATA_DIR / "HydroData" / "discharge_fill_mask.nc"
+# scripts/derive_water_level_fill_mask.py; same degrade-to-unflagged behaviour.
+WATER_LEVEL_FILL_MASK = DATA_DIR / "HydroData" / "water_level_fill_mask.nc"
 LEVEL_GTS_DIR = DATA_DIR / "HydroData" / "LevelGTS"
 # ERA5-Land aggregation lives on the Russia-wide meteo tree, not the CAMELS-RU one,
 # because it is produced by a pipeline that serves multiple projects.
@@ -144,24 +146,26 @@ def _edge_fills(present: np.ndarray, filled: np.ndarray) -> np.ndarray:
     return edge
 
 
-def _load_fill_mask(ws_ids: list[str], dates: pd.DatetimeIndex) -> np.ndarray:
-    """Load the per-gauge gap-fill mask aligned to ``ws_ids`` x ``dates``.
+def _load_fill_mask(
+    ws_ids: list[str], dates: pd.DatetimeIndex, path: Path = DISCHARGE_FILL_MASK
+) -> np.ndarray:
+    """Load a per-gauge provenance mask aligned to ``ws_ids`` x ``dates``.
 
-    Returns a (n_gauges, n_dates) bool array (True = day was gap-filled). Returns
-    all-False and warns when the mask artefact is absent, so packaging still works
-    (gap-fills simply remain unflagged, the pre-2026-06 behaviour).
+    Returns a (n_gauges, n_dates) int8 array of the mask codes (0 = untouched).
+    Returns all-zero and warns when the mask artefact is absent, so packaging still
+    works (altered days simply remain unflagged, the pre-2026-06 behaviour).
     """
-    out = np.zeros((len(ws_ids), len(dates)), dtype=bool)
-    if not DISCHARGE_FILL_MASK.exists():
-        print(f"  WARNING: {DISCHARGE_FILL_MASK.name} absent -> gap-fills will not be flagged")
+    out = np.zeros((len(ws_ids), len(dates)), dtype=np.int8)
+    if not path.exists():
+        print(f"  WARNING: {path.name} absent -> altered days will not be flagged")
         return out
-    with xr.open_dataset(DISCHARGE_FILL_MASK) as ds:
+    with xr.open_dataset(path) as ds:
         da = ds["fill_mask"].copy()
         da["gauge_id"] = da["gauge_id"].astype(str)
         da = da.reindex(gauge_id=ws_ids, time=dates, fill_value=0)
-        out = da.to_numpy().astype(bool)
-    n_fills = int(out.sum())
-    print(f"  loaded fill mask: {n_fills:,} gap-filled gauge-days across {int(out.any(1).sum())} gauges")
+        out = da.to_numpy().astype(np.int8)
+    n_days, n_gauges = int((out > 0).sum()), int((out > 0).any(1).sum())
+    print(f"  loaded {path.name}: {n_days:,} altered gauge-days across {n_gauges} gauges")
     return out
 
 
@@ -209,7 +213,7 @@ def package_discharge() -> None:
 
     # Flag the <=6-day in-place gap-fills (1) separately from observed (0) / missing (3),
     # after reverting the fills that extrapolate into longer gaps (2026-08-23).
-    filled = _load_fill_mask(ws_ids, dates)
+    filled = _load_fill_mask(ws_ids, dates) == 1
     edge = _edge_fills(present, filled)
     q_mm[edge] = np.nan
     q_m3s[edge] = np.nan
@@ -252,9 +256,10 @@ def package_discharge() -> None:
                     "flag_meanings": "no_discharge_record plausible implausible",
                     "description": (
                         f"1 = median discharge_mm exceeds {ANOMALY_MM_PER_DAY:g} mm d-1 over the "
-                        "record, i.e. the reported volume cannot come from the delineated area: "
-                        "delta distributaries, small experimental creeks whose source values "
-                        "appear to be in litres per second, or an underestimated catchment. "
+                        "record, i.e. the reported volume is inconsistent with the catchment "
+                        "area: delta distributaries, an underestimated catchment, or a small "
+                        "creek whose reported discharge is implausible (likely a unit error at "
+                        "source that the closed archive does not allow us to confirm). "
                         "Exclude these gauges from specific-discharge work; discharge_m3s is "
                         "released unchanged. 0 = plausible. -1 = no discharge record."
                     ),
@@ -499,6 +504,10 @@ def package_forcing() -> dict[str, str]:
         coords={"gauge_id": ws_ids, "time": dates},
         attrs={
             "title": "CAMELS-RU meteorological forcing",
+            "time_convention": (
+                "UTC calendar days as defined by each gridded product; discharge and "
+                "water level are Roshydromet local days"
+            ),
             "Conventions": "CF-1.8",
             "precip_source": "MSWEP v2.8 (Beck et al., 2019)",
             "alt_precip_sources": (
@@ -729,6 +738,21 @@ def package_water_level() -> None:
         if gid in heights:
             gauge_zero_m[i] = np.float32(heights[gid])
 
+    # Provenance: revert interpolations that do not bridge observed days (same rule as
+    # discharge), then flag 0 observed / 1 gap-filled / 2 zero-replaced / 3 missing.
+    mask = _load_fill_mask(ws_ids, dates, WATER_LEVEL_FILL_MASK)
+    present = ~np.isnan(lvl_cm)
+    filled = (mask == 1) & present
+    edge = _edge_fills(present, filled)
+    lvl_cm[edge] = np.nan
+    present[edge] = False
+    filled[edge] = False
+    print(f"  reverted {int(edge.sum()):,} interpolated gauge-days that did not bridge observed days")
+    lvl_flag = _discharge_quality_flags(present, filled)
+    lvl_flag[present & (mask == 2)] = 2
+    n_fill, n_zero = int((lvl_flag == 1).sum()), int((lvl_flag == 2).sum())
+    print(f"  flagged {n_fill:,} gap-filled and {n_zero:,} zero-replaced gauge-days")
+
     # Absolute elevation (m above BHS-77) = stage (cm) / 100 + zero-post (m)
     lvl_mbs = (lvl_cm / 100.0) + gauge_zero_m[:, np.newaxis]
 
@@ -772,6 +796,24 @@ def package_water_level() -> None:
                     "source": "AIS GMVO gauge_heights.csv + GTS_heights.csv",
                 },
             ),
+            "quality_flag": (
+                ["gauge_id", "time"],
+                lvl_flag,
+                {
+                    "long_name": "Data quality flag",
+                    "flag_values": np.array([0, 1, 2, 3], dtype=np.int8),
+                    "flag_meanings": "observed gap_filled zero_replaced missing",
+                    "description": (
+                        "0 = observed (gauge-reported). 1 = gap-filled (a gap of at most "
+                        "6 days, 15 for reservoir gauges, bounded by observations on both "
+                        "sides and interpolated in place with a second-order polynomial). "
+                        "2 = a reported stage of exactly 0 cm replaced by the day-of-year "
+                        "median of the gauge (the AIS GMVO export uses 0 for missing at some "
+                        "gauges; a genuine zero stage is indistinguishable). 3 = missing. "
+                        "Filter to flag == 0 for a strict observed-only series."
+                    ),
+                },
+            ),
             "gauge_type": (
                 ["gauge_id"],
                 gauge_type,
@@ -803,10 +845,13 @@ def package_water_level() -> None:
                 "users should assess per-gauge completeness before use."
             ),
             "gap_fill_method": (
-                "Second-order polynomial interpolation: gaps ≤6 days "
-                "(river gauges) or ≤15 days (reservoir/hydropower gauges). "
-                "Longer gaps retained as NaN."
+                "Second-order polynomial interpolation of gaps of at most 6 days "
+                "(river gauges) or 15 days (reservoir/hydropower gauges) bounded by "
+                "observations on both sides; longer gaps retained as NaN. Zero stage "
+                "readings replaced by the day-of-year median. Both are flagged in "
+                "quality_flag (1 and 2)."
             ),
+            "quality_flag_values": "0=observed, 1=gap_filled, 2=zero_replaced, 3=missing",
             **_ACDD_ATTRS,
         },
     )
@@ -818,6 +863,7 @@ def package_water_level() -> None:
             "water_level_cm": {"dtype": "float32", "zlib": True, "complevel": 4},
             "water_level_mbs": {"dtype": "float32", "zlib": True, "complevel": 4},
             "gauge_zero_m": {"dtype": "float32", "zlib": True, "complevel": 4},
+            "quality_flag": {"dtype": "int8", "zlib": True, "complevel": 4},
             "gauge_type": {"dtype": "int8", "zlib": True, "complevel": 4},
         },
     )

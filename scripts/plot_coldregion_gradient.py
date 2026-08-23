@@ -206,7 +206,7 @@ def main() -> None:
     )
     ax_a.set_xlabel("Permafrost extent (HydroATLAS proxy, %)")
     ax_a.set_ylabel("Baseflow index")
-    ax_a.set_title("(a) Baseflow index vs permafrost extent")
+    ax_a.set_title("(a) Baseflow index by permafrost extent")
     ax_a.legend(loc="lower left", frameon=False)
     cb = fig.colorbar(sc, ax=ax_a, fraction=0.046, pad=0.03)
     cb.set_label("Mean annual T (°C)", fontsize=8)
@@ -226,9 +226,19 @@ def main() -> None:
         ax_b.plot(
             bsub["center"], bsub["median"], "-o", color=color, lw=2, ms=4, label=f"{lab}, n={len(sub)}"
         )
+        for _, row in bsub.iterrows():  # per-bin n, so the sparse cold arm is read with its support
+            ax_b.annotate(
+                f"{int(row['n'])}",
+                (row["center"], row["median"]),
+                textcoords="offset points",
+                xytext=(0, 6 if color == "#b2182b" else -11),
+                ha="center",
+                fontsize=6,
+                color=color,
+            )
     ax_b.set_xlabel("Permafrost extent (%)")
     ax_b.set_ylabel("Baseflow index")
-    ax_b.set_title("(b) Sign reversal across the −5 °C line")
+    ax_b.set_title("(b) Baseflow index by temperature class")
     ax_b.legend(loc="upper right", frameon=False)
 
     # ---- Panel C: melt timing vs snow cover -----------------------------------
@@ -242,7 +252,7 @@ def main() -> None:
     ax_c.fill_between(hm["center"], hm["q25"], hm["q75"], color="#1b7837", alpha=0.15, label="IQR")
     ax_c.set_xlabel("Snow-cover extent (HydroATLAS proxy, %)")
     ax_c.set_ylabel("Half-flow date (day of hydrological year)")
-    ax_c.set_title("(c) Melt timing vs snow cover")
+    ax_c.set_title("(c) Half-flow date by snow-cover extent")
     ax_c.legend(loc="upper left", frameon=False)
 
     fig.tight_layout()

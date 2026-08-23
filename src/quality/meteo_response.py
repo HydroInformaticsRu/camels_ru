@@ -182,17 +182,19 @@ def calculate_pq_cross_correlation(
     precipitation: pd.Series,
     discharge: pd.Series,
     max_lag: int = 14,
-    window_days: int = 365,
+    min_pairs: int = 30,
 ) -> dict:
     """Calculate cross-correlation between precipitation and discharge.
 
-    Uses rolling windows to compute time-lagged correlation.
+    Discharge is shifted by ``lag`` calendar days (not array positions), so years
+    with missing days are evaluated on their observed pairs instead of being skipped
+    or mis-lagged.
 
     Args:
-        precipitation: Precipitation time series (mm/day).
-        discharge: Discharge time series (mm/day).
+        precipitation: Precipitation time series (mm/day), daily DatetimeIndex.
+        discharge: Discharge time series (mm/day), daily DatetimeIndex.
         max_lag: Maximum lag (days) to consider.
-        window_days: Window size for rolling correlation.
+        min_pairs: Minimum number of paired P-Q days required at a lag.
 
     Returns:
         Dictionary with:
@@ -200,43 +202,19 @@ def calculate_pq_cross_correlation(
         - optimal_lag_days: Lag at peak correlation
         - correlation_at_lags: Dict of lag -> correlation
     """
-    # Align series
-    combined = pd.DataFrame({"P": precipitation, "Q": discharge}).dropna()
-
-    if len(combined) < window_days:
-        return {
-            "max_cross_correlation": np.nan,
-            "optimal_lag_days": np.nan,
-            "correlation_at_lags": {},
-        }
-
-    p_values = combined["P"].values
-    q_values = combined["Q"].values
-
-    # Calculate cross-correlation at different lags
+    empty = {"max_cross_correlation": np.nan, "optimal_lag_days": np.nan, "correlation_at_lags": {}}
     correlations = {}
     for lag in range(max_lag + 1):
-        if lag > 0:
-            p_lagged = p_values[:-lag]
-            q_shifted = q_values[lag:]
-        else:
-            p_lagged = p_values
-            q_shifted = q_values
-
-        if len(p_lagged) < 30:
+        q_shifted = discharge.shift(-lag, freq="D") if lag else discharge
+        pair = pd.DataFrame({"P": precipitation, "Q": q_shifted}).dropna()
+        if len(pair) < min_pairs:
             continue
-
-        # Calculate Pearson correlation
-        corr = np.corrcoef(p_lagged, q_shifted)[0, 1]
+        corr = pair["P"].corr(pair["Q"])
         if not np.isnan(corr):
             correlations[lag] = float(corr)
 
     if not correlations:
-        return {
-            "max_cross_correlation": np.nan,
-            "optimal_lag_days": np.nan,
-            "correlation_at_lags": {},
-        }
+        return empty
 
     # Find maximum correlation and optimal lag
     max_corr = max(correlations.values())

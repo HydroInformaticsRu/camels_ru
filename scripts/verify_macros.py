@@ -176,6 +176,26 @@ def check_winter_gap_macros(
         check_macro(macros, f"wintergappct{g}", share, "{:.0f}")
 
 
+def check_flag_frequency_table(macros: dict[str, str], year_grades: pd.DataFrame) -> None:
+    """Lock the Table 3 share-of-years literals to paper/tables/flag_frequencies.csv."""
+    section("FLAG FREQUENCIES (paper/tables/flag_frequencies.csv vs tables/quality_flags.tex)")
+    freq = pd.read_csv(PAPER / "tables" / "flag_frequencies.csv")
+    cols = [c for c in year_grades.columns if c.isdigit()]
+    check_macro(macros, "nassessedyears", float(year_grades[cols].notna().sum().sum()), "{:,.0f}")
+    check_val(
+        "flag census assessed years",
+        str(int(freq["n_assessed_years"].iloc[0])),
+        str(int(year_grades[cols].notna().sum().sum())),
+    )
+    share = freq.set_index("flag")["share_pct"]
+    tex = (PAPER / "overleaf" / "tables" / "quality_flags.tex").read_text()
+    for m in re.finditer(
+        r"^& \\texttt\{([^}]*)\}\s*&\s*(?:Minor|Major|Critical)\s*&.*?& ([\d.]+) \\\\$", tex, re.M
+    ):
+        name = m.group(1).replace("\\allowbreak ", "").replace("\\_", "_")
+        check_val(f"Table 3 {name}", f"{share.get(name, 0.0):.1f}", m.group(2))
+
+
 def blank_interior_years(year_grades: pd.DataFrame) -> tuple[int, int]:
     """Count unassessed hydro-years between the first and last graded year of each gauge."""
     grid = year_grades.set_index(year_grades.columns[0]).notna().to_numpy()
@@ -202,6 +222,14 @@ def check_discharge_fill_macros(macros: dict[str, str]) -> None:
     fill_pct = 100.0 * n_fill / n_present if n_present else float("nan")
     check_macro(macros, "ndischargefilldays", n_fill, "{:,.0f}")
     check_macro(macros, "ndischargefillpct", fill_pct, "{:.3f}")
+    section("WATER-LEVEL PROVENANCE (quality_flag in camels_ru_water_level.nc)")
+    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
+        wf = wds["quality_flag"].values
+    n_present = int((wf != 3).sum())
+    check_macro(macros, "nwaterlevelfilldays", float((wf == 1).sum()), "{:,.0f}")
+    check_macro(macros, "nwaterlevelzerodays", float((wf == 2).sum()), "{:,.0f}")
+    check_macro(macros, "nwaterlevelzeropct", 100.0 * (wf == 2).sum() / n_present, "{:.1f}")
+    check_macro(macros, "nwaterlevelzerogauges", float((wf == 2).any(axis=1).sum()), "{:.0f}")
 
 
 def report_drift_summary() -> None:
@@ -383,6 +411,7 @@ def main() -> None:
     n_decent = int(gauge_summary["overall_grade"].isin(["A", "B", "C"]).sum())
     check_macro(macros, "decentpct", 100.0 * n_decent / n_with_data, "{:.0f}")
     check_winter_gap_macros(macros, gauge_summary, winter_gap, winter_gap_severe)
+    check_flag_frequency_table(macros, year_grades)
 
     section("CATCHMENT AREA STATISTICS (boundaries.gpkg area_km2)")
     areas = boundaries["area_km2"].dropna()
@@ -392,6 +421,12 @@ def main() -> None:
         "2,670,000",
         f"{areas.max():,.0f}",
         match=abs(areas.max() - 2_670_000) < 500,
+    )
+    table1 = (PAPER / "overleaf" / "tables" / "camels_comparison.tex").read_text()
+    check_val(
+        "Table 1 CAMELS-RU area range literal",
+        f"{areas.min():.2f} to {round(areas.max(), -4):,.0f}".replace(",", "\\,"),
+        "0.49 to 2\\,670\\,000" if "0.49 to 2\\,670\\,000" in table1 else "absent",
     )
     check_macro(parse_macros(), "meanarea", float(areas.mean()), "{:.0f}")
     check_macro(parse_macros(), "medianarea", float(areas.median()), "{:.0f}")
@@ -485,14 +520,22 @@ def main() -> None:
 
     section("PAPER-ANALYSIS PRECIPITATION TABLES")
     precip_table = pd.read_csv(PAPER / "tables" / "precip_dataset_comparison.csv")
-    expected_precip = {
-        "ERA5-Land": (3201, 705, 225),
-        "MSWEP": (3201, 609, 217),
-        "GPCP": (3201, 657, 206),
+    expected_precip = {  # (n, std); the mean is locked to the \...annual macro below
+        "ERA5-Land": (3201, 225, "erafiveannual"),
+        "MSWEP": (3201, 217, "mswepannual"),
+        "GPCP": (3201, 207, "gpcpannual"),
     }
+    macros = parse_macros()
     for _, row in precip_table.iterrows():
         dataset = str(row["Dataset"])
-        exp_n, exp_mean, exp_std = expected_precip[dataset]
+        exp_n, exp_std, mean_macro = expected_precip[dataset]
+        exp_mean = int(macro_num(macros[mean_macro]))
+        table_tex = (PAPER / "overleaf" / "tables" / "forcing_products.tex").read_text()
+        check_val(
+            f"{dataset} Table 7 Mean P literal",
+            str(exp_mean),
+            str(re.search(rf"^{re.escape(dataset)}\s*&\s*(\d+)", table_tex, re.M).group(1)),
+        )
         kv(
             f"{dataset} N gauges",
             f"{exp_n:,}",
@@ -511,6 +554,13 @@ def main() -> None:
             f"{int(row['Std annual P (mm/yr)'])}",
             match=int(row["Std annual P (mm/yr)"]) == exp_std,
         )
+
+    agg_table = pd.read_csv(PAPER / "tables" / "aggregation_sensitivity.csv").set_index("band_km2")
+    agg = agg_table.loc["150-500"]
+    check_macro(macros, "aggpmedsmall", float(agg["p_median_abs_rel_pct"]), "{:.1f}")
+    check_macro(macros, "aggpninetysmall", float(agg["p_p90_abs_rel_pct"]), "{:.1f}")
+    check_macro(macros, "aggtmedsmall", float(agg["t_median_abs_degc"]), "{:.2f}")
+    check_macro(macros, "aggtninetysmall", float(agg["t_p90_abs_degc"]), "{:.2f}")
 
     corr_table = pd.read_csv(PAPER / "tables" / "precip_inter_dataset_corr.csv")
     expected_corr = {
