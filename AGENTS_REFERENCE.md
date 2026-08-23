@@ -84,7 +84,7 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
 | Metric | Value |
 |--------|-------|
 | Catchments | 3,353 (manually verified) |
-| Discharge gauges | 2,170 (849 Grade A, ~87% decent quality) |
+| Discharge gauges | 2,170 (840 Grade A, ~86% decent quality) |
 | Water level gauges | 2,989 |
 | Temporal coverage | 2008–2023 (daily) |
 | Mean areal error | 5.1% (trimmed mean over \|err\| ≤ 100%; median 1.4%; n=3,011 with Roshydromet reference) |

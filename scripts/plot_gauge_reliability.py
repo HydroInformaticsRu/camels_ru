@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import shutil
 import sys
 import warnings
 
@@ -264,9 +265,13 @@ def main() -> None:
     gauge = load_gauges()
     fig = build_figure(gauge)
     outputs = PAPER_OUTPUTS if args.write else (TEST_OUTPUT,)
-    for out in outputs:
+    first, *rest = outputs  # save once, copy: repeated tight saves differ by a few pixels
+    first.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(first, dpi=300, bbox_inches="tight")
+    print(f"wrote {first}")
+    for out in rest:
         out.parent.mkdir(parents=True, exist_ok=True)
-        fig.savefig(out, dpi=300, bbox_inches="tight")
+        shutil.copy2(first, out)
         print(f"wrote {out}")
     plt.close(fig)
 

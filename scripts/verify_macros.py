@@ -257,24 +257,10 @@ def main() -> None:
         f"{n_with_data}",
         match=n_with_data == 2170,
     )
-    kv(
-        "ngraded (gauge_summary rows)",
-        "2,067",
-        f"{n_graded}",
-        match=n_graded == 2067,
-    )
-    kv(
-        "nungraded (data but no grade)",
-        "103",
-        f"{n_ungraded}",
-        match=n_ungraded == 103,
-    )
-    kv(
-        "year_grades rows",
-        "2,067",
-        f"{n_year_grades}",
-        match=n_year_grades == 2067,
-    )
+    check_macro(macros, "ngraded", float(n_graded), "{:.0f}")
+    check_macro(macros, "nungraded", float(n_ungraded), "{:.0f}")
+    # year_grades.csv must list exactly the graded gauges of gauge_summary.csv.
+    check_macro(macros, "ngraded", float(n_year_grades), "{:.0f}")
 
     # ERA5-Land temperature gap-fill provenance: \nforcingfillgauges must equal the
     # number of rows shipped in camels_ru_forcing_notes.csv (all domain-edge gauges).
@@ -347,10 +333,11 @@ def main() -> None:
     cols = [c for c in year_grades.columns if c.isdigit()]
     year_grades["all_A"] = year_grades[cols].apply(lambda r: all(v == "A" for v in r.dropna()), axis=1)
     strict_a = int(year_grades["all_A"].sum())
-    kv("nhighquality (Grade A: every year A)", "849", f"{strict_a}", match=strict_a == 849)
+    check_macro(macros, "nhighquality", float(strict_a), "{:.0f}")
     for g in ["A", "B", "C", "D", "F"]:
-        n_g = int((gauge_summary["overall_grade"] == g).sum())
-        kv(f"ngrade{g}", f"{ {'A': 849, 'B': 883, 'C': 148, 'D': 173, 'F': 14}[g] }", f"{n_g}")
+        check_macro(macros, f"ngrade{g}", float((gauge_summary["overall_grade"] == g).sum()), "{:.0f}")
+    n_decent = int(gauge_summary["overall_grade"].isin(["A", "B", "C"]).sum())
+    check_macro(macros, "decentpct", 100.0 * n_decent / n_with_data, "{:.0f}")
 
     section("CATCHMENT AREA STATISTICS (boundaries.gpkg area_km2)")
     areas = boundaries["area_km2"].dropna()
