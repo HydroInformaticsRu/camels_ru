@@ -64,6 +64,7 @@ _FAILURES: list[str] = []
 
 def kv(label: str, paper: str, actual: str, match: bool | None = None) -> None:
     """Print a labelled paper-versus-data comparison row; record drifts for the exit code."""
+    match = None if match is None else bool(match)  # numpy bools would dodge the `is False` test
     mark = "OK " if match else ("DRIFT" if match is False else "  ? ")
     print(f"[{mark}] {label:40s}  paper={paper:25s}  actual={actual}")
     if match is False:
@@ -162,6 +163,35 @@ def check_coldregion_macros(macros: dict[str, str]) -> None:
         )
 
 
+def check_winter_gap_macros(
+    macros: dict[str, str], gauge_summary: pd.DataFrame, gap: pd.Series, severe: pd.Series
+) -> None:
+    """Lock the Sect. 4.1.1 winter-gap counts and their per-grade shares."""
+    check_macro(macros, "nwintergap", float(gap.sum()), "{:.0f}")
+    check_macro(macros, "nwintergapsevere", float(severe.sum()), "{:.0f}")
+    grade_of = gauge_summary.set_index(gauge_summary["gauge_id"].astype(str))["overall_grade"]
+    gap_grades = grade_of.reindex(gap.index[gap]).value_counts()
+    for g in ["A", "B", "C", "D", "F"]:
+        share = 100.0 * gap_grades.get(g, 0) / (grade_of == g).sum()
+        check_macro(macros, f"wintergappct{g}", share, "{:.0f}")
+
+
+def blank_interior_years(year_grades: pd.DataFrame) -> tuple[int, int]:
+    """Count unassessed hydro-years between the first and last graded year of each gauge."""
+    grid = year_grades.set_index(year_grades.columns[0]).notna().to_numpy()
+    n_blank = 0
+    n_gauges = 0
+    for mask in grid:
+        idx = np.flatnonzero(mask)
+        if len(idx) == 0:
+            continue
+        inner = ~mask[idx[0] : idx[-1] + 1]
+        if inner.any():
+            n_blank += int(inner.sum())
+            n_gauges += 1
+    return n_blank, n_gauges
+
+
 def check_discharge_fill_macros(macros: dict[str, str]) -> None:
     """Lock the discharge gap-fill macros against quality_flag==1 in discharge.nc."""
     section("DISCHARGE GAP-FILL (quality_flag in camels_ru_discharge.nc)")
@@ -218,7 +248,15 @@ def main() -> None:
         q_coord = "gauge_id" if "gauge_id" in qds.coords else "gauge"
         q_ids = qds[q_coord].values.astype(str)
         q_obs_days = pd.Series(q_present.sum(dim="time").values, index=q_ids)
+        q_anomaly_ids = set(q_ids[qds["specific_discharge_anomaly"].values == 1])
+        n_q_anomaly = len(q_anomaly_ids)
+        q_months = pd.DatetimeIndex(qds["time"].values).month
+        q_summer = q_present.values[:, q_months.isin([6, 7, 8, 9])].mean(axis=1)
+        q_winter = q_present.values[:, q_months.isin([12, 1, 2, 3])].mean(axis=1)
     n_ungraded = n_with_data - n_graded
+    # Winter-gap gauges (Sect. 4.1.1): summer coverage > 80 % but under half of Dec-Mar days
+    winter_gap = pd.Series((q_summer > 0.8) & (q_winter < 0.5), index=q_ids)
+    winter_gap_severe = winter_gap & pd.Series(q_winter < 0.2, index=q_ids)
 
     with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
         wl_has_data = (~np.isnan(wds["water_level_cm"])).any(dim="time")
@@ -259,6 +297,12 @@ def main() -> None:
     )
     check_macro(macros, "ngraded", float(n_graded), "{:.0f}")
     check_macro(macros, "nungraded", float(n_ungraded), "{:.0f}")
+    check_macro(macros, "nqanomalygauges", float(n_q_anomaly), "{:.0f}")
+    sig_anomaly_ids = set(sigs.loc[sigs["is_anomalous"].astype(bool), "gauge_id"].astype(str))
+    check_macro(macros, "nqanomalyinsig", float(len(q_anomaly_ids & sig_anomaly_ids)), "{:.0f}")
+    n_blank, n_blank_gauges = blank_interior_years(year_grades)
+    check_macro(macros, "nblankyears", float(n_blank), "{:.0f}")
+    check_macro(macros, "nblankyeargauges", float(n_blank_gauges), "{:.0f}")
     # year_grades.csv must list exactly the graded gauges of gauge_summary.csv.
     check_macro(macros, "ngraded", float(n_year_grades), "{:.0f}")
 
@@ -338,6 +382,7 @@ def main() -> None:
         check_macro(macros, f"ngrade{g}", float((gauge_summary["overall_grade"] == g).sum()), "{:.0f}")
     n_decent = int(gauge_summary["overall_grade"].isin(["A", "B", "C"]).sum())
     check_macro(macros, "decentpct", 100.0 * n_decent / n_with_data, "{:.0f}")
+    check_winter_gap_macros(macros, gauge_summary, winter_gap, winter_gap_severe)
 
     section("CATCHMENT AREA STATISTICS (boundaries.gpkg area_km2)")
     areas = boundaries["area_km2"].dropna()
@@ -348,8 +393,8 @@ def main() -> None:
         f"{areas.max():,.0f}",
         match=abs(areas.max() - 2_670_000) < 500,
     )
-    kv("meanarea", "78,217", f"{areas.mean():,.0f}", match=abs(areas.mean() - 78217) < 5)
-    kv("medianarea", "2,817", f"{areas.median():,.0f}", match=abs(areas.median() - 2817) < 5)
+    check_macro(parse_macros(), "meanarea", float(areas.mean()), "{:.0f}")
+    check_macro(parse_macros(), "medianarea", float(areas.median()), "{:.0f}")
     analysis_areas = boundaries.loc[
         boundaries["gauge_id"].astype(str).str.len() != 7, "area_km2"
     ].dropna()

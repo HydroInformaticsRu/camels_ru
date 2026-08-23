@@ -542,7 +542,9 @@ def get_gauge_summary(  # noqa: C901
         grade_freq: dict[QualityGrade, int] = {}
         for g in usable_grades:
             grade_freq[g] = grade_freq.get(g, 0) + 1
-        overall_grade = max(grade_freq.keys(), key=lambda g: grade_freq[g])
+        # Ties resolve to the worse grade (higher index in the A..F enum).
+        order = list(QualityGrade)
+        overall_grade = max(grade_freq.keys(), key=lambda g: (grade_freq[g], order.index(g)))
         # Cannot be A (handled above), so cap at B minimum
         if overall_grade == QualityGrade.A:
             overall_grade = QualityGrade.B
@@ -551,7 +553,6 @@ def get_gauge_summary(  # noqa: C901
     # A gauge with few usable years shouldn't get top grades regardless
     # of how clean those few years are.
     usable_fraction = n_years_usable / n_years_total if n_years_total > 0 else 0
-    fail_fraction = n_fail / n_years_total if n_years_total > 0 else 0
 
     if usable_fraction < 0.5:
         # Less than half usable → cap at D
@@ -559,9 +560,6 @@ def get_gauge_summary(  # noqa: C901
     elif usable_fraction < 0.7:
         # 50-70% usable → cap at C
         overall_grade = max(overall_grade, QualityGrade.C, key=lambda g: list(QualityGrade).index(g))
-    elif fail_fraction > 0.3:
-        # More than 30% F years → cap at B
-        overall_grade = max(overall_grade, QualityGrade.B, key=lambda g: list(QualityGrade).index(g))
 
     # Determine recommendation and tier
     if overall_grade in [QualityGrade.A, QualityGrade.B] and usable_fraction >= 0.8:

@@ -1,23 +1,23 @@
 COLD-REGION PERMAFROST-BFI ROBUSTNESS VERDICT
 ================================================
-subset n = 1516 (Grade A/B, dam-excluded, non-anomalous)
+subset n = 1530 (Grade A/B, dam-excluded, non-anomalous)
 
 Inverted-U (peak > baseline AND peak > high):
-  Lyne-Hollick : True  (baseline 0.530 / peak 0.639 / high 0.541)
-  Eckhardt     : True  (baseline 0.754 / peak 0.777 / high 0.742)
+  Lyne-Hollick : True  (baseline 0.530 / peak 0.640 / high 0.541)
+  Eckhardt     : True  (baseline 0.754 / peak 0.778 / high 0.742)
 
 Sign reversal across -5 degC (warm rho>0 AND cold rho<0; 95% bootstrap CI):
-  Lyne-Hollick : True  (warm +0.238 CI [+0.19, +0.29] / cold -0.338 CI [-0.48, -0.18])
-  Eckhardt     : True  (warm +0.246 / cold -0.387)
+  Lyne-Hollick : True  (warm +0.249 CI [+0.20, +0.30] / cold -0.336 CI [-0.48, -0.18])
+  Eckhardt     : True  (warm +0.260 / cold -0.385)
 
-Spearman(LH, Eckhardt) BFI agreement = +0.597
+Spearman(LH, Eckhardt) BFI agreement = +0.604
 
 Alpha-sensitivity (Lyne-Hollick parameter; released = mean over U[0.90,0.98]):
   inverted-U holds at every alpha in [0.9, 0.94, 0.98]? True
   sign reversal holds at every alpha? True
-    alpha=0.90: baseline 0.603 / peak 0.737 / high 0.620 (warm +0.307 / cold -0.338)
-    alpha=0.94: baseline 0.537 / peak 0.661 / high 0.551 (warm +0.264 / cold -0.352)
-    alpha=0.98: baseline 0.438 / peak 0.453 / high 0.360 (warm +0.068 / cold -0.424)
+    alpha=0.90: baseline 0.603 / peak 0.738 / high 0.620 (warm +0.318 / cold -0.336)
+    alpha=0.94: baseline 0.537 / peak 0.661 / high 0.551 (warm +0.274 / cold -0.350)
+    alpha=0.98: baseline 0.437 / peak 0.455 / high 0.360 (warm +0.076 / cold -0.421)
 
 KILL-SWITCH:
   inverted-U survives Eckhardt? YES

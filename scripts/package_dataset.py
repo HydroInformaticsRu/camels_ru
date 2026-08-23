@@ -17,6 +17,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import shutil
+import warnings
 
 import geopandas as gpd
 import numpy as np
@@ -88,6 +89,19 @@ def package_boundaries() -> None:
     ws = ws[[c for c in keep_cols if c in ws.columns]]
     ws.to_file(dst, driver="GPKG")
     print(f"  {len(ws)} catchments -> {dst.name}")
+
+
+ANOMALY_MM_PER_DAY = 20.0  # same threshold as is_anomalous in the signature file
+
+
+def _specific_discharge_anomaly(q_mm: np.ndarray) -> np.ndarray:
+    """Per-gauge flag: 1 if the median runoff depth exceeds ANOMALY_MM_PER_DAY, -1 if no record."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)  # all-NaN rows
+        median = np.nanmedian(q_mm, axis=1)
+    flag = np.where(median > ANOMALY_MM_PER_DAY, 1, 0).astype(np.int8)
+    flag[np.isnan(median)] = -1
+    return flag
 
 
 def _discharge_quality_flags(present: np.ndarray, filled: np.ndarray) -> np.ndarray:
@@ -203,6 +217,8 @@ def package_discharge() -> None:
     filled[edge] = False
     print(f"  reverted {int(edge.sum()):,} gap-filled gauge-days that did not bridge observed days")
     q_flag = _discharge_quality_flags(present, filled)
+    anomaly = _specific_discharge_anomaly(q_mm)
+    print(f"  {int((anomaly == 1).sum())} gauges flagged specific_discharge_anomaly")
 
     ds = xr.Dataset(
         {
@@ -225,6 +241,23 @@ def package_discharge() -> None:
                     "standard_name": "water_volume_transport_in_river_channel",
                     "units": "m3 s-1",
                     "source": "AIS GMVO / Roshydromet",
+                },
+            ),
+            "specific_discharge_anomaly": (
+                ["gauge_id"],
+                anomaly,
+                {
+                    "long_name": "Implausible specific discharge flag",
+                    "flag_values": np.array([-1, 0, 1], dtype=np.int8),
+                    "flag_meanings": "no_discharge_record plausible implausible",
+                    "description": (
+                        f"1 = median discharge_mm exceeds {ANOMALY_MM_PER_DAY:g} mm d-1 over the "
+                        "record, i.e. the reported volume cannot come from the delineated area: "
+                        "delta distributaries, small experimental creeks whose source values "
+                        "appear to be in litres per second, or an underestimated catchment. "
+                        "Exclude these gauges from specific-discharge work; discharge_m3s is "
+                        "released unchanged. 0 = plausible. -1 = no discharge record."
+                    ),
                 },
             ),
             "quality_flag": (
@@ -266,6 +299,7 @@ def package_discharge() -> None:
             "discharge_mm": {"dtype": "float32", "zlib": True, "complevel": 4},
             "discharge_m3s": {"dtype": "float32", "zlib": True, "complevel": 4},
             "quality_flag": {"dtype": "int8", "zlib": True, "complevel": 4},
+            "specific_discharge_anomaly": {"dtype": "int8"},
         },
     )
     n_with_data = int((q_flag != 3).any(axis=1).sum())

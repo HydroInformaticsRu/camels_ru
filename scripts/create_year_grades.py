@@ -66,7 +66,12 @@ def extract_year_grades(compound_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame]
     # Extract year grades from each gauge
     rows: list[dict[str, str]] = []
 
+    # The grader's overall grade is the by_grade/ folder name: a single source of truth,
+    # so the aggregation rules (strict A, mode with ties to the worse grade, caps) are
+    # not re-implemented here.
+    folder_grade: dict[str, str] = {}
     for gauge_id, csv_path in tqdm(all_files, desc="Extracting year grades"):
+        folder_grade[gauge_id] = csv_path.parent.name
         df = pd.read_csv(csv_path, index_col="date", parse_dates=True)
 
         if "grade" not in df.columns:
@@ -134,31 +139,9 @@ def extract_year_grades(compound_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame]
         n_d = grades.count("D")
         n_f = grades.count("F")
 
-        # Strict Grade A: every year must be A
-        if all(g == "A" for g in grades):
-            overall = "A"
-        else:
-            # Mode of non-F grades, capped at B
-            usable = [g for g in grades if g != "F"]
-            if usable:
-                from collections import Counter
-
-                freq = Counter(usable)
-                mode_grade = freq.most_common(1)[0][0]
-                overall = mode_grade if mode_grade != "A" else "B"
-            else:
-                overall = "F"
-
-            # Apply coverage caps
-            usable_frac = len([g for g in grades if g in ("A", "B", "C")]) / n_total
-            fail_frac = n_f / n_total
-
-            if usable_frac < 0.5:
-                overall = max(overall, "D", key=lambda g: GRADE_ORDER.get(g, 99))
-            elif usable_frac < 0.7:
-                overall = max(overall, "C", key=lambda g: GRADE_ORDER.get(g, 99))
-            elif fail_frac > 0.3:
-                overall = max(overall, "B", key=lambda g: GRADE_ORDER.get(g, 99))
+        overall = folder_grade[gauge_id]
+        if overall not in GRADE_ORDER:
+            raise ValueError(f"gauge {gauge_id}: by_grade folder {overall!r} is not a grade")
 
         worst = max(grades, key=lambda g: GRADE_ORDER.get(g, 99))
 

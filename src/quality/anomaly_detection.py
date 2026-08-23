@@ -15,6 +15,15 @@ from .quality_flags import QualityFlag
 logger = logging.getLogger(__name__)
 
 
+ICE_MONTHS: tuple[int, ...] = (11, 12, 1, 2, 3, 4)
+
+
+def _ice_period_fraction(start: pd.Timestamp, end: pd.Timestamp, ice_months: tuple[int, ...]) -> float:
+    """Fraction of calendar days between ``start`` and ``end`` that fall in the ice period."""
+    days = pd.date_range(start, end, freq="D")
+    return float(days.month.isin(ice_months).mean()) if len(days) else 0.0
+
+
 def detect_constant_periods(
     discharge: pd.Series,
     min_days: int = 30,
@@ -274,6 +283,8 @@ def detect_anomalies_all_years(  # noqa: C901
     spike_sigma_threshold: float = 8.0,  # Raised - flood peaks can be extreme
     variance_alpha: float = 0.01,  # Stricter - only flag extreme variance anomalies
     check_variance: bool = False,  # Disabled by default - variance varies naturally
+    ice_months: tuple[int, ...] = ICE_MONTHS,
+    ice_run_fraction: float = 0.8,
 ) -> dict[int, list[QualityFlag]]:
     """Detect statistical anomalies for all years in the time series.
 
@@ -284,6 +295,9 @@ def detect_anomalies_all_years(  # noqa: C901
         spike_sigma_threshold: Sigma threshold for spike detection.
         variance_alpha: Alpha level for variance F-test.
         check_variance: Whether to run inter-annual variance check.
+        ice_months: Calendar months of the ice period (November to April).
+        ice_run_fraction: Constant runs with at least this fraction of their days in
+            ``ice_months`` are not flagged (under-ice reporting convention).
 
     Returns:
         Dictionary mapping year to list of quality flags.
@@ -314,6 +328,11 @@ def detect_anomalies_all_years(  # noqa: C901
     flags_by_year: dict[int, list[QualityFlag]] = {year: [] for year in years}
 
     for start, end, _duration, _value in constant_periods:
+        if _ice_period_fraction(start, end, ice_months) >= ice_run_fraction:
+            # Roshydromet computes under-ice discharge from sparse measurements and an
+            # ice coefficient, so piecewise-constant winter series are the reporting
+            # convention, not a stuck sensor.
+            continue
         # Determine which year(s) this affects
         for year in years:
             if hydro_year_start_month > 1:
