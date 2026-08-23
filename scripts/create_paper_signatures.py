@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
 """Regenerate the 15 hydrological signatures declared in the manuscript (paper/overleaf, Table 3).
 
-Inputs:
-- Release discharge NetCDF (`release/CAMELS_RU_v1.0/camels_ru_discharge.nc`)
-- ERA5-Land per-basin precipitation CSVs (`data/CAMELS_RU/parsed_meteo/era5_land/*.csv`)
-- GLEAM4 per-basin PET CSVs (`data/CAMELS_RU/parsed_meteo/gleam/*.csv`)
+Inputs (release files only, so the signatures are reproducible from the archive):
+- `release/CAMELS_RU_v1.0/camels_ru_discharge.nc` (discharge_mm)
+- `release/CAMELS_RU_v1.0/camels_ru_forcing.nc` (precip_mswep, precip_era5, pet)
+- `release/CAMELS_RU_v1.0/camels_ru_boundaries.gpkg` (area filter)
 
 Outputs (written to `--output-dir`):
-- `camels_ru_signatures.csv` — per-gauge × 15 signatures
+- `camels_ru_signatures.csv` — per-gauge × 15 signatures (+ `_era5` water-balance variants)
 - `camels_ru_signatures_summary.csv` — summary stats (n, mean, median, min, max, std) per signature
 
-Signatures produced (matching the manuscript signature table):
-q_mean, runoff_ratio, q_cv, fdc_slope, flashiness_index, q05, q95,
-high_flow_freq, high_flow_dur, baseflow_index, low_flow_freq, low_flow_dur, half_flow_date,
-aridity_index (PET/P, mean of per-hydro-year ratios),
-evaporative_index ((P-Q)/P, mean of per-hydro-year ratios).
+Conventions (2026-08-23 revision, science-review Domain Expert M-1/M-5):
+- Only the 15 hydrological years that lie fully inside the 2008-2023 grid are used
+  (Oct 2008 to Sep 2023); the partial edge periods are dropped.
+- A hydrological year is valid when at least 70 % of its days carry discharge; a gauge
+  needs at least 5 valid years. Signatures are the mean over valid years.
+- Water-balance ratios (runoff_ratio Q/P, aridity_index PET/P, evaporative_index (P-Q)/P)
+  are computed per valid year over the days where discharge is observed, then averaged.
+  MSWEP is the primary precipitation; `_era5` columns give the ERA5-Land variants.
 """
 
 from __future__ import annotations
@@ -33,7 +36,6 @@ sys.path.append(str(Path(__file__).parent.parent))
 from src.hydro.flow_variability import FlowVariability  # noqa: E402
 from src.hydro.period_based_metrics import (  # noqa: E402
     calculate_comprehensive_metrics,
-    calculate_runoff_ratio,
     split_by_period,
 )
 from src.utils.logger import setup_logger  # noqa: E402
@@ -57,106 +59,85 @@ SIGNATURE_ORDER = [
     "aridity_index",
     "evaporative_index",
 ]
+ERA5_VARIANTS = ["runoff_ratio_era5", "aridity_index_era5", "evaporative_index_era5"]
+HYDRO_YEAR_WINDOW = ("2008-10-01", "2023-09-30")  # complete hydrological years 2009-2023
+MIN_DATA_FRACTION = 0.7
+MIN_PERIODS = 5
 
 
-def _budyko_indices(
+def _water_balance_ratios(
     discharge: pd.Series,
     precipitation: pd.Series,
     pet: pd.Series,
-    hydro_year_start_month: int = 10,
-    min_periods: int = 5,
-) -> tuple[float, float]:
-    """Compute aridity index (PET/P) and evaporative index ((P-Q)/P).
+    min_data_fraction: float = MIN_DATA_FRACTION,
+    min_periods: int = MIN_PERIODS,
+) -> tuple[float, float, float]:
+    """Mean annual Q/P, PET/P and (P-Q)/P over valid hydrological years, on paired days.
 
-    Both are the mean of per-hydrological-year ratios over common years,
-    matching the convention used by `calculate_runoff_ratio`.
+    A year is valid when at least ``min_data_fraction`` of its days carry discharge;
+    within a year the sums run over the days where discharge, precipitation and PET are
+    all present, so a winter gap does not bias the ratio through the precipitation of the
+    missing days.
     """
-    q_periods = split_by_period(discharge, "hydrological", hydro_year_start_month)
-    p_periods = split_by_period(precipitation, "hydrological", hydro_year_start_month)
-    pet_periods = split_by_period(pet, "hydrological", hydro_year_start_month)
-
-    common = set(q_periods) & set(p_periods) & set(pet_periods)
-    if len(common) < min_periods:
-        return np.nan, np.nan
-
-    aridity: list[float] = []
-    evaporative: list[float] = []
-    for year in sorted(common):
-        total_q = np.nansum(q_periods[year])
-        total_p = np.nansum(p_periods[year])
-        total_pet = np.nansum(pet_periods[year])
-        if total_p > 0:
-            aridity.append(total_pet / total_p)
-            evaporative.append((total_p - total_q) / total_p)
-
-    if len(aridity) < min_periods:
-        return np.nan, np.nan
-    return float(np.nanmean(aridity)), float(np.nanmean(evaporative))
+    q_periods = split_by_period(discharge, "hydrological", 10)
+    ratios: list[tuple[float, float, float]] = []
+    for q in q_periods.values():
+        if q.notna().mean() < min_data_fraction:
+            continue
+        p_year = precipitation.reindex(q.index)
+        e_year = pet.reindex(q.index)
+        paired = q.notna() & p_year.notna() & e_year.notna()
+        if paired.sum() < min_data_fraction * len(q):
+            continue
+        p = p_year[paired]
+        e = e_year[paired]
+        total_p = float(np.nansum(p))
+        if total_p <= 0:
+            continue
+        total_q = float(np.nansum(q[paired]))
+        ratios.append((total_q / total_p, float(np.nansum(e)) / total_p, (total_p - total_q) / total_p))
+    if len(ratios) < min_periods:
+        return np.nan, np.nan, np.nan
+    arr = np.asarray(ratios)
+    return float(arr[:, 0].mean()), float(arr[:, 1].mean()), float(arr[:, 2].mean())
 
 
 def _compute_one(
     gauge_id: str,
     discharge_values: np.ndarray,
+    p_mswep: np.ndarray,
+    p_era5: np.ndarray,
+    pet_values: np.ndarray,
     dates: pd.DatetimeIndex,
-    precip_dir: Path,
-    era5_col: str,
-    pet_dir: Path,
-    pet_col: str,
 ) -> dict | None:
-    """Compute all 15 signatures for a single gauge."""
+    """Compute all 15 signatures (plus ERA5-Land water-balance variants) for one gauge."""
     try:
         disch = pd.Series(np.asarray(discharge_values, dtype=np.float64), index=dates, name="discharge")
-        disch = disch.dropna()
-        if len(disch) < 365 * 5:
-            return None
+        disch = disch[HYDRO_YEAR_WINDOW[0] : HYDRO_YEAR_WINDOW[1]]
 
         metrics = calculate_comprehensive_metrics(
             disch,
             period_type="hydrological",
             hydro_year_start_month=10,
-            min_data_fraction=0.7,
-            min_periods=5,
+            min_data_fraction=MIN_DATA_FRACTION,
+            min_periods=MIN_PERIODS,
             aggregation="mean",
         )
         if not np.isfinite(metrics.get("mean_discharge", np.nan)):
             return None
 
-        precip_path = precip_dir / f"{gauge_id}.csv"
-        runoff_ratio = np.nan
-        p_series: pd.Series | None = None
-        if precip_path.exists():
-            p_series = pd.read_csv(
-                precip_path, index_col="date", parse_dates=True, usecols=["date", era5_col]
-            )[era5_col].reindex(dates)
-            runoff_ratio = calculate_runoff_ratio(
-                disch,
-                p_series.dropna(),
-                period_type="hydrological",
-                hydro_year_start_month=10,
-                min_periods=5,
-            )
-
-        aridity_index = np.nan
-        evaporative_index = np.nan
-        pet_path = pet_dir / f"{gauge_id}.csv"
-        if pet_path.exists() and p_series is not None:
-            pet_series = pd.read_csv(
-                pet_path, index_col="date", parse_dates=True, usecols=["date", pet_col]
-            )[pet_col].reindex(dates)
-            aridity_index, evaporative_index = _budyko_indices(
-                disch,
-                p_series.dropna(),
-                pet_series.dropna(),
-                hydro_year_start_month=10,
-                min_periods=5,
-            )
+        pet = pd.Series(np.asarray(pet_values, dtype=np.float64), index=dates)
+        mswep = pd.Series(np.asarray(p_mswep, dtype=np.float64), index=dates)
+        era5 = pd.Series(np.asarray(p_era5, dtype=np.float64), index=dates)
+        rr, ai, ei = _water_balance_ratios(disch, mswep, pet)
+        rr_e, ai_e, ei_e = _water_balance_ratios(disch, era5, pet)
 
         flashiness = FlowVariability(disch).calculate_flashiness_index().get("flashiness_index", np.nan)
 
         return {
             "gauge_id": gauge_id,
             "q_mean": metrics["mean_discharge"],
-            "runoff_ratio": runoff_ratio,
+            "runoff_ratio": rr,
             "q_cv": metrics["cv_discharge"],
             "fdc_slope": metrics["fdc_slope"],
             "flashiness_index": flashiness,
@@ -168,9 +149,12 @@ def _compute_one(
             "low_flow_freq": metrics["low_flow_frequency"],
             "low_flow_dur": metrics["low_flow_avg_duration"],
             "half_flow_date": metrics["mean_half_flow_date"],
-            "aridity_index": aridity_index,
-            "evaporative_index": evaporative_index,
+            "aridity_index": ai,
+            "evaporative_index": ei,
             "n_valid_years": metrics.get("n_valid_periods", 0),
+            "runoff_ratio_era5": rr_e,
+            "aridity_index_era5": ai_e,
+            "evaporative_index_era5": ei_e,
         }
     except Exception as exc:
         log.error(f"gauge {gauge_id}: {exc!r}")
@@ -188,20 +172,11 @@ def main() -> None:
         default=Path("release/CAMELS_RU_v1.0/camels_ru_discharge.nc"),
     )
     parser.add_argument(
-        "--precip-dir",
+        "--forcing-nc",
         type=Path,
-        # Corrected de-accumulated ERA5-Land precip. The era5_land copy over-accumulated
-        # tp (~1.5x), inflating P and biasing runoff_ratio/aridity/evaporative; this is the fix.
-        default=Path("data/Russia/MeteoData/CamelsRU/era5land_tp_new"),
+        default=Path("release/CAMELS_RU_v1.0/camels_ru_forcing.nc"),
+        help="Release forcing NetCDF (precip_mswep, precip_era5, pet)",
     )
-    parser.add_argument("--era5-col", default="prcp")
-    parser.add_argument(
-        "--pet-dir",
-        type=Path,
-        default=Path("data/CAMELS_RU/parsed_meteo/gleam"),
-        help="Directory of per-gauge GLEAM4 PET CSVs",
-    )
-    parser.add_argument("--pet-col", default="potential_evaporation")
     parser.add_argument(
         "--output-dir",
         type=Path,
@@ -242,6 +217,12 @@ def main() -> None:
 
     log.info(f"{len(gauges)} gauges × {len(dates)} days in {dvar}")
 
+    forcing = xr.open_dataset(args.forcing_nc).reindex(gauge_id=gauges, time=dates)
+    p_mswep = forcing["precip_mswep"].values
+    p_era5 = forcing["precip_era5"].values
+    pet_values = forcing["pet"].values
+    log.info(f"Loaded precip_mswep, precip_era5, pet from {args.forcing_nc}")
+
     # Apply area filter (< 50,000 km²) per paper §3.5
     import geopandas as gpd  # noqa: PLC0415
 
@@ -252,15 +233,15 @@ def main() -> None:
         f"{len(small_gauges)} of {len(ws)} catchments are < {args.area_max_km2:g} km² (area filter)"
     )
 
+    in_window = (dates >= HYDRO_YEAR_WINDOW[0]) & (dates <= HYDRO_YEAR_WINDOW[1])
     valid_indices = [
         i
         for i in range(len(gauges))
-        if gauges[i] in small_gauges and np.isfinite(discharge[i]).sum() >= 365 * 5
+        if gauges[i] in small_gauges and np.isfinite(discharge[i][in_window]).any()
     ]
-    log.info(
-        f"{len(valid_indices)} gauges pass both area < {args.area_max_km2:g} km² "
-        f"and ≥ 5 years of valid data filters"
-    )
+    # The >= 5 valid-year rule is applied inside calculate_comprehensive_metrics (min_periods);
+    # no day-count pre-filter, so the stated rule alone defines the gauge set.
+    log.info(f"{len(valid_indices)} gauges pass area < {args.area_max_km2:g} km² with discharge")
 
     results: list[dict] = []
     with ProcessPoolExecutor(max_workers=args.workers) as exe:
@@ -269,11 +250,10 @@ def main() -> None:
                 _compute_one,
                 gauges[i],
                 discharge[i],
+                p_mswep[i],
+                p_era5[i],
+                pet_values[i],
                 dates,
-                args.precip_dir,
-                args.era5_col,
-                args.pet_dir,
-                args.pet_col,
             ): gauges[i]
             for i in valid_indices
         }
@@ -296,7 +276,7 @@ def main() -> None:
         f"(area < 50 km² AND q_mean > 20 mm/d); excluded from summary statistics"
     )
 
-    df = df[["gauge_id", "area_km2", "is_anomalous", *SIGNATURE_ORDER, "n_valid_years"]]
+    df = df[["gauge_id", "area_km2", "is_anomalous", *SIGNATURE_ORDER, "n_valid_years", *ERA5_VARIANTS]]
     # Deterministic row order so the released CSV is reproducible across rebuilds
     # (parallel processing otherwise yields completion-order rows, which perturbs
     # order-sensitive downstream statistics such as bootstrap resampling).
@@ -310,7 +290,7 @@ def main() -> None:
 
     sig_descriptions = {
         "q_mean": "Mean daily discharge (mm/d)",
-        "runoff_ratio": "Annual runoff ratio Q/P (ERA5-Land P)",
+        "runoff_ratio": "Annual runoff ratio Q/P (MSWEP P, paired days)",
         "q_cv": "CV of daily discharge",
         "fdc_slope": "FDC slope [ln(Q33)-ln(Q66)]/33*100",
         "flashiness_index": "Richards-Baker flashiness Σ|ΔQ|/ΣQ",
@@ -322,8 +302,8 @@ def main() -> None:
         "low_flow_freq": "% of days with Q < 0.2×mean",
         "low_flow_dur": "Mean duration of low-flow events (d)",
         "half_flow_date": "Day of hydro year when 50% of annual Q has passed",
-        "aridity_index": "Aridity index PET/P (GLEAM4 PET, ERA5-Land P; mean of annual ratios)",
-        "evaporative_index": "Evaporative index (P-Q)/P (ERA5-Land P; mean of annual ratios)",
+        "aridity_index": "Aridity index PET/P (GLEAM4 PET, MSWEP P; mean of annual ratios)",
+        "evaporative_index": "Evaporative index (P-Q)/P (MSWEP P; mean of annual ratios)",
     }
 
     summary_rows = []

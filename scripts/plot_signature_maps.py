@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import shutil
 import sys
 import warnings
 
@@ -119,12 +120,18 @@ def main() -> None:
     suffix = "" if args.write else "_test"
     for name, panels, letters in (
         ("fig_hydro_signatures_1", PANELS_1, "abcd"),
-        ("fig_hydro_signatures_2", PANELS_2, "efgh"),
+        ("fig_hydro_signatures_2", PANELS_2, "abcd"),
     ):
         fig = build_figure(gdf, panels, letters)
-        for out_dir in out_dirs:
+        # Save once and copy: repeated tight-bbox saves crop a few pixels differently,
+        # which breaks the md5 parity between paper/images and paper/overleaf/images.
+        first, *rest = out_dirs
+        first.mkdir(parents=True, exist_ok=True)
+        fig.savefig(first / f"{name}{suffix}.png", dpi=300, bbox_inches="tight")
+        print(f"wrote {first / f'{name}{suffix}.png'}")
+        for out_dir in rest:
             out_dir.mkdir(parents=True, exist_ok=True)
-            fig.savefig(out_dir / f"{name}{suffix}.png", dpi=300, bbox_inches="tight")
+            shutil.copy2(first / f"{name}{suffix}.png", out_dir / f"{name}{suffix}.png")
             print(f"wrote {out_dir / f'{name}{suffix}.png'}")
         plt.close(fig)
 

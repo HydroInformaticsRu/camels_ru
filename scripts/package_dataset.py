@@ -106,6 +106,30 @@ def _discharge_quality_flags(present: np.ndarray, filled: np.ndarray) -> np.ndar
     return flags
 
 
+def _edge_fills(present: np.ndarray, filled: np.ndarray) -> np.ndarray:
+    """Mark gap-filled runs that do not bridge two observed days.
+
+    ``ParseAisQData`` used ``interpolate(limit=6)``, which fills the first six days
+    of *every* gap, so most filled runs are polynomial extrapolations into long
+    gaps rather than bridges across short ones (2026-08 review, Domain Expert M-3).
+    A run is a genuine bridge only when the day before and the day after it are
+    both present and not filled; everything else is returned True and is dropped
+    from the release (value -> missing, flag 3).
+    """
+    observed = present & ~filled
+    edge = np.zeros(present.shape, dtype=bool)
+    for i in range(present.shape[0]):
+        row = filled[i]
+        if not row.any():
+            continue
+        d = np.diff(np.concatenate(([0], row.astype(np.int8), [0])))
+        for s, e in zip(np.flatnonzero(d == 1), np.flatnonzero(d == -1), strict=True):
+            bridged = s > 0 and e < row.size and observed[i, s - 1] and observed[i, e]
+            if not bridged:
+                edge[i, s:e] = True
+    return edge
+
+
 def _load_fill_mask(ws_ids: list[str], dates: pd.DatetimeIndex) -> np.ndarray:
     """Load the per-gauge gap-fill mask aligned to ``ws_ids`` x ``dates``.
 
@@ -169,8 +193,15 @@ def package_discharge() -> None:
                 q_m3s[i, valid.values] = sub[valid].values.astype(np.float32)
                 present[i, valid.values] = True
 
-    # Flag the <=6-day in-place gap-fills (1) separately from observed (0) / missing (3).
+    # Flag the <=6-day in-place gap-fills (1) separately from observed (0) / missing (3),
+    # after reverting the fills that extrapolate into longer gaps (2026-08-23).
     filled = _load_fill_mask(ws_ids, dates)
+    edge = _edge_fills(present, filled)
+    q_mm[edge] = np.nan
+    q_m3s[edge] = np.nan
+    present[edge] = False
+    filled[edge] = False
+    print(f"  reverted {int(edge.sum()):,} gap-filled gauge-days that did not bridge observed days")
     q_flag = _discharge_quality_flags(present, filled)
 
     ds = xr.Dataset(
@@ -205,10 +236,11 @@ def package_discharge() -> None:
                     "flag_meanings": "observed gap_filled missing",
                     "description": (
                         "0 = observed (gauge-reported). 1 = gap-filled (a gap of "
-                        "≤6 days interpolated in place with a second-order "
-                        "polynomial; the value is present but not an original "
-                        "observation). 3 = missing. Filter to flag == 0 for a "
-                        "strict observed-only series."
+                        "at most 6 days bounded by observations on both sides, "
+                        "interpolated in place with a second-order polynomial; "
+                        "the value is present but not an original observation). "
+                        "3 = missing. Filter to flag == 0 for a strict "
+                        "observed-only series."
                     ),
                 },
             ),

@@ -19,6 +19,27 @@ from src.data_processing.gdal_processing import (
 from src.data_processing.geom_functions import poly_from_multipoly
 from src.utils.logger import setup_logger
 
+
+def area_weighted_mean(data: np.ndarray, inter_areas: np.ndarray) -> np.ndarray:
+    """Area-weighted mean of polygon attributes, normalised per variable over non-NaN polygons.
+
+    Args:
+        data: Attribute matrix of shape (n_polygons, n_variables); NaN marks no-data.
+        inter_areas: Intersection area of each polygon with the catchment, shape (n_polygons,).
+
+    Returns:
+        Weighted mean per variable. Weights are normalised by the summed intersection area of
+        the polygons that carry a value for that variable, so partial HydroATLAS coverage of the
+        catchment does not scale the result. NaN where no polygon carries a value.
+    """
+    valid = ~np.isnan(data)
+    weights = np.asarray(inter_areas, dtype="float64")[:, None] * valid
+    weight_sum = weights.sum(axis=0)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        out = (np.nan_to_num(data) * weights).sum(axis=0) / weight_sum
+    return np.where(weight_sum > 0, out, np.nan)
+
+
 logger = setup_logger(
     "hydroAtlasWS",
     log_file="logs/hydroAtlasWS.log",
@@ -370,13 +391,8 @@ class HydroAtlas:
             raise ValueError(f"No HydroATLAS overlap for gauge <{gauge_id}>")
 
         # ── 2.  Area-weighted aggregation (Caravan methodology) ───────
-        # Weight = intersection_area / total_catchment_area
-        weights = inter_areas / user_catchment_area
-
         data = gdf[self.ALL_VARIABLES].to_numpy(dtype="float32", copy=False)
-        # Handle NaN: set to 0 for weighted sum, then normalize
-        num = np.nan_to_num(data) * weights[:, None]
-        geo_vector = pd.Series(num.sum(axis=0), index=self.ALL_VARIABLES)
+        geo_vector = pd.Series(area_weighted_mean(data, inter_areas), index=self.ALL_VARIABLES)
 
         # ── 3.  Unit corrections ──────────────────────────────────────
         geo_vector.loc[self._DIV10] /= 10.0

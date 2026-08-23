@@ -199,7 +199,7 @@ def aggregate_period_metrics(
             raise ValueError(f"Invalid aggregation: {aggregation}")
 
     # Add inter-annual variability metrics
-    result["n_valid_periods"] = len(period_metrics)
+    result["n_valid_periods"] = int(df["mean_discharge"].notna().sum())
     result["mean_discharge_std"] = float(np.nanstd(df["mean_discharge"]))
     result["mean_discharge_cv"] = (
         result["mean_discharge_std"] / result.get("mean_discharge", np.nan)

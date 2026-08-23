@@ -17,11 +17,26 @@ def mp_ais_discharge(discharge_file: Path) -> dict:
     return discharge_to_csv(data_path=discharge_file, save_folder=DISCHARGE_CSV_DIR)
 
 
+def fill_short_gaps(series: pd.Series, max_gap: int = 6) -> pd.Series:
+    """Second-order polynomial fill of interior gaps of at most ``max_gap`` days.
+
+    ``interpolate(limit=max_gap)`` would fill the first ``max_gap`` days of every
+    gap, extrapolating into long ones; here only runs whose full length is at
+    most ``max_gap`` and that lie between observations are filled.
+    """
+    missing = series.isna()
+    run_id = (missing != missing.shift()).cumsum()
+    run_len = missing.groupby(run_id).transform("size")
+    short_gap = missing & (run_len <= max_gap)
+    interpolated = series.interpolate(method="polynomial", order=2, limit_area="inside")
+    return series.where(~short_gap, interpolated)
+
+
 def interpolate_discharge(file: Path, column: str = "q_cms") -> None:
     """Polynomial-interpolate short gaps, then clamp negatives to NaN."""
     df = pd.read_csv(file, index_col="date", parse_dates=True)
     df = df[~df.index.duplicated(keep="first")]
-    df[column] = df[column].interpolate(method="polynomial", order=2, limit=6)
+    df[column] = fill_short_gaps(df[column])
     if (df[column] < 0).any():
         df.loc[df[column] < 0, column] = np.nan
     df.to_csv(file)

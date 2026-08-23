@@ -91,7 +91,7 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
 | Grade A definition | Every assessed year Grade A |
 | CRS for paper maps | Albers Equal-Area Conic |
 | HydroATLAS attributes | 288 (22 primary subset) |
-| Hydrological signatures | 15 metrics for 1,845 cleaned gauges (release CSV; maps via `scripts/plot_signature_maps.py`; the former 1,716 notebook strict subset is retired) |
+| Hydrological signatures | 15 metrics, 1,719 rows / 1,706 non-anomalous gauges (release CSV from `scripts/create_paper_signatures.py`, release-only inputs, complete hydro-years 2009–2023 at ≥ 70 % coverage, ≥ 5 valid years; MSWEP primary + `*_era5` variants; maps via `scripts/plot_signature_maps.py`) |
 | Hydrological year | Oct–Sep |
 
 ---
@@ -135,3 +135,6 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
   when run with `--write` (LaTeX reads only the latter via `\graphicspath`). Verify md5
   parity of the seven manuscript figures before pushing Overleaf; a stale copy in
   `paper/overleaf/images/` silently ships the old figure.
+- Save the figure **once** and `shutil.copy2` it to the second directory: two consecutive
+  `savefig(bbox_inches="tight")` calls crop a few pixels differently, so the two copies
+  never agree byte-for-byte (seen 2026-08-23 on the signature maps).

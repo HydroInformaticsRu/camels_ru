@@ -104,37 +104,19 @@ def check_val(label: str, expected: str, actual: str) -> None:
 
 
 def check_aet_macros(macros: dict[str, str]) -> None:
-    """Reconcile the AET>PET headline macros + in-text Budyko trios against the audit table."""
-    section("BUDYKO / AET ADEQUACY (results/hess_quality/budyko_aet_table.csv)")
-    table = RESULTS_HESS / "budyko_aet_table.csv"
+    """Reconcile the Table 7 water-balance macros against paper/tables/forcing_water_balance.csv."""
+    section("FORCING WATER BALANCE (paper/tables/forcing_water_balance.csv)")
+    table = PAPER / "tables" / "forcing_water_balance.csv"
     if not table.exists():
-        print("  SKIP — budyko_aet_table.csv absent (gitignored); run scripts/hess_quality_audit.py")
+        print("  SKIP — forcing_water_balance.csv absent; run scripts/generate_budyko_figure.py")
         return
-    budyko = pd.read_csv(table).set_index("product")
-    era5, mswep, gpcp = budyko.loc["ERA5-Land"], budyko.loc["MSWEP"], budyko.loc["GPCP"]
-    check_macro(macros, "aetgtpeterafive", float(era5["aet_wb_gt_pet_pct"]), "{:.1f}")
-    check_macro(macros, "aetgtpetmswep", float(mswep["aet_wb_gt_pet_pct"]), "{:.1f}")
-    check_macro(macros, "aetgtpetgpcp", float(gpcp["aet_wb_gt_pet_pct"]), "{:.1f}")
-    check_macro(macros, "naetcheckgauges", float(era5["aet_area_ge_50_n"]), "{:.0f}")
-    # In-text hardcoded trios (§5.4, no macro) — gate against the audit table so they cannot drift.
-    check_val(
-        "in-text energy-viol E/M/G %",
-        "8.1/2.0/3.4",
-        f"{era5['energy_violation_pct']:.1f}/"
-        f"{mswep['energy_violation_pct']:.1f}/{gpcp['energy_violation_pct']:.1f}",
-    )
-    check_val(
-        "in-text aridity median E/M/G",
-        "0.91/1.02/0.92",
-        f"{era5['median_aridity_index']:.2f}/"
-        f"{mswep['median_aridity_index']:.2f}/{gpcp['median_aridity_index']:.2f}",
-    )
-    check_val(
-        "in-text evaporative median E/M/G",
-        "0.67/0.61/0.66",
-        f"{era5['median_evaporative_index']:.2f}/"
-        f"{mswep['median_evaporative_index']:.2f}/{gpcp['median_evaporative_index']:.2f}",
-    )
+    wb = pd.read_csv(table).set_index("product")
+    for product, suffix in (("ERA5-Land", "erafive"), ("MSWEP", "mswep"), ("GPCP", "gpcp")):
+        row = wb.loc[product]
+        check_macro(macros, f"qpmedian{suffix}", float(row["median_runoff_ratio"]), "{:.3f}")
+        check_macro(macros, f"qpgtone{suffix}", float(row["runoff_ratio_gt_1_pct"]), "{:.1f}")
+        check_macro(macros, f"aetgtpet{suffix}", float(row["aet_wb_gt_pet_pct"]), "{:.1f}")
+    check_macro(macros, "nwaterbalgauges", float(wb["n_gauges"].iloc[0]), "{:.0f}")
 
 
 def check_coldregion_macros(macros: dict[str, str]) -> None:
@@ -316,6 +298,17 @@ def main() -> None:
         f"{paper_attr_scope.n_included}",
         match=paper_attr_scope.n_included == 3187 and paper_attr_scope.n_excluded == 152,
     )
+    # §2.3 / §5.1 attribute statistics over the Analysis set (renormalised attributes, 2026-08-23)
+    analysis_attrs = attrs.loc[~attrs["gauge_id"].astype(str).map(is_paper_analysis_excluded_gauge_id)]
+    check_macro(
+        macros, "permafrostabsentpct", 100.0 * (analysis_attrs["prm_pc_use"] == 0).mean(), "{:.0f}"
+    )
+    check_macro(macros, "npermafrostninety", float((analysis_attrs["prm_pc_use"] >= 90).sum()), "{:.0f}")
+    check_macro(macros, "nforesteighty", float((analysis_attrs["for_pc_use"] > 80).sum()), "{:.0f}")
+    check_macro(macros, "ncroplandfifty", float((analysis_attrs["crp_pc_use"] > 50).sum()), "{:.0f}")
+    check_macro(macros, "nurbanten", float((analysis_attrs["urb_pc_use"] > 10).sum()), "{:.0f}")
+    check_macro(macros, "minelevation", float(attrs["ele_mt_uav"].min()), "{:.0f}")
+    check_macro(macros, "maxelevation", float(attrs["ele_mt_uav"].max()), "{:.0f}")
     kv(
         "npaperanalysisexcluded",
         "152",
@@ -343,12 +336,12 @@ def main() -> None:
     )
     n_primary_attrs = len(re.findall(r"[a-z]{3}\\_[a-z]{2}\\_[a-z]{3}", attr_table_text))
     check_macro(macros, "nattributes", float(n_primary_attrs), "{:.0f}")
-    kv(
-        "nsigngauges (signatures.csv cleaned)",
-        "1,845",
-        f"{n_sig_clean} (raw={n_sig_rows}, anomalous={n_sig_anomalous})",
-        match=n_sig_clean == 1845,
-    )
+    check_macro(macros, "nsignrows", float(n_sig_rows), "{:.0f}")
+    check_macro(macros, "nsignanomalous", float(n_sig_anomalous), "{:.0f}")
+    check_macro(macros, "nsigngauges", float(n_sig_clean), "{:.0f}")
+    clean_sigs = sigs.loc[~sigs["is_anomalous"].astype(bool)]
+    check_macro(macros, "nhalfflowgauges", float(clean_sigs["half_flow_date"].notna().sum()), "{:.0f}")
+    check_macro(macros, "nwaterbalgauges", float(clean_sigs["runoff_ratio"].notna().sum()), "{:.0f}")
 
     section("GAUGE QUALITY BREAKDOWN (from year_grades.csv)")
     cols = [c for c in year_grades.columns if c.isdigit()]
@@ -441,48 +434,22 @@ def main() -> None:
         ["runoff_ratio", "aridity_index", "evaporative_index"]
     ].notna().all(axis=1)
     half_flow_dam_free = dam_free & dam_merged["half_flow_date"].notna()
-    kv("ndamfreesigngauges", "1,800", f"{int(dam_free.sum()):,}", match=int(dam_free.sum()) == 1800)
-    kv(
-        "nregulatedsigngauges",
-        "43",
-        f"{int(regulated.sum()):,}",
-        match=int(regulated.sum()) == 43,
-    )
-    kv(
-        "nunknownregulation",
-        "2",
-        f"{int(unknown_regulation.sum()):,}",
-        match=int(unknown_regulation.sum()) == 2,
-    )
-    kv(
-        "nwaterbaldamfree",
-        "1,800",
-        f"{int(water_balance_dam_free.sum()):,}",
-        match=int(water_balance_dam_free.sum()) == 1800,
-    )
-    kv(
-        "nhalfflowdamfree",
-        "1,600",
-        f"{int(half_flow_dam_free.sum()):,}",
-        match=int(half_flow_dam_free.sum()) == 1600,
-    )
-    median_expectations = {
-        "mediandamfreedischarge": ("q_mean", 0.697, "{:.3f}"),
-        "mediandamfreerunoffratio": ("runoff_ratio", 0.333, "{:.3f}"),
-        "mediandamfreebaseflowindex": ("baseflow_index", 0.555, "{:.3f}"),
-        "mediandamfreefdcslope": ("fdc_slope", 2.370, "{:.3f}"),
-        "mediandamfreehalfflowday": ("half_flow_date", 214.0, "{:.0f}"),
-        "mediandamfreesnowcover": ("snw_pc_uyr", 45.8, "{:.1f}"),
-        "mediandamfreepermafrost": ("prm_pc_use", 0.04, "{:.2f}"),
+    check_macro(macros, "ndamfreesigngauges", float(dam_free.sum()), "{:.0f}")
+    check_macro(macros, "nregulatedsigngauges", float(regulated.sum()), "{:.0f}")
+    check_macro(macros, "nunknownregulation", float(unknown_regulation.sum()), "{:.0f}")
+    check_macro(macros, "nwaterbaldamfree", float(water_balance_dam_free.sum()), "{:.0f}")
+    check_macro(macros, "nhalfflowdamfree", float(half_flow_dam_free.sum()), "{:.0f}")
+    median_columns = {
+        "mediandamfreedischarge": ("q_mean", "{:.3f}"),
+        "mediandamfreerunoffratio": ("runoff_ratio", "{:.3f}"),
+        "mediandamfreebaseflowindex": ("baseflow_index", "{:.3f}"),
+        "mediandamfreefdcslope": ("fdc_slope", "{:.3f}"),
+        "mediandamfreehalfflowday": ("half_flow_date", "{:.0f}"),
+        "mediandamfreesnowcover": ("snw_pc_uyr", "{:.1f}"),
+        "mediandamfreepermafrost": ("prm_pc_use", "{:.2f}"),
     }
-    for macro_name, (column, expected, fmt) in median_expectations.items():
-        actual = float(dam_merged.loc[dam_free, column].dropna().median())
-        kv(
-            macro_name,
-            fmt.format(expected),
-            fmt.format(actual),
-            match=fmt.format(actual) == fmt.format(expected),
-        )
+    for macro_name, (column, fmt) in median_columns.items():
+        check_macro(macros, macro_name, float(dam_merged.loc[dam_free, column].dropna().median()), fmt)
 
     section("PAPER-ANALYSIS PRECIPITATION TABLES")
     precip_table = pd.read_csv(PAPER / "tables" / "precip_dataset_comparison.csv")

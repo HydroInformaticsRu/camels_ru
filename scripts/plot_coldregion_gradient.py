@@ -20,6 +20,7 @@ Outputs:
 from __future__ import annotations
 
 from pathlib import Path
+import shutil
 
 import matplotlib as mpl
 from matplotlib.colors import TwoSlopeNorm
@@ -266,9 +267,13 @@ def main() -> None:
             )
         )
     pd.concat(prov, ignore_index=True).to_csv(RESULTS / "coldregion_gradient_bins.csv", index=False)
-    for d in IMG_DIRS:
+    first, *rest = IMG_DIRS  # save once, copy: repeated tight saves differ by a few pixels
+    first.mkdir(parents=True, exist_ok=True)
+    fig.savefig(first / "fig_coldregion_gradient.png", bbox_inches="tight")
+    print(f"wrote {first / 'fig_coldregion_gradient.png'}")
+    for d in rest:
         d.mkdir(parents=True, exist_ok=True)
-        fig.savefig(d / "fig_coldregion_gradient.png", bbox_inches="tight")
+        shutil.copy2(first / "fig_coldregion_gradient.png", d / "fig_coldregion_gradient.png")
         print(f"wrote {d / 'fig_coldregion_gradient.png'}")
     plt.close(fig)
 
