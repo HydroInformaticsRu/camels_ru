@@ -67,7 +67,7 @@ ERA5-Land/MSWEP/GPCP → aggregate_watersheds.py → per-gauge forcing
 ## Installation
 
 ```bash
-git clone https://github.com/dmbrmv/camels_ru.git
+git clone git@github.com:HydroInformaticsRu/camels_ru.git
 cd camels_ru
 pixi install        # Python 3.12+, all dependencies
 ```
@@ -91,7 +91,7 @@ The dataset is not included in this repository. To use the analysis tools:
 
 ## Citation
 
-Abramov, D. V.: CAMELS-RU: A Large-Sample Hydroclimatic Dataset for 3,353 Russian Catchments, Earth Syst. Sci. Data (in preparation), 2026.
+Abramov, D. V., Maximov, Y., Tsyplenkov, A., and Moreido, V.: CAMELS-RU: hydro-meteorological time series and landscape attributes for 3,353 catchments in Russia, Earth Syst. Sci. Data (in review), 2026. See `CITATION.cff`.
 
 ## Acknowledgments
 

@@ -171,7 +171,7 @@ def check_discharge_fill_macros(macros: dict[str, str]) -> None:
         n_present = int((qf != 3).sum())
     fill_pct = 100.0 * n_fill / n_present if n_present else float("nan")
     check_macro(macros, "ndischargefilldays", n_fill, "{:,.0f}")
-    check_macro(macros, "ndischargefillpct", fill_pct, "{:.2f}")
+    check_macro(macros, "ndischargefillpct", fill_pct, "{:.3f}")
 
 
 def report_drift_summary() -> None:
