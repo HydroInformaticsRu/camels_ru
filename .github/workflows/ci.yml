@@ -17,12 +17,13 @@ jobs:
           cache: true
 
       - name: Lint with ruff
-        run: pixi run ruff check src/
+        run: pixi run lint
 
       - name: Run tests
+        # The tests are self-checking scripts (each has a __main__ block); pytest is
+        # deliberately not a dependency.
         run: |
-          if [ -d tests ]; then
-            pixi run pytest tests/
-          else
-            echo "No tests/ directory found — skipping pytest"
-          fi
+          for t in tests/test_*.py; do
+            echo "== $t"
+            pixi run python "$t" || exit 1
+          done

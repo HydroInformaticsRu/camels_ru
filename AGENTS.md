@@ -148,6 +148,7 @@ pixi shell                         # Drop into env shell
 pixi run lint                      # ruff check src/
 pixi run format                    # ruff format src/
 pixi run typecheck                 # pyright src/
+for t in tests/test_*.py; do pixi run python "$t"; done   # self-checking test scripts (what CI runs)
 
 # Pipeline (typical order)
 python scripts/ParseAis*.py               # AIS GMVO (XLS) → compound CSVs

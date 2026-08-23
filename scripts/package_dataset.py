@@ -41,7 +41,7 @@ LEVEL_GTS_DIR = DATA_DIR / "HydroData" / "LevelGTS"
 ERA5_DIR = PROJECT_ROOT / "data" / "Russia" / "MeteoData" / "CamelsRU" / "era5_land"
 ERA5_FILLED_DIR = PROJECT_ROOT / "data" / "Russia" / "MeteoData" / "CamelsRU" / "era5_land_filled"
 # Corrected, de-accumulated ERA5-Land total precipitation (col "prcp"); the
-# authoritative source used to recompute the Sect. 5 forcing numbers. Shipped
+# authoritative source used to recompute the Sect. 6.3 forcing numbers. Shipped
 # as the precip_era5 intercomparison variable (MSWEP remains primary).
 ERA5_TP_DIR = PROJECT_ROOT / "data" / "Russia" / "MeteoData" / "CamelsRU" / "era5land_tp_new"
 MSWEP_DIR = DATA_DIR / "parsed_meteo" / "mswep"
@@ -395,7 +395,7 @@ def package_forcing() -> dict[str, str]:
                     "source": "ERA5-Land (Munoz-Sabater et al., 2021)",
                     "note": (
                         "Corrected de-accumulated ERA5-Land total precipitation, "
-                        "provided for forcing intercomparison (manuscript Sect. 5). "
+                        "provided for forcing intercomparison (manuscript Sect. 6.3). "
                         "Not the recommended forcing; use precip_mswep for modelling."
                     ),
                 },
@@ -408,7 +408,7 @@ def package_forcing() -> dict[str, str]:
                     "units": "mm d-1",
                     "source": "GPCP v3.3 (NASA MEaSUREs, doi:10.5067/MEASURES/GPCP/DATA307)",
                     "note": (
-                        "Provided for forcing intercomparison (manuscript Sect. 5). "
+                        "Provided for forcing intercomparison (manuscript Sect. 6.3). "
                         "0.5-degree product; coverage is sparser than MSWEP/ERA5-Land. "
                         "Not the recommended forcing; use precip_mswep for modelling."
                     ),
@@ -470,7 +470,7 @@ def package_forcing() -> dict[str, str]:
             "alt_precip_sources": (
                 "precip_era5 = ERA5-Land de-accumulated total precipitation (corrected); "
                 "precip_gpcp = GPCP v3.3. Both are provided for the forcing "
-                "intercomparison of manuscript Sect. 5; precip_mswep (MSWEP v2.8) "
+                "intercomparison of manuscript Sect. 6.3; precip_mswep (MSWEP v2.8) "
                 "is the recommended primary forcing."
             ),
             "temp_source": "ERA5-Land (Munoz-Sabater et al., 2021)",
