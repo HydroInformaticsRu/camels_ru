@@ -248,6 +248,25 @@ def check_water_balance_screen_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "maxrunoffratio", float(flagged["runoff_ratio"].max()), "{:.1f}")
 
 
+def check_precip_caption_macros(macros: dict[str, str]) -> None:
+    """Lock the six Fig. 5 caption numbers against their provenance CSV."""
+    section("FIG. 5 CAPTION (paper/tables/precip_comparison_caption.csv)")
+    table = PAPER / "tables" / "precip_comparison_caption.csv"
+    if not table.exists():
+        print("  SKIP — run scripts/regenerate_precip_comparison_figure.py --caption-only")
+        return
+    row = pd.read_csv(table).iloc[0]
+    for macro_name, column in (
+        ("dperamswepmean", "mean_d_era5_mswep"),
+        ("dpgpcpmswepmean", "mean_d_gpcp_mswep"),
+        ("pctgpcpwetterwest", "pct_gpcp_wetter_west60"),
+        ("dpgpcpwest", "mean_d_gpcp_west60"),
+        ("pctgpcpdriereast", "pct_gpcp_drier_east100140"),
+        ("dpgpcpeast", "mean_d_gpcp_east100140"),
+    ):
+        check_macro(macros, macro_name, float(row[column]), "{:.0f}")
+
+
 def check_nested_macros(macros: dict[str, str]) -> None:
     """Lock the Sect. 6.5 nested mass-balance macros against the per-pair provenance CSV."""
     section("NESTED MASS BALANCE (paper/tables/nested_mass_balance.csv)")
@@ -825,6 +844,7 @@ def main() -> None:
 
     check_aet_macros(macros)
     check_nested_macros(macros)
+    check_precip_caption_macros(macros)
     check_coldregion_macros(macros)
     check_spike_threshold_macros(macros)
     check_stage_screen_encoding_macros(macros)

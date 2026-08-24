@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
+import shutil
 import sys
 
 import matplotlib
@@ -85,6 +86,38 @@ def build_table() -> pd.DataFrame:
     return df
 
 
+def write_caption_stats(df: pd.DataFrame) -> None:
+    """Write the six Fig. 5 caption numbers to a provenance CSV (verify_macros-locked).
+
+    These were the only numbers in the paper with neither a macro nor a provenance
+    CSV; the consistency audit could not reproduce four of them to the printed digit.
+    """
+    gauge = gpd.read_file(GEOM / "camels_gauges.gpkg")
+    gauge["gauge_id"] = gauge["gauge_id"].astype(str)
+    if gauge.crs is None or gauge.crs.to_epsg() != 4326:
+        gauge = gauge.to_crs(4326)
+    lon = gauge.set_index("gauge_id").geometry.x
+    d = df.set_index("gauge_id")["d_GPCP"].dropna()
+    lon = lon.reindex(d.index)
+    west = lon < 60.0
+    east = (lon >= 100.0) & (lon <= 140.0)
+    stats = {
+        "mean_d_era5_mswep": float(df["d_ERA5-Land"].dropna().mean()),
+        "mean_d_gpcp_mswep": float(d.mean()),
+        "pct_gpcp_wetter_west60": float(100.0 * (d[west] > 0).mean()),
+        "mean_d_gpcp_west60": float(d[west].mean()),
+        "pct_gpcp_drier_east100140": float(100.0 * (d[east] < 0).mean()),
+        "mean_d_gpcp_east100140": float(d[east].mean()),
+        "n_west60": int(west.sum()),
+        "n_east100140": int(east.sum()),
+    }
+    out = PROJECT_ROOT / "paper" / "tables" / "precip_comparison_caption.csv"
+    pd.DataFrame([stats]).to_csv(out, index=False, float_format="%.6g")
+    print(f"Wrote {out}")
+    for k, v in stats.items():
+        print(f"  {k} = {v:.1f}" if isinstance(v, float) else f"  {k} = {v}")
+
+
 def _edges(df: pd.DataFrame) -> list[int]:
     """Symmetric diverging bin edges centred on zero, rounded, from a robust spread."""
     alld = np.concatenate([df[f"d_{m}"].dropna().to_numpy() for m, _ in DIFFS])
@@ -139,17 +172,26 @@ def plot(df: pd.DataFrame, out: Path) -> None:
     print(f"Wrote {out}")
 
 
-def main(write: bool) -> None:
+def main(write: bool, caption_only: bool = False) -> None:
     """Build the table, render the figure, and print sanity numbers."""
     df = build_table()
+    write_caption_stats(df)
+    if caption_only:
+        return
     if write:
         dests = [PROJECT_ROOT / "paper" / "images", PROJECT_ROOT / "paper" / "overleaf" / "images"]
     else:
         dests = [PROJECT_ROOT / ".tmp" / "cluster_diag"]
     suffix = "" if write else "_test"
-    for dest in dests:
+    # Save once and copy: two savefig(bbox_inches="tight") calls crop differently,
+    # so the two image directories would never agree byte-for-byte.
+    first = dests[0] / f"fig_precip_comparison{suffix}.png"
+    dests[0].mkdir(parents=True, exist_ok=True)
+    plot(df, first)
+    for dest in dests[1:]:
         dest.mkdir(parents=True, exist_ok=True)
-        plot(df, dest / f"fig_precip_comparison{suffix}.png")
+        shutil.copy2(first, dest / first.name)
+        print(f"Copied {dest / first.name}")
 
     n_all = int(df[list(PRODUCTS)].notna().all(axis=1).sum())
     print("\n" + "=" * 64)
@@ -164,4 +206,4 @@ def main(write: bool) -> None:
 
 
 if __name__ == "__main__":
-    main(write="--write" in sys.argv)
+    main(write="--write" in sys.argv, caption_only="--caption-only" in sys.argv)
