@@ -57,9 +57,8 @@ def main() -> None:
     print(piv.round(1).to_string())
     print(f"\nERA5-Land minus MSWEP, sub-freezing  : {delta['sub_freezing']:+.1f} mm/yr")
     print(f"ERA5-Land minus MSWEP, above-freezing: {delta['above_freezing']:+.1f} mm/yr")
-    print(
-        f"sub-freezing share of MSWEP total    : {100 * piv.loc['mswep', 'sub_freezing'] / mswep_total:.0f}%"
-    )
+    sub_share = 100 * piv.loc["mswep", "sub_freezing"] / mswep_total
+    print(f"sub-freezing share of MSWEP total    : {sub_share:.0f}%")
     print(
         f"share of total offset that is sub-freezing: {100 * delta['sub_freezing'] / delta.sum():.0f}%"
     )
