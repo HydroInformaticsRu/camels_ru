@@ -116,6 +116,8 @@ def check_aet_macros(macros: dict[str, str]) -> None:
         check_macro(macros, f"qpmedian{suffix}", float(row["median_runoff_ratio"]), "{:.3f}")
         check_macro(macros, f"qpgtone{suffix}", float(row["runoff_ratio_gt_1_pct"]), "{:.1f}")
         check_macro(macros, f"aetgtpet{suffix}", float(row["aet_wb_gt_pet_pct"]), "{:.1f}")
+        check_macro(macros, f"budykobelow{suffix}", float(row["below_budyko_pct"]), "{:.1f}")
+        check_macro(macros, f"budykodep{suffix}", float(row["median_budyko_departure"]), "{:+.3f}")
     check_macro(macros, "nwaterbalgauges", float(wb["n_gauges"].iloc[0]), "{:.0f}")
 
 
@@ -130,9 +132,7 @@ def check_coldregion_macros(macros: dict[str, str]) -> None:
     cats = pd.cut(cr["prm_pc_use"].clip(0, 100), bins=edges, include_lowest=True)
     wff_med = cr["winter_flow_ratio"].groupby(cats, observed=True).median()
     bfi_med = cr["baseflow_index"].groupby(cats, observed=True).median()
-    rho_winter = float(
-        spearmanr(cr["prm_pc_use"], cr["winter_flow_ratio"], nan_policy="omit")[0]
-    )
+    rho_winter = float(spearmanr(cr["prm_pc_use"], cr["winter_flow_ratio"], nan_policy="omit")[0])
     rho_bfi = float(spearmanr(cr["prm_pc_use"], cr["baseflow_index"], nan_policy="omit")[0])
     rho_qcv = float(spearmanr(cr["baseflow_index"], cr["q_cv"], nan_policy="omit")[0])
 
@@ -246,6 +246,47 @@ def check_water_balance_screen_macros(macros: dict[str, str]) -> None:
         macros, "nwaterbalscreengradea", float((flagged["overall_grade"] == "A").sum()), "{:.0f}"
     )
     check_macro(macros, "maxrunoffratio", float(flagged["runoff_ratio"].max()), "{:.1f}")
+
+
+def check_nested_macros(macros: dict[str, str]) -> None:
+    """Lock the Sect. 6.5 nested mass-balance macros against the per-pair provenance CSV."""
+    section("NESTED MASS BALANCE (paper/tables/nested_mass_balance.csv)")
+    table = PAPER / "tables" / "nested_mass_balance.csv"
+    if not table.exists():
+        print("  SKIP — run scripts/nested_mass_balance.py")
+        return
+    df = pd.read_csv(table, dtype={"up": str, "down": str})
+    fail = df["v_ratio"] <= 1
+    informative = df["area_ratio"] <= 2
+    big = df["area_ratio"] > 5
+    yield_ratio = df["v_ratio"] / df["area_ratio"]
+    check_macro(macros, "nnestedpairs", float(len(df)), "{:.0f}")
+    check_macro(macros, "pctnestedpass", float(100.0 * (~fail).mean()), "{:.1f}")
+    check_macro(macros, "nnestedviolations", float(fail.sum()), "{:.0f}")
+    check_macro(macros, "nnestedviolbig", float((fail & (df["area_ratio"] > 2)).sum()), "{:.0f}")
+    summary = pd.read_csv(RELEASE / "camels_ru_gauge_summary.csv")
+    summary["gauge_id"] = summary["gauge_id"].astype(str)
+    grade = summary.set_index("gauge_id")["overall_grade"]
+    check_macro(
+        macros, "nnestedviolgradea", float((df.loc[fail, "up"].map(grade) == "A").sum()), "{:.0f}"
+    )
+    check_macro(macros, "nnestedinformative", float(informative.sum()), "{:.0f}")
+    check_macro(macros, "pctnestedinformativefail", float(100.0 * fail[informative].mean()), "{:.1f}")
+    check_macro(macros, "pctnestedbigshare", float(100.0 * big.mean()), "{:.1f}")
+    check_macro(macros, "pctnestedbigfail", float(100.0 * fail[big].mean()), "{:.1f}")
+    check_macro(macros, "nnestedgauges", float(pd.concat([df["up"], df["down"]]).nunique()), "{:.0f}")
+    check_macro(macros, "nestedyieldlow", float(100.0 * (yield_ratio < 0.5).mean()), "{:.1f}")
+    check_macro(macros, "nestedyieldhigh", float(100.0 * (yield_ratio > 2).mean()), "{:.1f}")
+    strat = PAPER / "tables" / "nested_stratification.csv"
+    if strat.exists():
+        s = pd.read_csv(strat)
+        check_val(
+            "stratification CSV total pairs",
+            str(len(df)),
+            str(int(s.loc[s["band"] == "All", "n_pairs"].iloc[0])),
+        )
+    else:
+        print("  SKIP stratification CSV — run scripts/nested_mass_balance.py --table-only")
 
 
 def check_spike_threshold_macros(macros: dict[str, str]) -> None:
@@ -574,12 +615,16 @@ def main() -> None:
         f"{areas.max():,.0f}",
         match=abs(areas.max() - 2_670_000) < 500,
     )
+    # The Table 1 cell references \minareanum/\maxareanum, so the number lives once in
+    # macros.tex; lock those macros against the recomputed areas instead of a cell literal.
     table1 = (PAPER / "overleaf" / "tables" / "camels_comparison.tex").read_text()
     check_val(
-        "Table 1 CAMELS-RU area range literal",
-        f"{areas.min():.2f} to {round(areas.max(), -4):,.0f}".replace(",", "\\,"),
-        "0.49 to 2\\,670\\,000" if "0.49 to 2\\,670\\,000" in table1 else "absent",
+        "Table 1 CAMELS-RU area range cell",
+        "\\minareanum{} to \\maxareanum",
+        "\\minareanum{} to \\maxareanum" if "\\minareanum{} to \\maxareanum" in table1 else "literal",
     )
+    check_macro(parse_macros(), "minareanum", float(areas.min()), "{:.2f}")
+    check_macro(parse_macros(), "maxareanum", float(round(areas.max(), -4)), "{:.0f}")
     check_macro(parse_macros(), "meanarea", float(areas.mean()), "{:.0f}")
     check_macro(parse_macros(), "medianarea", float(areas.median()), "{:.0f}")
     analysis_areas = boundaries.loc[
@@ -681,13 +726,12 @@ def main() -> None:
     for _, row in precip_table.iterrows():
         dataset = str(row["Dataset"])
         exp_n, exp_std, mean_macro = expected_precip[dataset]
-        exp_mean = int(macro_num(macros[mean_macro]))
+        # The composite \...annual macro expands \...annualnum, so the number lives once;
+        # parse the numeric macro (the composite has no digits of its own to extract).
+        exp_mean = int(macro_num(macros[f"{mean_macro}num"]))
         table_tex = (PAPER / "overleaf" / "tables" / "forcing_products.tex").read_text()
-        check_val(
-            f"{dataset} Table 7 Mean P literal",
-            str(exp_mean),
-            str(re.search(rf"^{re.escape(dataset)}\s*&\s*(\d+)", table_tex, re.M).group(1)),
-        )
+        cell = re.search(rf"^{re.escape(dataset)}\s*&\s*(\S+)", table_tex, re.M).group(1)
+        check_val(f"{dataset} forcing-table Mean P cell", f"\\{mean_macro}num", cell)
         kv(
             f"{dataset} N gauges",
             f"{exp_n:,}",
@@ -780,6 +824,7 @@ def main() -> None:
             print(f"  {tarball.name}: {gb:.2f} GB gzipped")
 
     check_aet_macros(macros)
+    check_nested_macros(macros)
     check_coldregion_macros(macros)
     check_spike_threshold_macros(macros)
     check_stage_screen_encoding_macros(macros)

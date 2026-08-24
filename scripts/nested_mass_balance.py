@@ -15,6 +15,7 @@ days observed at BOTH gauges, so a gap at either end never creates a false viola
 """
 
 from pathlib import Path
+import sys
 
 import geopandas as gpd
 import numpy as np
@@ -23,7 +24,75 @@ import xarray as xr
 
 REPO = Path(__file__).resolve().parents[1]
 RELEASE = REPO / "release" / "CAMELS_RU_v1.0"
+PAIRS_CSV = REPO / "paper" / "tables" / "nested_mass_balance.csv"
+STRAT_CSV = REPO / "paper" / "tables" / "nested_stratification.csv"
+STRAT_TEX = REPO / "paper" / "overleaf" / "tables" / "nested_stratification.tex"
 MIN_COMMON_DAYS = 2000
+RATIO_BANDS = [(0.0, 2.0, r"$\le 2$"), (2.0, 5.0, "2 to 5"), (5.0, np.inf, "$> 5$")]
+
+TABLE_HEADER = r"""\begin{table}[t]
+\centering
+\caption{Nested mass-balance check stratified by the downstream-to-upstream area ratio,
+over the \nnestedpairs{} pairs with at least 2000 jointly observed days. The check's power
+falls as the ratio grows, because a much larger downstream catchment exceeds the upstream
+volume almost by construction; the near-nested pairs in the first row are where a
+violation is easiest to produce. Per-pair results ship in
+\texttt{paper/tables/nested\_mass\_balance.csv}.}
+\label{tab:nested_stratification}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Area ratio $A_{dn}/A_{up}$ & Pairs & Share & Violations & Failure rate \\
+\midrule
+"""
+
+TABLE_FOOTER = r"""\bottomrule
+\end{tabular}
+\end{table}
+"""
+
+
+def write_stratified(df: pd.DataFrame) -> None:
+    """Write the area-ratio stratification (CSV + generated LaTeX table).
+
+    Generated rather than typed for the same reason as the grade-regime table:
+    hand-transcribed cells drift.
+    """
+    fail = df["v_ratio"] <= 1
+    rows = []
+    for lo, hi, label in RATIO_BANDS:
+        m = (df["area_ratio"] > lo) & (df["area_ratio"] <= hi)
+        rows.append(
+            {
+                "band": label,
+                "n_pairs": int(m.sum()),
+                "share_pct": 100.0 * m.mean(),
+                "n_violations": int(fail[m].sum()),
+                "fail_pct": 100.0 * fail[m].mean(),
+            }
+        )
+    rows.append(
+        {
+            "band": "All",
+            "n_pairs": len(df),
+            "share_pct": 100.0,
+            "n_violations": int(fail.sum()),
+            "fail_pct": 100.0 * fail.mean(),
+        }
+    )
+    out = pd.DataFrame(rows)
+    out.to_csv(STRAT_CSV, index=False, float_format="%.6g")
+    print(f"wrote {STRAT_CSV.relative_to(REPO)}")
+
+    lines = [TABLE_HEADER]
+    for _, r in out.iterrows():
+        lines.append(
+            f"{r['band']} & {r['n_pairs']} & {r['share_pct']:.1f}\\% & "
+            f"{r['n_violations']} & {r['fail_pct']:.1f}\\% \\\\\n"
+        )
+    lines.append(TABLE_FOOTER)
+    STRAT_TEX.write_text("".join(lines))
+    print(f"wrote {STRAT_TEX.relative_to(REPO)}")
 
 
 def main() -> None:
@@ -95,8 +164,14 @@ def main() -> None:
     print(f"  upstream gauge graded A or B: {bad['grade_up'].isin(['A', 'B']).sum()}")
     print("\nworst 12 violations:")
     print(bad.head(12).round(3).to_string(index=False))
-    df.to_csv(REPO / "paper" / "tables" / "nested_mass_balance.csv", index=False)
+    df.to_csv(PAIRS_CSV, index=False)
+    write_stratified(df)
 
 
 if __name__ == "__main__":
-    main()
+    if "--table-only" in sys.argv:
+        # Regenerate the stratification from the shipped per-pair CSV without
+        # re-reading the 852 MB boundaries file.
+        write_stratified(pd.read_csv(PAIRS_CSV, dtype={"up": str, "down": str}))
+    else:
+        main()

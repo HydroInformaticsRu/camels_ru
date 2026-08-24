@@ -1,4 +1,4 @@
-product,n_gauges,median_runoff_ratio,runoff_ratio_gt_1_pct,aet_wb_gt_pet_pct
-ERA5-Land,1716,0.357645,4.37063,6.81818
-MSWEP,1716,0.409806,6.11888,1.10723
-GPCP,1716,0.362758,7.28438,2.97203
+product,n_gauges,median_runoff_ratio,runoff_ratio_gt_1_pct,aet_wb_gt_pet_pct,below_budyko_pct,median_budyko_departure
+ERA5-Land,1716,0.357645,4.37063,6.81818,59.1492,-0.0240364
+MSWEP,1716,0.409806,6.11888,1.10723,79.7786,-0.123
+GPCP,1716,0.362758,7.28438,2.97203,59.8485,-0.0361671

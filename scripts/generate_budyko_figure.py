@@ -21,6 +21,7 @@ from __future__ import annotations
 
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
+import shutil
 import sys
 
 import matplotlib.pyplot as plt
@@ -138,9 +139,11 @@ def _plot(df: pd.DataFrame) -> None:
     axes[0].legend(loc="lower right", fontsize=7, framealpha=0.9)
 
     OUT_PNG.parent.mkdir(parents=True, exist_ok=True)
+    # Save once and copy: two savefig(bbox_inches="tight") calls crop differently,
+    # so the two image directories would never agree byte-for-byte.
     fig.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
     if OVERLEAF_OUT_PNG.parent.exists():
-        fig.savefig(OVERLEAF_OUT_PNG, dpi=300, bbox_inches="tight")
+        shutil.copy2(OUT_PNG, OVERLEAF_OUT_PNG)
     plt.close(fig)
     log.info(f"Saved {OUT_PNG}")
     if OVERLEAF_OUT_PNG.exists():
@@ -164,6 +167,11 @@ def _summary_table(df: pd.DataFrame) -> None:
         if sub.empty:
             continue
         n = len(sub)
+        # Signed departure from the Budyko curve: negative = below (less evaporation than
+        # the curve predicts for that aridity). Reported as a bulk fit metric alongside
+        # the tail exceedances, so the table does not describe the distribution by its
+        # extremes alone.
+        departure = sub["evaporative_index"] - _budyko_curve(sub["aridity_index"].to_numpy())
         table_rows.append(
             {
                 "product": product,
@@ -173,6 +181,8 @@ def _summary_table(df: pd.DataFrame) -> None:
                 "aet_wb_gt_pet_pct": float(
                     100.0 * (sub["evaporative_index"] > sub["aridity_index"]).mean()
                 ),
+                "below_budyko_pct": float(100.0 * (departure < 0.0).mean()),
+                "median_budyko_departure": float(departure.median()),
             }
         )
         ai_med = sub["aridity_index"].median()
