@@ -93,7 +93,7 @@ def load_data() -> pd.DataFrame:
     ].copy()
     # A winter flow fraction built on a record that omits most of its winters is not a
     # measurement of winter yield, so screen on the coverage column the release ships.
-    df = df[(df["winter_coverage"] >= MIN_WINTER_COVERAGE) & df["winter_flow_fraction"].notna()]
+    df = df[(df["winter_coverage"] >= MIN_WINTER_COVERAGE) & df["winter_flow_ratio"].notna()]
 
     # Optional ERA5-Land water-balance-failure flag for the forcing bridge (panel C).
     aet_path = RESULTS / "aet_per_gauge_product.csv"
@@ -130,7 +130,7 @@ def main() -> None:
     df = load_data()
     pf, wff, bfi, snow, temp = (
         df["prm_pc_use"],
-        df["winter_flow_fraction"],
+        df["winter_flow_ratio"],
         df["baseflow_index"],
         df["snw_pc_uyr"],
         df["tmp_dc_uyr"],
@@ -147,10 +147,10 @@ def main() -> None:
     rho_w, p_w = spearmanr(pf, wff)
     rho_b, p_b = spearmanr(pf, bfi)
     rho_smooth, _ = spearmanr(bfi, df["q_cv"])
-    print(f"\nSpearman permafrost vs winter flow fraction: rho={rho_w:.3f} (p={p_w:.2g})")
+    print(f"\nSpearman permafrost vs winter flow ratio: rho={rho_w:.3f} (p={p_w:.2g})")
     print(f"Spearman permafrost vs baseflow index      : rho={rho_b:.3f} (p={p_b:.2g})")
     print(f"Spearman baseflow index vs q_cv            : rho={rho_smooth:.3f}")
-    print("\nWinter flow fraction by permafrost bin:")
+    print("\nWinter flow ratio by permafrost bin:")
     print(wm[["center", "median", "n"]].round(3).to_string(index=False))
     print("\nBaseflow index by permafrost bin:")
     print(bm[["center", "median", "n"]].round(3).to_string(index=False))
@@ -233,7 +233,7 @@ def main() -> None:
     RESULTS.mkdir(parents=True, exist_ok=True)
     prov = pd.concat(
         [
-            wm.assign(panel="A_winter_flow_fraction_vs_permafrost"),
+            wm.assign(panel="A_winter_flow_ratio_vs_permafrost"),
             bm.assign(panel="B_bfi_vs_permafrost"),
             hm.assign(panel="C_half_flow_date_vs_snow"),
         ],

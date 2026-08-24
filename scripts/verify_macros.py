@@ -125,21 +125,21 @@ def check_coldregion_macros(macros: dict[str, str]) -> None:
     cr = load_subset()
     # The figure screens on the released winter_coverage column; recompute on the same subset
     # or the macros would be checked against a different sample than the one plotted.
-    cr = cr[(cr["winter_coverage"] >= MIN_WINTER_COVERAGE) & cr["winter_flow_fraction"].notna()]
+    cr = cr[(cr["winter_coverage"] >= MIN_WINTER_COVERAGE) & cr["winter_flow_ratio"].notna()]
     edges = [0, 5, 10, 20, 30, 50, 70, 100]
     cats = pd.cut(cr["prm_pc_use"].clip(0, 100), bins=edges, include_lowest=True)
-    wff_med = cr["winter_flow_fraction"].groupby(cats, observed=True).median()
+    wff_med = cr["winter_flow_ratio"].groupby(cats, observed=True).median()
     bfi_med = cr["baseflow_index"].groupby(cats, observed=True).median()
     rho_winter = float(
-        spearmanr(cr["prm_pc_use"], cr["winter_flow_fraction"], nan_policy="omit")[0]
+        spearmanr(cr["prm_pc_use"], cr["winter_flow_ratio"], nan_policy="omit")[0]
     )
     rho_bfi = float(spearmanr(cr["prm_pc_use"], cr["baseflow_index"], nan_policy="omit")[0])
     rho_qcv = float(spearmanr(cr["baseflow_index"], cr["q_cv"], nan_policy="omit")[0])
 
     check_macro(macros, "ncoldregiongauges", len(cr), "{:.0f}")
-    check_macro(macros, "ncoldregionclipped", float((cr["winter_flow_fraction"] > 1.2).sum()), "{:.0f}")
-    check_macro(macros, "winterfractionbaseline", float(wff_med.iloc[0]), "{:.2f}")
-    check_macro(macros, "winterfractionhigh", float(wff_med.iloc[-1]), "{:.2f}")
+    check_macro(macros, "ncoldregionclipped", float((cr["winter_flow_ratio"] > 1.2).sum()), "{:.0f}")
+    check_macro(macros, "winterratiobaseline", float(wff_med.iloc[0]), "{:.2f}")
+    check_macro(macros, "winterratiohigh", float(wff_med.iloc[-1]), "{:.2f}")
     check_macro(macros, "bfipermafrostbaseline", float(bfi_med.iloc[0]), "{:.2f}")
     check_macro(macros, "bfipermafrostpeak", float(bfi_med.max()), "{:.2f}")
     check_macro(macros, "bfipermafrosthigh", float(bfi_med.iloc[-1]), "{:.2f}")

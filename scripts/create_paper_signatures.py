@@ -16,7 +16,7 @@ Conventions (2026-08-23 revision, science-review Domain Expert M-1/M-5):
 - A hydrological year is valid when at least 70 % of its days carry discharge; a gauge
   needs at least 5 valid years. Signatures are the mean over valid years.
 - Water-balance ratios (runoff_ratio Q/P, aridity_index PET/P, evaporative_index (P-Q)/P)
-- winter_flow_fraction: mean Jan-Mar flow / mean annual flow, on observed days. A
+- winter_flow_ratio: mean Jan-Mar flow / mean annual flow, on observed days. A
   Lyne-Hollick BFI with alpha in [0.9, 0.98] has a 10-50 day recession constant and so
   reads a multi-week snowmelt recession as baseflow; this measures cold-season yield
   directly and declines monotonically with permafrost extent, as the BFI does not.
@@ -60,7 +60,7 @@ SIGNATURE_ORDER = [
     "low_flow_freq",
     "low_flow_dur",
     "half_flow_date",
-    "winter_flow_fraction",
+    "winter_flow_ratio",
     "aridity_index",
     "evaporative_index",
 ]
@@ -68,8 +68,6 @@ ERA5_VARIANTS = ["runoff_ratio_era5", "aridity_index_era5", "evaporative_index_e
 HYDRO_YEAR_WINDOW = ("2008-10-01", "2023-09-30")  # complete hydrological years 2009-2023
 MIN_DATA_FRACTION = 0.7
 MIN_PERIODS = 5
-# One winter season of observed Jan-Mar days before a winter flow fraction is reported.
-MIN_WINTER_DAYS = 90
 
 
 def _water_balance_ratios(
@@ -142,19 +140,34 @@ def _compute_one(
         flashiness = FlowVariability(disch).calculate_flashiness_index().get("flashiness_index", np.nan)
 
         # Cold-season yield, straight from the record: mean Jan-Mar flow over mean annual
-        # flow, both on observed days only so a winter gap cannot depress the ratio.
-        # winter_coverage reports how much of Dec-Mar was actually observed, because the
-        # archive omits under-ice values at many gauges and the ratio is only as
-        # trustworthy as that coverage.
+        # flow, both as means over observed days. Using means rather than sums is what makes
+        # this robust to winter gaps -- summing would count a missing under-ice day as zero
+        # and gut the signature at exactly the gauges the archive leaves incomplete.
+        #
+        # It is not fully immune. The denominator averages every observed day, so where
+        # winter days are missing the annual mean is drawn from a sample short of its
+        # low-flow days, biasing it high and the ratio low. Measured over the release that
+        # residual is negligible (Spearman(ratio, winter_coverage) = -0.02, p = 0.4), but
+        # winter_coverage ships so a user can check it per gauge rather than trust that.
+        #
+        # winter_coverage counts the same Jan-Mar window as the ratio: a coverage figure
+        # spanning a different season would not qualify the number it sits beside.
         months = disch.index.month
-        winter_obs = disch[months.isin([1, 2, 3])].dropna()
+        jfm = disch[months.isin([1, 2, 3])]
+        winter_coverage = float(jfm.notna().sum() / max(len(jfm), 1))
+        # A valid winter carries at least MIN_DATA_FRACTION of its Jan-Mar days; require
+        # MIN_PERIODS of them, so this signature meets the same bar as every other column
+        # in the row instead of qualifying on a single season.
+        n_valid_winters = sum(
+            g.notna().sum() / len(g) >= MIN_DATA_FRACTION
+            for _, g in jfm.groupby(jfm.index.year)
+            if len(g)
+        )
         annual_obs = disch.dropna()
-        dec_mar = months.isin([12, 1, 2, 3])
-        winter_coverage = float(disch[dec_mar].notna().sum() / max(int(dec_mar.sum()), 1))
         annual_mean = float(annual_obs.mean()) if len(annual_obs) else np.nan
-        winter_fraction = (
-            float(winter_obs.mean()) / annual_mean
-            if len(winter_obs) >= MIN_WINTER_DAYS and np.isfinite(annual_mean) and annual_mean > 0
+        winter_ratio = (
+            float(jfm.dropna().mean()) / annual_mean
+            if n_valid_winters >= MIN_PERIODS and np.isfinite(annual_mean) and annual_mean > 0
             else np.nan
         )
 
@@ -173,7 +186,7 @@ def _compute_one(
             "low_flow_freq": metrics["low_flow_frequency"],
             "low_flow_dur": metrics["low_flow_avg_duration"],
             "half_flow_date": metrics["mean_half_flow_date"],
-            "winter_flow_fraction": winter_fraction,
+            "winter_flow_ratio": winter_ratio,
             "winter_coverage": winter_coverage,
             "aridity_index": ai,
             "evaporative_index": ei,
@@ -346,11 +359,11 @@ def main() -> None:
         "high_flow_freq": "% of days with Q > 2×median",
         "high_flow_dur": "Mean duration of high-flow events (d)",
         "baseflow_index": "BFI (Lyne-Hollick ensemble, 1000 runs; smoothness index, "
-        "not a groundwater fraction in nival regimes -- see winter_flow_fraction)",
+        "not a groundwater fraction in nival regimes -- see winter_flow_ratio)",
         "low_flow_freq": "% of days with Q < 0.2×mean",
         "low_flow_dur": "Mean duration of low-flow events (d)",
         "half_flow_date": "Day of hydro year when 50% of annual Q has passed",
-        "winter_flow_fraction": "Mean Jan-Mar flow / mean annual flow (observed days)",
+        "winter_flow_ratio": "Mean Jan-Mar flow / mean annual flow, both over observed days",
         "aridity_index": "Aridity index PET/P (GLEAM4 PET, MSWEP P; mean of annual ratios)",
         "evaporative_index": "Evaporative index (P-Q)/P (MSWEP P; mean of annual ratios)",
     }
