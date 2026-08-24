@@ -1,10 +1,12 @@
 """Where the ERA5-Land minus MSWEP precipitation offset falls, by phase (Sect. 6.3).
 
-Sect. 6.3 reports a +96 mm/yr basin-mean excess of ERA5-Land over MSWEP and selects
+Sect. 6.5 reports a +96 mm/yr basin-mean excess of ERA5-Land over MSWEP and selects
 MSWEP partly on the grounds that it assimilates gauge observations. In a cold region
-that argument cuts both ways, because shielded gauges undercatch solid precipitation
-and MSWEP assimilates the uncorrected reports. This script locates the offset in
-temperature space so the manuscript can say which phase carries it.
+that argument needs care. Gauges undercatch solid precipitation, and although MSWEP v2
+does correct systematic terrestrial bias, it infers that correction from river discharge
+(Beck et al., 2019), which constrains the catchment total and not its rain/snow
+partition. This script locates the offset in temperature space so the manuscript can say
+which phase carries it.
 
 Splitting the daily series at 0 degC using the released ERA5-Land air temperature shows
 roughly half the annual offset landing on sub-freezing days that carry only about a
