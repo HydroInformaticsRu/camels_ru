@@ -1,15 +1,20 @@
-"""Cold-region signature-gradient figure for the CAMELS-RU dataset paper (Paper 1, HESS).
+"""Cold-region signature-gradient figure for the CAMELS-RU dataset paper (ESSD).
 
-Builds the §4 cold-region signature-gradient figure: baseflow index varies non-monotonically with
-permafrost extent (rising to a peak near intermediate cover, then returning toward baseline above
-~70%), the association reverses sign across the -5 degC mean-annual-temperature line, and the
-snow-dominated regimes that anchor this structure co-locate with where ERA5-Land water-balance
-closure fails (a bridge to the forcing analysis, quantified in Sect. 5).
+Builds the Sect. 7 figure. Cold-season yield, measured directly as the winter flow
+fraction (mean Jan-Mar flow over mean annual flow, observed days only), declines
+monotonically with permafrost extent. The Lyne-Hollick baseflow index does not track it:
+with alpha in [0.9, 0.98] the filter has a 10-50 day recession constant, so it reads a
+multi-week snowmelt recession as baseflow and instead traces hydrograph smoothness
+(rho = -0.93 with q_cv over this subset). Panels (a) and (b) put the two side by side on
+identical bins, which is the reusability point: in nival and permafrost regimes the BFI
+is not a groundwater-contribution fraction and the winter flow fraction is what
+cold-season work needs.
 
-These are descriptive associations between released signatures and HydroATLAS proxies, not causal
-permafrost attribution. Robustness (Eckhardt cross-check, within-temperature-slice association) is
-established by scripts/coldregion_robustness.py. All numbers derive from the released CAMELS-RU v1.0
-artifacts; no modelling is involved.
+These are descriptive associations between released signatures and HydroATLAS proxies,
+not causal permafrost attribution. Gauges are screened on the released winter_coverage
+column, because the archive omits under-ice values at many gauges and the ratio is only
+as trustworthy as the winter coverage behind it. All numbers derive from the released
+CAMELS-RU v1.0 artifacts; no modelling is involved.
 
 Outputs:
     paper/images/fig_coldregion_gradient.png
@@ -34,7 +39,9 @@ RELEASE = ROOT / "release" / "CAMELS_RU_v1.0"
 RESULTS = ROOT / "results" / "hess_quality"
 IMG_DIRS = [ROOT / "paper" / "images", ROOT / "paper" / "overleaf" / "images"]
 
-T_SPLIT = -5.0  # mean-annual-temperature regime boundary (deg C)
+T_COLOUR_CENTRE = -5.0  # colour-scale midpoint only; no analysis is stratified on it
+MIN_WINTER_COVERAGE = 0.95  # released winter_coverage: share of Dec-Mar days observed
+Y_CLIP_A = 1.2  # panel (a) axis limit; the tail above it is clipped from view, not dropped
 N_BOOT = 2000
 # Seed matches scripts/coldregion_robustness.py so the panel-A bin-median CIs are reproducible
 # and consistent with the robustness table.
@@ -84,6 +91,9 @@ def load_data() -> pd.DataFrame:
         & (df["dor_pc_pva"] == 0)
         & (df["overall_grade"].isin(["A", "B"]))
     ].copy()
+    # A winter flow fraction built on a record that omits most of its winters is not a
+    # measurement of winter yield, so screen on the coverage column the release ships.
+    df = df[(df["winter_coverage"] >= MIN_WINTER_COVERAGE) & df["winter_flow_fraction"].notna()]
 
     # Optional ERA5-Land water-balance-failure flag for the forcing bridge (panel C).
     aet_path = RESULTS / "aet_per_gauge_product.csv"
@@ -118,64 +128,48 @@ def binned_median(x: pd.Series, y: pd.Series, edges: list[float]) -> pd.DataFram
 def main() -> None:
     """Build and save the cold-region signature-gradient figure (Grade A/B gauges)."""
     df = load_data()
-    pf, bfi, snow, temp = (
+    pf, wff, bfi, snow, temp = (
         df["prm_pc_use"],
+        df["winter_flow_fraction"],
         df["baseflow_index"],
         df["snw_pc_uyr"],
         df["tmp_dc_uyr"],
     )
-    print(f"n (A/B-graded, dam-excluded, non-anomalous) = {len(df)}")
+    print(f"n (A/B, dam-excluded, non-anomalous, winter_coverage >= {MIN_WINTER_COVERAGE}) = {len(df)}")
     print("grade counts:", df["overall_grade"].value_counts().to_dict())
 
-    # --- Verification: does the permafrost-BFI insight survive the A/B filter? ---
-    bfi_by_pf = binned_median(pf, bfi, [0, 5, 10, 20, 30, 50, 70, 100])
-    print("\nBFI median by permafrost bin:")
-    print(bfi_by_pf[["center", "median", "n"]].to_string(index=False))
-    rho_all, p_all = spearmanr(pf, bfi)
-    warm = df[df["tmp_dc_uyr"] >= T_SPLIT]
-    cold = df[df["tmp_dc_uyr"] < T_SPLIT]
-    rho_w, p_w = spearmanr(warm["prm_pc_use"], warm["baseflow_index"])
-    rho_c, p_c = spearmanr(cold["prm_pc_use"], cold["baseflow_index"])
-    print(
-        f"\nSpearman permafrost-BFI: all rho={rho_all:.3f} (p={p_all:.2g}); "
-        f"warm rho={rho_w:.3f} (p={p_w:.2g}, n={len(warm)}); "
-        f"cold rho={rho_c:.3f} (p={p_c:.2g}, n={len(cold)})"
-    )
-    hi = df.loc[df["prm_pc_use"] > 70, "baseflow_index"]
-    nofrost = df.loc[df["prm_pc_use"] == 0, "baseflow_index"]
-    print(
-        f">70% permafrost BFI median={hi.median():.3f} (n={len(hi)}) vs "
-        f"permafrost-free median={nofrost.median():.3f} (n={len(nofrost)})"
-    )
-    if df["aet_wb_gt_pet"].notna().any():
-        rate = (
-            df.groupby(pd.cut(snow, [0, 25, 40, 50, 60, 100], include_lowest=True), observed=True)[
-                "aet_wb_gt_pet"
-            ].mean()
-            * 100
-        )
-        print("\nERA5-Land AET>PET rate by snow bin (%):")
-        print(rate.round(1).to_string())
+    pf_edges = [0, 5, 10, 20, 30, 50, 70, 100]
+    wm = binned_median(pf, wff, pf_edges)
+    bm = binned_median(pf, bfi, pf_edges)
+
+    # The two signatures move in opposite directions across the same gradient. Report both,
+    # because that contrast is the point of the panel pair.
+    rho_w, p_w = spearmanr(pf, wff)
+    rho_b, p_b = spearmanr(pf, bfi)
+    rho_smooth, _ = spearmanr(bfi, df["q_cv"])
+    print(f"\nSpearman permafrost vs winter flow fraction: rho={rho_w:.3f} (p={p_w:.2g})")
+    print(f"Spearman permafrost vs baseflow index      : rho={rho_b:.3f} (p={p_b:.2g})")
+    print(f"Spearman baseflow index vs q_cv            : rho={rho_smooth:.3f}")
+    print("\nWinter flow fraction by permafrost bin:")
+    print(wm[["center", "median", "n"]].round(3).to_string(index=False))
+    print("\nBaseflow index by permafrost bin:")
+    print(bm[["center", "median", "n"]].round(3).to_string(index=False))
 
     fig, (ax_a, ax_b, ax_c) = plt.subplots(1, 3, figsize=(15, 4.6))
 
-    # ---- Panel A: BFI vs permafrost, coloured by mean annual T ----------------
-    norm = TwoSlopeNorm(vmin=float(temp.min()), vcenter=T_SPLIT, vmax=float(temp.max()))
-    sc = ax_a.scatter(pf, bfi, c=temp, cmap="RdBu_r", norm=norm, s=10, alpha=0.55, linewidths=0)
-    pf_edges = [0, 5, 10, 20, 30, 50, 70, 100]
-    bm = binned_median(pf, bfi, pf_edges)
-    # Bootstrap 95% CI on each bin median (estimator uncertainty, distinct from the IQR spread);
-    # makes the n-limited >70% "return to baseline" carry its uncertainty (audit: cold-arm evidence).
-    cats_a = pd.cut(pf, bins=pf_edges, include_lowest=True)
-    ci_map = {iv.mid: _boot_median_ci(sub.to_numpy()) for iv, sub in bfi.groupby(cats_a, observed=True)}
-    bm["ci_lo"] = [ci_map.get(c, (np.nan, np.nan))[0] for c in bm["center"]]
-    bm["ci_hi"] = [ci_map.get(c, (np.nan, np.nan))[1] for c in bm["center"]]
-    ax_a.plot(bm["center"], bm["median"], "-o", color="black", lw=1.8, ms=4, label="binned median")
-    ax_a.fill_between(bm["center"], bm["q25"], bm["q75"], color="black", alpha=0.12, label="IQR")
+    # ---- Panel A: winter flow fraction vs permafrost -------------------------
+    norm = TwoSlopeNorm(vmin=float(temp.min()), vcenter=T_COLOUR_CENTRE, vmax=float(temp.max()))
+    sc = ax_a.scatter(pf, wff, c=temp, cmap="RdBu_r", norm=norm, s=10, alpha=0.55, linewidths=0)
+    cats_a = pd.cut(pf.clip(0, 100), bins=pf_edges, include_lowest=True)
+    ci_map = {iv.mid: _boot_median_ci(sub.to_numpy()) for iv, sub in wff.groupby(cats_a, observed=True)}
+    wm["ci_lo"] = [ci_map.get(c, (np.nan, np.nan))[0] for c in wm["center"]]
+    wm["ci_hi"] = [ci_map.get(c, (np.nan, np.nan))[1] for c in wm["center"]]
+    ax_a.plot(wm["center"], wm["median"], "-o", color="black", lw=1.8, ms=4, label="binned median")
+    ax_a.fill_between(wm["center"], wm["q25"], wm["q75"], color="black", alpha=0.12, label="IQR")
     ax_a.errorbar(
-        bm["center"],
-        bm["median"],
-        yerr=[bm["median"] - bm["ci_lo"], bm["ci_hi"] - bm["median"]],
+        wm["center"],
+        wm["median"],
+        yerr=[wm["median"] - wm["ci_lo"], wm["ci_hi"] - wm["median"]],
         fmt="none",
         ecolor="black",
         elinewidth=1.1,
@@ -183,71 +177,49 @@ def main() -> None:
         zorder=5,
         label="95% bootstrap CI",
     )
-    ax_a.axvline(70, ls="--", color="0.4", lw=1)
-    peak = bm.loc[bm["median"].idxmax()]
-    high_pf = bm.iloc[-1]
-    nofrost_med = bm.iloc[0]["median"]
-    ax_a.axhline(nofrost_med, ls=":", color="0.5", lw=0.9)
-    ax_a.annotate(
-        f"peak {peak['median']:.2f}",
-        (peak["center"], peak["median"]),
-        textcoords="offset points",
-        xytext=(0, 8),
-        ha="center",
-        fontsize=8,
-    )
-    ax_a.annotate(
-        f"returns to baseline {high_pf['median']:.2f}\n"
-        f"[{high_pf['ci_lo']:.2f}, {high_pf['ci_hi']:.2f}], n={int(high_pf['n'])}",
-        (high_pf["center"], high_pf["median"]),
-        xytext=(56, 0.31),
-        textcoords="data",
-        ha="left",
-        fontsize=8,
-        arrowprops={"arrowstyle": "-", "lw": 0.6, "color": "0.3", "shrinkB": 3},
-    )
+    first_bin, last_bin = wm.iloc[0], wm.iloc[-1]
+    for row, dy in ((first_bin, 10), (last_bin, 12)):
+        ax_a.annotate(
+            f"{row['median']:.2f}\nn={int(row['n'])}",
+            (row["center"], row["median"]),
+            textcoords="offset points",
+            xytext=(0, dy),
+            ha="center",
+            fontsize=8,
+        )
+    # Clip the axis, not the data: a long upper tail (winter flow above the annual mean at
+    # spring-fed gauges) would otherwise squash the binned medians into the bottom third.
+    n_clipped = int((wff > Y_CLIP_A).sum())
+    ax_a.set_ylim(0, Y_CLIP_A)
+    print(f"panel (a): {n_clipped} of {len(wff)} points above the {Y_CLIP_A} axis limit")
     ax_a.set_xlabel("Permafrost extent (HydroATLAS proxy, %)")
-    ax_a.set_ylabel("Baseflow index")
-    ax_a.set_title("(a) Baseflow index by permafrost extent")
-    ax_a.legend(loc="lower left", frameon=False)
+    ax_a.set_ylabel("Winter flow fraction (Jan\u2013Mar / annual)")
+    ax_a.set_title(f"(a) Winter flow fraction ($\\rho$ = {rho_w:+.2f})")
+    ax_a.legend(loc="upper right", frameon=False)
     cb = fig.colorbar(sc, ax=ax_a, fraction=0.046, pad=0.03)
-    cb.set_label("Mean annual T (°C)", fontsize=8)
+    cb.set_label("Mean annual T (\u00b0C)", fontsize=8)
 
-    # ---- Panel B: same, split by temperature regime ---------------------------
-    warm = df[df["tmp_dc_uyr"] >= T_SPLIT]
-    cold = df[df["tmp_dc_uyr"] < T_SPLIT]
-    b_edges = [0, 10, 30, 50, 70, 100]
-    for sub, color, lab in [
-        (warm, "#b2182b", f"warm (T ≥ {T_SPLIT:.0f}°C)"),
-        (cold, "#2166ac", f"cold (T < {T_SPLIT:.0f}°C)"),
-    ]:
-        ax_b.scatter(
-            sub["prm_pc_use"], sub["baseflow_index"], s=8, alpha=0.25, color=color, linewidths=0
+    # ---- Panel B: the baseflow index over the same bins ----------------------
+    ax_b.scatter(pf, bfi, s=10, alpha=0.35, color="0.45", linewidths=0)
+    ax_b.plot(bm["center"], bm["median"], "-o", color="#b2182b", lw=2, ms=4, label="binned median")
+    ax_b.fill_between(bm["center"], bm["q25"], bm["q75"], color="#b2182b", alpha=0.12, label="IQR")
+    for _, row in bm.iterrows():
+        ax_b.annotate(
+            f"{int(row['n'])}",
+            (row["center"], row["median"]),
+            textcoords="offset points",
+            xytext=(0, 7),
+            ha="center",
+            fontsize=6,
+            color="#b2182b",
         )
-        bsub = binned_median(sub["prm_pc_use"], sub["baseflow_index"], b_edges)
-        ax_b.plot(
-            bsub["center"], bsub["median"], "-o", color=color, lw=2, ms=4, label=f"{lab}, n={len(sub)}"
-        )
-        for _, row in bsub.iterrows():  # per-bin n, so the sparse cold arm is read with its support
-            ax_b.annotate(
-                f"{int(row['n'])}",
-                (row["center"], row["median"]),
-                textcoords="offset points",
-                xytext=(0, 6 if color == "#b2182b" else -11),
-                ha="center",
-                fontsize=6,
-                color=color,
-            )
+    ax_b.set_ylim(bottom=0)
     ax_b.set_xlabel("Permafrost extent (%)")
     ax_b.set_ylabel("Baseflow index")
-    ax_b.set_title("(b) Baseflow index by temperature class")
-    ax_b.legend(loc="upper right", frameon=False)
+    ax_b.set_title(f"(b) Baseflow index, same gauges ($\\rho$ = {rho_b:+.2f})")
+    ax_b.legend(loc="lower right", frameon=False)
 
-    # ---- Panel C: melt timing vs snow cover -----------------------------------
-    # The ERA5-Land AET>PET rate is single-digit and not monotonic in snow cover once
-    # precipitation is de-accumulated, so it is no longer plotted here; the apparent
-    # snow co-location in the over-accumulated data was an artifact (rates exported to
-    # coldregion_gradient_bins.csv for provenance).
+    # ---- Panel C: melt timing vs snow cover ----------------------------------
     s_edges = [0, 25, 40, 50, 60, 100]
     hm = binned_median(snow, df["half_flow_date"], s_edges)
     ax_c.plot(hm["center"], hm["median"], "-o", color="#1b7837", lw=2, ms=4, label="binned median")
@@ -259,26 +231,15 @@ def main() -> None:
 
     fig.tight_layout()
     RESULTS.mkdir(parents=True, exist_ok=True)
-    # Provenance: panel-A permafrost-BFI medians + the (no-longer-plotted) snow->AET>PET rates,
-    # retained to document that the corrected rate is single-digit and not monotonic in snow.
-    prov = [bm.assign(panel="A_bfi_vs_permafrost")]
-    if df["aet_wb_gt_pet"].notna().any():
-        srate = df.groupby(pd.cut(snow, bins=s_edges, include_lowest=True), observed=True)[
-            "aet_wb_gt_pet"
-        ].agg(["mean", "count"])
-        prov.append(
-            pd.DataFrame(
-                {
-                    "center": [iv.mid for iv in srate.index],
-                    "median": srate["mean"].to_numpy() * 100.0,
-                    "q25": np.nan,
-                    "q75": np.nan,
-                    "n": srate["count"].to_numpy(),
-                    "panel": "C_aetpet_pct_vs_snow",
-                }
-            )
-        )
-    pd.concat(prov, ignore_index=True).to_csv(RESULTS / "coldregion_gradient_bins.csv", index=False)
+    prov = pd.concat(
+        [
+            wm.assign(panel="A_winter_flow_fraction_vs_permafrost"),
+            bm.assign(panel="B_bfi_vs_permafrost"),
+            hm.assign(panel="C_half_flow_date_vs_snow"),
+        ],
+        ignore_index=True,
+    )
+    prov.to_csv(RESULTS / "coldregion_gradient_bins.csv", index=False)
     first, *rest = IMG_DIRS  # save once, copy: repeated tight saves differ by a few pixels
     first.mkdir(parents=True, exist_ok=True)
     fig.savefig(first / "fig_coldregion_gradient.png", bbox_inches="tight")

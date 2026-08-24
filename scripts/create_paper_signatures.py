@@ -16,6 +16,10 @@ Conventions (2026-08-23 revision, science-review Domain Expert M-1/M-5):
 - A hydrological year is valid when at least 70 % of its days carry discharge; a gauge
   needs at least 5 valid years. Signatures are the mean over valid years.
 - Water-balance ratios (runoff_ratio Q/P, aridity_index PET/P, evaporative_index (P-Q)/P)
+- winter_flow_fraction: mean Jan-Mar flow / mean annual flow, on observed days. A
+  Lyne-Hollick BFI with alpha in [0.9, 0.98] has a 10-50 day recession constant and so
+  reads a multi-week snowmelt recession as baseflow; this measures cold-season yield
+  directly and declines monotonically with permafrost extent, as the BFI does not.
   are computed per valid year over the days where discharge is observed, then averaged.
   MSWEP is the primary precipitation; `_era5` columns give the ERA5-Land variants.
 """
@@ -56,6 +60,7 @@ SIGNATURE_ORDER = [
     "low_flow_freq",
     "low_flow_dur",
     "half_flow_date",
+    "winter_flow_fraction",
     "aridity_index",
     "evaporative_index",
 ]
@@ -63,6 +68,8 @@ ERA5_VARIANTS = ["runoff_ratio_era5", "aridity_index_era5", "evaporative_index_e
 HYDRO_YEAR_WINDOW = ("2008-10-01", "2023-09-30")  # complete hydrological years 2009-2023
 MIN_DATA_FRACTION = 0.7
 MIN_PERIODS = 5
+# One winter season of observed Jan-Mar days before a winter flow fraction is reported.
+MIN_WINTER_DAYS = 90
 
 
 def _water_balance_ratios(
@@ -110,7 +117,7 @@ def _compute_one(
     pet_values: np.ndarray,
     dates: pd.DatetimeIndex,
 ) -> dict | None:
-    """Compute all 15 signatures (plus ERA5-Land water-balance variants) for one gauge."""
+    """Compute all 16 signatures (plus ERA5-Land variants and winter coverage) for one gauge."""
     try:
         disch = pd.Series(np.asarray(discharge_values, dtype=np.float64), index=dates, name="discharge")
         disch = disch[HYDRO_YEAR_WINDOW[0] : HYDRO_YEAR_WINDOW[1]]
@@ -134,6 +141,23 @@ def _compute_one(
 
         flashiness = FlowVariability(disch).calculate_flashiness_index().get("flashiness_index", np.nan)
 
+        # Cold-season yield, straight from the record: mean Jan-Mar flow over mean annual
+        # flow, both on observed days only so a winter gap cannot depress the ratio.
+        # winter_coverage reports how much of Dec-Mar was actually observed, because the
+        # archive omits under-ice values at many gauges and the ratio is only as
+        # trustworthy as that coverage.
+        months = disch.index.month
+        winter_obs = disch[months.isin([1, 2, 3])].dropna()
+        annual_obs = disch.dropna()
+        dec_mar = months.isin([12, 1, 2, 3])
+        winter_coverage = float(disch[dec_mar].notna().sum() / max(int(dec_mar.sum()), 1))
+        annual_mean = float(annual_obs.mean()) if len(annual_obs) else np.nan
+        winter_fraction = (
+            float(winter_obs.mean()) / annual_mean
+            if len(winter_obs) >= MIN_WINTER_DAYS and np.isfinite(annual_mean) and annual_mean > 0
+            else np.nan
+        )
+
         return {
             "gauge_id": gauge_id,
             "q_mean": metrics["mean_discharge"],
@@ -149,6 +173,8 @@ def _compute_one(
             "low_flow_freq": metrics["low_flow_frequency"],
             "low_flow_dur": metrics["low_flow_avg_duration"],
             "half_flow_date": metrics["mean_half_flow_date"],
+            "winter_flow_fraction": winter_fraction,
+            "winter_coverage": winter_coverage,
             "aridity_index": ai,
             "evaporative_index": ei,
             "n_valid_years": metrics.get("n_valid_periods", 0),
@@ -276,7 +302,28 @@ def main() -> None:
         f"(area < 50 km² AND q_mean > 20 mm/d); excluded from summary statistics"
     )
 
-    df = df[["gauge_id", "area_km2", "is_anomalous", *SIGNATURE_ORDER, "n_valid_years", *ERA5_VARIANTS]]
+    # A multi-year runoff ratio above 1 is physically impossible without inter-basin
+    # import, so it marks a delineation, rating, or precipitation error. is_anomalous
+    # does not catch these -- it screens tiny basins with huge specific discharge, a
+    # disjoint population -- so the screen ships as its own column.
+    df["water_balance_screen"] = df["runoff_ratio"] > 1.0
+    log.info(
+        f"{int(df['water_balance_screen'].sum())} of {len(df)} gauges flagged "
+        f"water_balance_screen (multi-year runoff ratio > 1)"
+    )
+
+    df = df[
+        [
+            "gauge_id",
+            "area_km2",
+            "is_anomalous",
+            "water_balance_screen",
+            *SIGNATURE_ORDER,
+            "winter_coverage",
+            "n_valid_years",
+            *ERA5_VARIANTS,
+        ]
+    ]
     # Deterministic row order so the released CSV is reproducible across rebuilds
     # (parallel processing otherwise yields completion-order rows, which perturbs
     # order-sensitive downstream statistics such as bootstrap resampling).
@@ -298,10 +345,12 @@ def main() -> None:
         "q95": "Q95 low-flow threshold (mm/d)",
         "high_flow_freq": "% of days with Q > 2×median",
         "high_flow_dur": "Mean duration of high-flow events (d)",
-        "baseflow_index": "BFI (Lyne-Hollick ensemble, 1000 runs)",
+        "baseflow_index": "BFI (Lyne-Hollick ensemble, 1000 runs; smoothness index, "
+        "not a groundwater fraction in nival regimes -- see winter_flow_fraction)",
         "low_flow_freq": "% of days with Q < 0.2×mean",
         "low_flow_dur": "Mean duration of low-flow events (d)",
         "half_flow_date": "Day of hydro year when 50% of annual Q has passed",
+        "winter_flow_fraction": "Mean Jan-Mar flow / mean annual flow (observed days)",
         "aridity_index": "Aridity index PET/P (GLEAM4 PET, MSWEP P; mean of annual ratios)",
         "evaporative_index": "Evaporative index (P-Q)/P (MSWEP P; mean of annual ratios)",
     }

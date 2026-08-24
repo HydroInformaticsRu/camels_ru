@@ -24,12 +24,11 @@ for _p in (REPO, SCRIPTS):
     if str(_p) not in sys.path:
         sys.path.insert(0, str(_p))
 
-from coldregion_robustness import (  # noqa: E402
-    T_SPLIT,
-    boot_spearman_ci,
-    load_subset,
-    shape_stats,
-)
+from coldregion_robustness import load_subset  # noqa: E402
+
+# Must match scripts/plot_coldregion_gradient.py: the macros are checked against the same
+# subset the figure plots, not a differently screened one.
+MIN_WINTER_COVERAGE = 0.95
 
 from src.utils.paper_analysis_scope import (  # noqa: E402
     is_paper_analysis_excluded_gauge_id,
@@ -121,37 +120,36 @@ def check_aet_macros(macros: dict[str, str]) -> None:
 
 
 def check_coldregion_macros(macros: dict[str, str]) -> None:
-    """Reconcile the §4.3 cold-region macros against a fresh recompute + the committed verdict."""
-    section("COLD-REGION ROBUSTNESS (coldregion_robustness.py + verdict.txt)")
+    """Reconcile the Sect. 7 cold-region macros against a fresh recompute from the release."""
+    section("COLD-REGION GRADIENT (release signatures + attributes)")
     cr = load_subset()
-    warm = cr[cr["tmp_dc_uyr"] >= T_SPLIT]
-    cold = cr[cr["tmp_dc_uyr"] < T_SPLIT]
-    cr_shape = shape_stats(cr["prm_pc_use"], cr["baseflow_index"])
-    rho_warm = float(spearmanr(warm["prm_pc_use"], warm["baseflow_index"], nan_policy="omit")[0])
-    rho_cold = float(spearmanr(cold["prm_pc_use"], cold["baseflow_index"], nan_policy="omit")[0])
-    # 9 of 10 cold-region macros recompute from release; the Eckhardt agreement needs the
-    # (gitignored) verdict, so guard it for fresh clones rather than crashing.
+    # The figure screens on the released winter_coverage column; recompute on the same subset
+    # or the macros would be checked against a different sample than the one plotted.
+    cr = cr[(cr["winter_coverage"] >= MIN_WINTER_COVERAGE) & cr["winter_flow_fraction"].notna()]
+    edges = [0, 5, 10, 20, 30, 50, 70, 100]
+    cats = pd.cut(cr["prm_pc_use"].clip(0, 100), bins=edges, include_lowest=True)
+    wff_med = cr["winter_flow_fraction"].groupby(cats, observed=True).median()
+    bfi_med = cr["baseflow_index"].groupby(cats, observed=True).median()
+    rho_winter = float(
+        spearmanr(cr["prm_pc_use"], cr["winter_flow_fraction"], nan_policy="omit")[0]
+    )
+    rho_bfi = float(spearmanr(cr["prm_pc_use"], cr["baseflow_index"], nan_policy="omit")[0])
+    rho_qcv = float(spearmanr(cr["baseflow_index"], cr["q_cv"], nan_policy="omit")[0])
+
     check_macro(macros, "ncoldregiongauges", len(cr), "{:.0f}")
-    check_macro(macros, "ncoldregionwarm", len(warm), "{:.0f}")
-    check_macro(macros, "ncoldregioncold", len(cold), "{:.0f}")
-    check_macro(macros, "bfipermafrostbaseline", cr_shape["baseline_med"], "{:.2f}")
-    check_macro(macros, "bfipermafrostpeak", cr_shape["peak_med"], "{:.2f}")
-    check_macro(macros, "bfipermafrosthigh", cr_shape["high_med"], "{:.2f}")
-    check_macro(macros, "rhopermafrostwarm", rho_warm, "{:.2f}")
-    check_macro(macros, "rhopermafrostcold", rho_cold, "{:.2f}")
-    # Bootstrap CIs on the warm/cold rho (seeded, order-independent) -> lock both bounds.
-    ci_w = boot_spearman_ci(warm["prm_pc_use"].to_numpy(), warm["baseflow_index"].to_numpy())
-    ci_c = boot_spearman_ci(cold["prm_pc_use"].to_numpy(), cold["baseflow_index"].to_numpy())
-    check_val(
-        "rhopermafrostwarmci",
-        macros.get("rhopermafrostwarmci", "").replace("\\xspace", ""),
-        f"$[{ci_w[1]:+.2f}, {ci_w[2]:+.2f}]$",
-    )
-    check_val(
-        "rhopermafrostcoldci",
-        macros.get("rhopermafrostcoldci", "").replace("\\xspace", ""),
-        f"$[{ci_c[1]:+.2f}, {ci_c[2]:+.2f}]$",
-    )
+    check_macro(macros, "ncoldregionclipped", float((cr["winter_flow_fraction"] > 1.2).sum()), "{:.0f}")
+    check_macro(macros, "winterfractionbaseline", float(wff_med.iloc[0]), "{:.2f}")
+    check_macro(macros, "winterfractionhigh", float(wff_med.iloc[-1]), "{:.2f}")
+    check_macro(macros, "bfipermafrostbaseline", float(bfi_med.iloc[0]), "{:.2f}")
+    check_macro(macros, "bfipermafrostpeak", float(bfi_med.max()), "{:.2f}")
+    check_macro(macros, "bfipermafrosthigh", float(bfi_med.iloc[-1]), "{:.2f}")
+    # Signed macros carry a LaTeX $...$ wrapper, so compare the rendered string.
+    for name, value in (
+        ("rhopermafrostwinter", rho_winter),
+        ("rhopermafrostbfi", rho_bfi),
+        ("rhobfiqcv", rho_qcv),
+    ):
+        check_val(name, macros.get(name, "").replace("\\xspace", ""), f"${value:+.2f}$")
     verdict_path = RESULTS_HESS / "coldregion_robustness_verdict.txt"
     if verdict_path.exists():
         m_agree = re.search(r"agreement\s*=\s*([+-]?\d+\.\d+)", verdict_path.read_text())
@@ -232,6 +230,51 @@ def check_discharge_fill_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "nwaterlevelzerogauges", float((wf == 2).any(axis=1).sum()), "{:.0f}")
 
 
+def check_water_balance_screen_macros(macros: dict[str, str]) -> None:
+    """Lock the Sect. 4.1.2 water-balance-screen macros against the released signatures CSV."""
+    section("WATER-BALANCE SCREEN (signatures + gauge_summary)")
+    sig = pd.read_csv(RELEASE / "camels_ru_signatures.csv")
+    summary = pd.read_csv(RELEASE / "camels_ru_gauge_summary.csv")
+    sig["gauge_id"] = sig["gauge_id"].astype(str)
+    summary["gauge_id"] = summary["gauge_id"].astype(str)
+    clean = sig[~sig["is_anomalous"].astype(bool)].drop_duplicates("gauge_id")
+    flagged = clean[clean["water_balance_screen"].astype(bool)].merge(
+        summary[["gauge_id", "overall_grade"]], on="gauge_id", how="left"
+    )
+    check_macro(macros, "nwaterbalscreen", float(len(flagged)), "{:.0f}")
+    check_macro(
+        macros, "nwaterbalscreengradea", float((flagged["overall_grade"] == "A").sum()), "{:.0f}"
+    )
+    check_macro(macros, "maxrunoffratio", float(flagged["runoff_ratio"].max()), "{:.1f}")
+
+
+def check_spike_threshold_macros(macros: dict[str, str]) -> None:
+    """Lock the Sect. 4.1.1 spike-threshold sensitivity against its provenance CSV."""
+    section("SPIKE THRESHOLD SENSITIVITY (paper/tables/spike_threshold_sensitivity.csv)")
+    table = PAPER / "tables" / "spike_threshold_sensitivity.csv"
+    if not table.exists():
+        print("  SKIP — run scripts/spike_threshold_sensitivity.py")
+        return
+    df = pd.read_csv(table).set_index("sigma_threshold")
+    check_macro(macros, "spikeflagfive", float(df.loc[5.0, "pct_flagged"]), "{:.0f}%")
+    check_macro(macros, "spikeflageight", float(df.loc[8.0, "pct_flagged"]), "{:.0f}%")
+
+
+def check_stage_screen_encoding_macros(macros: dict[str, str]) -> None:
+    """Lock the Sect. 8.2 encoding counts against what np.unique actually returns.
+
+    The screen is defined on the full catchment grid, so the file carries more -1 values
+    than the water-level gauges that could not be tested; both numbers are correct in
+    their own scope and Sect. 8.2 describes the file.
+    """
+    section("STAGE-SCREEN ENCODING (water_level.nc)")
+    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as ds:
+        screen = ds["stage_discharge_screen"].values
+        gauge_type = ds["gauge_type"].values
+    check_macro(macros, "nstagescreenunassessed", float((screen == -1).sum()), "{:.0f}")
+    check_macro(macros, "nnowaterlevel", float((gauge_type == -1).sum()), "{:.0f}")
+
+
 def check_grade_regime_macros(macros: dict[str, str]) -> None:
     """Lock the Sect. 4.1.2 grade--regime macros against the release CSVs.
 
@@ -248,6 +291,10 @@ def check_grade_regime_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "gradeApct", 100.0 * is_a.mean(), "{:.0f}")
     covered = df["snw_pc_uyr"].notna().sum()
     check_macro(macros, "ngradebandcovered", float(covered), "{:.0f}")
+
+    # Sect. 9 states cold-region coverage as counts rather than a superlative, so lock them.
+    check_macro(macros, "npermafrosttwenty", float((df["prm_pc_use"] > 20).sum()), "{:.0f}")
+    check_macro(macros, "npermafrosteighty", float((df["prm_pc_use"] > 80).sum()), "{:.0f}")
 
     low_snow = df["snw_pc_uyr"] < 20
     high_snow = df["snw_pc_uyr"] >= 50
@@ -734,6 +781,9 @@ def main() -> None:
 
     check_aet_macros(macros)
     check_coldregion_macros(macros)
+    check_spike_threshold_macros(macros)
+    check_stage_screen_encoding_macros(macros)
+    check_water_balance_screen_macros(macros)
     check_grade_regime_macros(macros)
     check_plausibility_macros(macros)
     check_stage_discharge_macros(macros)

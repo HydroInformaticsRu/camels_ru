@@ -31,7 +31,10 @@ from src.utils.paper_analysis_scope import paper_analysis_inclusion_mask  # noqa
 GEOM = ROOT / "data" / "CAMELS_RU" / "geometry" / "camels_watersheds.gpkg"
 GRIDS = ROOT / "data" / "Russia" / "MeteoData" / "ParsedMonthly"
 OUT = ROOT / "paper" / "tables" / "aggregation_sensitivity.csv"
-BANDS = [(5, 150), (150, 500), (500, 1000), (1000, 5000)]
+# The top band is open-ended: 1391 catchments (41.5 % of the network) exceed 5000 km2,
+# and that is where the unweighted touched-cell mean is most exposed, since a basin
+# spanning many degrees of latitude has the widest spread of true cell areas.
+BANDS = [(5, 150), (150, 500), (500, 1000), (1000, 5000), (5000, float("inf"))]
 PRODUCTS = {"mswep": ("mswep", "precipitation"), "era5_land": ("era5_land", "t_mean")}
 
 
@@ -72,7 +75,8 @@ def main() -> None:
     for lo, hi in BANDS:
         band = ws[(ws["area_km2"] >= lo) & (ws["area_km2"] < hi)]
         sample = band.sample(min(args.n, len(band)), random_state=int(rng.integers(1 << 31)))
-        rec = {"band_km2": f"{lo}-{hi}", "n_band": len(band), "n_sample": len(sample)}
+        label = f"{lo}+" if hi == float("inf") else f"{lo}-{hi}"
+        rec = {"band_km2": label, "n_band": len(band), "n_sample": len(sample)}
         for key, (product, var) in PRODUCTS.items():
             w, u = [], []
             for gid, geom in zip(sample["gauge_id"], sample["geometry"], strict=True):

@@ -29,6 +29,7 @@ import xarray as xr
 REPO = Path(__file__).resolve().parent.parent
 RELEASE = REPO / "release" / "CAMELS_RU_v1.0"
 OUT = REPO / "paper" / "tables" / "grade_regime.csv"
+OUT_TEX = REPO / "paper" / "overleaf" / "tables" / "grade_regime.tex"
 
 # Bands are chosen to be interpretable, not tuned: permafrost-free / sporadic /
 # discontinuous / near-continuous, and the snow-cover quartile-ish breaks.
@@ -36,7 +37,7 @@ BANDS: dict[str, tuple[str, list[float], list[str]]] = {
     "snow": (
         "snw_pc_uyr",
         [-0.001, 20, 35, 50, 100],
-        ["< 20", "20 to 35", "35 to 50", r"$\geq$ 50"],
+        [r"$<$ 20", "20 to 35", "35 to 50", r"$\geq$ 50"],
     ),
     "permafrost": (
         "prm_pc_use",
@@ -78,6 +79,53 @@ def load() -> pd.DataFrame:
     return df.merge(winter_gap_flags(), on="gauge_id", how="left")
 
 
+TABLE_HEADER = r"""\begin{table}[t]
+\centering
+\caption{Grade composition by climate band, over the \ngradebandcovered{} gauges of the
+Quality set that carry HydroATLAS attributes (3 of the \ngraded{} lack them). Bands are
+mean annual snow-cover extent (\texttt{snw\_pc\_uyr}) and permafrost extent
+(\texttt{prm\_pc\_use}), both in percent of catchment area. The last column is the share of
+gauges showing the winter-gap pattern of Section~\ref{sec:qc}. The network
+grade-A share is \gradeApct{}. Grade A and grades D or F respond to different regimes, and
+neither band is climatically neutral (Section~\ref{sec:grading}).}
+\label{tab:grade_regime}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Band (\%) & $n$ & Grade A & Grade B & Grade D or F & Winter gap \\
+\midrule
+"""
+
+TABLE_FOOTER = r"""\bottomrule
+\end{tabular}
+\end{table}
+"""
+
+GRADIENT_TITLES = {"snow": "Snow-cover extent", "permafrost": "Permafrost extent"}
+
+
+def write_tex(out: pd.DataFrame) -> None:
+    """Emit the LaTeX table body from the same frame that produced the CSV.
+
+    Hand-transcribing these cells put three of them a percentage point out, each rounded
+    the wrong way, so the table is generated rather than typed.
+    """
+    lines = [TABLE_HEADER]
+    for i, gradient in enumerate(GRADIENT_TITLES):
+        if i:
+            lines.append("\\addlinespace\n")
+        lines.append(f"\\multicolumn{{6}}{{@{{}}l}}{{\\textit{{{GRADIENT_TITLES[gradient]}}}}} \\\\\n")
+        for _, r in out[out["gradient"] == gradient].iterrows():
+            lines.append(
+                f"\\quad {r['band']:<12} & {int(r['n'])} & {r['pct_A']:.0f}\\% & "
+                f"{r['pct_B']:.0f}\\% & {r['pct_DF']:.0f}\\% & {r['pct_winter_gap']:.0f}\\% \\\\\n"
+            )
+    lines.append(TABLE_FOOTER)
+    OUT_TEX.parent.mkdir(parents=True, exist_ok=True)
+    OUT_TEX.write_text("".join(lines))
+    print(f"wrote {OUT_TEX.relative_to(REPO)}")
+
+
 def main() -> None:
     """Tabulate grade composition per climate band and write the provenance CSV."""
     df = load()
@@ -99,6 +147,7 @@ def main() -> None:
     out = pd.DataFrame(rows)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(OUT, index=False)
+    write_tex(out)
 
     covered = out["n"].sum() // 2  # each gauge appears once per gradient
     print(out.round(1).to_string(index=False))
