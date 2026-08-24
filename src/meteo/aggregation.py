@@ -30,7 +30,12 @@ from src.utils.logger import setup_logger
 logger = setup_logger("MeteoAggregation", log_file="logs/meteo_aggregation.log")
 
 # Constants
-SMALL_WATERSHED_THRESHOLD_KM2 = 150.0  # Watersheds smaller than this use weights
+# Watersheds smaller than this use fractional-area weights; larger ones take the simple
+# mean of every touched cell. This MUST match the --small-threshold default in
+# scripts/aggregate_watersheds.py: the two disagreed (150 here, 5 in the CLI) through the
+# v1.0 build, and because the CLI value wins, the release was produced at 5.0 while the
+# manuscript documented 150. Change both together or not at all.
+SMALL_WATERSHED_THRESHOLD_KM2 = 5.0
 
 # Dataset unit specifications (source → target)
 DATASET_UNITS = {

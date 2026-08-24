@@ -72,13 +72,17 @@ PAPER_OUTPUTS = (
 )
 TEST_OUTPUT = PROJECT_ROOT / ".tmp" / "cluster_diag" / "fig_gauge_reliability_test.png"
 
-# Ordinal grade palette (A dark green -> F red, grey for ungraded), shared by both panels.
+# Ordinal grade palette, shared by both panels. Sampled from viridis rather than the
+# red-yellow-green ramp this figure used through v1.0: under deuteranopia the old grade A
+# and grade F were near-indistinguishable, which defeats the point of the map. Grades are
+# ordinal, so a sequential ramp is the correct encoding, and it runs the same direction as
+# panel (b)'s colourbar (bright = more grade-A years).
 GRADE_COLORS = {
-    "A": "#1a9850",
-    "B": "#91cf60",
-    "C": "#fee08b",
-    "D": "#fc8d59",
-    "F": "#d73027",
+    "A": "#dfe318",
+    "B": "#4ec36b",
+    "C": "#21918c",
+    "D": "#375a8c",
+    "F": "#440154",
     "ungraded": "#BBBBBB",
 }
 GRADE_ORDER = ["A", "B", "C", "D", "F", "ungraded"]

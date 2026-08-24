@@ -1,0 +1,5 @@
+product,phase,mm_per_year
+mswep,sub_freezing,147.27183532714844
+mswep,above_freezing,460.4332580566406
+era5,sub_freezing,196.47962951660156
+era5,above_freezing,507.0126647949219

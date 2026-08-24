@@ -31,13 +31,17 @@ from src.utils.paper_analysis_scope import paper_analysis_inclusion_mask  # noqa
 GEOM = ROOT / "data" / "CAMELS_RU" / "geometry" / "camels_watersheds.gpkg"
 GRIDS = ROOT / "data" / "Russia" / "MeteoData" / "ParsedMonthly"
 OUT = ROOT / "paper" / "tables" / "aggregation_sensitivity.csv"
-BANDS = [(150, 500), (500, 1000), (1000, 5000)]
+BANDS = [(5, 150), (150, 500), (500, 1000), (1000, 5000)]
 PRODUCTS = {"mswep": ("mswep", "precipitation"), "era5_land": ("era5_land", "t_mean")}
 
 
 def _annual(gid: str, geom, product: str, var: str, year: int, weighted: bool) -> float:
     """Annual mean of ``var`` for one catchment with the chosen branch."""
-    threshold = float("inf") if weighted else 150.0  # inf forces the weighted branch
+    # small_ws_threshold means "catchments SMALLER than this use fractional weights", so
+    # inf forces the weighted branch and 0 forces the touched-cell mean. The unweighted
+    # case must be 0, not 150: with 150 every catchment in the 5-150 band would fall
+    # below the threshold and be weighted, making both arms of the comparison identical.
+    threshold = float("inf") if weighted else 0.0
     parts = []
     for month in range(1, 13):
         df = aggregate_watershed(
@@ -56,7 +60,7 @@ def main() -> None:
     """Sample catchments per band, aggregate both ways, write the summary table."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--year", type=int, default=2015)
-    ap.add_argument("--n", type=int, default=100, help="catchments per band")
+    ap.add_argument("--n", type=int, default=60, help="catchments per band")
     ap.add_argument("--seed", type=int, default=1996)
     args = ap.parse_args()
 

@@ -677,6 +677,23 @@ def _load_gauge_zero_heights() -> dict[str, float]:
     return heights
 
 
+def _load_stage_discharge_screen(ws_ids: list[str]) -> np.ndarray:
+    """Per-gauge stage--discharge consistency screen, aligned to the release gauge axis.
+
+    Produced by ``scripts/stage_discharge_consistency.py`` from the released discharge
+    and water-level series. Absent on a cold build (that script reads the packaged
+    files), in which case every gauge is reported as not assessed; rerun the script
+    and repackage to populate it.
+    """
+    src = DATA_DIR / "HydroData" / "stage_discharge_screen.nc"
+    if not src.exists():
+        print(f"  WARNING: {src.name} missing — stage_discharge_screen set to -1 (not assessed)")
+        return np.full(len(ws_ids), -1, dtype=np.int8)
+    with xr.open_dataset(src) as ds:
+        screen = ds["stage_discharge_screen"].to_series()
+    return screen.reindex(ws_ids).fillna(-1).to_numpy().astype(np.int8)
+
+
 def package_water_level() -> None:
     """Build water-level NetCDF from per-gauge CSVs.
 
@@ -708,6 +725,7 @@ def package_water_level() -> None:
     n_gauges = len(ws_ids)
 
     heights = _load_gauge_zero_heights()
+    stage_screen = _load_stage_discharge_screen(ws_ids)
 
     lvl_cm = np.full((n_gauges, n_dates), np.nan, dtype=np.float32)
     gauge_zero_m = np.full(n_gauges, np.nan, dtype=np.float32)
@@ -829,6 +847,28 @@ def package_water_level() -> None:
                     ),
                 },
             ),
+            "stage_discharge_screen": (
+                ["gauge_id"],
+                stage_screen,
+                {
+                    "long_name": "Stage-discharge consistency screen",
+                    "flag_values": np.array([-1, 0, 1], dtype=np.int8),
+                    "flag_meanings": "not_assessed consistent inconsistent",
+                    "comment": (
+                        "Spearman rank correlation between water_level_cm and "
+                        "discharge_m3s over days observed in both files (quality_flag "
+                        "= 0), restricted to the open-water months May to October "
+                        "because backwater shifts the rating under ice. 1 marks a "
+                        "correlation below 0.5, which includes a small set of gauges "
+                        "whose stage falls as discharge rises; the closed AIS GMVO "
+                        "archive does not allow the cause to be confirmed at source. "
+                        "-1 marks gauges with fewer than 365 jointly observed days or "
+                        "no discharge record. This screens ingestion consistency, not "
+                        "observational accuracy: it cannot detect an error shared by "
+                        "both series at source."
+                    ),
+                },
+            ),
         },
         coords={
             "gauge_id": ws_ids,
@@ -865,6 +905,7 @@ def package_water_level() -> None:
             "gauge_zero_m": {"dtype": "float32", "zlib": True, "complevel": 4},
             "quality_flag": {"dtype": "int8", "zlib": True, "complevel": 4},
             "gauge_type": {"dtype": "int8", "zlib": True, "complevel": 4},
+            "stage_discharge_screen": {"dtype": "int8", "zlib": True, "complevel": 4},
         },
     )
     n_with_mbs = int(np.isfinite(gauge_zero_m).sum())

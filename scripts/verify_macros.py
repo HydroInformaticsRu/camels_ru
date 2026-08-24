@@ -232,6 +232,111 @@ def check_discharge_fill_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "nwaterlevelzerogauges", float((wf == 2).any(axis=1).sum()), "{:.0f}")
 
 
+def check_grade_regime_macros(macros: dict[str, str]) -> None:
+    """Lock the Sect. 4.1.2 grade--regime macros against the release CSVs.
+
+    Recomputed here rather than read from paper/tables/grade_regime.csv, so the
+    lock is against the data and not against the provenance script's own output.
+    """
+    section("GRADE--REGIME CONFOUND (gauge_summary + attributes)")
+    summary = pd.read_csv(RELEASE / "camels_ru_gauge_summary.csv")
+    attrs = pd.read_csv(RELEASE / "camels_ru_attributes.csv")
+    df = summary.merge(attrs[["gauge_id", "snw_pc_uyr", "prm_pc_use"]], on="gauge_id", how="left")
+    df["prm_pc_use"] = df["prm_pc_use"].clip(0, 100)
+    is_a = df["overall_grade"] == "A"
+
+    check_macro(macros, "gradeApct", 100.0 * is_a.mean(), "{:.0f}")
+    covered = df["snw_pc_uyr"].notna().sum()
+    check_macro(macros, "ngradebandcovered", float(covered), "{:.0f}")
+
+    low_snow = df["snw_pc_uyr"] < 20
+    high_snow = df["snw_pc_uyr"] >= 50
+    check_macro(macros, "nlowsnow", float(low_snow.sum()), "{:.0f}")
+    check_macro(macros, "gradeAlowsnow", 100.0 * is_a[low_snow].mean(), "{:.0f}")
+    check_macro(macros, "gradeAhighsnow", 100.0 * is_a[high_snow].mean(), "{:.0f}")
+    check_macro(
+        macros,
+        "gradeBlowsnow",
+        100.0 * (df.loc[low_snow, "overall_grade"] == "B").mean(),
+        "{:.0f}",
+    )
+
+    no_pf = df["prm_pc_use"] == 0
+    mid_pf = (df["prm_pc_use"] > 0) & (df["prm_pc_use"] <= 20)
+    high_pf = df["prm_pc_use"] >= 80
+    check_macro(macros, "nhighpermafrostgraded", float(high_pf.sum()), "{:.0f}")
+    check_macro(macros, "gradeAnopermafrost", 100.0 * is_a[no_pf].mean(), "{:.0f}")
+    check_macro(macros, "gradeAmidpermafrost", 100.0 * is_a[mid_pf].mean(), "{:.0f}")
+    check_macro(macros, "gradeAhighpermafrost", 100.0 * is_a[high_pf].mean(), "{:.0f}")
+    check_macro(
+        macros,
+        "gradeDFhighpermafrost",
+        100.0 * df.loc[high_pf, "overall_grade"].isin(["D", "F"]).mean(),
+        "{:.0f}",
+    )
+
+
+def check_plausibility_macros(macros: dict[str, str]) -> None:
+    """Lock the Sect. 4.1.2 grade-vs-plausibility macros and the stage valid range.
+
+    The stage bounds were hard-coded in Sect. 8.2 and drifted to a pre-rebuild value
+    (-499 against an actual -434, then 0.5 after the out-of-range fills were reverted);
+    they are recomputed here so a rebuild cannot desynchronise them again.
+    """
+    section("GRADE VS PLAUSIBILITY + WATER-LEVEL RANGE")
+    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as qds:
+        anomaly = pd.Series(
+            qds["specific_discharge_anomaly"].values,
+            index=[str(g) for g in qds["gauge_id"].values],
+        )
+    summary = pd.read_csv(RELEASE / "camels_ru_gauge_summary.csv")
+    summary["gauge_id"] = summary["gauge_id"].astype(str)
+    flagged = summary[summary["gauge_id"].isin(set(anomaly[anomaly == 1].index))]
+    check_macro(
+        macros, "nanomalygradeab", float(flagged["overall_grade"].isin(["A", "B"]).sum()), "{:.0f}"
+    )
+    check_macro(macros, "nanomalygradea", float((flagged["overall_grade"] == "A").sum()), "{:.0f}")
+
+    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
+        stage = wds["water_level_cm"].values
+        flag = wds["quality_flag"].values
+    # After the repair no altered value may sit outside its gauge's observed range, and
+    # no stage may be negative: both were true of the v1.0 build and are what the
+    # reversion removed. Assert them rather than only reporting the bounds.
+    n_negative = int((np.isfinite(stage) & (stage < 0)).sum())
+    check_val("water-level negatives", "0", str(n_negative))
+    observed = np.where(flag == 0, stage, np.nan)
+    stage_min, obs_min = float(np.nanmin(stage)), float(np.nanmin(observed))
+    check_val("stage min (cm)", "0.50", f"{stage_min:.2f}")
+    # The point of the repair: the released stage is bounded by what was observed.
+    check_val("stage min == observed min", "True", str(abs(stage_min - obs_min) < 1e-6))
+    # \nwlreverted is not recomputable post-repair (the reverted values are gone), so it
+    # is locked by scripts/repair_water_level_fills.py --dry-run against the backup, not here.
+
+
+def check_stage_discharge_macros(macros: dict[str, str]) -> None:
+    """Lock the Sect. 6.4 stage--discharge macros against the release flag and provenance CSV."""
+    section("STAGE--DISCHARGE CONSISTENCY (stage_discharge_screen + provenance CSV)")
+    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
+        screen = wds["stage_discharge_screen"].values
+        gauge_type = wds["gauge_type"].values
+    check_macro(macros, "nstageweak", float((screen == 1).sum()), "{:.0f}")
+    check_macro(macros, "nstageunassessed", float(((gauge_type >= 0) & (screen == -1)).sum()), "{:.0f}")
+
+    csv = REPO / "paper" / "tables" / "stage_discharge.csv"
+    if not csv.exists():
+        print("  SKIP rho macros — stage_discharge.csv absent; run stage_discharge_consistency.py")
+        return
+    sd = pd.read_csv(csv)
+    river = sd[sd["gauge_type"] == 0].dropna(subset=["rho_open_water"])
+    check_macro(macros, "nstagedischarge", float(len(river)), "{:.0f}")
+    check_macro(macros, "rhostagemedian", river["rho_open_water"].median(), "{:.2f}")
+    check_macro(macros, "rhostagemedianallyear", river["rho_all"].dropna().median(), "{:.2f}")
+    check_macro(macros, "pctstagestrong", 100.0 * (river["rho_open_water"] >= 0.9).mean(), "{:.0f}")
+    check_macro(macros, "pctstagegood", 100.0 * (river["rho_open_water"] >= 0.8).mean(), "{:.0f}")
+    check_macro(macros, "nstageinverted", float((river["rho_open_water"] <= -0.5).sum()), "{:.0f}")
+
+
 def report_drift_summary() -> None:
     """Print the drift summary; exit non-zero if any checked macro drifted from the data."""
     section("DRIFT SUMMARY")
@@ -629,6 +734,9 @@ def main() -> None:
 
     check_aet_macros(macros)
     check_coldregion_macros(macros)
+    check_grade_regime_macros(macros)
+    check_plausibility_macros(macros)
+    check_stage_discharge_macros(macros)
     check_discharge_fill_macros(macros)
 
     section("AUTHORITATIVE VALUES FOR MACROS.TEX")

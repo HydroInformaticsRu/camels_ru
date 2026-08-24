@@ -16,8 +16,8 @@ A CAMELS-standard hydrological dataset for the Russian Federation, covering 3,35
 | Discharge | 2,170 gauges, daily, 2008–2023 (936 Grade A, 86% decent quality) |
 | Water level | 2,989 gauges, daily, 2008–2023 |
 | Forcing | ERA5-Land (T) + GLEAM4 (PET) + MSWEP v2.8 (P), basin-averaged |
-| Attributes | 288 HydroATLAS variables per catchment (22 primary subset) |
-| Signatures | 15 hydrological metrics for 1,845 gauges (1,716 strict-completeness subset for main-text figures) |
+| Attributes | 281 HydroATLAS attributes + 7 derived = 288 columns per catchment (22 primary subset) |
+| Signatures | 15 hydrological metrics for 1,729 gauges (1,716 non-anomalous rows used in the main-text figures) |
 | Quality control | Per-year grading (A–F), strict Grade A (all years must be A) |
 
 ## Quality Grading

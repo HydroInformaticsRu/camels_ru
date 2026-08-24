@@ -99,7 +99,9 @@ def load_data() -> pd.DataFrame:
 
 def binned_median(x: pd.Series, y: pd.Series, edges: list[float]) -> pd.DataFrame:
     """Median (+IQR, count) of y within bins of x defined by edges."""
-    cats = pd.cut(x, bins=edges, include_lowest=True)
+    # Area-weighted HydroATLAS percentages can overshoot their nominal range by a float
+    # ulp (prm_pc_use maxes at 100.00000000000004), which pd.cut would drop as NaN.
+    cats = pd.cut(x.clip(edges[0], edges[-1]), bins=edges, include_lowest=True)
     g = y.groupby(cats, observed=True)
     out = pd.DataFrame(
         {

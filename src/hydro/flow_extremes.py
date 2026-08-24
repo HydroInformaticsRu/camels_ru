@@ -210,26 +210,28 @@ class FlowExtremes:
         if not condition_mask.any():
             return []
 
-        # Find start and end points of events
-        transitions = condition_mask.astype(int).diff()
-        starts = condition_mask.index[transitions == 1]
-        ends = condition_mask.index[transitions == -1]
+        # Count consecutive positions in the mask, not calendar spans between them. The
+        # series is observed-days-only (NaNs dropped upstream), so a calendar difference
+        # would swallow every missing day between two separate events: two 3-day spells
+        # either side of a 28-day gap used to report as one 34-day event. A run is broken
+        # both by the condition going False and by a break in consecutive daily dates.
+        flags = condition_mask.to_numpy()
+        index = condition_mask.index
+        contiguous = np.ones(len(index), dtype=bool)
+        if isinstance(index, pd.DatetimeIndex) and len(index) > 1:
+            contiguous[1:] = (index[1:] - index[:-1]) == pd.Timedelta(days=1)
 
-        # Handle edge cases
-        if condition_mask.iloc[0]:
-            starts = pd.Index([condition_mask.index[0]]).append(starts)
-        if condition_mask.iloc[-1]:
-            ends = ends.append(pd.Index([condition_mask.index[-1]]))
-
-        # Calculate durations
-        durations = []
-        for start, end in zip(starts, ends, strict=True):
-            if isinstance(start, pd.Timestamp) and isinstance(end, pd.Timestamp):
-                duration = (end - start).days + 1
-            else:
-                # For non-datetime indices, assume daily data
-                duration = 1
-            durations.append(duration)
+        durations: list[int] = []
+        run = 0
+        for i, active in enumerate(flags):
+            if active and (run == 0 or contiguous[i]):
+                run += 1
+                continue
+            if run:
+                durations.append(run)
+            run = 1 if active else 0
+        if run:
+            durations.append(run)
 
         return durations
 

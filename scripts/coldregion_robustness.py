@@ -71,6 +71,9 @@ def load_subset() -> pd.DataFrame:
         & (df["dor_pc_pva"] == 0)
         & (df["overall_grade"].isin(["A", "B"]))
     ].copy()
+    # Area-weighted HydroATLAS percentages can overshoot 100 by a float ulp
+    # (prm_pc_use maxes at 100.00000000000004), which pd.cut(bins=PF_EDGES) drops as NaN.
+    df["prm_pc_use"] = df["prm_pc_use"].clip(PF_EDGES[0], PF_EDGES[-1])
     return df
 
 
