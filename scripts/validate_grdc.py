@@ -133,7 +133,7 @@ def parse_grdc_file(path: Path) -> GRDCStation | None:
     )
 
 
-def load_grdc_stations(grdc_dir: Path, country: str = "RU") -> list[GRDCStation]:
+def load_grdc_stations(grdc_dir: Path, country: str = "RU") -> tuple[list[GRDCStation], int]:
     """Load all GRDC stations for a country with data overlapping 2008+.
 
     Args:
@@ -141,10 +141,31 @@ def load_grdc_stations(grdc_dir: Path, country: str = "RU") -> list[GRDCStation]
         country: ISO country code to filter.
 
     Returns:
-        List of parsed GRDC stations with 2008+ data.
+        List of parsed GRDC stations with 2008+ data, and the total station
+        count for the country regardless of period (the manuscript inventory).
     """
     all_files = sorted(grdc_dir.rglob("*_Q_Day.Cmd.txt"))
     print(f"Found {len(all_files)} GRDC files")
+
+    # Inventory count from the file headers: the full parse below returns None for
+    # stations whose series ends before the study period, but they are still
+    # stations of the archive (the manuscript's "792 Russian stations").
+    country_ids: set[str] = set()
+    for f in all_files:
+        try:
+            with open(f, encoding="cp1252", errors="ignore") as fh:
+                head = fh.read(3000)
+        except OSError:
+            continue
+        grdc_no = file_country = None
+        for line in head.split("\n"):
+            if "GRDC-No." in line and ":" in line:
+                grdc_no = line.split(":")[1].strip()
+            elif "Country:" in line:
+                file_country = line.split(":")[1].strip()
+        if file_country == country and grdc_no:
+            country_ids.add(grdc_no)
+    n_country = len(country_ids)
 
     stations = []
     for f in all_files:
@@ -158,8 +179,8 @@ def load_grdc_stations(grdc_dir: Path, country: str = "RU") -> list[GRDCStation]
             continue
         stations.append(st)
 
-    print(f"Loaded {len(stations)} {country} stations with 2008+ data")
-    return stations
+    print(f"Loaded {len(stations)} of {n_country} {country} stations with 2008+ data")
+    return stations, n_country
 
 
 def match_grdc_to_camels(
@@ -322,7 +343,7 @@ def main() -> None:
 
     # Load GRDC
     print(f"\nLoading GRDC from {args.grdc_dir}...")
-    grdc_stations = load_grdc_stations(args.grdc_dir)
+    grdc_stations, n_ru_stations = load_grdc_stations(args.grdc_dir)
 
     # Match
     print("\nMatching GRDC → CAMELS-RU...")
@@ -385,6 +406,23 @@ def main() -> None:
     out_path = args.output_dir / "grdc_validation.csv"
     results_df.to_csv(out_path, index=False)
     print(f"\nResults saved to {out_path}")
+
+    # Inventory counts for the manuscript (Sect. 6.1 and the introduction);
+    # gated by verify_macros.py against paper/tables/grdc_inventory.csv.
+    inventory = pd.DataFrame(
+        [
+            {
+                "n_ru_stations": n_ru_stations,
+                "n_daily_in_period": len(grdc_stations),
+                "n_matched": len(matches),
+                "n_discharge_pairs": len(results_df),
+                "n_water_level_only": len(matches) - len(results_df),
+            }
+        ]
+    )
+    inv_path = PROJECT_ROOT / "paper" / "tables" / "grdc_inventory.csv"
+    inventory.to_csv(inv_path, index=False)
+    print(f"Inventory counts saved to {inv_path}")
 
     # Print summary
     valid = results_df[results_df["r"].notna()]

@@ -166,6 +166,22 @@ def check_coldregion_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "ncoldregionabovemean", float((cr["winter_flow_ratio"] > 1.0).sum()), "{:.0f}")
     check_macro(macros, "winterratiobaseline", float(wff_med.iloc[0]), "{:.2f}")
     check_macro(macros, "winterratiohigh", float(wff_med.iloc[-1]), "{:.2f}")
+    # Sect. 7 in-text bin counts and the high-permafrost retention disclosure.
+    bin_counts = cr["winter_flow_ratio"].groupby(cats, observed=True).count()
+    check_macro(macros, "nwinterbinlow", float(bin_counts.iloc[0]), "{:.0f}")
+    check_macro(macros, "nwinterbinhigh", float(bin_counts.iloc[-1]), "{:.0f}")
+    summary = pd.read_csv(RELEASE / "camels_ru_gauge_summary.csv", dtype={"gauge_id": str})
+    attrs = pd.read_csv(RELEASE / "camels_ru_attributes.csv", usecols=["gauge_id", "prm_pc_use"])
+    attrs["gauge_id"] = attrs["gauge_id"].astype(str)
+    high_perm = summary.merge(attrs, on="gauge_id", how="left")
+    high_perm = high_perm[high_perm["prm_pc_use"] >= 80]
+    check_macro(macros, "nhighpermafrostgraded", float(len(high_perm)), "{:.0f}")
+    check_macro(
+        macros,
+        "nhighpermretained",
+        float(high_perm["gauge_id"].isin(set(cr["gauge_id"])).sum()),
+        "{:.0f}",
+    )
     check_macro(macros, "bfipermafrostbaseline", float(bfi_med.iloc[0]), "{:.2f}")
     check_macro(macros, "bfipermafrostpeak", float(bfi_med.max()), "{:.2f}")
     check_macro(macros, "bfipermafrosthigh", float(bfi_med.iloc[-1]), "{:.2f}")
@@ -274,15 +290,33 @@ def check_water_balance_screen_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "maxrunoffratio", float(flagged["runoff_ratio"].max()), "{:.1f}")
     check_macro(macros, "nwaterbalscreenall", float(sig["water_balance_screen"].sum()), "{:.0f}")
     check_macro(macros, "nwinterflowgauges", float(clean["winter_flow_ratio"].notna().sum()), "{:.0f}")
+    # Diagnosability of the runoff-ratio > 1 population (Sect. 4.1.2, domain m-6).
+    boundaries = gpd.read_file(RELEASE / "camels_ru_boundaries.gpkg")
+    boundaries["gauge_id"] = boundaries["gauge_id"].astype(str)
+    rr1 = clean[clean["runoff_ratio"] > 1].merge(
+        boundaries[["gauge_id", "area_diff_perc"]], on="gauge_id", how="left"
+    )
+    rest = clean[clean["runoff_ratio"] <= 1]
+    check_macro(macros, "nrronewithref", float(rr1["area_diff_perc"].notna().sum()), "{:.0f}")
+    check_macro(macros, "nrronebigerr", float((rr1["area_diff_perc"].abs() > 15).sum()), "{:.0f}")
+    check_macro(macros, "nrroneerafive", float((rr1["runoff_ratio_era5"] > 1).sum()), "{:.0f}")
+    check_macro(macros, "rronemedarea", float(rr1["area_km2"].median()), "{:.0f}")
+    check_macro(macros, "nonrronemedarea", float(rest["area_km2"].median()), "{:.0f}")
 
 
-def check_grdc_gates() -> None:
-    """Gate the Sect. 6.1 GRDC literals against the committed per-pair CSV.
-
-    The station-inventory counts (792 / 16 / 15 / 4) come from the matching log of
-    scripts/validate_grdc.py, not this CSV, and stay ungated.
-    """
-    section("GRDC CROSS-CHECK (paper/tables/grdc_validation.csv)")
+def check_grdc_gates(macros: dict[str, str]) -> None:
+    """Gate the Sect. 6.1 GRDC statistics and inventory against the committed CSVs."""
+    section("GRDC CROSS-CHECK (paper/tables/grdc_validation.csv + grdc_inventory.csv)")
+    inventory = PAPER / "tables" / "grdc_inventory.csv"
+    if inventory.exists():
+        inv = pd.read_csv(inventory).iloc[0]
+        check_macro(macros, "ngrdcstations", float(inv["n_ru_stations"]), "{:.0f}")
+        check_macro(macros, "ngrdcdaily", float(inv["n_daily_in_period"]), "{:.0f}")
+        check_macro(macros, "ngrdcmatched", float(inv["n_matched"]), "{:.0f}")
+        check_macro(macros, "ngrdcdischargepairs", float(inv["n_discharge_pairs"]), "{:.0f}")
+        check_macro(macros, "ngrdcwlonly", float(inv["n_water_level_only"]), "{:.0f}")
+    else:
+        print("  SKIP inventory — run scripts/validate_grdc.py to write grdc_inventory.csv")
     table = PAPER / "tables" / "grdc_validation.csv"
     if not table.exists():
         print("  SKIP — run scripts/validate_grdc.py and copy its CSV into paper/tables/")
@@ -556,6 +590,221 @@ def check_stage_discharge_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "pctstagestrong", 100.0 * (river["rho_open_water"] >= 0.9).mean(), "{:.0f}")
     check_macro(macros, "pctstagegood", 100.0 * (river["rho_open_water"] >= 0.8).mean(), "{:.0f}")
     check_macro(macros, "nstageinverted", float((river["rho_open_water"] <= -0.5).sum()), "{:.0f}")
+
+
+def check_release_range_gates(macros: dict[str, str]) -> None:
+    """Gate the Table 3 value-range macros and the release coverage statistics.
+
+    Rounding mirrors the printed precision: volumes to the nearest 1000 (m3/s) or
+    100 (mm/d stage), precipitation and temperatures to integers, the pet minimum
+    to 2 d.p., the stage minimum to 1 d.p.
+    """
+    section("RELEASE VALUE RANGES AND COVERAGE (Table 3 + Sect. 2.3/4.2/4.4)")
+
+    def norm(name: str) -> str:
+        return macros.get(name, "").replace("\\xspace", "").replace("\\,", "").replace("$", "").strip()
+
+    def gate_range(name: str, lo: str, hi: str) -> None:
+        check_val(name, norm(name), f"{lo} to {hi}")
+
+    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+        q3 = ds["discharge_m3s"]
+        qm = ds["discharge_mm"]
+        gate_range("rngqvol", "0", f"{round(float(q3.max()) / 1000) * 1000:.0f}")
+        gate_range("rngqmm", "0", f"{round(float(qm.max()) / 100) * 100:.0f}")
+        check_macro(macros, "nallmissingdischarge", float(q3.isnull().all("time").sum()), "{:.0f}")
+
+    with xr.open_dataset(RELEASE / "camels_ru_forcing.nc") as fx:
+        for name, var in (
+            ("rngpmswep", "precip_mswep"),
+            ("rngpera", "precip_era5"),
+            ("rngpgpcp", "precip_gpcp"),
+        ):
+            gate_range(name, f"{float(fx[var].min()):.0f}", f"{float(fx[var].max()):.0f}")
+        for name, var in (("rngtmean", "temp_mean"), ("rngtmin", "temp_min"), ("rngtmax", "temp_max")):
+            gate_range(name, f"{float(fx[var].min()):.0f}", f"{float(fx[var].max()):.0f}")
+        pet = fx["pet"]
+        gate_range("rngpet", f"{float(pet.min()):.2f}", f"{float(pet.max()):.0f}")
+        check_macro(macros, "petminnum", float(pet.min()), "{:.2f}")
+        neg_pct = 100.0 * float((pet < 0).sum()) / int(pet.notnull().sum())
+        check_macro(macros, "petnegpct", neg_pct, "{:.1f}")
+        gpcp_miss = fx["precip_gpcp"].isnull()
+        check_macro(macros, "ngpcpgapdays", float((gpcp_miss.sum("gauge_id") > 0).sum()), "{:.0f}")
+        check_macro(macros, "ngpcpgapgauges", float(gpcp_miss.any("time").sum()), "{:.0f}")
+        coverage = 100.0 * (1.0 - float(gpcp_miss.sum()) / gpcp_miss.size)
+        check_macro(macros, "gpcpcoverage", coverage, "{:.1f}")
+        # Climate percentiles of Sect. 2.3 over the Analysis set (in-text literals).
+        ids = fx["gauge_id"].astype(str).values
+        in_analysis = ~pd.Series(ids).map(is_paper_analysis_excluded_gauge_id).to_numpy()
+        p_ann = (fx["precip_mswep"].sum("time", skipna=True) / 16.0).values[in_analysis]
+        t_ann = fx["temp_mean"].mean("time", skipna=True).values[in_analysis]
+        check_val(
+            "P annual 5th pct (round 10)", "320", f"{round(np.nanpercentile(p_ann, 5) / 10) * 10:.0f}"
+        )
+        check_val(
+            "P annual 95th pct (round 10)", "960", f"{round(np.nanpercentile(p_ann, 95) / 10) * 10:.0f}"
+        )
+        check_val("T annual 5th pct", "-8.7", f"{np.nanpercentile(t_ann, 5):.1f}")
+        check_val("T annual 95th pct", "+9.7", f"{np.nanpercentile(t_ann, 95):+.1f}")
+        attrs = pd.read_csv(RELEASE / "camels_ru_attributes.csv", usecols=["gauge_id", "snw_pc_uyr"])
+        snw = attrs.set_index(attrs["gauge_id"].astype(str))["snw_pc_uyr"].reindex(
+            pd.Index(ids)[in_analysis]
+        )
+        snw5, snw95 = np.nanpercentile(snw, 5), np.nanpercentile(snw, 95)
+        check_val("snow 5th pct below 15%", "True", str(bool(snw5 < 15)))
+        check_val("snow 95th pct above 60%", "True", str(bool(snw95 > 60)))
+
+    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as wl:
+        cm = wl["water_level_cm"]
+        mbs = wl["water_level_mbs"]
+        zero = wl["gauge_zero_m"]
+        gate_range("rngwlcm", f"{float(cm.min()):.1f}", f"{round(float(cm.max()) / 100) * 100:.0f}")
+        gate_range("rngwlmbs", f"{float(mbs.min()):.0f}", f"{float(mbs.max()):.0f}")
+        gate_range("rngzero", f"{float(zero.min()):.0f}", f"{float(zero.max()):.0f}")
+
+    boundaries = gpd.read_file(RELEASE / "camels_ru_boundaries.gpkg")
+    err = boundaries["area_diff_perc"].dropna()
+    check_macro(macros, "ntrimkept", float((err.abs() <= 100).sum()), "{:.0f}")
+    check_macro(macros, "ntrimexcluded", float((err.abs() > 100).sum()), "{:.0f}")
+    check_macro(macros, "nsubfivecatchments", float((boundaries["area_km2"] < 5).sum()), "{:.0f}")
+    # 0.1-degree cell areas at the catchment-centroid latitudes (Sect. 4.2).
+    with np.errstate(invalid="ignore"):
+        lat = boundaries.geometry.centroid.y
+    cell = 0.1 * 111.32 * (0.1 * 111.32 * np.cos(np.deg2rad(lat)))
+    check_macro(macros, "cellareasouth", float(cell[lat.idxmin()]), "{:.0f}")
+    check_macro(macros, "cellareanorth", float(cell[lat.idxmax()]), "{:.0f}")
+    check_macro(macros, "cellareamedian", float(cell.median()), "{:.0f}")
+
+
+_GRADE_ORDER = ["A", "B", "C", "D", "F"]
+
+
+def _overall_grade(grades: list[str]) -> str:
+    """Mirror quality_grader.get_gauge_summary: strict A, mode of non-F, coverage caps."""
+    usable_g = [g for g in grades if g != "F"]
+    if not usable_g:
+        return "F"
+    if all(g == "A" for g in grades):
+        return "A"
+    freq: dict[str, int] = {}
+    for g in usable_g:
+        freq[g] = freq.get(g, 0) + 1
+    og = max(freq, key=lambda g: (freq[g], _GRADE_ORDER.index(g)))
+    if og == "A":
+        og = "B"
+    usable_fraction = sum(g in ("A", "B", "C") for g in grades) / len(grades)
+    if usable_fraction < 0.5:
+        og = max(og, "D", key=_GRADE_ORDER.index)
+    elif usable_fraction < 0.7:
+        og = max(og, "C", key=_GRADE_ORDER.index)
+    return og
+
+
+def _nss_flag_matrix() -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Mirror detect_flat_years on the released discharge: (nss, comp, ids, hy_years)."""
+    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+        q = ds["discharge_mm"].transpose("gauge_id", "time").values
+        ids = ds["gauge_id"].astype(str).values
+        times = pd.DatetimeIndex(ds["time"].values)
+
+    hy = times.year + (times.month >= 10).astype(int)
+    hy_years = np.arange(hy.min(), hy.max() + 1)
+    obs = ~np.isnan(q)
+    n_g = q.shape[0]
+    peak = np.full((n_g, len(hy_years)), np.nan)
+    comp = np.zeros((n_g, len(hy_years)))
+    for j, y in enumerate(hy_years):
+        m = hy == y
+        qy = np.where(obs[:, m], q[:, m], np.nan)
+        cnt = obs[:, m].sum(axis=1)
+        comp[:, j] = cnt / int(m.sum())
+        with np.errstate(invalid="ignore", divide="ignore"):
+            r = np.nanmax(qy, axis=1, initial=np.nan) / np.nanmean(qy, axis=1)
+        r[(cnt == 0)] = np.nan
+        peak[:, j] = r
+
+    valid_ratio = ~np.isnan(peak)
+    p75 = np.full(n_g, np.nan)
+    mx = np.full(n_g, np.nan)
+    for i in range(n_g):
+        if valid_ratio[i].sum() >= 3:
+            vals = peak[i, valid_ratio[i]]
+            p75[i] = np.percentile(vals, 75)
+            mx[i] = vals.max()
+    seasonal = (p75 >= 10.0) | (mx >= 20.0)
+    nss = valid_ratio & seasonal[:, None] & (peak < (0.3 * p75)[:, None])
+    return nss, comp, ids, hy_years
+
+
+def check_nss_completeness_macros(macros: dict[str, str]) -> None:
+    """Recompute the no_seasonal_signal completeness-bar disclosure (Sect. 4.1.1).
+
+    Mirrors src/quality/climatology.py::detect_flat_years on the released
+    discharge alone (validated: all F gauge-years reproduce, zero false
+    positives) and quantifies an 85 % completeness bar: F years the flag alone
+    explains at completeness 0.5-0.85, and the upper bound on gauges whose
+    overall grade would change.
+    """
+    section("NO_SEASONAL_SIGNAL COMPLETENESS BAR (released discharge + year grades)")
+    nss, comp, ids, hy_years = _nss_flag_matrix()
+
+    yg = pd.read_csv(RELEASE / "camels_ru_year_grades.csv", dtype={"gauge_id": str}).set_index(
+        "gauge_id"
+    )
+    year_cols = [c for c in yg.columns if c.isdigit()]
+    id_pos = {g: i for i, g in enumerate(ids)}
+    ypos = {int(y): j for j, y in enumerate(hy_years)}
+
+    n_f = 0
+    suppressed: dict[str, list[int]] = {}
+    for gid, row in yg.iterrows():
+        i = id_pos.get(gid)
+        if i is None:
+            continue
+        for c in year_cols:
+            g = row[c]
+            if not isinstance(g, str) or g != "F":
+                continue
+            n_f += 1
+            j = ypos[int(c)]
+            if nss[i, j] and 0.5 <= comp[i, j] < 0.85:
+                suppressed.setdefault(gid, []).append(int(c))
+    n_suppressed = sum(len(v) for v in suppressed.values())
+    check_macro(macros, "nfyeartotal", float(n_f), "{:.0f}")
+    check_macro(macros, "nnssbarsuppressed", float(n_suppressed), "{:.0f}")
+
+    # Upper bound on gauge-grade changes: suppressed years become C (the best the
+    # remaining completeness allows at 0.7-0.85; below 0.7 the year is D anyway).
+    n_changed = 0
+    for gid, years in suppressed.items():
+        row = yg.loc[gid]
+        gr = {int(c): row[c] for c in year_cols if isinstance(row[c], str) and row[c]}
+        base = _overall_grade(list(gr.values()))
+        i = id_pos[gid]
+        for y in years:
+            gr[y] = "D" if comp[i, ypos[y]] < 0.7 else "C"
+        if _overall_grade(list(gr.values())) != base:
+            n_changed += 1
+    check_macro(macros, "nnssbargauges", float(n_changed), "{:.0f}")
+
+
+def check_ice_window_gates(macros: dict[str, str]) -> None:
+    """Gate the ice-window sensitivity macros against the committed provenance CSV."""
+    section("ICE-WINDOW SENSITIVITY (paper/tables/ice_window_sensitivity.csv)")
+    table = PAPER / "tables" / "ice_window_sensitivity.csv"
+    if not table.exists():
+        print("  SKIP — run scripts/ice_window_sensitivity.py")
+        return
+    row = pd.read_csv(table).iloc[0]
+    check_macro(macros, "nconstflagged", float(row["n_const_flagged_fixed"]), "{:.0f}")
+    check_macro(macros, "nconstwinexempt", float(row["n_const_exempt_derived"]), "{:.0f}")
+    check_macro(macros, "nconstwinnew", float(row["n_const_new_derived"]), "{:.0f}")
+    check_val(
+        "stage screen weak May-Oct (CSV vs nstageweak)",
+        macros.get("nstageweak", "").replace("\\xspace", ""),
+        str(int(row["n_stage_weak_may_oct"])),
+    )
+    check_macro(macros, "nstageweakjunsep", float(row["n_stage_weak_jun_sep"]), "{:.0f}")
 
 
 def report_drift_summary() -> None:
@@ -895,15 +1144,21 @@ def main() -> None:
     check_macro(macros, "aggpninetytiny", float(tiny["p_p90_abs_rel_pct"]), "{:.1f}")
     check_macro(macros, "aggtmedtiny", float(tiny["t_median_abs_degc"]), "{:.2f}")
     check_macro(macros, "aggtninetytiny", float(tiny["t_p90_abs_degc"]), "{:.2f}")
-    check_macro(macros, "aggpmedmid", float(agg_table.loc["500-1000", "p_median_abs_rel_pct"]), "{:.1f}")
-    check_macro(
-        macros, "aggpmedlarge", float(agg_table.loc["1000-5000", "p_median_abs_rel_pct"]), "{:.1f}"
-    )
-    check_macro(macros, "aggtninetylarge", float(agg_table.loc["1000-5000", "t_p90_abs_degc"]), "{:.2f}")
+    mid = agg_table.loc["500-1000"]
+    check_macro(macros, "aggpmedmid", float(mid["p_median_abs_rel_pct"]), "{:.1f}")
+    check_macro(macros, "aggpninetymid", float(mid["p_p90_abs_rel_pct"]), "{:.1f}")
+    check_macro(macros, "aggtmedmid", float(mid["t_median_abs_degc"]), "{:.2f}")
+    check_macro(macros, "aggtninetymid", float(mid["t_p90_abs_degc"]), "{:.2f}")
+    large = agg_table.loc["1000-5000"]
+    check_macro(macros, "aggpmedlarge", float(large["p_median_abs_rel_pct"]), "{:.1f}")
+    check_macro(macros, "aggpninetylarge", float(large["p_p90_abs_rel_pct"]), "{:.1f}")
+    check_macro(macros, "aggtmedlarge", float(large["t_median_abs_degc"]), "{:.2f}")
+    check_macro(macros, "aggtninetylarge", float(large["t_p90_abs_degc"]), "{:.2f}")
     huge = agg_table.loc["5000+"]
     check_macro(macros, "aggpmedhuge", float(huge["p_median_abs_rel_pct"]), "{:.1f}")
     check_macro(macros, "aggpninetyhuge", float(huge["p_p90_abs_rel_pct"]), "{:.1f}")
     check_macro(macros, "aggpsignedhuge", float(huge["p_median_rel_pct"]), "{:+.2f}")
+    check_macro(macros, "aggtmedhuge", float(huge["t_median_abs_degc"]), "{:.2f}")
     check_macro(macros, "aggtninetyhuge", float(huge["t_p90_abs_degc"]), "{:.2f}")
     check_macro(macros, "aggtnvalidhuge", float(huge["t_n_valid"]), "{:.0f}")
 
@@ -975,8 +1230,11 @@ def main() -> None:
     check_aet_macros(macros)
     check_nested_macros(macros)
     check_nesting_depth_macros(macros, boundaries)
-    check_grdc_gates()
+    check_grdc_gates(macros)
     check_koppen_gates()
+    check_release_range_gates(macros)
+    check_nss_completeness_macros(macros)
+    check_ice_window_gates(macros)
     check_precip_caption_macros(macros)
     check_coldregion_macros(macros)
     check_spike_threshold_macros(macros)
