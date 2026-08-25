@@ -36,8 +36,8 @@ TABLE_HEADER = r"""\begin{table}[t]
 over the \nnestedpairs{} pairs with at least 2000 jointly observed days. The check's power
 falls as the ratio grows, because a much larger downstream catchment exceeds the upstream
 volume almost by construction; the near-nested pairs in the first row are where a
-violation is easiest to produce. Per-pair results ship in
-\texttt{paper/tables/nested\_mass\_balance.csv}.}
+violation is easiest to produce. Shares are rounded independently and need not sum to
+100. Per-pair results ship in \texttt{paper/tables/nested\_mass\_balance.csv}.}
 \label{tab:nested_stratification}
 \small
 \begin{tabular}{@{}lrrrr@{}}

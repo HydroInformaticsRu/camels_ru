@@ -32,6 +32,7 @@ MIN_WINTER_COVERAGE = 0.95
 
 from src.utils.paper_analysis_scope import (  # noqa: E402
     is_paper_analysis_excluded_gauge_id,
+    paper_analysis_inclusion_mask,
     paper_analysis_scope_summary,
 )
 
@@ -120,6 +121,30 @@ def check_aet_macros(macros: dict[str, str]) -> None:
         check_macro(macros, f"budykodep{suffix}", float(row["median_budyko_departure"]), "{:+.3f}")
     check_macro(macros, "nwaterbalgauges", float(wb["n_gauges"].iloc[0]), "{:.0f}")
 
+    # Snow-fraction confound (Sect. 6.5): recompute from the released signatures and
+    # attributes with the same Budyko (1974) curve as generate_budyko_figure.py.
+    sig = pd.read_csv(RELEASE / "camels_ru_signatures.csv", dtype={"gauge_id": str})
+    sig = sig[~sig["is_anomalous"].astype(bool)]
+    attrs = pd.read_csv(RELEASE / "camels_ru_attributes.csv", usecols=["gauge_id", "snw_pc_uyr"])
+    attrs["gauge_id"] = attrs["gauge_id"].astype(str)
+    joined = sig.merge(attrs, on="gauge_id", how="left")
+
+    def _budyko_curve(aridity: np.ndarray) -> np.ndarray:
+        with np.errstate(divide="ignore", invalid="ignore"):
+            val = aridity * np.tanh(1.0 / aridity) * (1.0 - np.exp(-aridity))
+        return np.sqrt(np.clip(val, 0.0, None))
+
+    dep_mswep = joined["evaporative_index"] - _budyko_curve(joined["aridity_index"].to_numpy())
+    dep_era5 = joined["evaporative_index_era5"] - _budyko_curve(joined["aridity_index_era5"].to_numpy())
+    low_snow = joined["snw_pc_uyr"] < 20
+    rho_snow = float(spearmanr(joined["snw_pc_uyr"], dep_mswep, nan_policy="omit")[0])
+    check_val(
+        "rhosnowbudyko", macros.get("rhosnowbudyko", "").replace("\\xspace", ""), f"${rho_snow:+.2f}$"
+    )
+    check_macro(macros, "nlowsnowbudyko", float(low_snow.sum()), "{:.0f}")
+    check_macro(macros, "budykodeplowsnowmswep", float(dep_mswep[low_snow].median()), "{:+.3f}")
+    check_macro(macros, "budykodeplowsnowerafive", float(dep_era5[low_snow].median()), "{:+.3f}")
+
 
 def check_coldregion_macros(macros: dict[str, str]) -> None:
     """Reconcile the Sect. 7 cold-region macros against a fresh recompute from the release."""
@@ -138,6 +163,7 @@ def check_coldregion_macros(macros: dict[str, str]) -> None:
 
     check_macro(macros, "ncoldregiongauges", len(cr), "{:.0f}")
     check_macro(macros, "ncoldregionclipped", float((cr["winter_flow_ratio"] > 1.2).sum()), "{:.0f}")
+    check_macro(macros, "ncoldregionabovemean", float((cr["winter_flow_ratio"] > 1.0).sum()), "{:.0f}")
     check_macro(macros, "winterratiobaseline", float(wff_med.iloc[0]), "{:.2f}")
     check_macro(macros, "winterratiohigh", float(wff_med.iloc[-1]), "{:.2f}")
     check_macro(macros, "bfipermafrostbaseline", float(bfi_med.iloc[0]), "{:.2f}")
@@ -246,6 +272,93 @@ def check_water_balance_screen_macros(macros: dict[str, str]) -> None:
         macros, "nwaterbalscreengradea", float((flagged["overall_grade"] == "A").sum()), "{:.0f}"
     )
     check_macro(macros, "maxrunoffratio", float(flagged["runoff_ratio"].max()), "{:.1f}")
+    check_macro(macros, "nwaterbalscreenall", float(sig["water_balance_screen"].sum()), "{:.0f}")
+    check_macro(macros, "nwinterflowgauges", float(clean["winter_flow_ratio"].notna().sum()), "{:.0f}")
+
+
+def check_grdc_gates() -> None:
+    """Gate the Sect. 6.1 GRDC literals against the committed per-pair CSV.
+
+    The station-inventory counts (792 / 16 / 15 / 4) come from the matching log of
+    scripts/validate_grdc.py, not this CSV, and stay ungated.
+    """
+    section("GRDC CROSS-CHECK (paper/tables/grdc_validation.csv)")
+    table = PAPER / "tables" / "grdc_validation.csv"
+    if not table.exists():
+        print("  SKIP — run scripts/validate_grdc.py and copy its CSV into paper/tables/")
+        return
+    g = pd.read_csv(table)
+    check_val("GRDC discharge pairs", "11", str(len(g)))
+    check_val("median r", "1.000", f"{g['r'].median():.3f}")
+    check_val("median NSE", "1.000", f"{g['nse'].median():.3f}")
+    check_val("median PBIAS", "0.0%", f"{g['pbias'].median():.1f}%")
+    identical = int(((g["r"].round(3) == 1.0) & (g["pbias"].round(1) == 0.0)).sum())
+    check_val("pairs identical at reported precision", "10", str(identical))
+    kon = g[g["grdc_station"].str.contains("KONSTANTIN", case=False, na=False)]
+    check_val("Konstantinovo r", "0.996", f"{float(kon['r'].iloc[0]):.3f}")
+    check_val("Konstantinovo PBIAS", "-0.6%", f"{float(kon['pbias'].iloc[0]):.1f}%")
+
+
+def check_koppen_gates() -> None:
+    """Gate the Sect. 2.3 Koppen shares against the committed per-gauge class CSV."""
+    section("KOPPEN CLASSES (paper/tables/koppen_classes.csv)")
+    table = PAPER / "tables" / "koppen_classes.csv"
+    if not table.exists():
+        print("  SKIP — koppen_classes.csv absent")
+        return
+    k = pd.read_csv(table, dtype=str)
+    # The CSV covers the full release; the manuscript states shares over the Analysis set.
+    k = k[paper_analysis_inclusion_mask(k["gauge_id"]).to_numpy()]
+    n = len(k)
+    check_val("Koppen catchments (Analysis set)", "3201", str(n))
+    share = k["kg"].value_counts()
+    dw = int(share[share.index.str.startswith("Dw")].sum())
+    for label, expected, count in (
+        ("Dfb", "37%", int(share.get("Dfb", 0))),
+        ("Dfc", "32%", int(share.get("Dfc", 0))),
+        ("Dw*", "21%", dw),
+        ("Dfa", "5%", int(share.get("Dfa", 0))),
+        ("Cfa", "2%", int(share.get("Cfa", 0))),
+        ("Dsc", "2%", int(share.get("Dsc", 0))),
+        ("BSk+BWk", "1%", int(share.get("BSk", 0)) + int(share.get("BWk", 0))),
+    ):
+        check_val(f"Koppen {label} share", expected, f"{100.0 * count / n:.0f}%")
+
+
+def check_nesting_depth_macros(macros: dict[str, str], boundaries: gpd.GeoDataFrame) -> None:
+    """Lock the Sect. 8.5 nesting-depth claims: containment chains over the release.
+
+    Depth(g) = 1 + max depth over the strictly larger polygons containing g's gauge
+    point (0 if none) — the same definition as scripts/detect_nesting.py, but computed
+    from release artifacts alone.
+    """
+    section("NESTING DEPTH (boundaries.gpkg + attributes lat/lon)")
+    pts_df = pd.read_csv(RELEASE / "camels_ru_attributes.csv", usecols=["gauge_id", "lat", "lon"])
+    pts_df["gauge_id"] = pts_df["gauge_id"].astype(str)
+    pts = gpd.GeoDataFrame(
+        pts_df, geometry=gpd.points_from_xy(pts_df["lon"], pts_df["lat"]), crs=boundaries.crs
+    )
+    poly = boundaries[["gauge_id", "area_km2", "geometry"]].copy()
+    poly["gauge_id"] = poly["gauge_id"].astype(str)
+    areas = poly.set_index("gauge_id")["area_km2"]
+    contain = gpd.sjoin(pts, poly.rename(columns={"gauge_id": "parent"}), predicate="within")
+    contain = contain[contain["gauge_id"] != contain["parent"]]
+    contain = contain[contain["area_km2"] > contain["gauge_id"].map(areas)]
+    parents = contain.groupby("gauge_id")["parent"].apply(list).to_dict()
+
+    def max_depth(members: pd.Index) -> int:
+        depth = dict.fromkeys(members, 0)
+        # Largest-first: every (strictly larger) parent is final before its children.
+        for g in areas.loc[members].sort_values(ascending=False).index:
+            ps = [p for p in parents.get(g, []) if p in depth]
+            if ps:
+                depth[g] = 1 + max(depth[p] for p in ps)
+        return max(depth.values())
+
+    all_ids = pd.Index(areas.index)
+    analysis_ids = all_ids[paper_analysis_inclusion_mask(pd.Series(all_ids)).to_numpy()]
+    check_macro(macros, "nnestmaxdepth", float(max_depth(all_ids)), "{:.0f}")
+    check_macro(macros, "nnestmaxdepthanalysis", float(max_depth(analysis_ids)), "{:.0f}")
 
 
 def check_precip_caption_macros(macros: dict[str, str]) -> None:
@@ -354,7 +467,8 @@ def check_grade_regime_macros(macros: dict[str, str]) -> None:
 
     # Sect. 9 states cold-region coverage as counts rather than a superlative, so lock them.
     check_macro(macros, "npermafrosttwenty", float((df["prm_pc_use"] > 20).sum()), "{:.0f}")
-    check_macro(macros, "npermafrosteighty", float((df["prm_pc_use"] > 80).sum()), "{:.0f}")
+    # >= 80, matching the Table 6 band definition (the old > 80 gave the same 155).
+    check_macro(macros, "npermafrosteighty", float((df["prm_pc_use"] >= 80).sum()), "{:.0f}")
 
     low_snow = df["snw_pc_uyr"] < 20
     high_snow = df["snw_pc_uyr"] >= 50
@@ -670,7 +784,7 @@ def main() -> None:
         f"{aep_trim.mean():.2f}%",
         match=abs(aep_trim.mean() - 5.1) < 0.3,
     )
-    kv("median |err| (no trim)", "-", f"{aep.median():.2f}%")
+    check_macro(macros, "medianerror", float(aep.median()), "{:.1f}")
     kv(
         "withinfive (no trim)",
         "77%",
@@ -781,6 +895,10 @@ def main() -> None:
     check_macro(macros, "aggpninetytiny", float(tiny["p_p90_abs_rel_pct"]), "{:.1f}")
     check_macro(macros, "aggtmedtiny", float(tiny["t_median_abs_degc"]), "{:.2f}")
     check_macro(macros, "aggtninetytiny", float(tiny["t_p90_abs_degc"]), "{:.2f}")
+    check_macro(macros, "aggpmedmid", float(agg_table.loc["500-1000", "p_median_abs_rel_pct"]), "{:.1f}")
+    check_macro(
+        macros, "aggpmedlarge", float(agg_table.loc["1000-5000", "p_median_abs_rel_pct"]), "{:.1f}"
+    )
     check_macro(macros, "aggtninetylarge", float(agg_table.loc["1000-5000", "t_p90_abs_degc"]), "{:.2f}")
     huge = agg_table.loc["5000+"]
     check_macro(macros, "aggpmedhuge", float(huge["p_median_abs_rel_pct"]), "{:.1f}")
@@ -856,6 +974,9 @@ def main() -> None:
 
     check_aet_macros(macros)
     check_nested_macros(macros)
+    check_nesting_depth_macros(macros, boundaries)
+    check_grdc_gates()
+    check_koppen_gates()
     check_precip_caption_macros(macros)
     check_coldregion_macros(macros)
     check_spike_threshold_macros(macros)
