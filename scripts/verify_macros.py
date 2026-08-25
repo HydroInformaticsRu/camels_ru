@@ -776,6 +776,18 @@ def main() -> None:
     check_macro(macros, "aggpninetysmall", float(agg["p_p90_abs_rel_pct"]), "{:.1f}")
     check_macro(macros, "aggtmedsmall", float(agg["t_median_abs_degc"]), "{:.2f}")
     check_macro(macros, "aggtninetysmall", float(agg["t_p90_abs_degc"]), "{:.2f}")
+    tiny = agg_table.loc["5-150"]
+    check_macro(macros, "aggpmedtiny", float(tiny["p_median_abs_rel_pct"]), "{:.1f}")
+    check_macro(macros, "aggpninetytiny", float(tiny["p_p90_abs_rel_pct"]), "{:.1f}")
+    check_macro(macros, "aggtmedtiny", float(tiny["t_median_abs_degc"]), "{:.2f}")
+    check_macro(macros, "aggtninetytiny", float(tiny["t_p90_abs_degc"]), "{:.2f}")
+    check_macro(macros, "aggtninetylarge", float(agg_table.loc["1000-5000", "t_p90_abs_degc"]), "{:.2f}")
+    huge = agg_table.loc["5000+"]
+    check_macro(macros, "aggpmedhuge", float(huge["p_median_abs_rel_pct"]), "{:.1f}")
+    check_macro(macros, "aggpninetyhuge", float(huge["p_p90_abs_rel_pct"]), "{:.1f}")
+    check_macro(macros, "aggpsignedhuge", float(huge["p_median_rel_pct"]), "{:+.2f}")
+    check_macro(macros, "aggtninetyhuge", float(huge["t_p90_abs_degc"]), "{:.2f}")
+    check_macro(macros, "aggtnvalidhuge", float(huge["t_n_valid"]), "{:.0f}")
 
     corr_table = pd.read_csv(PAPER / "tables" / "precip_inter_dataset_corr.csv")
     expected_corr = {

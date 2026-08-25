@@ -31,6 +31,10 @@ from src.utils.paper_analysis_scope import paper_analysis_inclusion_mask  # noqa
 GEOM = ROOT / "data" / "CAMELS_RU" / "geometry" / "camels_watersheds.gpkg"
 GRIDS = ROOT / "data" / "Russia" / "MeteoData" / "ParsedMonthly"
 OUT = ROOT / "paper" / "tables" / "aggregation_sensitivity.csv"
+# Per-product weight cache: without it the fractional weights of the weighted branch are
+# recomputed 12x per product per catchment, which multiplied the >5000 km2 band's cost
+# roughly tenfold (a 2.44M km2 basin's weights take tens of minutes to compute once).
+CACHE = ROOT / ".tmp" / "agg_weight_cache"
 # The top band is open-ended: 1391 catchments (41.5 % of the network) exceed 5000 km2,
 # and that is where the unweighted touched-cell mean is most exposed, since a basin
 # spanning many degrees of latitude has the widest spread of true cell areas.
@@ -53,6 +57,7 @@ def _annual(gid: str, geom, product: str, var: str, year: int, weighted: bool) -
             gid,
             product,
             small_ws_threshold=threshold,
+            cache_dir=CACHE / product,
             variables=[var],
         )
         parts.append(df[var])
@@ -79,9 +84,10 @@ def main() -> None:
         rec = {"band_km2": label, "n_band": len(band), "n_sample": len(sample)}
         for key, (product, var) in PRODUCTS.items():
             w, u = [], []
-            for gid, geom in zip(sample["gauge_id"], sample["geometry"], strict=True):
+            for i, (gid, geom) in enumerate(zip(sample["gauge_id"], sample["geometry"], strict=True), 1):
                 w.append(_annual(gid, geom, product, var, args.year, weighted=True))
                 u.append(_annual(gid, geom, product, var, args.year, weighted=False))
+                print(f"[{label} {key} {i}/{len(sample)}] gauge {gid}", flush=True)
             w, u = np.array(w), np.array(u)
             if key == "mswep":
                 rel = 100.0 * (u - w) / w
@@ -89,12 +95,16 @@ def main() -> None:
                 rec["p_p90_abs_rel_pct"] = float(np.percentile(np.abs(rel), 90))
                 rec["p_median_rel_pct"] = float(np.median(rel))
             else:
+                # ERA5-Land grids end at 170E, so watersheds crossing that edge have no
+                # native temperature; report over the covered catchments and say so.
                 d = u - w
-                rec["t_median_abs_degc"] = float(np.median(np.abs(d)))
-                rec["t_p90_abs_degc"] = float(np.percentile(np.abs(d), 90))
-                rec["t_median_degc"] = float(np.median(d))
+                valid = np.isfinite(d)
+                rec["t_median_abs_degc"] = float(np.median(np.abs(d[valid])))
+                rec["t_p90_abs_degc"] = float(np.percentile(np.abs(d[valid]), 90))
+                rec["t_median_degc"] = float(np.median(d[valid]))
+                rec["t_n_valid"] = int(valid.sum())
         rows.append(rec)
-        print(rec)
+        print(rec, flush=True)
     pd.DataFrame(rows).to_csv(OUT, index=False)
     print(f"wrote {OUT.relative_to(ROOT)}")
 
