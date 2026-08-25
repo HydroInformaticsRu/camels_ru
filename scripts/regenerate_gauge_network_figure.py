@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 import re
+import shutil
 import sys
 import warnings
 
@@ -70,6 +71,8 @@ plt.rcParams.update(
 
 # Köppen-Geiger legend colours in the Peel et al. (2007) / Beck et al. (2018) convention;
 # dict order is the canonical legend order.
+MERGE_MAX = 11  # classes with at most this many catchments merge into "other"
+
 KG_COLORS = {
     "BWk": "#FF9696",
     "BSk": "#FFDC64",
@@ -209,8 +212,17 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
     )
 
     counts = gauge["kg"].value_counts()
+    # Classes with MERGE_MAX or fewer catchments merge into a grey "other" class:
+    # their individual dots are indistinguishable at map scale, and dropping the
+    # rare hues keeps the remaining palette legible (round-6 editor m7).
+    rare = {c for c in counts.index if c and counts[c] <= MERGE_MAX}
+    gauge = gauge.copy()
+    gauge.loc[gauge["kg"].isin(rare), "kg"] = "other"
+    counts = gauge["kg"].value_counts()
     classes = [c for c in KG_COLORS if c in counts.index]
-    classes += sorted(c for c in counts.index if c and c not in KG_COLORS)
+    classes += sorted(c for c in counts.index if c and c != "other" and c not in KG_COLORS)
+    if "other" in counts.index:
+        classes.append("other")
     # Draw the common classes first so the rare ones stay visible on top.
     for cls in sorted(classes, key=lambda c: -int(counts[c])):
         sub = gauge[gauge["kg"] == cls]
@@ -262,12 +274,15 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
                 label=f"no class (n={len(unclassified)})",
             )
         )
-    ax_map.legend(
+    # The legend sits below the map, outside the frame, so it cannot cover the
+    # southwest gauge cluster it labels (round-6 editor m7).
+    fig = ax_map.get_figure()
+    fig.legend(
         handles=handles,
-        loc="lower left",
+        loc="outside lower center",
         fontsize=8,
         framealpha=0.9,
-        ncol=3,
+        ncol=6,
         columnspacing=0.8,
         handletextpad=0.4,
         title="Köppen-Geiger class",
@@ -316,11 +331,17 @@ def main() -> None:
 
     gauge, size_counts = load_data()
     fig = build_figure(gauge, size_counts)
+    # Save ONCE and copy: two bbox_inches="tight" saves crop a few pixels apart,
+    # so the paper/ and overleaf/ copies would never agree byte-for-byte.
     outputs = PAPER_OUTPUTS if args.write else (TEST_OUTPUT,)
-    for out in outputs:
+    first = outputs[0]
+    first.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(first, dpi=300, bbox_inches="tight")
+    print(f"\nSaved: {first}")
+    for out in outputs[1:]:
         out.parent.mkdir(parents=True, exist_ok=True)
-        fig.savefig(out, dpi=300, bbox_inches="tight")
-        print(f"\nSaved: {out}")
+        shutil.copy2(first, out)
+        print(f"Copied: {out}")
     plt.close(fig)
 
 
