@@ -128,6 +128,19 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
   all remaining figures pile up after the references. Give tall figures `[tp]` (e.g. the
   two-panel `fig_gauge_reliability`) and check the figure pages after each build
   (`pdftotext -layout` per page, `pdftoppm` to view).
+- Worse variant (found round 6): a `table` float taller than the page **silently drops
+  its overflowing rows** — the build succeeds with only a "Float too large for page"
+  log warning, and the page looks plausible. Two released-variable rows of the
+  signatures table shipped un-rendered this way. Long tables go in `longtable`
+  (already loaded), and after each build grep `main.log` for "Float too large" and
+  count rendered rows against the source.
+
+### PostToolUse formatter strips a just-added import if it is momentarily unused
+
+- The Edit hook runs ruff autofix after every edit. Adding an `import X` in one edit
+  and the code that uses it in the next means the import is deleted between the two
+  (seen twice with `shutil`/`sys`, 2026-08-24/25). Add the import in the same edit as
+  its first use, or add the usage first and the import second.
 
 ### Figure scripts write to both image directories
 
