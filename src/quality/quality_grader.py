@@ -170,10 +170,10 @@ class YearQualityGrader:
 
         Grade assignment rules (simplified, flag-focused):
         - F: Any critical flag (NO_SEASONAL_SIGNAL, VERY_LOW_COMPLETENESS, etc.)
-        - D: Multiple major flags, or very low completeness
-        - C: 1 major flag or 3+ minor flags
-        - B: 1-2 minor flags
-        - A: No flags and good completeness
+        - D: 2+ major flags, or completeness below min_completeness_c
+        - C: 1 major flag or 5+ minor flags, or completeness below min_completeness_b
+        - B: 3-4 minor flags, or completeness below min_completeness_a
+        - A: 0-2 minor flags and good completeness
 
         Climatology correlation is downweighted since amplitude variation
         is natural in snowmelt-dominated catchments.

@@ -30,11 +30,11 @@ class QualityFlag(Enum):
     HIGH_AMPLITUDE = "high_amplitude"  # amplitude_ratio > 3.0
     NO_SEASONAL_SIGNAL = "no_seasonal_signal"  # flat hydrograph, no flood peak
 
-    # Meteorological response flags
-    NO_PRECIP_RESPONSE = "no_precip_response"  # event_response_rate < 0.3
-    VERY_LOW_PQ_CORRELATION = "very_low_pq_correlation"  # max_cross_corr < 0.2
-    LOW_PQ_CORRELATION = "low_pq_correlation"  # max_cross_corr < 0.4
-    LOW_FLASHINESS = "low_flashiness"  # flashiness_index < 0.02
+    # Meteorological response flags (thresholds from meteo_response.detect_dead_years defaults)
+    NO_PRECIP_RESPONSE = "no_precip_response"  # event_response_rate < 0.2
+    VERY_LOW_PQ_CORRELATION = "very_low_pq_correlation"  # max_cross_corr < 0.1
+    LOW_PQ_CORRELATION = "low_pq_correlation"  # max_cross_corr < 0.2
+    LOW_FLASHINESS = "low_flashiness"  # flashiness_index < 0.01
     NO_EFFECTIVE_WATER_RESPONSE = "no_effective_water_response"
     VERY_LOW_EFFECTIVE_WATER_CORRELATION = "very_low_effective_water_correlation"
     LOW_EFFECTIVE_WATER_CORRELATION = "low_effective_water_correlation"

@@ -719,8 +719,10 @@ def _nss_flag_matrix() -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         cnt = obs[:, m].sum(axis=1)
         comp[:, j] = cnt / int(m.sum())
         with np.errstate(invalid="ignore", divide="ignore"):
-            r = np.nanmax(qy, axis=1, initial=np.nan) / np.nanmean(qy, axis=1)
-        r[(cnt == 0)] = np.nan
+            mean_y = np.nanmean(qy, axis=1)
+            r = np.nanmax(qy, axis=1, initial=np.nan) / mean_y
+        # detect_seasonal_signal returns NaN below 30 observed days or at mean <= 0
+        r[(cnt < 30) | ~(mean_y > 0)] = np.nan
         peak[:, j] = r
 
     valid_ratio = ~np.isnan(peak)
@@ -740,10 +742,10 @@ def check_nss_completeness_macros(macros: dict[str, str]) -> None:
     """Recompute the no_seasonal_signal completeness-bar disclosure (Sect. 4.1.1).
 
     Mirrors src/quality/climatology.py::detect_flat_years on the released
-    discharge alone (validated: all F gauge-years reproduce, zero false
-    positives) and quantifies an 85 % completeness bar: F years the flag alone
-    explains at completeness 0.5-0.85, and the upper bound on gauges whose
-    overall grade would change.
+    discharge alone (gated below: the mirror must fire on exactly the assessed
+    gauge-years of the released flag census) and quantifies an 85 % completeness
+    bar: F years the flag alone explains at completeness 0.5-0.85, and the
+    upper bound on gauges whose overall grade would change.
     """
     section("NO_SEASONAL_SIGNAL COMPLETENESS BAR (released discharge + year grades)")
     nss, comp, ids, hy_years = _nss_flag_matrix()
@@ -754,6 +756,17 @@ def check_nss_completeness_macros(macros: dict[str, str]) -> None:
     year_cols = [c for c in yg.columns if c.isdigit()]
     id_pos = {g: i for i, g in enumerate(ids)}
     ypos = {int(y): j for j, y in enumerate(hy_years)}
+
+    sub = yg.reindex(ids)[year_cols]
+    assessed = np.zeros(nss.shape, dtype=bool)
+    assessed[:, [ypos[int(c)] for c in year_cols]] = (sub.notna() & (sub != "")).to_numpy()
+    census = pd.read_csv(PAPER / "tables" / "flag_frequencies.csv")
+    n_census = int(census.loc[census["flag"] == "no_seasonal_signal", "n_years"].iloc[0])
+    check_val(
+        "NSS mirror fires on assessed years (vs flag census)",
+        str(int((nss & assessed).sum())),
+        str(n_census),
+    )
 
     n_f = 0
     suppressed: dict[str, list[int]] = {}
