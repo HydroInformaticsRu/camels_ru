@@ -292,8 +292,12 @@ def main() -> None:
     df = df.merge(eck.rename_axis("gauge_id").reset_index(), on="gauge_id", how="left")
     n_eck = int(df["bfi_eckhardt"].notna().sum())
     print(f"  Eckhardt BFI computed for {n_eck}/{len(df)} gauges (BFImax={ECKHARDT_BFI_MAX})")
-    corr = df[["baseflow_index", "bfi_eckhardt"]].corr(method="spearman").iloc[0, 1]
-    print(f"  Spearman(LH-BFI, Eckhardt-BFI) = {corr:+.3f}")
+    # The manuscript quotes this agreement for the Sect. 8 sample, which additionally
+    # screens on winter_coverage >= 0.95; the shape and reversal checks below keep the
+    # full A/B dam-free set, where the ensemble statistics are better populated.
+    scr = df[df["winter_coverage"] >= 0.95]
+    corr = scr[["baseflow_index", "bfi_eckhardt"]].corr(method="spearman").iloc[0, 1]
+    print(f"  Spearman(LH-BFI, Eckhardt-BFI) = {corr:+.3f} (winter_coverage >= 0.95, n={len(scr)})")
 
     lh_shape = shape_stats(df["prm_pc_use"], df["baseflow_index"])
     eck_shape = shape_stats(df["prm_pc_use"], df["bfi_eckhardt"])
@@ -389,7 +393,8 @@ def main() -> None:
         f"cold {rho_c_lh:+.3f} CI {ci_c_s})",
         f"  Eckhardt     : {reversal_eck}  (warm {rho_w_e:+.3f} / cold {rho_c_e:+.3f})",
         "",
-        f"Spearman(LH, Eckhardt) BFI agreement = {corr:+.3f}",
+        f"Spearman(LH, Eckhardt) BFI agreement = {corr:+.3f} "
+        f"(winter_coverage >= 0.95 subset, n = {len(scr)})",
         "",
         "Alpha-sensitivity (Lyne-Hollick parameter; released = mean over U[0.90,0.98]):",
         f"  inverted-U holds at every alpha in {LH_ALPHA_BOUNDS}? {alpha_hump_all}",

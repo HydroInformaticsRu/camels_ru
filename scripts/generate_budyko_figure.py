@@ -88,15 +88,19 @@ def _plot(df: pd.DataFrame) -> None:
     """Render the Budyko check as one panel per precipitation product."""
     colors = {"ERA5-Land": "#EE6677", "MSWEP": "#4477AA", "GPCP": "#228833"}
     products = ["ERA5-Land", "MSWEP", "GPCP"]
+    # ESSD editor pre-review font floor: this figure prints at \textwidth from a 13.5in-wide
+    # source (~0.52x shrink), so text must start at >=16pt to clear 7pt in the final PDF.
+    fs = 16
     fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.8), sharey=True, constrained_layout=True)
 
     # Theoretical bounds in Budyko coordinates
-    #   Water  limit: AET <= P     -> evap_index <= 1            (horizontal at y=1)
+    #   Water  limit: AET <= P     -> evap_index <= 1            (horizontal at y=1;
+    #                                 this is the y>=1 branch of the envelope below,
+    #                                 so it is not drawn again as its own line)
     #   Energy limit: AET <= PET   -> evap_index <= aridity      (45-degree y=x for x<1)
     #   Combined physical envelope: evap_index <= min(1, aridity)
     x = np.linspace(0.01, 5.0, 400)
     envelope_line = np.minimum(x, 1.0)
-    water_line = np.ones_like(x)
     budyko = _budyko_curve(x)
 
     for ax, panel, product in zip(axes, "abc", products, strict=True):
@@ -107,10 +111,7 @@ def _plot(df: pd.DataFrame) -> None:
             color="#AA2222",
             linestyle="--",
             linewidth=1.0,
-            label="Physical envelope (AET ≤ min(PET, P))",
-        )
-        ax.plot(
-            x, water_line, color="#333333", linestyle=":", linewidth=1.0, label="Water limit (AET ≤ P)"
+            label="Physical envelope",
         )
         ax.plot(x, budyko, color="#222222", linestyle="-", linewidth=1.2, label="Budyko (1974) curve")
         ax.scatter(
@@ -122,21 +123,30 @@ def _plot(df: pd.DataFrame) -> None:
             edgecolors="none",
             zorder=2,
         )
-        ax.set_title(f"({panel}) {product} (n={len(sub)})", fontsize=11, loc="left")
-        ax.set_xlabel("Aridity index  PET / P", fontsize=11)
+        ax.set_title(f"({panel}) {product} (n={len(sub)})", fontsize=fs, loc="left")
+        ax.set_xlabel("Aridity index  PET / P", fontsize=fs)
         ax.set_xlim(0, 3.5)
         ax.set_ylim(-0.3, 1.5)
         ax.axhline(0, color="#888888", linewidth=0.5)
         ax.axvline(1, color="#888888", linewidth=0.5, linestyle=":")
-        ax.text(0.5, 1.38, "HUMID  (PET < P)", fontsize=7, color="#555555", ha="center")
-        ax.text(2.2, 1.38, "ARID  (PET > P)", fontsize=7, color="#555555", ha="center")
+        # Anchored away from the x=1 divider (not centered on fixed x positions) so the
+        # two labels cannot collide once the font floor bump widens them; the humid zone
+        # is only 1 aridity-unit wide, too narrow at floor size for a qualifier that
+        # duplicates the x-axis label and the dotted divider, so it is dropped here.
+        ax.text(0.95, 1.38, "HUMID", fontsize=fs, color="#555555", ha="right")
+        ax.text(1.05, 1.38, "ARID", fontsize=fs, color="#555555", ha="left")
         ax.grid(alpha=0.2, linestyle="--")
+        ax.tick_params(labelsize=fs)
 
-    axes[0].set_ylabel("Evaporative index  (P − Q) / P", fontsize=11)
-    axes[0].text(0.04, 1.06, "above water limit (Q < 0)", fontsize=7, color="#AA2222")
-    axes[0].text(0.04, -0.24, "below zero (Q > P)", fontsize=7, color="#AA2222")
-    # Lower-right corner (very arid, low evaporative index) is empty for this humid domain.
-    axes[0].legend(loc="lower right", fontsize=7, framealpha=0.9)
+    axes[0].set_ylabel("Evaporative index  (P − Q) / P", fontsize=fs, labelpad=10)
+    axes[0].text(0.04, 1.06, "above water limit (Q < 0)", fontsize=fs, color="#AA2222")
+    axes[0].text(0.04, -0.24, "below zero (Q > P)", fontsize=fs, color="#AA2222")
+    # A within-panel legend wide enough to clear the font floor also spans most of this
+    # narrow (3-panel) panel width, so any in-panel corner collides with one of the two
+    # boundary annotations. Placed outside the axes instead (as in the gauge-network
+    # figure's Koppen legend), which constrained_layout reserves dedicated space for.
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="outside lower center", ncol=2, fontsize=fs, framealpha=0.9)
 
     OUT_PNG.parent.mkdir(parents=True, exist_ok=True)
     # Save once and copy: two savefig(bbox_inches="tight") calls crop differently,

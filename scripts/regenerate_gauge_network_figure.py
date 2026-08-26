@@ -63,8 +63,10 @@ plt.rcParams.update(
         "savefig.dpi": 300,
         "axes.labelsize": 12,
         "axes.titlesize": 13,
-        "xtick.labelsize": 10,
-        "ytick.labelsize": 10,
+        # Font floor (ESSD editor pre-review): panel (b)'s histogram ticks land at ~0.59x
+        # shrink to \textwidth from this ~11.8in figure, so 10pt was landing at ~5.9pt.
+        "xtick.labelsize": 13,
+        "ytick.labelsize": 13,
         "legend.fontsize": 9,
     }
 )
@@ -125,6 +127,38 @@ def _size_label(category: str) -> str:
     if ">" in body:
         return f"> {_thousands(nums[0])}"
     return f"{_thousands(nums[0])}–{_thousands(nums[1])}"
+
+
+def _add_scale_bar(
+    ax: plt.Axes, length_km: float = 1000, loc: tuple[float, float] = (0.05, 0.06)
+) -> None:
+    """Draw a simple linear scale bar directly in the GeoAxes' own (projected) units.
+
+    Valid because the axes use the Albers equal-area conic projection (`get_russia_projection`),
+    so a straight length in projected meters is a defensible, if not geodesically exact, distance.
+
+    Args:
+        ax: GeoAxes with its extent already set (xlim/ylim in projected meters).
+        length_km: Bar length in kilometres.
+        loc: (x, y) fraction of the current axes extent for the bar's left end.
+    """
+    xlim, ylim = ax.get_xlim(), ax.get_ylim()
+    x0 = xlim[0] + loc[0] * (xlim[1] - xlim[0])
+    y0 = ylim[0] + loc[1] * (ylim[1] - ylim[0])
+    length_m = length_km * 1000.0
+    tick = 0.012 * (ylim[1] - ylim[0])
+    ax.plot([x0, x0 + length_m], [y0, y0], color="black", linewidth=1.6, solid_capstyle="butt", zorder=6)
+    for x in (x0, x0 + length_m):
+        ax.plot([x, x], [y0 - tick, y0 + tick], color="black", linewidth=1.2, zorder=6)
+    ax.text(
+        x0 + length_m / 2,
+        y0 + tick * 1.6,
+        f"{int(length_km)} km",
+        ha="center",
+        va="bottom",
+        fontsize=14,
+        zorder=6,
+    )
 
 
 def classify_catchments() -> pd.Series:
@@ -206,6 +240,12 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
 
     ax_map.axis("off")
     _set_extent_from_data(ax_map, gauge)
+    # Editor pre-review: no coordinate reference on the map. Graticule labels sized for the
+    # same font floor as the other figures (~0.54x shrink at \textwidth from this 13in figure).
+    from src.plots.paper_maps import _add_graticule
+
+    _add_graticule(ax_map, draw_labels=True, label_size=14)
+    _add_scale_bar(ax_map, length_km=1000)
     ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
     ne_land.to_crs(aea.proj4_init).plot(
         ax=ax_map, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.3, zorder=1
@@ -277,16 +317,18 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
     # The legend sits below the map, outside the frame, so it cannot cover the
     # southwest gauge cluster it labels (round-6 editor m7).
     fig = ax_map.get_figure()
+    # Font floor: legend text bumped 8->13pt; ncol dropped 6->4 so the wider entries
+    # (~1.6x) still fit below the map instead of overflowing the figure width.
     fig.legend(
         handles=handles,
         loc="outside lower center",
-        fontsize=8,
+        fontsize=13,
         framealpha=0.9,
-        ncol=6,
+        ncol=4,
         columnspacing=0.8,
         handletextpad=0.4,
         title="Köppen-Geiger class",
-        title_fontsize=8,
+        title_fontsize=13,
     )
     ax_map.set_title("(a) Climate classes", fontsize=13, fontweight="bold", loc="left")
 
@@ -299,9 +341,9 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
         linewidth=0.5,
     )
     ax_hist.set_yticks(range(len(size_counts)))
-    ax_hist.set_yticklabels([_size_label(str(cat)) for cat in size_counts.index], fontsize=10)
-    ax_hist.set_ylabel("Catchment area (km²)", fontsize=11)
-    ax_hist.set_xlabel("Number of catchments", fontsize=11)
+    ax_hist.set_yticklabels([_size_label(str(cat)) for cat in size_counts.index], fontsize=13)
+    ax_hist.set_ylabel("Catchment area (km²)", fontsize=13)
+    ax_hist.set_xlabel("Number of catchments", fontsize=13)
     ax_hist.set_title("(b) Size distribution", fontsize=13, fontweight="bold", loc="left")
     ax_hist.grid(alpha=0.15, axis="x", linestyle="--")
     ax_hist.invert_yaxis()
@@ -312,7 +354,7 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
             bar.get_y() + bar.get_height() / 2,
             f"{cnt}",
             va="center",
-            fontsize=10,
+            fontsize=13,
             fontweight="bold",
         )
 

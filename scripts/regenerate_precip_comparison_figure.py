@@ -157,6 +157,10 @@ def plot(df: pd.DataFrame, out: Path) -> None:
             colorbar=False,
             title=f"({panel[j]}) {minuend} − {subtrahend}",
             background_gdf=ne,
+            # Editor pre-review: no coordinate reference on the map. ~0.54x shrink to
+            # \textwidth from this 13in figure, so labels need to start well above 7pt.
+            graticule_labels=True,
+            graticule_label_size=14,
         )
 
     n = len(edges) - 1
@@ -164,8 +168,10 @@ def plot(df: pd.DataFrame, out: Path) -> None:
     cb = fig.colorbar(sm, ax=list(axes), orientation="horizontal", shrink=0.5, aspect=45, pad=0.02)
     cb.set_ticks(edges)
     cb.set_ticklabels([("0" if e == 0 else f"{e:g}") for e in edges])
-    cb.set_label("Mean annual precipitation difference (mm yr$^{-1}$)", fontsize=10)
-    cb.ax.tick_params(labelsize=9)
+    # Font floor (ESSD editor pre-review): prints at \textwidth from a ~12.6in source
+    # (~0.55x shrink), so 9/10pt source text was landing at ~5pt in the final PDF.
+    cb.set_label("Mean annual precipitation difference (mm yr$^{-1}$)", fontsize=14)
+    cb.ax.tick_params(labelsize=14)
 
     fig.savefig(out, dpi=300, bbox_inches="tight")
     plt.close(fig)

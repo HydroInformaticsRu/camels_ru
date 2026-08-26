@@ -102,6 +102,11 @@ def build_figure(
         marker_size=8,
         show_nan=True,
         background_gdf=ne_land,
+        # Font floor (ESSD editor pre-review): panels render at 0.96\textwidth from a
+        # 16x8.2in figure (~0.42x shrink), so 12/9pt source text would land at ~5/4pt in
+        # print. Bumped so both clear 7pt with margin (20 * 0.42 ~= 8.4pt).
+        title_fontsize=20,
+        colorbar_ticklabelsize=20,
     )
 
 

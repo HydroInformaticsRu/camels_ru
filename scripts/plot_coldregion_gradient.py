@@ -58,17 +58,21 @@ def _boot_median_ci(values: np.ndarray, n_boot: int = N_BOOT) -> tuple[float, fl
     return (float(np.percentile(meds, 2.5)), float(np.percentile(meds, 97.5)))
 
 
+# ESSD editor pre-review font floor: this figure prints at \textwidth from a 15in-wide
+# source (~0.46x shrink), so text must start at >=18pt to clear 7pt in the final PDF.
+FS = 18
+
 mpl.rcParams.update(
     {
         "font.family": "serif",
         "font.serif": ["DejaVu Serif"],
         "figure.dpi": 150,
         "savefig.dpi": 300,
-        "axes.labelsize": 11,
-        "axes.titlesize": 12,
-        "xtick.labelsize": 9,
-        "ytick.labelsize": 9,
-        "legend.fontsize": 8.5,
+        "axes.labelsize": FS,
+        "axes.titlesize": FS,
+        "xtick.labelsize": FS,
+        "ytick.labelsize": FS,
+        "legend.fontsize": FS,
     }
 )
 
@@ -155,7 +159,10 @@ def main() -> None:
     print("\nBaseflow index by permafrost bin:")
     print(bm[["center", "median", "n"]].round(3).to_string(index=False))
 
-    fig, (ax_a, ax_b, ax_c) = plt.subplots(1, 3, figsize=(15, 4.6))
+    # Modest width increase (was 15in) plus constrained_layout: fig.tight_layout() doesn't
+    # reserve space for the colorbar or reflow around the font-floor bump below, causing
+    # panel titles to run into each other and axis labels to clip at the saved image edges.
+    fig, (ax_a, ax_b, ax_c) = plt.subplots(1, 3, figsize=(16, 5.0), constrained_layout=True)
 
     # ---- Panel A: winter flow fraction vs permafrost -------------------------
     norm = TwoSlopeNorm(vmin=float(temp.min()), vcenter=T_COLOUR_CENTRE, vmax=float(temp.max()))
@@ -178,45 +185,76 @@ def main() -> None:
         label="95% bootstrap CI",
     )
     first_bin, last_bin = wm.iloc[0], wm.iloc[-1]
-    for row, dy in ((first_bin, 10), (last_bin, 12)):
-        ax_a.annotate(
-            f"{row['median']:.2f}\nn={int(row['n'])}",
-            (row["center"], row["median"]),
-            textcoords="offset points",
-            xytext=(0, dy),
-            ha="center",
-            fontsize=8,
-        )
+    # First bin sits right at the left spine (center=2.5 on a 0-100 axis); centered-above
+    # placement at floor-clearing size pushed "0.45" into the 0.6 y-tick and "n=776" past
+    # the spine. Anchored to the right of the point instead, clear of both.
+    ax_a.annotate(
+        f"{first_bin['median']:.2f}\nn={int(first_bin['n'])}",
+        (first_bin["center"], first_bin["median"]),
+        textcoords="offset points",
+        xytext=(12, 0),
+        ha="left",
+        va="center",
+        fontsize=FS,
+    )
+    ax_a.annotate(
+        f"{last_bin['median']:.2f}\nn={int(last_bin['n'])}",
+        (last_bin["center"], last_bin["median"]),
+        textcoords="offset points",
+        xytext=(0, 12),
+        ha="center",
+        fontsize=FS,
+    )
     # Clip the axis, not the data: a long upper tail (winter flow above the annual mean at
     # spring-fed gauges) would otherwise squash the binned medians into the bottom third.
     n_clipped = int((wff > Y_CLIP_A).sum())
     ax_a.set_ylim(0, Y_CLIP_A)
     print(f"panel (a): {n_clipped} of {len(wff)} points above the {Y_CLIP_A} axis limit")
     ax_a.set_xlabel("Permafrost extent (HydroATLAS proxy, %)")
-    ax_a.set_ylabel("Winter flow ratio (mean Jan\u2013Mar $Q$ / mean annual $Q$)")
-    ax_a.set_title(f"(a) Winter flow ratio ($\\rho$ = {rho_w:+.2f})")
+    # Rotated at 18pt, "Winter flow ratio (mean Jan-Mar Q / mean annual Q)" is taller than
+    # the panel itself and clips at both ends; the definition moves to the caption, matching
+    # panel (b)'s bare "Baseflow index" label.
+    ax_a.set_ylabel("Winter flow ratio")
+    ax_a.set_title(f"(a) Winter flow ratio ($\\rho$ = {rho_w:+.2f})", loc="left")
     ax_a.legend(loc="upper right", frameon=False)
+    # fig.colorbar(sc, ax=ax_a, ...) reserves its space from panel (a) correctly only under
+    # constrained_layout (set on the figure below); under the plain fig.tight_layout() this
+    # script used before, that reservation gets reclaimed and the bar abuts panel (b) instead.
     cb = fig.colorbar(sc, ax=ax_a, fraction=0.046, pad=0.03)
-    cb.set_label("Mean annual T (\u00b0C)", fontsize=8)
+    cb.set_label("Mean annual T (\u00b0C)", fontsize=FS)
 
     # ---- Panel B: the baseflow index over the same bins ----------------------
     ax_b.scatter(pf, bfi, s=10, alpha=0.35, color="0.45", linewidths=0)
     ax_b.plot(bm["center"], bm["median"], "-o", color="#b2182b", lw=2, ms=4, label="binned median")
     ax_b.fill_between(bm["center"], bm["q25"], bm["q75"], color="#b2182b", alpha=0.12, label="IQR")
-    for _, row in bm.iterrows():
+    for i, (_, row) in enumerate(bm.iterrows()):
+        # The first three bins (centers 2.5/7.5/15) sit close together on this 0-100 axis;
+        # at floor-clearing size same-side labels collide with each other and, for the
+        # leftmost bin, with the y-tick column. Alternate above/below the line, and anchor
+        # the leftmost bin to the right of its point instead of centered on it.
+        above = i % 2 == 0
+        # +-9pt wasn't enough clearance for the first two bins (centers 2.5/7.5 are only
+        # ~14pt apart in y at this font size) - +-20 pushes each string clear of the other
+        # by diverging away from the shared zone between them, not just alternating side.
+        dy = 20 if above else -20
+        ha = "left" if row["center"] < 5 else "center"
+        xytext = (4, dy) if ha == "left" else (0, dy)
         ax_b.annotate(
             f"{int(row['n'])}",
             (row["center"], row["median"]),
             textcoords="offset points",
-            xytext=(0, 7),
-            ha="center",
-            fontsize=6,
+            xytext=xytext,
+            ha=ha,
+            va="bottom" if above else "top",
+            fontsize=FS,
             color="#b2182b",
         )
     ax_b.set_ylim(bottom=0)
     ax_b.set_xlabel("Permafrost extent (%)")
     ax_b.set_ylabel("Baseflow index")
-    ax_b.set_title(f"(b) Baseflow index, same gauges ($\\rho$ = {rho_b:+.2f})")
+    # Shortened from "..., same gauges (...)" — too wide for one panel at floor size;
+    # "same gauges" is already established by the panel (a)/(b) pairing and caption.
+    ax_b.set_title(f"(b) Baseflow index ($\\rho$ = {rho_b:+.2f})", loc="left")
     ax_b.legend(loc="lower right", frameon=False)
 
     # ---- Panel C: melt timing vs snow cover ----------------------------------
@@ -225,11 +263,12 @@ def main() -> None:
     ax_c.plot(hm["center"], hm["median"], "-o", color="#1b7837", lw=2, ms=4, label="binned median")
     ax_c.fill_between(hm["center"], hm["q25"], hm["q75"], color="#1b7837", alpha=0.15, label="IQR")
     ax_c.set_xlabel("Snow-cover extent (HydroATLAS proxy, %)")
-    ax_c.set_ylabel("Half-flow date (day of hydrological year)")
-    ax_c.set_title("(c) Half-flow date by snow-cover extent")
+    # Same clipping issue as panel (a)'s label; "day of hydrological year" moves to the
+    # caption, "DOY" is the standard abbreviation.
+    ax_c.set_ylabel("Half-flow date (DOY)")
+    ax_c.set_title("(c) Half-flow date by snow-cover extent", loc="left")
     ax_c.legend(loc="upper left", frameon=False)
 
-    fig.tight_layout()
     RESULTS.mkdir(parents=True, exist_ok=True)
     prov = pd.concat(
         [

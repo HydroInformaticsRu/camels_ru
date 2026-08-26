@@ -122,66 +122,40 @@ class YearQualityGrader:
 
     def __init__(
         self,
-        # Grade A thresholds (Excellent)
-        min_corr_a: float = 0.8,
-        min_response_a: float = 0.7,
         min_completeness_a: float = 0.95,
-        # Grade B thresholds (Good)
-        min_corr_b: float = 0.6,
-        min_response_b: float = 0.5,
         min_completeness_b: float = 0.85,
-        # Grade C thresholds (Usable)
-        min_corr_c: float = 0.4,
         min_completeness_c: float = 0.7,
-        # Grade F threshold (Fail)
-        max_corr_f: float = 0.2,
     ):
-        """Initialize grader with thresholds.
+        """Initialize grader with completeness thresholds.
+
+        Grading is flag-and-completeness only: climatology correlation and event
+        response enter through the flags of ``quality_flags.py``, never directly.
 
         Args:
-            min_corr_a: Minimum climatology correlation for grade A.
-            min_response_a: Minimum event response rate for grade A.
             min_completeness_a: Minimum data completeness for grade A.
-            min_corr_b: Minimum climatology correlation for grade B.
-            min_response_b: Minimum event response rate for grade B.
             min_completeness_b: Minimum data completeness for grade B.
-            min_corr_c: Minimum climatology correlation for grade C.
             min_completeness_c: Minimum data completeness for grade C.
-            max_corr_f: Maximum climatology correlation for automatic grade F.
         """
-        self.min_corr_a = min_corr_a
-        self.min_response_a = min_response_a
         self.min_completeness_a = min_completeness_a
-        self.min_corr_b = min_corr_b
-        self.min_response_b = min_response_b
         self.min_completeness_b = min_completeness_b
-        self.min_corr_c = min_corr_c
         self.min_completeness_c = min_completeness_c
-        self.max_corr_f = max_corr_f
 
     def grade_year(
         self,
         flags: list[QualityFlag],
-        clim_correlation: float,
-        event_response_rate: float,
         data_completeness: float,
     ) -> QualityGrade:
-        """Assign a quality grade to a year based on flags and metrics.
+        """Assign a quality grade to a year from its flags and data completeness.
 
-        Grade assignment rules (simplified, flag-focused):
+        Grade assignment rules:
         - F: Any critical flag (NO_SEASONAL_SIGNAL, VERY_LOW_COMPLETENESS, etc.)
         - D: 2+ major flags, or completeness below min_completeness_c
         - C: 1 major flag or 5+ minor flags, or completeness below min_completeness_b
         - B: 3-4 minor flags, or completeness below min_completeness_a
         - A: 0-2 minor flags and good completeness
 
-        Climatology correlation is downweighted since amplitude variation
-        is natural in snowmelt-dominated catchments.
-
         Args:
             flags: List of quality flags for the year.
-            clim_correlation: Correlation with climatology (secondary metric).
-            event_response_rate: P-Q event response rate (secondary metric).
             data_completeness: Fraction of valid data.
 
         Returns:
@@ -454,7 +428,7 @@ def assess_gauge_quality(  # noqa: C901
 
         # Assign grade
         flags = all_flags.get(year, [])
-        grade = grader.grade_year(flags, clim_corr, event_response_rate, completeness)
+        grade = grader.grade_year(flags, completeness)
 
         result = YearQualityResult(
             year=year,

@@ -303,6 +303,13 @@ def check_water_balance_screen_macros(macros: dict[str, str]) -> None:
     check_macro(
         macros, "nwaterbalscreengradea", float((flagged["overall_grade"] == "A").sum()), "{:.0f}"
     )
+    # Base rate for the grade!=plausibility argument (round-7 writing M5): grade-A share
+    # of the screened population vs of the whole non-anomalous signature set.
+    check_macro(
+        macros, "pctwaterbalscreengradea", 100.0 * (flagged["overall_grade"] == "A").mean(), "{:.0f}"
+    )
+    clean_grades = clean.merge(summary[["gauge_id", "overall_grade"]], on="gauge_id", how="left")
+    check_macro(macros, "pctsigngradea", 100.0 * (clean_grades["overall_grade"] == "A").mean(), "{:.0f}")
     check_macro(macros, "maxrunoffratio", float(flagged["runoff_ratio"].max()), "{:.1f}")
     check_macro(macros, "nwaterbalscreenall", float(sig["water_balance_screen"].sum()), "{:.0f}")
     check_macro(macros, "nwinterflowgauges", float(clean["winter_flow_ratio"].notna().sum()), "{:.0f}")
@@ -452,6 +459,12 @@ def check_nested_macros(macros: dict[str, str]) -> None:
     check_macro(
         macros, "nnestedviolgradea", float((df.loc[fail, "up"].map(grade) == "A").sum()), "{:.0f}"
     )
+    # Base rate for the violation share (round-7 writing M5): grade-A share among the
+    # upstream gauges of the violating pairs vs among the upstream gauges of ALL pairs.
+    check_macro(
+        macros, "pctnestedviolgradea", 100.0 * (df.loc[fail, "up"].map(grade) == "A").mean(), "{:.0f}"
+    )
+    check_macro(macros, "pctnestedupgradea", 100.0 * (df["up"].map(grade) == "A").mean(), "{:.0f}")
     check_macro(macros, "nnestedinformative", float(informative.sum()), "{:.0f}")
     check_macro(macros, "pctnestedinformativefail", float(100.0 * fail[informative].mean()), "{:.1f}")
     check_macro(macros, "pctnestedbigshare", float(100.0 * big.mean()), "{:.1f}")
@@ -606,6 +619,8 @@ def check_stage_discharge_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "pctstagestrong", 100.0 * (river["rho_open_water"] >= 0.9).mean(), "{:.0f}")
     check_macro(macros, "pctstagegood", 100.0 * (river["rho_open_water"] >= 0.8).mean(), "{:.0f}")
     check_macro(macros, "nstageinverted", float((river["rho_open_water"] <= -0.5).sum()), "{:.0f}")
+    check_macro(macros, "nstagenegative", float((river["rho_open_water"] < 0).sum()), "{:.0f}")
+    check_macro(macros, "pctstageweak", 100.0 * (river["rho_open_water"] < 0.5).mean(), "{:.1f}")
 
 
 def check_release_range_gates(macros: dict[str, str]) -> None:
@@ -802,18 +817,24 @@ def check_nss_completeness_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "nfyeartotal", float(n_f), "{:.0f}")
     check_macro(macros, "nnssbarsuppressed", float(n_suppressed), "{:.0f}")
 
-    # Upper bound on gauge-grade changes: suppressed years become C (the best the
-    # remaining completeness allows at 0.7-0.85; below 0.7 the year is D anyway).
-    n_changed = 0
-    for gid, years in suppressed.items():
-        row = yg.loc[gid]
-        gr = {int(c): row[c] for c in year_cols if isinstance(row[c], str) and row[c]}
-        base = _overall_grade(list(gr.values()))
-        i = id_pos[gid]
-        for y in years:
-            gr[y] = "D" if comp[i, ypos[y]] < 0.7 else "C"
-        if _overall_grade(list(gr.values())) != base:
-            n_changed += 1
+    # Exact gauge-grade changes: re-run the full year rule on each suppressed year's
+    # remaining flags (release evidence file), then re-aggregate. The earlier
+    # become-C/D heuristic ignored the other flags of a suppressed year and missed
+    # a tie-rule mode shift, undercounting by one (round-8 consistency M1).
+    yfl = pd.read_csv(RELEASE / "camels_ru_year_flags.csv", dtype={"gauge_id": str})
+    yfl["flag_codes"] = yfl["flag_codes"].fillna("")
+    base_g: dict[str, list[str]] = {}
+    var_g: dict[str, list[str]] = {}
+    for r in yfl.itertuples(index=False):
+        flags = [f for f in r.flag_codes.split(",") if f]
+        gv = r.grade
+        if r.completeness < 0.85 and "no_seasonal_signal" in flags:
+            gv = _year_grade_from_evidence(
+                [f for f in flags if f != "no_seasonal_signal"], r.completeness
+            )
+        base_g.setdefault(r.gauge_id, []).append(r.grade)
+        var_g.setdefault(r.gauge_id, []).append(gv)
+    n_changed = sum(1 for g in base_g if _overall_grade(base_g[g]) != _overall_grade(var_g[g]))
     check_macro(macros, "nnssbargauges", float(n_changed), "{:.0f}")
 
 
@@ -847,6 +868,191 @@ def check_year_flags_gates(year_grades: pd.DataFrame) -> None:
     merged = yf.merge(long, on=["gauge_id", "hydro_year"], how="outer", indicator=True)
     mism = (merged["_merge"] != "both") | (merged["grade"] != merged["released"])
     check_val("grade parity with year_grades.csv", "0 differences", f"{int(mism.sum())} differences")
+
+
+def check_agg_missing_temperature_gate(huge: pd.Series, boundaries: gpd.GeoDataFrame) -> None:
+    """Gate the Table 4 caption's causal claim (round-7 consistency m5).
+
+    The temperature-less sampled catchment is named in the CSV and its released
+    boundary lies past 170 E.
+    """
+    raw_missing = huge.get("t_missing_gauge_ids")
+    miss = (
+        []
+        if pd.isna(raw_missing)
+        else [s.split(".")[0] for s in str(raw_missing).split(";") if s and s != "nan"]
+    )
+    check_val(
+        "5000+ band t_n_valid + missing ids",
+        str(int(huge["n_sample"])),
+        str(int(huge["t_n_valid"]) + len(miss)),
+    )
+    if miss:
+        bnd = boundaries.loc[boundaries["gauge_id"].astype(str).isin(miss)]
+        crosses = len(bnd) == len(miss) and bool((bnd.geometry.bounds["maxx"] > 170.0).all())
+        check_val("missing-T catchment(s) past 170E", "True", str(crosses))
+
+
+def check_water_level_reversion_gates(macros: dict[str, str]) -> None:
+    """Lock the Sect. 4.1.3 reversion macros to the committed per-gauge provenance CSV."""
+    section("WATER-LEVEL REVERSION (paper/tables/water_level_reversion.csv + release flags)")
+    table = PAPER / "tables" / "water_level_reversion.csv"
+    if not table.exists():
+        print("  SKIP — run scripts/derive_water_level_reversion.py (needs the data drive)")
+        return
+    rev = pd.read_csv(table, dtype={"gauge_id": str})
+    n_rev = int(rev["n_reverted"].sum())
+    check_macro(macros, "nwlreverted", float(n_rev), "{:.0f}")
+    check_macro(macros, "nwlrevertedgauges", float(len(rev)), "{:.0f}")
+    check_macro(macros, "nwlnegatives", float(rev["n_negative"].sum()), "{:.0f}")
+    check_val(
+        "per-gauge origin split sums to n_reverted",
+        "True",
+        str(bool((rev["n_from_gap_fill"] + rev["n_from_zero_replacement"] == rev["n_reverted"]).all())),
+    )
+    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
+        flag = wds["quality_flag"].values
+        rel_ids = {str(g) for g in wds["gauge_id"].values}
+    n_altered = n_rev + int((flag == 1).sum()) + int((flag == 2).sum())
+    check_macro(macros, "nwlaltered", float(n_altered), "{:,.0f}")
+    check_macro(macros, "nwlrevertedpct", 100.0 * n_rev / n_altered, "{:.1f}")
+    check_val(
+        "reversion gauges exist in the release", "True", str(bool(rev["gauge_id"].isin(rel_ids).all()))
+    )
+
+
+def check_peak_winter_ratio_macros(macros: dict[str, str]) -> None:
+    """Lock the Sect. 4.1.1 annual-max / winter-mean ratio behind the 8-sigma threshold.
+
+    Per gauge-hydro-year (2009-2023): max daily discharge over the year divided by the
+    mean Jan-Mar discharge of the same year, over years with >= 70% daily coverage,
+    >= 30 observed Jan-Mar days, and a positive winter mean; pooled over gauge-years.
+    """
+    section("PEAK/WINTER RATIO (camels_ru_discharge.nc)")
+    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+        q = ds["discharge_m3s"].transpose("gauge_id", "time").values
+        t = pd.DatetimeIndex(ds["time"].values)
+    hy = (t.year + (t.month >= 10).astype(int)).to_numpy()
+    winter = np.isin(t.month, (1, 2, 3))
+    obs = np.isfinite(q)
+    ratios = []
+    for y in range(2009, 2024):
+        my = hy == y
+        mw = my & winter
+        qy = np.where(obs[:, my], q[:, my], np.nan)
+        cov = obs[:, my].sum(axis=1) / int(my.sum())
+        n_w = obs[:, mw].sum(axis=1)
+        with np.errstate(invalid="ignore", divide="ignore"):
+            amax = np.nanmax(np.where(np.isnan(qy), -np.inf, qy), axis=1)
+            wmean = np.nanmean(np.where(obs[:, mw], q[:, mw], np.nan), axis=1)
+            r = amax / wmean
+        valid = (cov >= 0.70) & (n_w >= 30) & (wmean > 0) & np.isfinite(r)
+        ratios.append(r[valid])
+    pooled = np.concatenate(ratios)
+    check_macro(macros, "nqpeakwinteryears", float(len(pooled)), "{:,.0f}")
+    check_macro(macros, "qpeakwintermed", float(np.median(pooled)), "{:.0f}")
+    check_macro(macros, "qpeakwinterqone", float(np.percentile(pooled, 25)), "{:.0f}")
+    check_macro(macros, "qpeakwinterqthree", float(np.percentile(pooled, 75)), "{:.0f}")
+
+
+# Mirror of src/quality severity classes for the flags that fire in the release
+# (src/quality/quality_flags.py); used by check_pq_family_gates below.
+_SEVERITY_MIRROR = {
+    "low_clim_correlation": "minor",
+    "very_low_clim_correlation": "major",
+    "high_clim_nrmse": "minor",
+    "low_amplitude": "minor",
+    "high_amplitude": "minor",
+    "no_seasonal_signal": "critical",
+    "no_precip_response": "minor",
+    "very_low_pq_correlation": "minor",
+    "low_pq_correlation": "minor",
+    "low_flashiness": "minor",
+    "constant_value": "major",
+    "implausible_spike": "minor",
+    "low_completeness": "major",
+    "very_low_completeness": "critical",
+    "negative_values": "critical",
+    "zero_flow_dominant": "minor",
+}
+_PQ_FAMILY = {"very_low_pq_correlation", "low_pq_correlation"}
+_GRADE_ORDER = "ABCDF"
+
+
+def _year_grade_from_evidence(flags: list[str], completeness: float) -> str:
+    """Table 5 year-grade rule, applied top-down."""
+    n_crit = sum(1 for f in flags if _SEVERITY_MIRROR[f] == "critical")
+    n_major = sum(1 for f in flags if _SEVERITY_MIRROR[f] == "major")
+    n_minor = sum(1 for f in flags if _SEVERITY_MIRROR[f] == "minor")
+    if n_crit:
+        return "F"
+    if n_major >= 2 or completeness < 0.70:
+        return "D"
+    if n_major == 1 or n_minor >= 5 or completeness < 0.85:
+        return "C"
+    if n_minor >= 3 or completeness < 0.95:
+        return "B"
+    return "A"
+
+
+def _overall_grade(grades: list[str]) -> str:
+    """Sect. 4.1.2 gauge-aggregation rule (strict A, mode of non-F, ties worse, caps)."""
+    if all(g == "A" for g in grades):
+        return "A"
+    if all(g == "F" for g in grades):
+        return "F"
+    nonf = [g for g in grades if g != "F"]
+    counts = {g: nonf.count(g) for g in set(nonf)}
+    top = max(counts.values())
+    mode = max([g for g, n in counts.items() if n == top], key=_GRADE_ORDER.index)
+    if mode == "A":
+        mode = "B"
+    share_abc = sum(1 for g in grades if g in "ABC") / len(grades)
+    cap = "D" if share_abc < 0.5 else ("C" if share_abc < 0.7 else None)
+    if cap and _GRADE_ORDER.index(mode) < _GRADE_ORDER.index(cap):
+        mode = cap
+    return mode
+
+
+def check_pq_family_gates(macros: dict[str, str]) -> None:
+    """Lock the Sect. 4.1.2 P-Q-family dominance macros via a full regrade mirror.
+
+    Recomputes every year grade from camels_ru_year_flags.csv (completeness + flag
+    codes), requires exact parity with the shipped grades as a self-check, then
+    recomputes the gauge-grade distribution with the two P-Q correlation flags removed.
+    """
+    section("P-Q FAMILY DOMINANCE (camels_ru_year_flags.csv regrade mirror)")
+    path = RELEASE / "camels_ru_year_flags.csv"
+    if not path.exists():
+        print("  SKIP — run scripts/create_year_flags.py")
+        return
+    yf = pd.read_csv(path, dtype={"gauge_id": str}).fillna({"flag_codes": ""})
+    mismatch = 0
+    n_pq_years = 0
+    base_by_gauge: dict[str, list[str]] = {}
+    nopq_by_gauge: dict[str, list[str]] = {}
+    for row in yf.itertuples(index=False):
+        flags = row.flag_codes.split(",") if row.flag_codes else []
+        if any(f in _PQ_FAMILY for f in flags):
+            n_pq_years += 1
+        base = _year_grade_from_evidence(flags, float(row.completeness))
+        if base != row.grade:
+            mismatch += 1
+        base_by_gauge.setdefault(row.gauge_id, []).append(base)
+        nopq_by_gauge.setdefault(row.gauge_id, []).append(
+            _year_grade_from_evidence([f for f in flags if f not in _PQ_FAMILY], float(row.completeness))
+        )
+    check_val("regrade mirror parity with shipped year grades", "0 mismatches", f"{mismatch} mismatches")
+    base_dist = pd.Series([_overall_grade(v) for v in base_by_gauge.values()]).value_counts()
+    nopq_dist = pd.Series([_overall_grade(v) for v in nopq_by_gauge.values()]).value_counts()
+    check_val(
+        "baseline gauge grade A",
+        macros.get("ngradeA", "").replace("\\xspace", ""),
+        str(int(base_dist.get("A", 0))),
+    )
+    check_macro(macros, "pqfamilypct", 100.0 * n_pq_years / len(yf), "{:.1f}")
+    check_macro(macros, "ngradeanopq", float(nopq_dist.get("A", 0)), "{:.0f}")
+    check_macro(macros, "ngradebnopq", float(nopq_dist.get("B", 0)), "{:.0f}")
 
 
 def check_ice_window_gates(macros: dict[str, str]) -> None:
@@ -1222,6 +1428,7 @@ def main() -> None:
     check_macro(macros, "aggtmedhuge", float(huge["t_median_abs_degc"]), "{:.2f}")
     check_macro(macros, "aggtninetyhuge", float(huge["t_p90_abs_degc"]), "{:.2f}")
     check_macro(macros, "aggtnvalidhuge", float(huge["t_n_valid"]), "{:.0f}")
+    check_agg_missing_temperature_gate(huge, boundaries)
 
     corr_table = pd.read_csv(PAPER / "tables" / "precip_inter_dataset_corr.csv")
     expected_corr = {
@@ -1306,6 +1513,9 @@ def main() -> None:
     check_plausibility_macros(macros)
     check_stage_discharge_macros(macros)
     check_discharge_fill_macros(macros)
+    check_water_level_reversion_gates(macros)
+    check_peak_winter_ratio_macros(macros)
+    check_pq_family_gates(macros)
 
     section("AUTHORITATIVE VALUES FOR MACROS.TEX")
     print(f"  ntotal               = {n_attrs:,} (3,339 HydroATLAS-covered catchments)")

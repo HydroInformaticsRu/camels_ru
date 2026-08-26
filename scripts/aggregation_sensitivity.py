@@ -96,13 +96,17 @@ def main() -> None:
                 rec["p_median_rel_pct"] = float(np.median(rel))
             else:
                 # ERA5-Land grids end at 170E, so watersheds crossing that edge have no
-                # native temperature; report over the covered catchments and say so.
+                # native temperature; report over the covered catchments and name the
+                # excluded ones so the Table 4 caption's causal claim is checkable.
                 d = u - w
                 valid = np.isfinite(d)
                 rec["t_median_abs_degc"] = float(np.median(np.abs(d[valid])))
                 rec["t_p90_abs_degc"] = float(np.percentile(np.abs(d[valid]), 90))
                 rec["t_median_degc"] = float(np.median(d[valid]))
                 rec["t_n_valid"] = int(valid.sum())
+                rec["t_missing_gauge_ids"] = ";".join(
+                    g for g, ok in zip(sample["gauge_id"], valid, strict=True) if not ok
+                )
         rows.append(rec)
         print(rec, flush=True)
     pd.DataFrame(rows).to_csv(OUT, index=False)

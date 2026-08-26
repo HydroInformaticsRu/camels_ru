@@ -177,6 +177,10 @@ def scatter_map(
     colorbar_label: str = "",
     colorbar_orientation: str = "horizontal",
     background_gdf: gpd.GeoDataFrame | None = None,
+    title_fontsize: int = 12,
+    colorbar_ticklabelsize: int = 9,
+    graticule_labels: bool = False,
+    graticule_label_size: int = 7,
 ) -> Axes:
     """Plot continuous-valued scatter map on a single axis.
 
@@ -220,7 +224,7 @@ def scatter_map(
     # Set extent from data, then draw background clipped to it
     _hide_frame(ax)
     _set_extent_from_data(ax, gdf)
-    _add_graticule(ax)
+    _add_graticule(ax, draw_labels=graticule_labels, label_size=graticule_label_size)
 
     if background_gdf is not None:
         aea_proj4 = get_russia_projection().proj4_init
@@ -274,7 +278,7 @@ def scatter_map(
                 else:
                     labels.append(f"{v:g}")
             cb.set_ticklabels(labels)
-            cb.ax.tick_params(labelsize=9)
+            cb.ax.tick_params(labelsize=colorbar_ticklabelsize)
             if colorbar_label:
                 cb.set_label(colorbar_label, fontsize=10)
 
@@ -293,7 +297,7 @@ def scatter_map(
         )
 
     if title:
-        ax.set_title(title, fontsize=12, fontweight="bold", loc="left")
+        ax.set_title(title, fontsize=title_fontsize, fontweight="bold", loc="left")
 
     return ax
 
@@ -313,6 +317,8 @@ def continuous_multiplot(
     show_nan: bool = True,
     colorbar_labels: dict[str, str] | None = None,
     background_gdf: gpd.GeoDataFrame | None = None,
+    title_fontsize: int = 12,
+    colorbar_ticklabelsize: int = 9,
 ) -> Figure:
     """Create N-panel scatter maps with colorbars for continuous metrics.
 
@@ -388,6 +394,8 @@ def continuous_multiplot(
             show_nan=show_nan,
             colorbar_label=cb_label,
             background_gdf=background_gdf,
+            title_fontsize=title_fontsize,
+            colorbar_ticklabelsize=colorbar_ticklabelsize,
         )
 
     # Hide unused axes
