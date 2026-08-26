@@ -56,6 +56,8 @@ PANELS_1 = [
 PANELS_2 = [
     (
         "half_flow_date",
+        # Not "DOY": under a calendar day-of-year reading the 120-270 classes look like
+        # Apr-Sep instead of the intended late-Jan to late-Jun of the 1-Oct year.
         "Mean half-flow date (day of hydrological year)",
         [120, 150, 180, 200, 220, 240, 270],
     ),

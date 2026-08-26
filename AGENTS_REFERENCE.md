@@ -39,7 +39,7 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
 | `src/quality/` | Per-year quality grading (A–F); 21 flag types defined, 16 active in release-default grading |
 | `src/meteo/` | Basin-averaged forcing from ERA5-Land, MSWEP v2.8, GPCP |
 | `src/static/` | HydroATLAS attribute extraction (288 vars, 22 primary) |
-| `src/timeseries_stats/` | 15 hydrological signatures (Table 3 in paper) |
+| `src/timeseries_stats/` | 16 hydrological signatures (Table 3 in paper) |
 | `src/data_processing/` | AIS GMVO XLS parsers, NetCDF builders |
 | `src/plots/` | Paper figure generation (Albers Equal-Area Conic) |
 | `src/utils/` | Shared helpers (logging, IO, transliteration) |
@@ -91,7 +91,7 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
 | Grade A definition | Every assessed year Grade A |
 | CRS for paper maps | Albers Equal-Area Conic |
 | HydroATLAS attributes | 288 (22 primary subset) |
-| Hydrological signatures | 15 metrics, 1,729 rows / 1,716 non-anomalous gauges (release CSV from `scripts/create_paper_signatures.py`, release-only inputs, complete hydro-years 2009–2023 at ≥ 70 % coverage, ≥ 5 valid years; MSWEP primary + `*_era5` variants; maps via `scripts/plot_signature_maps.py`) |
+| Hydrological signatures | 16 metrics, 1,729 rows / 1,716 non-anomalous gauges (release CSV from `scripts/create_paper_signatures.py`, release-only inputs, complete hydro-years 2009–2023 at ≥ 70 % coverage, ≥ 5 valid years; MSWEP primary + `*_era5` variants; maps via `scripts/plot_signature_maps.py`) |
 | Hydrological year | Oct–Sep |
 
 ---

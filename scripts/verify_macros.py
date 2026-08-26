@@ -472,6 +472,31 @@ def check_nested_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "nnestedgauges", float(pd.concat([df["up"], df["down"]]).nunique()), "{:.0f}")
     check_macro(macros, "nestedyieldlow", float(100.0 * (yield_ratio < 0.5).mean()), "{:.1f}")
     check_macro(macros, "nestedyieldhigh", float(100.0 * (yield_ratio > 2).mean()), "{:.1f}")
+    # Violations with no released screen flag on either gauge (Sect. 7.1 disclosure):
+    # specific_discharge_anomaly, stage_discharge_screen == 1, is_anomalous, or
+    # water_balance_screen. The worked example (2131) must remain caught.
+    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as dq:
+        sda = pd.Series(
+            dq["specific_discharge_anomaly"].values, index=[str(g) for g in dq["gauge_id"].values]
+        )
+    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as dw:
+        sds = pd.Series(
+            dw["stage_discharge_screen"].values, index=[str(g) for g in dw["gauge_id"].values]
+        )
+    sig = pd.read_csv(RELEASE / "camels_ru_signatures.csv", dtype={"gauge_id": str}).set_index(
+        "gauge_id"
+    )
+    flagged_ids = set(sda.index[sda == 1]) | set(sds.index[sds == 1])
+    flagged_ids |= set(sig.index[sig["is_anomalous"].astype(bool)])
+    flagged_ids |= set(sig.index[sig["water_balance_screen"] == 1])
+    viol = df[fail]
+    unflagged = (~viol["up"].isin(flagged_ids) & ~viol["down"].isin(flagged_ids)).sum()
+    check_macro(macros, "nnestedviolunflagged", float(unflagged), "{:.0f}")
+    check_val(
+        "worked example 2131 caught by a released screen",
+        "yes",
+        "yes" if "2131" in flagged_ids else "no",
+    )
     strat = PAPER / "tables" / "nested_stratification.csv"
     if strat.exists():
         s = pd.read_csv(strat)
@@ -530,7 +555,8 @@ def check_grade_regime_macros(macros: dict[str, str]) -> None:
 
     # Sect. 9 states cold-region coverage as counts rather than a superlative, so lock them.
     check_macro(macros, "npermafrosttwenty", float((df["prm_pc_use"] > 20).sum()), "{:.0f}")
-    # >= 80, matching the Table 6 band definition (the old > 80 gave the same 155).
+    # >= 80 as the Sect. 9 prose states it; Table 6's top band is (80, 100] but no
+    # catchment sits at exactly 80, so both conventions give the same 155.
     check_macro(macros, "npermafrosteighty", float((df["prm_pc_use"] >= 80).sum()), "{:.0f}")
 
     low_snow = df["snw_pc_uyr"] < 20
@@ -642,7 +668,8 @@ def check_release_range_gates(macros: dict[str, str]) -> None:
         q3 = ds["discharge_m3s"]
         qm = ds["discharge_mm"]
         gate_range("rngqvol", "0", f"{round(float(q3.max()) / 1000) * 1000:.0f}")
-        gate_range("rngqmm", "0", f"{round(float(qm.max()) / 100) * 100:.0f}")
+        # Ceil, not round: the declared maximum must not clip real data (66,732.20 -> 66,733).
+        gate_range("rngqmm", "0", f"{np.ceil(float(qm.max())):.0f}")
         check_macro(macros, "nallmissingdischarge", float(q3.isnull().all("time").sum()), "{:.0f}")
 
     with xr.open_dataset(RELEASE / "camels_ru_forcing.nc") as fx:
@@ -1540,9 +1567,16 @@ def main() -> None:
         "ERA5-Land vs GPCP": (3201, 0.664, 0.126),
         "MSWEP vs GPCP": (3201, 0.725, -0.138),
     }
+    # The Sect. 7.5 macros quote three decimals (2-dec roundings sat on knife-edges).
+    corr_macro = {
+        "ERA5-Land vs MSWEP": "eramsweprcorr",
+        "ERA5-Land vs GPCP": "eragpcpcorr",
+        "MSWEP vs GPCP": "mswepgpcpcorr",
+    }
     for _, row in corr_table.iterrows():
         comparison = str(row["Comparison"])
         exp_n, exp_r, exp_bias = expected_corr[comparison]
+        check_macro(macros, corr_macro[comparison], float(row["Mean r"]), "{:.3f}")
         kv(
             f"{comparison} N gauges",
             f"{exp_n:,}",

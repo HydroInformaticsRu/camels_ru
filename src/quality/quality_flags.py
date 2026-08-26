@@ -23,11 +23,11 @@ class QualityFlag(Enum):
     """
 
     # Climatology-related flags
-    LOW_CLIM_CORRELATION = "low_clim_correlation"  # correlation < 0.5
-    VERY_LOW_CLIM_CORRELATION = "very_low_clim_correlation"  # correlation < 0.2
-    HIGH_CLIM_NRMSE = "high_clim_nrmse"  # nrmse > 2.0
-    LOW_AMPLITUDE = "low_amplitude"  # amplitude_ratio < 0.3
-    HIGH_AMPLITUDE = "high_amplitude"  # amplitude_ratio > 3.0
+    LOW_CLIM_CORRELATION = "low_clim_correlation"  # correlation < 0.3 (release default)
+    VERY_LOW_CLIM_CORRELATION = "very_low_clim_correlation"  # correlation < 0.1 (release default)
+    HIGH_CLIM_NRMSE = "high_clim_nrmse"  # nrmse > 5.0 (release default)
+    LOW_AMPLITUDE = "low_amplitude"  # amplitude_ratio < 0.1 (release default)
+    HIGH_AMPLITUDE = "high_amplitude"  # amplitude_ratio > 5.0 (release default)
     NO_SEASONAL_SIGNAL = "no_seasonal_signal"  # flat hydrograph, no flood peak
 
     # Meteorological response flags (thresholds from meteo_response.detect_dead_years defaults)

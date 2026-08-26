@@ -33,16 +33,18 @@ OUT_TEX = REPO / "paper" / "overleaf" / "tables" / "grade_regime.tex"
 
 # Bands are chosen to be interpretable, not tuned: permafrost-free / sporadic /
 # discontinuous / near-continuous, and the snow-cover quartile-ish breaks.
+# pd.cut is right-inclusive, so every ranged band is (a, b]; the open-ended labels
+# spell that out ($\leq$ 20 owns its edge, $>$ 50 / $>$ 80 do not own theirs).
 BANDS: dict[str, tuple[str, list[float], list[str]]] = {
     "snow": (
         "snw_pc_uyr",
         [-0.001, 20, 35, 50, 100],
-        [r"$<$ 20", "20 to 35", "35 to 50", r"$\geq$ 50"],
+        [r"$\leq$ 20", "20 to 35", "35 to 50", r"$>$ 50"],
     ),
     "permafrost": (
         "prm_pc_use",
         [-0.001, 0, 20, 80, 100],
-        ["0", "0 to 20", "20 to 80", r"$\geq$ 80"],
+        ["0", "0 to 20", "20 to 80", r"$>$ 80"],
     ),
 }
 
@@ -84,10 +86,11 @@ TABLE_HEADER = r"""\begin{table}[t]
 \caption{Grade composition by climate band, over the \ngradebandcovered{} gauges of the
 Quality set that carry HydroATLAS attributes (3 of the \ngraded{} lack them). Bands are
 mean annual snow-cover extent (\texttt{snw\_pc\_uyr}) and permafrost extent
-(\texttt{prm\_pc\_use}), both in percent of catchment area. The last column is the share of
-gauges showing the winter-gap pattern of Section~\ref{sec:qc}. The network
+(\texttt{prm\_pc\_use}), both in percent of catchment area; ranged bands include their
+upper edge. The last column is the share of
+gauges showing the winter-gap pattern of Sect.~\ref{sec:qc}. The network
 grade-A share is \gradeApct{}. Grade A and grades D or F respond to different regimes, and
-neither band is climatically neutral (Section~\ref{sec:grading}).}
+neither band is climatically neutral (Sect.~\ref{sec:grading}).}
 \label{tab:grade_regime}
 \small
 \begin{tabular}{@{}lrrrrr@{}}

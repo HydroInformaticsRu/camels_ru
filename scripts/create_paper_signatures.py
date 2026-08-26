@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate the 15 hydrological signatures declared in the manuscript (paper/overleaf, Table 3).
+"""Regenerate the 16 hydrological signatures declared in the manuscript (paper/overleaf, Table 3).
 
 Inputs (release files only, so the signatures are reproducible from the archive):
 - `release/CAMELS_RU_v1.0/camels_ru_discharge.nc` (discharge_mm)
@@ -7,7 +7,7 @@ Inputs (release files only, so the signatures are reproducible from the archive)
 - `release/CAMELS_RU_v1.0/camels_ru_boundaries.gpkg` (area filter)
 
 Outputs (written to `--output-dir`):
-- `camels_ru_signatures.csv` — per-gauge × 15 signatures (+ `_era5` water-balance variants)
+- `camels_ru_signatures.csv` — per-gauge × 16 signatures (+ `_era5` water-balance variants)
 - `camels_ru_signatures_summary.csv` — summary stats (n, mean, median, min, max, std) per signature
 
 Conventions (2026-08-23 revision, science-review Domain Expert M-1/M-5):
@@ -16,12 +16,13 @@ Conventions (2026-08-23 revision, science-review Domain Expert M-1/M-5):
 - A hydrological year is valid when at least 70 % of its days carry discharge; a gauge
   needs at least 5 valid years. Signatures are the mean over valid years.
 - Water-balance ratios (runoff_ratio Q/P, aridity_index PET/P, evaporative_index (P-Q)/P)
-- winter_flow_ratio: mean Jan-Mar flow / mean annual flow, on observed days. A
-  Lyne-Hollick BFI with alpha in [0.9, 0.98] has a 10-50 day recession constant and so
-  reads a multi-week snowmelt recession as baseflow; this measures cold-season yield
-  directly and declines monotonically with permafrost extent, as the BFI does not.
   are computed per valid year over the days where discharge is observed, then averaged.
   MSWEP is the primary precipitation; `_era5` columns give the ERA5-Land variants.
+- winter_flow_ratio: mean Jan-Mar flow / mean annual flow, on observed days over the
+  whole record. A Lyne-Hollick BFI with alpha in [0.9, 0.98] has a 10-50 day recession
+  constant and so reads a multi-week snowmelt recession as baseflow; this measures
+  cold-season yield directly and declines monotonically with permafrost extent, as the
+  BFI does not.
 """
 
 from __future__ import annotations
