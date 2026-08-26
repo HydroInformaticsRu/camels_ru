@@ -220,7 +220,12 @@ def main() -> None:
     # fig.colorbar(sc, ax=ax_a, ...) reserves its space from panel (a) correctly only under
     # constrained_layout (set on the figure below); under the plain fig.tight_layout() this
     # script used before, that reservation gets reclaimed and the bar abuts panel (b) instead.
-    cb = fig.colorbar(sc, ax=ax_a, fraction=0.046, pad=0.03)
+    # Horizontal, below panel (a) rather than the default vertical-right placement: a
+    # rotated side label wide enough to clear the font floor reached past the colorbar into
+    # panel (b)'s own y-axis label (reading as if it belonged to panel (b)), and a title
+    # placed above the bar instead collided with panel (a)'s own title directly above it.
+    # Below is genuinely free - only panel (a)'s x-axis row lives there.
+    cb = fig.colorbar(sc, ax=ax_a, orientation="horizontal", fraction=0.05, pad=0.18, aspect=22)
     cb.set_label("Mean annual T (\u00b0C)", fontsize=FS)
 
     # ---- Panel B: the baseflow index over the same bins ----------------------

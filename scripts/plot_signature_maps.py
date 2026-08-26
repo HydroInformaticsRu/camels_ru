@@ -91,7 +91,7 @@ def build_figure(
 ) -> plt.Figure:
     """Four-panel signature map for one panel set."""
     ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
-    return continuous_multiplot(
+    fig = continuous_multiplot(
         gdf=gdf,
         metrics=[c for c, _, _ in panels],
         titles=[f"({letter}) {title}" for letter, (_, title, _) in zip(letters, panels, strict=True)],
@@ -104,10 +104,22 @@ def build_figure(
         background_gdf=ne_land,
         # Font floor (ESSD editor pre-review): panels render at 0.96\textwidth from a
         # 16x8.2in figure (~0.42x shrink), so 12/9pt source text would land at ~5/4pt in
-        # print. Bumped so both clear 7pt with margin (20 * 0.42 ~= 8.4pt).
+        # print. Bumped so both clear 7pt with margin (20 * 0.42 ~= 8.4pt); same figure
+        # scale, so the graticule labels below use the same 20pt.
         title_fontsize=20,
         colorbar_ticklabelsize=20,
+        graticule_labels=True,
+        graticule_label_size=20,
     )
+    # Map-furniture consistency pass: one scale bar per figure (all 4 panels share one
+    # extent), placed on panel (a).
+    from src.plots.paper_maps import add_scale_bar
+
+    # Lower-right, not the default lower-left: at fontsize=20 "1000 km" is ~2.7x the bar
+    # width and centred on it, so a left-edge bar spills into the rotated 30°N graticule
+    # label and outside the panel frame.
+    add_scale_bar(fig.axes[0], length_km=1000, loc=(0.82, 0.06), fontsize=20)
+    return fig
 
 
 def main() -> None:

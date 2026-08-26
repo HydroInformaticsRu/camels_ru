@@ -162,6 +162,11 @@ def plot(df: pd.DataFrame, out: Path) -> None:
             graticule_labels=True,
             graticule_label_size=14,
         )
+    # Map-furniture consistency pass: one scale bar for the figure (both panels share the
+    # same extent), placed on panel (a).
+    from src.plots.paper_maps import add_scale_bar
+
+    add_scale_bar(axes[0], length_km=1000, fontsize=14)
 
     n = len(edges) - 1
     sm = plt.cm.ScalarMappable(norm=BoundaryNorm(edges, n), cmap=plt.get_cmap("RdBu_r", n))

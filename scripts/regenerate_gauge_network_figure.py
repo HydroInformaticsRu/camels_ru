@@ -129,38 +129,6 @@ def _size_label(category: str) -> str:
     return f"{_thousands(nums[0])}–{_thousands(nums[1])}"
 
 
-def _add_scale_bar(
-    ax: plt.Axes, length_km: float = 1000, loc: tuple[float, float] = (0.05, 0.06)
-) -> None:
-    """Draw a simple linear scale bar directly in the GeoAxes' own (projected) units.
-
-    Valid because the axes use the Albers equal-area conic projection (`get_russia_projection`),
-    so a straight length in projected meters is a defensible, if not geodesically exact, distance.
-
-    Args:
-        ax: GeoAxes with its extent already set (xlim/ylim in projected meters).
-        length_km: Bar length in kilometres.
-        loc: (x, y) fraction of the current axes extent for the bar's left end.
-    """
-    xlim, ylim = ax.get_xlim(), ax.get_ylim()
-    x0 = xlim[0] + loc[0] * (xlim[1] - xlim[0])
-    y0 = ylim[0] + loc[1] * (ylim[1] - ylim[0])
-    length_m = length_km * 1000.0
-    tick = 0.012 * (ylim[1] - ylim[0])
-    ax.plot([x0, x0 + length_m], [y0, y0], color="black", linewidth=1.6, solid_capstyle="butt", zorder=6)
-    for x in (x0, x0 + length_m):
-        ax.plot([x, x], [y0 - tick, y0 + tick], color="black", linewidth=1.2, zorder=6)
-    ax.text(
-        x0 + length_m / 2,
-        y0 + tick * 1.6,
-        f"{int(length_km)} km",
-        ha="center",
-        va="bottom",
-        fontsize=14,
-        zorder=6,
-    )
-
-
 def classify_catchments() -> pd.Series:
     """Köppen-Geiger class per catchment from the released forcing climatology.
 
@@ -233,19 +201,24 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
     aea = get_russia_projection()
     data_crs = ccrs.PlateCarree()
 
-    fig = plt.figure(figsize=(13.0, 4.4), constrained_layout=True)
+    # Editor pre-review: the map (a GeoAxes) keeps its aspect fixed to the Albers projection,
+    # so it is height-bound, not width-bound by width_ratios below - at figsize (13,4.4) it
+    # rendered at only ~26% of the figure width regardless of its 2.7/3.7 gridspec share,
+    # leaving a large dead gutter before panel (b). Taller figure gives it more height to
+    # grow into (measured via ax_map.get_position() after constrained_layout, not eyeballed).
+    fig = plt.figure(figsize=(13.0, 6.6), constrained_layout=True)
     gs = fig.add_gridspec(1, 2, width_ratios=[2.7, 1])
     ax_map = fig.add_subplot(gs[0, 0], projection=aea)
     ax_hist = fig.add_subplot(gs[0, 1])
 
     ax_map.axis("off")
-    _set_extent_from_data(ax_map, gauge)
+    _set_extent_from_data(ax_map, gauge, pad=0.04)  # tighter than the 0.08 default
     # Editor pre-review: no coordinate reference on the map. Graticule labels sized for the
     # same font floor as the other figures (~0.54x shrink at \textwidth from this 13in figure).
-    from src.plots.paper_maps import _add_graticule
+    from src.plots.paper_maps import _add_graticule, add_scale_bar
 
     _add_graticule(ax_map, draw_labels=True, label_size=14)
-    _add_scale_bar(ax_map, length_km=1000)
+    add_scale_bar(ax_map, length_km=1000, fontsize=14)
     ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
     ne_land.to_crs(aea.proj4_init).plot(
         ax=ax_map, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.3, zorder=1
@@ -347,7 +320,9 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
     ax_hist.set_title("(b) Size distribution", fontsize=13, fontweight="bold", loc="left")
     ax_hist.grid(alpha=0.15, axis="x", linestyle="--")
     ax_hist.invert_yaxis()
-    ax_hist.set_xlim(0, float(size_counts.max()) * 1.18)
+    # 1.18 left the "1257" count label (13pt, widened by the font-floor fix) printing
+    # outside the axes frame for the largest bar; more headroom fixes it.
+    ax_hist.set_xlim(0, float(size_counts.max()) * 1.3)
     for bar, cnt in zip(bars, size_counts.values, strict=False):
         ax_hist.text(
             cnt + 20,

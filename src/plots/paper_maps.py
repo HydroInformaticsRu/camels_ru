@@ -125,13 +125,16 @@ def _add_graticule(
     lat_step: int = 10,
     draw_labels: bool = False,
     label_size: int = 6,
+    bottom_labels: bool = True,
 ) -> None:
     """Add a subtle lat/lon graticule to a GeoAxes.
 
     Meridians every *lon_step* degrees and parallels every *lat_step* degrees
     are drawn as thin, light-grey dashed lines underneath the data layer.
     Labels (bottom/left only) are rendered at *label_size* points when
-    *draw_labels* is True.
+    *draw_labels* is True. Set *bottom_labels=False* for the upper panel(s) of
+    a vertically stacked figure sharing one extent, so longitude labels don't
+    collide with the next panel's title.
     """
     gl = ax.gridlines(
         crs=_DATA_CRS,
@@ -147,8 +150,47 @@ def _add_graticule(
     if draw_labels:
         gl.top_labels = False
         gl.right_labels = False
+        gl.bottom_labels = bottom_labels
         gl.xlabel_style = {"size": label_size, "color": "#555555"}
         gl.ylabel_style = {"size": label_size, "color": "#555555"}
+
+
+def add_scale_bar(
+    ax: Axes,
+    length_km: float = 1000,
+    loc: tuple[float, float] = (0.05, 0.06),
+    fontsize: int = 12,
+) -> None:
+    """Draw a simple linear scale bar directly in the GeoAxes' own (projected) units.
+
+    Valid because the axes use the Albers equal-area conic projection (`get_russia_projection`),
+    so a straight length in projected meters is a defensible, if not geodesically exact, distance.
+    Shared by every map figure so the "scale bar is approximate" caption sentence holds everywhere.
+
+    Args:
+        ax: GeoAxes with its extent already set (xlim/ylim in projected meters).
+        length_km: Bar length in kilometres.
+        loc: (x, y) fraction of the current axes extent for the bar's left end.
+        fontsize: Label font size; caller picks a value that clears the 7pt print floor for
+            that figure's own textwidth shrink factor.
+    """
+    xlim, ylim = ax.get_xlim(), ax.get_ylim()
+    x0 = xlim[0] + loc[0] * (xlim[1] - xlim[0])
+    y0 = ylim[0] + loc[1] * (ylim[1] - ylim[0])
+    length_m = length_km * 1000.0
+    tick = 0.012 * (ylim[1] - ylim[0])
+    ax.plot([x0, x0 + length_m], [y0, y0], color="black", linewidth=1.6, solid_capstyle="butt", zorder=6)
+    for x in (x0, x0 + length_m):
+        ax.plot([x, x], [y0 - tick, y0 + tick], color="black", linewidth=1.2, zorder=6)
+    ax.text(
+        x0 + length_m / 2,
+        y0 + tick * 1.6,
+        f"{int(length_km)} km",
+        ha="center",
+        va="bottom",
+        fontsize=fontsize,
+        zorder=6,
+    )
 
 
 def _auto_bins(values: np.ndarray, n_bins: int = 6) -> np.ndarray:
@@ -181,6 +223,7 @@ def scatter_map(
     colorbar_ticklabelsize: int = 9,
     graticule_labels: bool = False,
     graticule_label_size: int = 7,
+    graticule_bottom_labels: bool = True,
 ) -> Axes:
     """Plot continuous-valued scatter map on a single axis.
 
@@ -224,7 +267,12 @@ def scatter_map(
     # Set extent from data, then draw background clipped to it
     _hide_frame(ax)
     _set_extent_from_data(ax, gdf)
-    _add_graticule(ax, draw_labels=graticule_labels, label_size=graticule_label_size)
+    _add_graticule(
+        ax,
+        draw_labels=graticule_labels,
+        label_size=graticule_label_size,
+        bottom_labels=graticule_bottom_labels,
+    )
 
     if background_gdf is not None:
         aea_proj4 = get_russia_projection().proj4_init
@@ -319,6 +367,8 @@ def continuous_multiplot(
     background_gdf: gpd.GeoDataFrame | None = None,
     title_fontsize: int = 12,
     colorbar_ticklabelsize: int = 9,
+    graticule_labels: bool = False,
+    graticule_label_size: int = 7,
 ) -> Figure:
     """Create N-panel scatter maps with colorbars for continuous metrics.
 
@@ -381,6 +431,10 @@ def continuous_multiplot(
 
         edges = bin_intervals.get(metric)
         cb_label = colorbar_labels.get(metric, "")
+        # All panels share one extent, stacked in rows: a non-bottom-row panel's longitude
+        # labels would sit directly above the next row's title, so only the actual bottom
+        # row gets them (matches the fix used for fig_gauge_reliability's stacked panels).
+        is_bottom_row = row == nrows - 1
 
         scatter_map(
             gdf,
@@ -396,6 +450,9 @@ def continuous_multiplot(
             background_gdf=background_gdf,
             title_fontsize=title_fontsize,
             colorbar_ticklabelsize=colorbar_ticklabelsize,
+            graticule_labels=graticule_labels,
+            graticule_label_size=graticule_label_size,
+            graticule_bottom_labels=is_bottom_row,
         )
 
     # Hide unused axes

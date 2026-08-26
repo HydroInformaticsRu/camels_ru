@@ -133,10 +133,27 @@ def load_gauges() -> gpd.GeoDataFrame:
     return gauge
 
 
-def _basemap(ax: plt.Axes, gauge: gpd.GeoDataFrame, aea: ccrs.Projection) -> None:
-    """Shared extent and Natural Earth landmass background for one panel."""
+def _basemap(
+    ax: plt.Axes, gauge: gpd.GeoDataFrame, aea: ccrs.Projection, *, bottom_labels: bool = True
+) -> None:
+    """Shared extent and Natural Earth landmass background for one panel.
+
+    Args:
+        ax: GeoAxes to draw on.
+        gauge: Gauge points defining the shared extent.
+        aea: Albers projection.
+        bottom_labels: False for the upper panel of this two-panel stack (both panels
+            share the same extent), so its longitude labels don't collide with the
+            lower panel's title directly beneath it.
+    """
     ax.axis("off")
     _set_extent_from_data(ax, gauge)
+    # Map-furniture consistency pass: labelled graticule on every map figure (same style as
+    # fig_gauge_network/fig_precip_comparison). Prints at 0.84\textwidth from a 9.5in source
+    # (~0.62x shrink), so 12pt clears the 7pt floor (12*0.62=7.4).
+    from src.plots.paper_maps import _add_graticule
+
+    _add_graticule(ax, draw_labels=True, label_size=12, bottom_labels=bottom_labels)
     ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
     ne_land.to_crs(aea.proj4_init).plot(
         ax=ax, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.3, zorder=1
@@ -249,10 +266,16 @@ def build_figure(gauge: gpd.GeoDataFrame) -> plt.Figure:
     fig, axes = plt.subplots(
         2, 1, figsize=(9.5, 9.2), subplot_kw={"projection": aea}, constrained_layout=True
     )
-    for ax in axes:
-        _basemap(ax, gauge, aea)
+    _basemap(axes[0], gauge, aea, bottom_labels=False)
+    _basemap(axes[1], gauge, aea)
     _panel_grades(axes[0], gauge, data_crs)
     _panel_reliability(fig, axes[1], gauge, data_crs)
+    # One scale bar for the figure (both panels share the same extent) rather than one per
+    # panel, to keep it unobtrusive. Lower-right corner: panel (a)'s grade legend already
+    # occupies lower-left.
+    from src.plots.paper_maps import add_scale_bar
+
+    add_scale_bar(axes[0], length_km=1000, loc=(0.72, 0.05), fontsize=12)
     return fig
 
 
