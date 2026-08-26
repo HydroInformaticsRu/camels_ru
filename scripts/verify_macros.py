@@ -15,7 +15,7 @@ import sys
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-from scipy.stats import spearmanr
+from scipy.stats import mannwhitneyu, spearmanr
 import xarray as xr
 
 REPO = Path(__file__).resolve().parents[1]
@@ -976,6 +976,15 @@ _SEVERITY_MIRROR = {
     "zero_flow_dominant": "minor",
 }
 _PQ_FAMILY = {"very_low_pq_correlation", "low_pq_correlation"}
+# The six rows of Table 4's climatology group, incl. critical no_seasonal_signal.
+_CLIM_FAMILY = {
+    "low_clim_correlation",
+    "very_low_clim_correlation",
+    "high_clim_nrmse",
+    "low_amplitude",
+    "high_amplitude",
+    "no_seasonal_signal",
+}
 _GRADE_ORDER = "ABCDF"
 
 
@@ -1056,13 +1065,14 @@ def check_fdc_sawicz_macros(macros: dict[str, str]) -> None:
 
 
 def check_pq_family_gates(macros: dict[str, str]) -> None:
-    """Lock the Sect. 4.1.2 P-Q-family dominance macros via a full regrade mirror.
+    """Lock the Sect. 4.1.2 flag-family counterfactual macros via a full regrade mirror.
 
     Recomputes every year grade from camels_ru_year_flags.csv (completeness + flag
     codes), requires exact parity with the shipped grades as a self-check, then
-    recomputes the gauge-grade distribution with the two P-Q correlation flags removed.
+    recomputes the gauge-grade distribution with the two P-Q correlation flags, the
+    six-flag climatology group, and implausible_spike disabled in turn.
     """
-    section("P-Q FAMILY DOMINANCE (camels_ru_year_flags.csv regrade mirror)")
+    section("FLAG-FAMILY COUNTERFACTUALS (camels_ru_year_flags.csv regrade mirror)")
     path = RELEASE / "camels_ru_year_flags.csv"
     if not path.exists():
         print("  SKIP — run scripts/create_year_flags.py")
@@ -1070,30 +1080,83 @@ def check_pq_family_gates(macros: dict[str, str]) -> None:
     yf = pd.read_csv(path, dtype={"gauge_id": str}).fillna({"flag_codes": ""})
     mismatch = 0
     n_pq_years = 0
-    base_by_gauge: dict[str, list[str]] = {}
-    nopq_by_gauge: dict[str, list[str]] = {}
+    variants = {"pq": _PQ_FAMILY, "clim": _CLIM_FAMILY, "spike": {"implausible_spike"}}
+    by_gauge: dict[str, dict[str, list[str]]] = {k: {} for k in ("base", *variants)}
     for row in yf.itertuples(index=False):
         flags = row.flag_codes.split(",") if row.flag_codes else []
+        comp = float(row.completeness)
         if any(f in _PQ_FAMILY for f in flags):
             n_pq_years += 1
-        base = _year_grade_from_evidence(flags, float(row.completeness))
+        base = _year_grade_from_evidence(flags, comp)
         if base != row.grade:
             mismatch += 1
-        base_by_gauge.setdefault(row.gauge_id, []).append(base)
-        nopq_by_gauge.setdefault(row.gauge_id, []).append(
-            _year_grade_from_evidence([f for f in flags if f not in _PQ_FAMILY], float(row.completeness))
-        )
+        by_gauge["base"].setdefault(row.gauge_id, []).append(base)
+        for key, fam in variants.items():
+            by_gauge[key].setdefault(row.gauge_id, []).append(
+                _year_grade_from_evidence([f for f in flags if f not in fam], comp)
+            )
     check_val("regrade mirror parity with shipped year grades", "0 mismatches", f"{mismatch} mismatches")
-    base_dist = pd.Series([_overall_grade(v) for v in base_by_gauge.values()]).value_counts()
-    nopq_dist = pd.Series([_overall_grade(v) for v in nopq_by_gauge.values()]).value_counts()
+    dist = {
+        k: pd.Series([_overall_grade(v) for v in g.values()]).value_counts() for k, g in by_gauge.items()
+    }
     check_val(
         "baseline gauge grade A",
         macros.get("ngradeA", "").replace("\\xspace", ""),
-        str(int(base_dist.get("A", 0))),
+        str(int(dist["base"].get("A", 0))),
     )
     check_macro(macros, "pqfamilypct", 100.0 * n_pq_years / len(yf), "{:.1f}")
-    check_macro(macros, "ngradeanopq", float(nopq_dist.get("A", 0)), "{:.0f}")
-    check_macro(macros, "ngradebnopq", float(nopq_dist.get("B", 0)), "{:.0f}")
+    check_macro(macros, "ngradeanopq", float(dist["pq"].get("A", 0)), "{:.0f}")
+    check_macro(macros, "ngradebnopq", float(dist["pq"].get("B", 0)), "{:.0f}")
+    check_macro(macros, "ngradeanoclim", float(dist["clim"].get("A", 0)), "{:.0f}")
+    check_macro(macros, "ngradeanospike", float(dist["spike"].get("A", 0)), "{:.0f}")
+    # The Sect. 4.1.2 sentence claims the climatology counterfactual also moves
+    # grades C-F, and that its dA is "nearly three times" the P-Q pair's.
+    base_a = int(dist["base"].get("A", 0))
+    moved_cf = any(int(dist["clim"].get(g, 0)) != int(dist["base"].get(g, 0)) for g in "CDF")
+    check_val("clim counterfactual moves grades C-F", "yes", "yes" if moved_cf else "no")
+    ratio = (int(dist["clim"].get("A", 0)) - base_a) / max(1, int(dist["pq"].get("A", 0)) - base_a)
+    check_val(
+        "clim/pq dA ratio supports 'nearly three times'",
+        "yes",
+        "yes" if 2.5 <= ratio < 3.05 else "no",
+    )
+
+
+def check_gradea_signature_bias(macros: dict[str, str]) -> None:
+    """Lock the usage-notes grade-A signature-space bias medians (Sect. 6.4).
+
+    Joins the non-anomalous signature gauges to the released overall grades and
+    recomputes the strict-grade-A vs graded-below-A medians of five signatures,
+    plus the Mann-Whitney significance floor the sentence claims (p < 1e-8).
+    """
+    section("GRADE-A SIGNATURE-SPACE BIAS (signatures.csv + gauge_summary.csv)")
+    sig = pd.read_csv(RELEASE / "camels_ru_signatures.csv", dtype={"gauge_id": str})
+    gs = pd.read_csv(RELEASE / "camels_ru_gauge_summary.csv", dtype={"gauge_id": str})
+    m = sig[~sig["is_anomalous"]].merge(gs[["gauge_id", "overall_grade"]], on="gauge_id")
+    graded = m[m["overall_grade"].isin(list("ABCDF"))]
+    a = graded[graded["overall_grade"] == "A"]
+    na = graded[graded["overall_grade"] != "A"]
+    check_macro(macros, "nsigngradea", float(len(a)), "{:.0f}")
+    check_macro(macros, "nsigngradednona", float(len(na)), "{:.0f}")
+    check_val(
+        "grade split exhausts nsigngauges",
+        macros.get("nsigngauges", "").replace("\\xspace", ""),
+        str(len(a) + len(na)),
+    )
+    specs = [
+        ("runoff_ratio", "sgamedrr", "sgnamedrr", "{:.2f}"),
+        ("q_mean", "sgamedqmean", "sgnamedqmean", "{:.2f}"),
+        ("winter_flow_ratio", "sgamedwfr", "sgnamedwfr", "{:.2f}"),
+        ("half_flow_date", "sgamedhfd", "sgnamedhfd", "{:.0f}"),
+        ("area_km2", "sgamedarea", "sgnamedarea", "{:.0f}"),
+    ]
+    worst_p = 0.0
+    for col, ma, mn, fmt in specs:
+        xa, xn = a[col].dropna(), na[col].dropna()
+        check_macro(macros, ma, float(xa.median()), fmt)
+        check_macro(macros, mn, float(xn.median()), fmt)
+        worst_p = max(worst_p, float(mannwhitneyu(xa, xn).pvalue))
+    check_val("all five contrasts Mann-Whitney p < 1e-8", "yes", "yes" if worst_p < 1e-8 else "no")
 
 
 def check_ice_window_gates(macros: dict[str, str]) -> None:
@@ -1557,6 +1620,7 @@ def main() -> None:
     check_water_level_reversion_gates(macros)
     check_peak_winter_ratio_macros(macros)
     check_fdc_sawicz_macros(macros)
+    check_gradea_signature_bias(macros)
     check_pq_family_gates(macros)
 
     section("AUTHORITATIVE VALUES FOR MACROS.TEX")
