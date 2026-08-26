@@ -553,6 +553,15 @@ def check_grade_regime_macros(macros: dict[str, str]) -> None:
     covered = df["snw_pc_uyr"].notna().sum()
     check_macro(macros, "ngradebandcovered", float(covered), "{:.0f}")
 
+    # Table 1 caption states permafrost shares over the FULL attribute-covered set
+    # (3339 rows of camels_ru_attributes.csv), not the graded merge below.
+    prm_all = attrs["prm_pc_use"].clip(0, 100)
+    # NaN would sit in .mean()'s denominator but not its numerator, silently deflating
+    # both shares while the locks stay green — so gate NaN-freeness explicitly.
+    check_val("prm_pc_use NaN-free (Table 1 shares)", "0", str(int(prm_all.isna().sum())))
+    check_macro(macros, "pctcatchpermafrost", 100.0 * (prm_all > 0).mean(), "{:.0f}")
+    check_macro(macros, "pctcatchpermafrosttwenty", 100.0 * (prm_all > 20).mean(), "{:.0f}")
+
     # Sect. 9 states cold-region coverage as counts rather than a superlative, so lock them.
     check_macro(macros, "npermafrosttwenty", float((df["prm_pc_use"] > 20).sum()), "{:.0f}")
     # >= 80 as the Sect. 9 prose states it; Table 6's top band is (80, 100] but no
