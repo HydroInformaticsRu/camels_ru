@@ -1014,6 +1014,47 @@ def _overall_grade(grades: list[str]) -> str:
     return mode
 
 
+def check_fdc_sawicz_macros(macros: dict[str, str]) -> None:
+    """Lock the Sect. 5.2 fdc_slope vs Sawicz (2011) comparability numbers.
+
+    The released fdc_slope formula IS Sawicz Eq. 3 (exceedance percentiles in
+    percent); the only convention difference is aggregation (mean of annual
+    slopes vs one whole-record slope). Recompute the whole-record slope from
+    discharge_mm for every non-anomalous gauge and gate the Spearman rank
+    agreement, the median relative difference, and full sign agreement. The
+    whole-record slope pools every released day (2008-2023), not only the
+    complete hydro-years the annual signature uses (windowed variant: median
+    -3.63 %, rho 0.9680 -- same printed values).
+    """
+    section("FDC SLOPE VS SAWICZ WHOLE-RECORD (release discharge + signatures)")
+    sig = pd.read_csv(RELEASE / "camels_ru_signatures.csv", dtype={"gauge_id": str})
+    sub = sig[(~sig["is_anomalous"]) & sig["fdc_slope"].notna()]
+    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+        pos = {str(g): i for i, g in enumerate(ds["gauge_id"].values)}
+        q = ds["discharge_mm"].values
+    released, sawicz = [], []
+    for g, rel_slope in zip(sub["gauge_id"], sub["fdc_slope"], strict=True):
+        x = q[pos[g]]
+        x = x[np.isfinite(x)]
+        q1 = np.percentile(x, 67)  # exceeded 33 % of the time
+        q2 = np.percentile(x, 34)  # exceeded 66 % of the time
+        if q1 <= 0 or q2 <= 0:
+            continue
+        released.append(rel_slope)
+        sawicz.append((np.log(q1) - np.log(q2)) / 33 * 100)
+    rel = np.array(released)
+    saw = np.array(sawicz)
+    check_val("gauges compared (nonpositive percentiles skipped)", str(len(rel)), str(len(sub)))
+    check_macro(macros, "nsigngauges", float(len(rel)), "{:.0f}")
+    check_val("sign agreement", "100.0%", f"{(np.sign(rel) == np.sign(saw)).mean():.1%}")
+    rho = float(spearmanr(rel, saw)[0])
+    check_macro(macros, "fdcsawiczrho", rho, "{:.2f}")
+    med = float(np.median((rel - saw) / saw))
+    check_macro(macros, "fdcsawiczmeddiff", abs(med) * 100, "{:.0f}")
+    direction = "below" if med < 0 else "above"
+    check_val("median difference direction (Sect. 5.2 says below)", "below", direction)
+
+
 def check_pq_family_gates(macros: dict[str, str]) -> None:
     """Lock the Sect. 4.1.2 P-Q-family dominance macros via a full regrade mirror.
 
@@ -1515,6 +1556,7 @@ def main() -> None:
     check_discharge_fill_macros(macros)
     check_water_level_reversion_gates(macros)
     check_peak_winter_ratio_macros(macros)
+    check_fdc_sawicz_macros(macros)
     check_pq_family_gates(macros)
 
     section("AUTHORITATIVE VALUES FOR MACROS.TEX")
