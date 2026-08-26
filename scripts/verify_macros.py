@@ -147,7 +147,7 @@ def check_aet_macros(macros: dict[str, str]) -> None:
 
 
 def check_coldregion_macros(macros: dict[str, str]) -> None:
-    """Reconcile the Sect. 7 cold-region macros against a fresh recompute from the release."""
+    """Reconcile the Sect. 8 cold-region macros against a fresh recompute from the release."""
     section("COLD-REGION GRADIENT (release signatures + attributes)")
     cr = load_subset()
     # The figure screens on the released winter_coverage column; recompute on the same subset
@@ -166,7 +166,7 @@ def check_coldregion_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "ncoldregionabovemean", float((cr["winter_flow_ratio"] > 1.0).sum()), "{:.0f}")
     check_macro(macros, "winterratiobaseline", float(wff_med.iloc[0]), "{:.2f}")
     check_macro(macros, "winterratiohigh", float(wff_med.iloc[-1]), "{:.2f}")
-    # Sect. 7 in-text bin counts and the high-permafrost retention disclosure.
+    # Sect. 8 in-text bin counts and the high-permafrost retention disclosure.
     bin_counts = cr["winter_flow_ratio"].groupby(cats, observed=True).count()
     check_macro(macros, "nwinterbinlow", float(bin_counts.iloc[0]), "{:.0f}")
     check_macro(macros, "nwinterbinhigh", float(bin_counts.iloc[-1]), "{:.0f}")
@@ -185,11 +185,27 @@ def check_coldregion_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "bfipermafrostbaseline", float(bfi_med.iloc[0]), "{:.2f}")
     check_macro(macros, "bfipermafrostpeak", float(bfi_med.max()), "{:.2f}")
     check_macro(macros, "bfipermafrosthigh", float(bfi_med.iloc[-1]), "{:.2f}")
+    # Identifiability disclosure (Sect. 8): temperature collinearity, coldest-quintile
+    # attenuation, and the fixed-window freshet overlap (half-flow date inside Jan-Mar,
+    # days 93-182 of the Oct-Sep hydrological year).
+    rho_tp = float(spearmanr(cr["tmp_dc_uyr"], cr["prm_pc_use"], nan_policy="omit")[0])
+    cold = cr[cr["tmp_dc_uyr"] <= cr["tmp_dc_uyr"].quantile(0.2)]
+    rho_cold = float(spearmanr(cold["prm_pc_use"], cold["winter_flow_ratio"], nan_policy="omit")[0])
+    in_win = (cr["half_flow_date"] >= 93) & (cr["half_flow_date"] <= 182)
+    check_macro(macros, "nfreshetinwindow", float(in_win.sum()), "{:.0f}")
+    check_macro(
+        macros, "winterratiofreshetin", float(cr.loc[in_win, "winter_flow_ratio"].median()), "{:.2f}"
+    )
+    check_macro(
+        macros, "winterratiofreshetout", float(cr.loc[~in_win, "winter_flow_ratio"].median()), "{:.2f}"
+    )
     # Signed macros carry a LaTeX $...$ wrapper, so compare the rendered string.
     for name, value in (
         ("rhopermafrostwinter", rho_winter),
         ("rhopermafrostbfi", rho_bfi),
         ("rhobfiqcv", rho_qcv),
+        ("rhotempperm", rho_tp),
+        ("rhopermwintercoldq", rho_cold),
     ):
         check_val(name, macros.get(name, "").replace("\\xspace", ""), f"${value:+.2f}$")
     verdict_path = RESULTS_HESS / "coldregion_robustness_verdict.txt"
@@ -801,6 +817,38 @@ def check_nss_completeness_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "nnssbargauges", float(n_changed), "{:.0f}")
 
 
+def check_year_flags_gates(year_grades: pd.DataFrame) -> None:
+    """Gate camels_ru_year_flags.csv: census parity and full grade parity."""
+    section("YEAR FLAGS (release camels_ru_year_flags.csv vs census + year grades)")
+    path = RELEASE / "camels_ru_year_flags.csv"
+    if not path.exists():
+        print("  SKIP — run scripts/create_year_flags.py")
+        return
+    yf = pd.read_csv(path, dtype={"gauge_id": str}).fillna({"flag_codes": ""})
+    census = pd.read_csv(PAPER / "tables" / "flag_frequencies.csv")
+    check_val(
+        "year_flags rows == assessed years", str(len(yf)), str(int(census["n_assessed_years"].iloc[0]))
+    )
+    counts = yf["flag_codes"].str.split(",").explode()
+    counts = counts[counts != ""].value_counts()
+    bad = [
+        f
+        for f, n in zip(census["flag"], census["n_years"], strict=True)
+        if int(counts.get(f, 0)) != int(n)
+    ]
+    # Both directions: a flag firing in year_flags but absent from the census is drift too
+    bad += sorted(set(counts.index) - set(census["flag"]))
+    check_val("per-flag counts == flag census", "0 mismatches", f"{len(bad)} mismatches")
+    yg = year_grades.copy()
+    yg["gauge_id"] = yg["gauge_id"].astype(str)
+    long = yg.melt(id_vars="gauge_id", var_name="hydro_year", value_name="released")
+    long = long[long["hydro_year"].str.isdigit()].dropna(subset=["released"])
+    long["hydro_year"] = long["hydro_year"].astype(int)
+    merged = yf.merge(long, on=["gauge_id", "hydro_year"], how="outer", indicator=True)
+    mism = (merged["_merge"] != "both") | (merged["grade"] != merged["released"])
+    check_val("grade parity with year_grades.csv", "0 differences", f"{int(mism.sum())} differences")
+
+
 def check_ice_window_gates(macros: dict[str, str]) -> None:
     """Gate the ice-window sensitivity macros against the committed provenance CSV."""
     section("ICE-WINDOW SENSITIVITY (paper/tables/ice_window_sensitivity.csv)")
@@ -1248,6 +1296,7 @@ def main() -> None:
     check_release_range_gates(macros)
     check_nss_completeness_macros(macros)
     check_ice_window_gates(macros)
+    check_year_flags_gates(year_grades)
     check_precip_caption_macros(macros)
     check_coldregion_macros(macros)
     check_spike_threshold_macros(macros)
