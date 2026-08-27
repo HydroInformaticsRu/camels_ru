@@ -141,6 +141,13 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
   figure-heavy section, e.g. §7) flushes the queue. Post-build check: no float may
   render after the "Data availability" heading.
 
+### `\hbadness=10000` makes the underfull count vacuous
+
+- `main.tex` sets `\hbadness=10000`/`\vbadness=10000`, which suppresses ALL Underfull
+  box reporting — a "0 Underfull" grep on `main.log` is meaningless, never cite it as
+  build evidence. Overfull reporting is gated by `\hfuzz`/`\vfuzz` (unset → active), so
+  the "0 Overfull" gate remains genuine.
+
 ### copernicus.cls renders `\correspondence` only if an `\Author` has a second bracketed argument
 
 - `\correspondence{...}` alone just stores text; every render branch is gated on
