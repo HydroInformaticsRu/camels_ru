@@ -104,3 +104,8 @@ reports/
 # QGIS
 *.qgz
 *.qgs
+
+# TikZ figure build byproducts (canonical PDFs live in paper/images/ + paper/overleaf/images/)
+paper/figures_src/*.aux
+paper/figures_src/*.log
+paper/figures_src/*.pdf
