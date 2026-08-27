@@ -18,8 +18,9 @@ Conventions (2026-08-23 revision, science-review Domain Expert M-1/M-5):
 - Water-balance ratios (runoff_ratio Q/P, aridity_index PET/P, evaporative_index (P-Q)/P)
   are computed per valid year over the days where discharge is observed, then averaged.
   MSWEP is the primary precipitation; `_era5` columns give the ERA5-Land variants.
-- winter_flow_ratio: mean Jan-Mar flow / mean annual flow, on observed days over the
-  whole record. A Lyne-Hollick BFI with alpha in [0.9, 0.98] has a 10-50 day recession
+- winter_flow_ratio: mean Jan-Mar flow / mean annual flow, on observed days pooled
+  over all complete hydrological years (2009-2023), valid or not.
+  A Lyne-Hollick BFI with alpha in [0.9, 0.98] has a 10-50 day recession
   constant and so reads a multi-week snowmelt recession as baseflow; this measures
   cold-season yield directly and declines monotonically with permafrost extent, as the
   BFI does not.

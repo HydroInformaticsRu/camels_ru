@@ -1,10 +1,14 @@
-"""Render the two hydrological-signature map figures (Section 5) from the release.
+"""Render the four hydrological-signature map figures (Section 5) from the release.
 
 Reads the released ``camels_ru_signatures.csv``, drops the small-basin anomalies flagged
 ``is_anomalous``, and maps eight key signatures for the remaining cleaned gauges on the
 shared Albers Equal-Area basemap. The bin edges and panel order follow the original
 notebook-02 maps; the gauge set is now the released cleaned subset, so the figures
 reproduce from the archive plus the gauge-point layer used by every other map script.
+
+Each figure holds two panels stacked vertically (one column) so every panel prints at
+full text width (ESSD editor round-N re-review: the previous 2x2-panel figures rendered
+too small to read).
 
 Usage:
     pixi run python scripts/plot_signature_maps.py            # test output (.tmp)
@@ -50,10 +54,12 @@ TEST_DIR = PROJECT_ROOT / ".tmp" / "cluster_diag"
 PANELS_1 = [
     ("q_mean", "Mean discharge (mm d$^{-1}$)", [0, 0.3, 0.6, 1.0, 1.5, 2.5, 5.0, 8.0]),
     ("q95", "Q95 (mm d$^{-1}$)", [0, 0.05, 0.1, 0.2, 0.35, 0.6, 1.0, 2.5]),
+]
+PANELS_2 = [
     ("q05", "Q05 (mm d$^{-1}$)", [0, 1, 3, 5, 7, 10, 15, 20]),
     ("baseflow_index", "Baseflow index", [0.2, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85]),
 ]
-PANELS_2 = [
+PANELS_3 = [
     (
         "half_flow_date",
         # Not "DOY": under a calendar day-of-year reading the 120-270 classes look like
@@ -62,6 +68,8 @@ PANELS_2 = [
         [120, 150, 180, 200, 220, 240, 270],
     ),
     ("fdc_slope", "FDC slope", [0, 1.0, 1.5, 2.5, 4.0, 6.0, 10.0, 15.0]),
+]
+PANELS_4 = [
     ("high_flow_freq", "High-flow frequency (%)", [0, 10, 15, 20, 25, 30, 40, 50]),
     ("low_flow_freq", "Low-flow frequency (%)", [0, 2, 5, 10, 20, 35, 50, 70]),
 ]
@@ -81,7 +89,7 @@ def load_signatures() -> gpd.GeoDataFrame:
     if len(missing):
         raise RuntimeError(f"{len(missing)} signature gauges lack a point geometry: {list(missing)[:5]}")
 
-    cols = [c for c, _, _ in PANELS_1 + PANELS_2]
+    cols = [c for c, _, _ in PANELS_1 + PANELS_2 + PANELS_3 + PANELS_4]
     gdf = gauge.loc[sig.index].join(sig[cols])
     n_half = int(gdf["half_flow_date"].notna().sum())
     print(f"mapped gauges: {len(gdf)}; half-flow date available: {n_half}")
@@ -91,41 +99,45 @@ def load_signatures() -> gpd.GeoDataFrame:
 def build_figure(
     gdf: gpd.GeoDataFrame, panels: list[tuple[str, str, list[float]]], letters: str
 ) -> plt.Figure:
-    """Four-panel signature map for one panel set."""
+    """Two-panel signature map (stacked vertically) for one panel set."""
     ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
     fig = continuous_multiplot(
         gdf=gdf,
         metrics=[c for c, _, _ in panels],
         titles=[f"({letter}) {title}" for letter, (_, title, _) in zip(letters, panels, strict=True)],
-        ncols=2,
+        ncols=1,
         panel_size=(8.0, 4.1),
         cmap_name="viridis",  # sequential: every panel is a strictly positive quantity
         bin_intervals={c: edges for c, _, edges in panels},
         marker_size=8,
         show_nan=True,
         background_gdf=ne_land,
-        # Font floor (ESSD editor pre-review): panels render at 0.96\textwidth from a
-        # 16x8.2in figure (~0.42x shrink), so 12/9pt source text would land at ~5/4pt in
-        # print. Bumped so both clear 7pt with margin (20 * 0.42 ~= 8.4pt); same figure
-        # scale, so the graticule labels below use the same 20pt.
-        title_fontsize=20,
-        colorbar_ticklabelsize=20,
+        # Font floor (ESSD editor round-N re-review): each figure is now 1 panel wide x 2
+        # rows (panel_size (8.0, 4.1) in -> figsize 8.0x8.2in) instead of 2x2, and prints at
+        # \textwidth ~= 12cm (4.72in) in the review-format (copernicus manuscript-mode) PDF,
+        # so the shrink factor is 4.72/8.0 ~= 0.59 (vs ~0.28 for the old 2x2 figure at
+        # 0.95\textwidth from a 16in-wide source, hence each panel prints ~2x wider now: a
+        # full \textwidth instead of half of 0.95\textwidth shared between two columns).
+        # 14pt source clears the 7pt print floor with margin (14 * 0.59 ~= 8.3pt) without
+        # printing oversized; same figure scale, so the graticule labels below use the same
+        # 14pt.
+        title_fontsize=14,
+        colorbar_ticklabelsize=14,
         graticule_labels=True,
-        graticule_label_size=20,
+        graticule_label_size=14,
     )
-    # Map-furniture consistency pass: one scale bar per figure (all 4 panels share one
-    # extent), placed on panel (a).
+    # Map-furniture consistency pass: one scale bar per figure (both panels share one
+    # extent), placed on panel (a), clear of the Far-East gauge cluster and the top-edge
+    # latitude labels (ESSD editor round-N re-review: the old lower-right placement sat on
+    # top of the Far-East data).
     from src.plots.paper_maps import add_scale_bar
 
-    # Lower-right, not the default lower-left: at fontsize=20 "1000 km" is ~2.7x the bar
-    # width and centred on it, so a left-edge bar spills into the rotated 30°N graticule
-    # label and outside the panel frame.
-    add_scale_bar(fig.axes[0], length_km=1000, loc=(0.82, 0.06), fontsize=20)
+    add_scale_bar(fig.axes[0], length_km=1000, loc=(0.47, 0.55), fontsize=14)
     return fig
 
 
 def main() -> None:
-    """Parse CLI args, build both figures, and write them out."""
+    """Parse CLI args, build all four figures, and write them out."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--write",
@@ -138,8 +150,10 @@ def main() -> None:
     out_dirs = PAPER_DIRS if args.write else (TEST_DIR,)
     suffix = "" if args.write else "_test"
     for name, panels, letters in (
-        ("fig_hydro_signatures_1", PANELS_1, "abcd"),
-        ("fig_hydro_signatures_2", PANELS_2, "abcd"),
+        ("fig_hydro_signatures_1", PANELS_1, "ab"),
+        ("fig_hydro_signatures_2", PANELS_2, "ab"),
+        ("fig_hydro_signatures_3", PANELS_3, "ab"),
+        ("fig_hydro_signatures_4", PANELS_4, "ab"),
     ):
         fig = build_figure(gdf, panels, letters)
         # Save once and copy: repeated tight-bbox saves crop a few pixels differently,

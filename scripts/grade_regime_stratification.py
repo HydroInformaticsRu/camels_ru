@@ -44,7 +44,7 @@ BANDS: dict[str, tuple[str, list[float], list[str]]] = {
     "permafrost": (
         "prm_pc_use",
         [-0.001, 0, 20, 80, 100],
-        ["0", "0 to 20", "20 to 80", r"$>$ 80"],
+        ["0", "$>$ 0 to 20", "20 to 80", r"$>$ 80"],
     ),
 }
 

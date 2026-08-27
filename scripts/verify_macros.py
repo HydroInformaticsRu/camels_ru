@@ -313,6 +313,15 @@ def check_water_balance_screen_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "maxrunoffratio", float(flagged["runoff_ratio"].max()), "{:.1f}")
     check_macro(macros, "nwaterbalscreenall", float(sig["water_balance_screen"].sum()), "{:.0f}")
     check_macro(macros, "nwinterflowgauges", float(clean["winter_flow_ratio"].notna().sum()), "{:.0f}")
+    # low_flow_dur zero convention (Table 12): eventless valid years enter the mean as
+    # zeros, so exactly the low_flow_freq == 0 gauges sit at duration 0.
+    dur0 = clean["low_flow_dur"] == 0
+    check_macro(macros, "nlowflowdurzero", float(dur0.sum()), "{:.0f}")
+    check_val(
+        "low_flow_dur==0 set equals low_flow_freq==0 set",
+        "yes",
+        "yes" if bool((dur0 == (clean["low_flow_freq"] == 0)).all()) else "no",
+    )
     # Diagnosability of the runoff-ratio > 1 population (Sect. 4.1.2, domain m-6).
     boundaries = gpd.read_file(RELEASE / "camels_ru_boundaries.gpkg")
     boundaries["gauge_id"] = boundaries["gauge_id"].astype(str)
@@ -673,12 +682,22 @@ def check_release_range_gates(macros: dict[str, str]) -> None:
     def gate_range(name: str, lo: str, hi: str) -> None:
         check_val(name, norm(name), f"{lo} to {hi}")
 
+    # Every declared bound must CONTAIN the released values (floor the minimum, ceil the
+    # maximum): a range filter built from Table 3 must never clip real data. Plain
+    # rounding shipped four inward-rounded cells (round-9 consistency N1).
+    def flo(x: float, decimals: int = 0) -> str:
+        f = 10.0**decimals
+        return f"{np.floor(float(x) * f) / f:.{decimals}f}"
+
+    def cei(x: float, decimals: int = 0) -> str:
+        f = 10.0**decimals
+        return f"{np.ceil(float(x) * f) / f:.{decimals}f}"
+
     with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
         q3 = ds["discharge_m3s"]
         qm = ds["discharge_mm"]
-        gate_range("rngqvol", "0", f"{round(float(q3.max()) / 1000) * 1000:.0f}")
-        # Ceil, not round: the declared maximum must not clip real data (66,732.20 -> 66,733).
-        gate_range("rngqmm", "0", f"{np.ceil(float(qm.max())):.0f}")
+        gate_range("rngqvol", "0", f"{np.ceil(float(q3.max()) / 1000) * 1000:.0f}")
+        gate_range("rngqmm", "0", cei(qm.max()))
         check_macro(macros, "nallmissingdischarge", float(q3.isnull().all("time").sum()), "{:.0f}")
 
     with xr.open_dataset(RELEASE / "camels_ru_forcing.nc") as fx:
@@ -687,11 +706,11 @@ def check_release_range_gates(macros: dict[str, str]) -> None:
             ("rngpera", "precip_era5"),
             ("rngpgpcp", "precip_gpcp"),
         ):
-            gate_range(name, f"{float(fx[var].min()):.0f}", f"{float(fx[var].max()):.0f}")
+            gate_range(name, flo(fx[var].min()), cei(fx[var].max()))
         for name, var in (("rngtmean", "temp_mean"), ("rngtmin", "temp_min"), ("rngtmax", "temp_max")):
-            gate_range(name, f"{float(fx[var].min()):.0f}", f"{float(fx[var].max()):.0f}")
+            gate_range(name, flo(fx[var].min()), cei(fx[var].max()))
         pet = fx["pet"]
-        gate_range("rngpet", f"{float(pet.min()):.2f}", f"{float(pet.max()):.0f}")
+        gate_range("rngpet", flo(pet.min(), 2), cei(pet.max()))
         check_macro(macros, "petminnum", float(pet.min()), "{:.2f}")
         neg_pct = 100.0 * float((pet < 0).sum()) / int(pet.notnull().sum())
         check_macro(macros, "petnegpct", neg_pct, "{:.1f}")
@@ -725,9 +744,9 @@ def check_release_range_gates(macros: dict[str, str]) -> None:
         cm = wl["water_level_cm"]
         mbs = wl["water_level_mbs"]
         zero = wl["gauge_zero_m"]
-        gate_range("rngwlcm", f"{float(cm.min()):.1f}", f"{round(float(cm.max()) / 100) * 100:.0f}")
-        gate_range("rngwlmbs", f"{float(mbs.min()):.0f}", f"{float(mbs.max()):.0f}")
-        gate_range("rngzero", f"{float(zero.min()):.0f}", f"{float(zero.max()):.0f}")
+        gate_range("rngwlcm", flo(cm.min(), 1), f"{np.ceil(float(cm.max()) / 100) * 100:.0f}")
+        gate_range("rngwlmbs", flo(mbs.min()), cei(mbs.max()))
+        gate_range("rngzero", flo(zero.min()), cei(zero.max()))
 
     boundaries = gpd.read_file(RELEASE / "camels_ru_boundaries.gpkg")
     err = boundaries["area_diff_perc"].dropna()

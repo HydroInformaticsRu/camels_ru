@@ -243,7 +243,14 @@ def main() -> None:
         # by diverging away from the shared zone between them, not just alternating side.
         dy = 20 if above else -20
         ha = "left" if row["center"] < 5 else "center"
-        xytext = (4, dy) if ha == "left" else (0, dy)
+        dx = 0
+        if i == 2:
+            # Bin 0's label ("776", left-anchored, above) is wide enough at floor-clearing
+            # size that it still reached into bin 2's own "above" label ("83", centered 15
+            # data-units away) - pushed further up and right, clear of that reach.
+            dy = 36
+            dx = 8
+        xytext = (4, dy) if ha == "left" else (dx, dy)
         ax_b.annotate(
             f"{int(row['n'])}",
             (row["center"], row["median"]),
