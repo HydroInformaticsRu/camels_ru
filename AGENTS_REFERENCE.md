@@ -134,6 +134,20 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
   signatures table shipped un-rendered this way. Long tables go in `longtable`
   (already loaded), and after each build grep `main.log` for "Float too large" and
   count rendered rows against the source.
+- Third variant (found round 10): full-page `[tp]` floats declared in the **last
+  appendix** defer past `\dataavailability` and the other mandatory back-matter
+  statements, interleaving appendix figures with them (Code availability was split
+  across six pages). `\clearpage` at the end of the appendix (and of any
+  figure-heavy section, e.g. §7) flushes the queue. Post-build check: no float may
+  render after the "Data availability" heading.
+
+### copernicus.cls renders `\correspondence` only if an `\Author` has a second bracketed argument
+
+- `\correspondence{...}` alone just stores text; every render branch is gated on
+  `\corr@cnt`, which advances only via `\Author[affil][email]{First}{Last}`. With
+  plain `\Author[1]{...}{...}` the Correspondence line is **silently absent** from
+  the PDF — no warning, and it shipped that way for nine review rounds. Post-build
+  check: `pdftotext -f 1 -l 1 main.pdf - | grep Correspondence`.
 
 ### PostToolUse formatter strips a just-added import if it is momentarily unused
 
