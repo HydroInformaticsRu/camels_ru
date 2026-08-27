@@ -36,7 +36,7 @@ with `pixi run python`):
 | File | Where | Description | Generator |
 |------|-------|-------------|-----------|
 | `fig_gauge_network.png` | §2 | Köppen–Geiger climate classes of the gauged catchments (forcing-derived) + catchment-size distribution | `scripts/regenerate_gauge_network_figure.py --write` |
-| `fig_workflow.pdf` | §3 | Dataset production workflow schematic | `scripts/plot_workflow_schematic.py` |
+| `fig_workflow.pdf` | §3 | Dataset production workflow schematic | `paper/figures_src/fig_workflow.tex` (standalone TikZ; build line in its header) |
 | `fig_gauge_reliability.png` | §4 | Overall discharge grade + per-gauge share of Grade A years, mapped | `scripts/plot_gauge_reliability.py --write` |
 | `fig_precip_comparison.png` | §7 | Precipitation-product differences | `scripts/regenerate_precip_comparison_figure.py --write` |
 | `fig_budyko.pdf` | §7 | Budyko consistency check, one panel per product | `scripts/generate_budyko_figure.py` |
