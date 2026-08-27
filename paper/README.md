@@ -6,26 +6,23 @@
 
 ```
 paper/
-├── overleaf/           # Active collaborative manuscript source (nested Overleaf git repo; ignored by parent repo)
+├── overleaf/           # Active collaborative manuscript source (git submodule, Overleaf remote)
 │   ├── main.tex
 │   ├── macros.tex
 │   ├── refs.bib
 │   ├── sections/
 │   └── tables/
-├── images/             # Figure generation outputs mirrored into overleaf/images/ when used by the manuscript
-├── latex/              # Legacy generated LaTeX snapshot from the Markdown-era workflow
-│   ├── main.tex
-│   ├── macros.tex
-│   ├── refs.bib
-│   ├── facts.yaml
-│   ├── sections/
-│   └── tables/
+├── images/             # Canonical manuscript figures, mirrored into overleaf/images/
+├── tables/             # Data tables backing manuscript numbers (verify_macros.py audit trail)
 └── README.md           # This file
 ```
 
+(A legacy `paper/latex/` snapshot from the Markdown-era workflow may exist in local
+working copies; it is gitignored and not authoritative.)
+
 ## Editing
 
-The active collaborative manuscript source is the Overleaf git clone at `paper/overleaf/` in local working copies. Treat `paper/latex/` as legacy Markdown-era context unless explicitly revived.
+The active collaborative manuscript source is the Overleaf submodule at `paper/overleaf/`.
 
 Use Overleaf comments and nested-repo diffs for manuscript review. Use parent-repo pull requests for code, data-processing, release, and documentation changes.
 
@@ -33,19 +30,22 @@ Use Overleaf comments and nested-repo diffs for manuscript review. Use parent-re
 
 Canonical manuscript figures live in `paper/overleaf/images/`. Figure-generation scripts may write first to `paper/images/`; copy or script-sync any manuscript-used figure into `paper/overleaf/images/` before building or pushing Overleaf.
 
-Figures referenced in the manuscript:
+Figures referenced in the manuscript (in order of appearance; generators listed run
+with `pixi run python`):
 
-| Figure | File | Description |
-|--------|------|-------------|
-| 1 | `fig_gauge_network.png` | Köppen–Geiger climate classes of the gauged catchments (forcing-derived) + catchment-size distribution (§2); `scripts/regenerate_gauge_network_figure.py --write` |
-| 2 | `fig_gauge_reliability.png` | Overall discharge grade + per-gauge share of Grade A years, mapped (§4); `scripts/plot_gauge_reliability.py --write` |
-| 3 | `fig_hydro_signatures_1.png` | Magnitude/baseflow signatures, released cleaned set (§5); `scripts/plot_signature_maps.py --write` |
-| 4 | `fig_hydro_signatures_2.png` | Timing/variability/extreme signatures, released cleaned set (§5); `scripts/plot_signature_maps.py --write` |
-| 5 | `fig_precip_comparison.png` | Precipitation-product differences (§6); `scripts/regenerate_precip_comparison_figure.py --write` |
-| 6 | `fig_budyko.png` | Budyko consistency check, one panel per product (§6); `scripts/generate_budyko_figure.py` |
-| 7 | `fig_coldregion_gradient.png` | Example cold-region signature analysis (§8); `scripts/plot_coldregion_gradient.py` |
+| File | Where | Description | Generator |
+|------|-------|-------------|-----------|
+| `fig_gauge_network.png` | §2 | Köppen–Geiger climate classes of the gauged catchments (forcing-derived) + catchment-size distribution | `scripts/regenerate_gauge_network_figure.py --write` |
+| `fig_workflow.pdf` | §3 | Dataset production workflow schematic | `scripts/plot_workflow_schematic.py` |
+| `fig_gauge_reliability.png` | §4 | Overall discharge grade + per-gauge share of Grade A years, mapped | `scripts/plot_gauge_reliability.py --write` |
+| `fig_precip_comparison.png` | §7 | Precipitation-product differences | `scripts/regenerate_precip_comparison_figure.py --write` |
+| `fig_budyko.pdf` | §7 | Budyko consistency check, one panel per product | `scripts/generate_budyko_figure.py` |
+| `fig_coldregion_gradient.pdf` | §8 | Example cold-region signature analysis | `scripts/plot_coldregion_gradient.py` |
+| `fig_hydro_signatures_1.png` … `_4.png` | Appendix | Signature maps, released cleaned set | `scripts/plot_signature_maps.py --write` |
 
-Additional figures available in `images/` for supplementary material.
+Generators save each figure once and copy it to the second directory (`shutil.copy2`),
+so `paper/images/` and `paper/overleaf/images/` stay byte-identical — verify md5 parity
+before pushing Overleaf.
 
 ## Building the canonical manuscript
 
@@ -54,7 +54,7 @@ cd paper/overleaf
 latexmk -pdf main.tex
 ```
 
-Requires: `copernicus.cls` (included), `booktabs`, `threeparttable`, `xspace`.
+Requires a TeX Live installation with the packages loaded in `main.tex` (`copernicus.cls` itself is included in the submodule).
 
 ## Key Numbers
 

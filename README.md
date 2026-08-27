@@ -5,8 +5,8 @@
 
 A CAMELS-standard hydrological dataset for the Russian Federation, covering 3,353 catchments with daily discharge, water level, meteorological forcing, physiographic attributes, and hydrological signatures (2008–2023).
 
-**Paper**: The active collaborative manuscript source is the Overleaf git clone at `paper/overleaf/` (target: Earth System Science Data, ESSD)
-**Dataset**: release bundle staged; Zenodo DOI pending
+**Paper**: The active collaborative manuscript source is the Overleaf submodule at `paper/overleaf/` (target: Earth System Science Data, ESSD)
+**Dataset**: Zenodo DOI [10.5281/zenodo.22132299](https://doi.org/10.5281/zenodo.22132299) — reserved; the record goes live upon paper acceptance
 
 ## Dataset Summary
 
@@ -17,7 +17,7 @@ A CAMELS-standard hydrological dataset for the Russian Federation, covering 3,35
 | Water level | 2,989 gauges, daily, 2008–2023 |
 | Forcing | ERA5-Land (T) + GLEAM4 (PET) + MSWEP v2.8 (P), basin-averaged |
 | Attributes | 281 HydroATLAS attributes + 7 derived = 288 columns per catchment (22 primary subset) |
-| Signatures | 15 hydrological metrics for 1,729 gauges (1,716 non-anomalous rows used in the main-text figures) |
+| Signatures | 16 hydrological metrics for 1,729 gauges (1,716 non-anomalous rows used in the main-text figures) |
 | Quality control | Per-year grading (A–F), strict Grade A (all years must be A) |
 
 ## Quality Grading
@@ -40,10 +40,12 @@ camels_ru/
 │   ├── static/              # HydroATLAS extraction and clustering
 │   └── utils/               # Logging and helpers
 ├── scripts/                 # Data processing pipeline
-├── notebooks/               # Analysis notebooks (5, with .py parallels)
+├── notebooks/               # Analysis notebooks (with .py parallels) + delineation utilities
+├── examples/                # Minimal dataset-loading example (load_camels_ru.py)
+├── tests/                   # Self-checking test scripts (run by CI)
 ├── paper/                   # ESSD manuscript assets
-│   ├── overleaf/            # Active manuscript source (nested Overleaf git repo, parent ignored)
-│   └── images/              # Figure generation outputs mirrored into overleaf/images/ when used
+│   ├── overleaf/            # Active manuscript source (git submodule, Overleaf remote)
+│   └── images/              # Canonical manuscript figures, mirrored into overleaf/images/
 ├── app/                     # FastAPI web interface for quality review
 └── release/                 # Zenodo dataset package (gitignored)
 ```
@@ -59,9 +61,9 @@ ERA5-Land/MSWEP/GPCP → aggregate_watersheds.py → per-gauge forcing
                                       ↓
                          create_year_grades.py → year_grades.csv
                                       ↓
-              create_hydro_netcdf.py / create_forcing_netcdf.py → NetCDF-4
+                    create_forcing_netcdf.py → forcing NetCDF-4
                                       ↓
-                          package_dataset.py → Zenodo release
+        package_dataset.py → discharge/water-level NetCDF-4 + Zenodo release
 ```
 
 ## Installation
@@ -76,7 +78,7 @@ pixi install        # Python 3.12+, all dependencies
 
 The dataset is not included in this repository. To use the analysis tools:
 
-1. Download CAMELS-RU from Zenodo after the v1.0 DOI is minted. Until then, use the locally staged release bundle only for internal verification.
+1. Download CAMELS-RU from Zenodo: DOI [10.5281/zenodo.22132299](https://doi.org/10.5281/zenodo.22132299) (the record goes live upon paper acceptance).
 2. Symlink the data directory:
    ```bash
    ln -s /path/to/camels_ru_data data

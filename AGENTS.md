@@ -155,9 +155,8 @@ python scripts/ParseAis*.py               # AIS GMVO (XLS) → compound CSVs
 python scripts/aggregate_watersheds.py    # forcing → per-gauge
 python scripts/GradeCompound.py           # quality grading (A–F)
 python scripts/create_year_grades.py      # year_grades.csv
-python scripts/create_hydro_netcdf.py     # discharge NetCDF
 python scripts/create_forcing_netcdf.py   # forcing NetCDF
-python scripts/package_dataset.py         # Zenodo bundle
+python scripts/package_dataset.py         # discharge/water-level NetCDF + Zenodo bundle
 ```
 
 ---
