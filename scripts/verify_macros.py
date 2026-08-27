@@ -104,6 +104,17 @@ def check_val(label: str, expected: str, actual: str) -> None:
     kv(label, expected, actual, match=(expected == actual))
 
 
+def check_title_count(n_boundaries: int) -> None:
+    r"""Gate the catchment count hardcoded in the manuscript title.
+
+    The title cannot use \ntotal (\xspace is not PDF-string safe), so the
+    count is a literal and this is its only drift gate (round-10 decision).
+    """
+    title = re.search(r"^\\title\{([^}]*)\}", (PAPER / "overleaf" / "main.tex").read_text(), re.M)
+    m = re.search(r"(\d+) Russian catchments", title.group(1)) if title else None
+    check_val("title catchment count", str(n_boundaries), m.group(1) if m else "absent")
+
+
 def check_aet_macros(macros: dict[str, str]) -> None:
     """Reconcile the Table 7 water-balance macros against paper/tables/forcing_water_balance.csv."""
     section("FORCING WATER BALANCE (paper/tables/forcing_water_balance.csv)")
@@ -1266,6 +1277,7 @@ def main() -> None:
         int((~sigs["is_anomalous"].astype(bool)).sum()) if "is_anomalous" in sigs.columns else n_sig_rows
     )
     n_sig_anomalous = n_sig_rows - n_sig_clean
+    check_title_count(n_boundaries)
     paper_scope = paper_analysis_scope_summary(boundaries["gauge_id"].astype(str))
     paper_attr_scope = paper_analysis_scope_summary(attrs["gauge_id"].astype(str))
 
