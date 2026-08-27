@@ -8,7 +8,7 @@ convention as scripts/create_paper_signatures.py, so the MSWEP panel reproduces
 the released aridity_index / evaporative_index columns exactly.
 
 Outputs:
-- paper/images/fig_budyko.png (+ paper/overleaf/images/fig_budyko.png when present)
+- paper/images/fig_budyko.pdf (+ paper/overleaf/images/fig_budyko.pdf when present)
 - paper/tables/forcing_water_balance.csv (Table 7 columns; locked by scripts/verify_macros.py)
 
 Inputs (release files only):
@@ -42,8 +42,10 @@ log = setup_logger("BudykoFigure", log_file="logs/budyko_figure.log")
 ROOT = Path(__file__).parent.parent
 RELEASE = ROOT / "release/CAMELS_RU_v1.0"
 PRODUCTS = {"ERA5-Land": "precip_era5", "MSWEP": "precip_mswep", "GPCP": "precip_gpcp"}
-OUT_PNG = ROOT / "paper/images/fig_budyko.png"
-OVERLEAF_OUT_PNG = ROOT / "paper/overleaf/images/fig_budyko.png"
+# Vector PDF (scatter figure, journal prefers vector for line art); CreationDate
+# stripped so reruns are byte-identical and git-clean.
+OUT_PNG = ROOT / "paper/images/fig_budyko.pdf"
+OVERLEAF_OUT_PNG = ROOT / "paper/overleaf/images/fig_budyko.pdf"
 OUT_TABLE = ROOT / "paper/tables/forcing_water_balance.csv"
 
 
@@ -151,7 +153,7 @@ def _plot(df: pd.DataFrame) -> None:
     OUT_PNG.parent.mkdir(parents=True, exist_ok=True)
     # Save once and copy: two savefig(bbox_inches="tight") calls crop differently,
     # so the two image directories would never agree byte-for-byte.
-    fig.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
+    fig.savefig(OUT_PNG, dpi=300, bbox_inches="tight", metadata={"CreationDate": None})
     if OVERLEAF_OUT_PNG.parent.exists():
         shutil.copy2(OUT_PNG, OVERLEAF_OUT_PNG)
     plt.close(fig)

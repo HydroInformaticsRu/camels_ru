@@ -17,8 +17,8 @@ as trustworthy as the winter coverage behind it. All numbers derive from the rel
 CAMELS-RU v1.0 artifacts; no modelling is involved.
 
 Outputs:
-    paper/images/fig_coldregion_gradient.png
-    paper/overleaf/images/fig_coldregion_gradient.png
+    paper/images/fig_coldregion_gradient.pdf
+    paper/overleaf/images/fig_coldregion_gradient.pdf
     results/hess_quality/coldregion_gradient_bins.csv
 """
 
@@ -293,12 +293,15 @@ def main() -> None:
     prov.to_csv(RESULTS / "coldregion_gradient_bins.csv", index=False)
     first, *rest = IMG_DIRS  # save once, copy: repeated tight saves differ by a few pixels
     first.mkdir(parents=True, exist_ok=True)
-    fig.savefig(first / "fig_coldregion_gradient.png", bbox_inches="tight")
-    print(f"wrote {first / 'fig_coldregion_gradient.png'}")
+    # Vector PDF (scatter/line figure); CreationDate stripped for reproducible bytes.
+    fig.savefig(
+        first / "fig_coldregion_gradient.pdf", bbox_inches="tight", metadata={"CreationDate": None}
+    )
+    print(f"wrote {first / 'fig_coldregion_gradient.pdf'}")
     for d in rest:
         d.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(first / "fig_coldregion_gradient.png", d / "fig_coldregion_gradient.png")
-        print(f"wrote {d / 'fig_coldregion_gradient.png'}")
+        shutil.copy2(first / "fig_coldregion_gradient.pdf", d / "fig_coldregion_gradient.pdf")
+        print(f"wrote {d / 'fig_coldregion_gradient.pdf'}")
     plt.close(fig)
 
 
