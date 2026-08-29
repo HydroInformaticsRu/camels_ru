@@ -217,50 +217,24 @@ def main() -> None:
     ax_a.set_ylabel("Winter flow ratio")
     ax_a.set_title(f"(a) Winter flow ratio ($\\rho$ = {rho_w:+.2f})", loc="left")
     ax_a.legend(loc="upper right", frameon=False)
-    # fig.colorbar(sc, ax=ax_a, ...) reserves its space from panel (a) correctly only under
-    # constrained_layout (set on the figure below); under the plain fig.tight_layout() this
-    # script used before, that reservation gets reclaimed and the bar abuts panel (b) instead.
-    # Horizontal, below panel (a) rather than the default vertical-right placement: a
-    # rotated side label wide enough to clear the font floor reached past the colorbar into
-    # panel (b)'s own y-axis label (reading as if it belonged to panel (b)), and a title
-    # placed above the bar instead collided with panel (a)'s own title directly above it.
-    # Below is genuinely free - only panel (a)'s x-axis row lives there.
-    cb = fig.colorbar(sc, ax=ax_a, orientation="horizontal", fraction=0.05, pad=0.18, aspect=22)
-    cb.set_label("Mean annual T (\u00b0C)", fontsize=FS)
+    # Vertical inset in panel (a)'s sparse mid-right interior: the previous full-width
+    # horizontal bar below the panel forced a dead white band under panels (b)/(c),
+    # since only (a) carries a colorbar.
+    # Horizontal inset in the empty center of panel (a), below the legend: the data hug
+    # the left edge and the bottom, the right edge carries the legend and the endpoint
+    # annotation, so this is the one region where bar, ticks, and label all fit clear.
+    cax = ax_a.inset_axes([0.40, 0.60, 0.42, 0.045])
+    cb = fig.colorbar(sc, cax=cax, orientation="horizontal")
+    cb.set_label("Mean annual T (\u00b0C)", fontsize=FS - 2)
+    cb.ax.tick_params(labelsize=FS - 4)
 
     # ---- Panel B: the baseflow index over the same bins ----------------------
     ax_b.scatter(pf, bfi, s=10, alpha=0.35, color="0.45", linewidths=0)
     ax_b.plot(bm["center"], bm["median"], "-o", color="#b2182b", lw=2, ms=4, label="binned median")
     ax_b.fill_between(bm["center"], bm["q25"], bm["q75"], color="#b2182b", alpha=0.12, label="IQR")
-    for i, (_, row) in enumerate(bm.iterrows()):
-        # The first three bins (centers 2.5/7.5/15) sit close together on this 0-100 axis;
-        # at floor-clearing size same-side labels collide with each other and, for the
-        # leftmost bin, with the y-tick column. Alternate above/below the line, and anchor
-        # the leftmost bin to the right of its point instead of centered on it.
-        above = i % 2 == 0
-        # +-9pt wasn't enough clearance for the first two bins (centers 2.5/7.5 are only
-        # ~14pt apart in y at this font size) - +-20 pushes each string clear of the other
-        # by diverging away from the shared zone between them, not just alternating side.
-        dy = 20 if above else -20
-        ha = "left" if row["center"] < 5 else "center"
-        dx = 0
-        if i == 2:
-            # Bin 0's label ("776", left-anchored, above) is wide enough at floor-clearing
-            # size that it still reached into bin 2's own "above" label ("83", centered 15
-            # data-units away) - pushed further up and right, clear of that reach.
-            dy = 36
-            dx = 8
-        xytext = (4, dy) if ha == "left" else (dx, dy)
-        ax_b.annotate(
-            f"{int(row['n'])}",
-            (row["center"], row["median"]),
-            textcoords="offset points",
-            xytext=xytext,
-            ha=ha,
-            va="bottom" if above else "top",
-            fontsize=FS,
-            color="#b2182b",
-        )
+    # Per-bin counts dropped: the bins and gauges are identical to panel (a)'s, whose
+    # endpoint annotations already carry the range (n=776 down to n=43); seven red
+    # numbers over the data read as clutter for no added information.
     ax_b.set_ylim(bottom=0)
     ax_b.set_xlabel("Permafrost extent (%)")
     ax_b.set_ylabel("Baseflow index")
@@ -279,7 +253,9 @@ def main() -> None:
     # caption, "DOY" is the standard abbreviation.
     ax_c.set_ylabel("Half-flow date (DOY)")
     ax_c.set_title("(c) Half-flow date by snow-cover extent", loc="left")
-    ax_c.legend(loc="upper left", frameon=False)
+    # Lower right is the empty corner: the median line and IQR band climb through the
+    # upper left, where the legend previously sat on top of the shading.
+    ax_c.legend(loc="lower right", frameon=False)
 
     RESULTS.mkdir(parents=True, exist_ok=True)
     prov = pd.concat(
