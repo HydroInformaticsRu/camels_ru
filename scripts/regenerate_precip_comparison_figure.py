@@ -157,10 +157,6 @@ def plot(df: pd.DataFrame, out: Path) -> None:
             colorbar=False,
             title=f"({panel[j]}) {minuend} − {subtrahend}",
             background_gdf=ne,
-            # Editor pre-review: no coordinate reference on the map. ~0.54x shrink to
-            # \textwidth from this 13in figure, so labels need to start well above 7pt.
-            graticule_labels=True,
-            graticule_label_size=14,
         )
     # Map-furniture consistency pass: one scale bar for the figure (both panels share the
     # same extent), placed on panel (a).

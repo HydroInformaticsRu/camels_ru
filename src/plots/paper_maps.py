@@ -118,87 +118,24 @@ def _hide_frame(ax: Axes) -> None:
     ax.set_yticks([])
 
 
-def _normalize_label_rotation(gl) -> None:  # noqa: ANN001 - cartopy.mpl.gridliner.Gridliner
-    """Patch a Gridliner so its non-inline labels never render past +/-90 degrees.
-
-    Cartopy rotates each label to follow the local gridline tangent (``rotate_labels``,
-    on by default for non-rectangular projections such as this Albers conic): it picks
-    ``rotation`` and ``ha`` together from the raw tangent angle so the label always reads
-    outward from the map, using an internal +/-90-degree band offset by 25 degrees
-    (``self.offset_angle``, uncentered on purpose so a label just past vertical on one side
-    still gets flipped the same way as its neighbours on a *rectangular* grid). On this
-    conic that offset leaves a wedge of angles (past +90 up to +115, and symmetrically
-    below -90) where cartopy keeps the un-flipped pairing even though the result reads
-    upside-down/mirrored - seen on the meridian labels nearest the map's central longitude
-    (100/120E) and on the outer parallel labels once `_add_graticule` starts drawing those
-    too (e.g. 50N at its top-edge crossing).
-
-    The fix re-derives ``rotation`` and ``ha`` together from the same raw angle using a
-    symmetric +/-90 band instead, which keeps the label's outward-facing direction
-    unchanged (only *which* of the two equivalent (rotation, ha) pairs represents it
-    flips) - so it's applied by wrapping the private ``_get_text_specs`` method that
-    computes them, not by tweaking the finished label afterwards. Tweaking rotation alone
-    post hoc was tried and rejected: cartopy renders each label as soon as this method
-    returns to test it against the map frame and decide visibility, so a rotation-only
-    change either lands too late to affect that render (leaving the wrong pixels painted)
-    or, patched before the render, feeds a box cartopy doesn't expect and silently drops
-    labels that should be visible. Recomputing the matched (rotation, ha) pair keeps that
-    render self-consistent, so cartopy's own placement/visibility logic still applies
-    correctly to it. It has to be a patch on the instance, not a one-off fix, because
-    Gridliner recomputes every label - calling this method again - on each draw, e.g. once
-    for the on-screen draw and again at `savefig`.
-    """
-    original = gl._get_text_specs
-
-    def _upright_text_specs(angle, loc, xylabel):
-        kw = original(angle, loc, xylabel)
-        if kw.get("rotation_mode") == "anchor":
-            a = angle
-            if a > 180:
-                a -= 360
-            elif a <= -180:
-                a += 360
-            if -90 < a <= 90:
-                kw["ha"] = "left"
-                kw["rotation"] = a
-            else:
-                kw["ha"] = "right"
-                kw["rotation"] = (a - 180) if a > 90 else (a + 180)
-        return kw
-
-    gl._get_text_specs = _upright_text_specs
-
-
 def _add_graticule(
     ax: Axes,
     *,
     lon_step: int = 20,
     lat_step: int = 10,
-    draw_labels: bool = False,
-    label_size: int = 6,
-    bottom_labels: bool = True,
 ) -> None:
     """Add a subtle lat/lon graticule to a GeoAxes.
 
     Meridians every *lon_step* degrees and parallels every *lat_step* degrees
     are drawn as thin, light-grey dashed lines underneath the data layer.
-    Labels are rendered at *label_size* points when *draw_labels* is True, all
-    kept upright by `_normalize_label_rotation`: longitude along the bottom,
-    and latitude at whichever spine each parallel actually crosses. The
-    network's lowest one or two parallels (~30/40N) cross the left spine, as
-    on a typical mid-latitude map, but this Albers conic curves the higher
-    ones (50N and up) inward as their radius shrinks toward the pole, so they
-    exit through the top spine instead - enabling top labels only for
-    latitude (`top_labels="y"`, longitude stays bottom-only) picks those up
-    at their true crossing rather than leaving them unlabelled or falling
-    back to cartopy's interior ``geo_labels`` placement, which drifts into
-    the data. Set *bottom_labels=False* for the upper panel(s) of a
-    vertically stacked figure sharing one extent, so longitude labels don't
-    collide with the next panel's title.
+    The graticule is deliberately unlabelled: on this Albers conic the labels
+    follow the curved gridline tangents and render rotated at the map edges,
+    which reads as clutter at manuscript scale, so the lines alone carry the
+    orientation cue.
     """
-    gl = ax.gridlines(
+    ax.gridlines(
         crs=_DATA_CRS,
-        draw_labels=draw_labels,
+        draw_labels=False,
         linewidth=0.4,
         color="#888888",
         alpha=0.45,
@@ -207,17 +144,6 @@ def _add_graticule(
         xlocs=list(range(0, 181, lon_step)),
         ylocs=list(range(30, 81, lat_step)),
     )
-    if draw_labels:
-        gl.top_labels = "y"
-        gl.right_labels = False
-        gl.bottom_labels = bottom_labels
-        gl.left_labels = True
-        # The interior placement latitude labels fall back to when they cross neither the
-        # left nor top spine cleanly (see docstring); superseded by `top_labels="y"` above.
-        gl.geo_labels = False
-        gl.xlabel_style = {"size": label_size, "color": "#555555"}
-        gl.ylabel_style = {"size": label_size, "color": "#555555"}
-        _normalize_label_rotation(gl)
 
 
 def add_scale_bar(
@@ -286,9 +212,6 @@ def scatter_map(
     background_gdf: gpd.GeoDataFrame | None = None,
     title_fontsize: int = 12,
     colorbar_ticklabelsize: int = 9,
-    graticule_labels: bool = False,
-    graticule_label_size: int = 7,
-    graticule_bottom_labels: bool = True,
 ) -> Axes:
     """Plot continuous-valued scatter map on a single axis.
 
@@ -332,12 +255,7 @@ def scatter_map(
     # Set extent from data, then draw background clipped to it
     _hide_frame(ax)
     _set_extent_from_data(ax, gdf)
-    _add_graticule(
-        ax,
-        draw_labels=graticule_labels,
-        label_size=graticule_label_size,
-        bottom_labels=graticule_bottom_labels,
-    )
+    _add_graticule(ax)
 
     if background_gdf is not None:
         aea_proj4 = get_russia_projection().proj4_init
@@ -432,8 +350,6 @@ def continuous_multiplot(
     background_gdf: gpd.GeoDataFrame | None = None,
     title_fontsize: int = 12,
     colorbar_ticklabelsize: int = 9,
-    graticule_labels: bool = False,
-    graticule_label_size: int = 7,
 ) -> Figure:
     """Create N-panel scatter maps with colorbars for continuous metrics.
 
@@ -496,10 +412,6 @@ def continuous_multiplot(
 
         edges = bin_intervals.get(metric)
         cb_label = colorbar_labels.get(metric, "")
-        # All panels share one extent, stacked in rows: a non-bottom-row panel's longitude
-        # labels would sit directly above the next row's title, so only the actual bottom
-        # row gets them (matches the fix used for fig_gauge_reliability's stacked panels).
-        is_bottom_row = row == nrows - 1
 
         scatter_map(
             gdf,
@@ -515,9 +427,6 @@ def continuous_multiplot(
             background_gdf=background_gdf,
             title_fontsize=title_fontsize,
             colorbar_ticklabelsize=colorbar_ticklabelsize,
-            graticule_labels=graticule_labels,
-            graticule_label_size=graticule_label_size,
-            graticule_bottom_labels=is_bottom_row,
         )
 
     # Hide unused axes

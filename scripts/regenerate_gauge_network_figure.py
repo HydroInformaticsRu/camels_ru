@@ -217,7 +217,7 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
     # same font floor as the other figures (~0.54x shrink at \textwidth from this 13in figure).
     from src.plots.paper_maps import _add_graticule, add_scale_bar
 
-    _add_graticule(ax_map, draw_labels=True, label_size=14)
+    _add_graticule(ax_map)
     add_scale_bar(ax_map, length_km=1000, fontsize=14)
     ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
     ne_land.to_crs(aea.proj4_init).plot(

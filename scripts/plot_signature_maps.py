@@ -119,12 +119,9 @@ def build_figure(
         # 0.95\textwidth from a 16in-wide source, hence each panel prints ~2x wider now: a
         # full \textwidth instead of half of 0.95\textwidth shared between two columns).
         # 14pt source clears the 7pt print floor with margin (14 * 0.59 ~= 8.3pt) without
-        # printing oversized; same figure scale, so the graticule labels below use the same
-        # 14pt.
+        # printing oversized.
         title_fontsize=14,
         colorbar_ticklabelsize=14,
-        graticule_labels=True,
-        graticule_label_size=14,
     )
     # Map-furniture consistency pass: one scale bar per figure (both panels share one
     # extent), placed on panel (a), clear of the Far-East gauge cluster and the top-edge
