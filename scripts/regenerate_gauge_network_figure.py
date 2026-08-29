@@ -213,12 +213,9 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
 
     ax_map.axis("off")
     _set_extent_from_data(ax_map, gauge, pad=0.04)  # tighter than the 0.08 default
-    # Editor pre-review: no coordinate reference on the map. Graticule labels sized for the
-    # same font floor as the other figures (~0.54x shrink at \textwidth from this 13in figure).
-    from src.plots.paper_maps import _add_graticule, add_scale_bar
+    from src.plots.paper_maps import _add_graticule
 
     _add_graticule(ax_map)
-    add_scale_bar(ax_map, length_km=1000, fontsize=14)
     ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
     ne_land.to_crs(aea.proj4_init).plot(
         ax=ax_map, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.3, zorder=1

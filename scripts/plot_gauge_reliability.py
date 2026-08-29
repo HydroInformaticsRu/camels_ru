@@ -262,13 +262,6 @@ def build_figure(gauge: gpd.GeoDataFrame) -> plt.Figure:
     _basemap(axes[1], gauge, aea)
     _panel_grades(axes[0], gauge, data_crs)
     _panel_reliability(fig, axes[1], gauge, data_crs)
-    # One scale bar for the figure (both panels share the same extent) rather than one per
-    # panel, to keep it unobtrusive. Placed in the empty interior of northern Siberia: the
-    # lower-right corner (the previous placement) sits on the dense Far-East gauge cluster,
-    # and panel (a)'s grade legend already occupies lower-left.
-    from src.plots.paper_maps import add_scale_bar
-
-    add_scale_bar(axes[0], length_km=1000, loc=(0.47, 0.55), fontsize=12)
     return fig
 
 

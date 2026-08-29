@@ -123,13 +123,6 @@ def build_figure(
         title_fontsize=14,
         colorbar_ticklabelsize=14,
     )
-    # Map-furniture consistency pass: one scale bar per figure (both panels share one
-    # extent), placed on panel (a), clear of the Far-East gauge cluster and the top-edge
-    # latitude labels (ESSD editor round-N re-review: the old lower-right placement sat on
-    # top of the Far-East data).
-    from src.plots.paper_maps import add_scale_bar
-
-    add_scale_bar(fig.axes[0], length_km=1000, loc=(0.47, 0.55), fontsize=14)
     return fig
 
 

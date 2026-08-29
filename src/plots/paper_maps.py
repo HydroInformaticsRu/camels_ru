@@ -146,44 +146,6 @@ def _add_graticule(
     )
 
 
-def add_scale_bar(
-    ax: Axes,
-    length_km: float = 1000,
-    loc: tuple[float, float] = (0.05, 0.06),
-    fontsize: int = 12,
-) -> None:
-    """Draw a simple linear scale bar directly in the GeoAxes' own (projected) units.
-
-    Valid because the axes use the Albers equal-area conic projection (`get_russia_projection`),
-    so a straight length in projected meters is a defensible, if not geodesically exact, distance.
-    Shared by every map figure so the "scale bar is approximate" caption sentence holds everywhere.
-
-    Args:
-        ax: GeoAxes with its extent already set (xlim/ylim in projected meters).
-        length_km: Bar length in kilometres.
-        loc: (x, y) fraction of the current axes extent for the bar's left end.
-        fontsize: Label font size; caller picks a value that clears the 7pt print floor for
-            that figure's own textwidth shrink factor.
-    """
-    xlim, ylim = ax.get_xlim(), ax.get_ylim()
-    x0 = xlim[0] + loc[0] * (xlim[1] - xlim[0])
-    y0 = ylim[0] + loc[1] * (ylim[1] - ylim[0])
-    length_m = length_km * 1000.0
-    tick = 0.012 * (ylim[1] - ylim[0])
-    ax.plot([x0, x0 + length_m], [y0, y0], color="black", linewidth=1.6, solid_capstyle="butt", zorder=6)
-    for x in (x0, x0 + length_m):
-        ax.plot([x, x], [y0 - tick, y0 + tick], color="black", linewidth=1.2, zorder=6)
-    ax.text(
-        x0 + length_m / 2,
-        y0 + tick * 1.6,
-        f"{int(length_km)} km",
-        ha="center",
-        va="bottom",
-        fontsize=fontsize,
-        zorder=6,
-    )
-
-
 def _auto_bins(values: np.ndarray, n_bins: int = 6) -> np.ndarray:
     """Generate evenly-spaced bin edges from data range."""
     vmin, vmax = float(np.nanmin(values)), float(np.nanmax(values))

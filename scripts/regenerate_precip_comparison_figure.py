@@ -158,12 +158,6 @@ def plot(df: pd.DataFrame, out: Path) -> None:
             title=f"({panel[j]}) {minuend} − {subtrahend}",
             background_gdf=ne,
         )
-    # Map-furniture consistency pass: one scale bar for the figure (both panels share the
-    # same extent), placed on panel (a).
-    from src.plots.paper_maps import add_scale_bar
-
-    add_scale_bar(axes[0], length_km=1000, fontsize=14)
-
     n = len(edges) - 1
     sm = plt.cm.ScalarMappable(norm=BoundaryNorm(edges, n), cmap=plt.get_cmap("RdBu_r", n))
     cb = fig.colorbar(sm, ax=list(axes), orientation="horizontal", shrink=0.5, aspect=45, pad=0.02)
