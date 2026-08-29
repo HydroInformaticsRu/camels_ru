@@ -213,6 +213,10 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
 
     ax_map.axis("off")
     _set_extent_from_data(ax_map, gauge, pad=0.04)  # tighter than the 0.08 default
+    # The aspect-locked GeoAxes is height-bound, so constrained_layout centers it
+    # vertically in its cell and its title sags below panel (b)'s; anchoring north
+    # aligns both panel tops and frees the space below the map for the legend.
+    ax_map.set_anchor("N")
     from src.plots.paper_maps import _add_graticule
 
     _add_graticule(ax_map)
@@ -285,13 +289,12 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
             )
         )
     # The legend sits below the map, outside the frame, so it cannot cover the
-    # southwest gauge cluster it labels (round-6 editor m7).
-    fig = ax_map.get_figure()
-    # Font floor: legend text bumped 8->13pt; ncol dropped 6->4 so the wider entries
-    # (~1.6x) still fit below the map instead of overflowing the figure width.
-    fig.legend(
+    # southwest gauge cluster it labels (round-6 editor m7). Anchored to the map
+    # axes (not the figure) so it centers under the panel it describes.
+    ax_map.legend(
         handles=handles,
-        loc="outside lower center",
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.01),
         fontsize=13,
         framealpha=0.9,
         ncol=4,
