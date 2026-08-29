@@ -146,6 +146,42 @@ def _add_graticule(
     )
 
 
+def _format_edge_labels(edges: np.ndarray) -> list[str]:
+    """Clean numeric tick labels: no scientific notation, no trailing zeros."""
+    labels = []
+    for v in edges:
+        if v == 0:
+            labels.append("0")
+        elif v == int(v) and abs(v) >= 1:
+            labels.append(f"{int(v)}")
+        else:
+            labels.append(f"{v:g}")
+    return labels
+
+
+def _colorbar_histogram(cb, values: np.ndarray, edges: np.ndarray, cmap) -> None:  # noqa: ANN001
+    """Draw a per-class frequency bar row above a horizontal discrete colorbar.
+
+    CAMELS-FR / LamaH-CE convention: the legend doubles as a histogram — one bar
+    per colour class, aligned above its segment (BoundaryNorm colorbars use uniform
+    segment widths), so the sample distribution rides along without an extra panel.
+    Values are clipped to the outer edges first so the tally matches the plotted dots.
+    """
+    n = len(edges) - 1
+    counts, _ = np.histogram(np.clip(values, edges[0], edges[-1]), bins=edges)
+    hax = cb.ax.inset_axes([0.0, 1.15, 1.0, 1.6])
+    hax.bar(
+        np.arange(n) + 0.5,
+        counts,
+        width=0.96,
+        color=[cmap(i) for i in range(n)],
+        edgecolor="none",
+    )
+    hax.set_xlim(0, n)
+    hax.set_ylim(0, float(counts.max()) * 1.05 if counts.max() else 1.0)
+    hax.axis("off")
+
+
 def _auto_bins(values: np.ndarray, n_bins: int = 6) -> np.ndarray:
     """Generate evenly-spaced bin edges from data range."""
     vmin, vmax = float(np.nanmin(values)), float(np.nanmax(values))
@@ -261,19 +297,12 @@ def scatter_map(
                 aspect=30,
             )
             cb.set_ticks(edges.tolist())
-            # Clean numeric labels: no scientific notation, no trailing zeros
-            labels = []
-            for v in edges:
-                if v == 0:
-                    labels.append("0")
-                elif v == int(v) and abs(v) >= 1:
-                    labels.append(f"{int(v)}")
-                else:
-                    labels.append(f"{v:g}")
-            cb.set_ticklabels(labels)
+            cb.set_ticklabels(_format_edge_labels(edges))
             cb.ax.tick_params(labelsize=colorbar_ticklabelsize)
             if colorbar_label:
                 cb.set_label(colorbar_label, fontsize=10)
+            if colorbar_orientation == "horizontal":
+                _colorbar_histogram(cb, values, edges, cmap)
 
     if show_nan and bool(nan_mask.any()):
         nan_gdf = gdf[nan_mask]

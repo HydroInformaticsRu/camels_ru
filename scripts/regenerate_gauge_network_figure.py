@@ -188,6 +188,106 @@ def load_data() -> tuple[gpd.GeoDataFrame, pd.Series]:
     return gauge, size_counts
 
 
+def _hero_background(ax: plt.Axes, aea: ccrs.Projection) -> None:
+    """Hillshade + major-river backdrop for the hero map (CAMELS-CH/FR convention).
+
+    Only Fig. 1 gets this treatment; every repeated attribute/signature map keeps the
+    flat gray silhouette, matching the hero/small-multiple split used by CAMELS-FR and
+    LamaH-CE. The MERIT mosaic (253 tiles, decimated to 0.05 deg/px) and the RiverATLAS
+    extract are cached in .tmp/ — delete the cache files to force a rebuild.
+    """
+    from matplotlib.colors import LightSource
+    import numpy as np
+    import pyogrio
+    import rasterio
+
+    # Bounds aligned to the 5-degree MERIT tile grid so every tile lands whole
+    lon0, lon1, lat0, lat1 = 15, 180, 40, 85
+    cache = PROJECT_ROOT / ".tmp"
+    cache.mkdir(exist_ok=True)
+
+    dem_npz = cache / "hero_dem_0p05.npz"
+    if dem_npz.exists():
+        z = np.load(dem_npz)["z"]
+    else:
+        px = 100  # each 5-degree MERIT tile decimated to 100 px -> 0.05 deg/px
+        z = np.full(((lat1 - lat0) * 20, (lon1 - lon0) * 20), np.nan, dtype="float32")
+        rasters = PROJECT_ROOT / "data/World/SpatialData/merit_global/adjusted_elevation/rasters"
+        for f in sorted(rasters.glob("n*_elv.tif")):
+            m = re.search(r"n(\d+)e(\d+)", f.name)
+            if m is None:
+                continue
+            tlat, tlon = int(m.group(1)), int(m.group(2))
+            if not (lat0 <= tlat < lat1 and lon0 <= tlon < lon1):
+                continue
+            with rasterio.open(f) as src:
+                a = src.read(1, out_shape=(px, px)).astype("float32")
+            a[a < -100] = np.nan  # MERIT nodata (ocean)
+            row0 = (lat1 - (tlat + 5)) * 20
+            col0 = (tlon - lon0) * 20
+            z[row0 : row0 + px, col0 : col0 + px] = a
+        np.savez_compressed(dem_npz, z=z)
+
+    # vert_exag tuned visually: 5 was invisible at print scale, 15 keeps the plains
+    # light while making the eastern ranges read at \textwidth
+    shade = LightSource(azdeg=315, altdeg=45).hillshade(
+        np.nan_to_num(z, nan=0.0), vert_exag=15.0, dx=2800.0, dy=5500.0
+    )
+    ax.imshow(
+        np.ma.masked_where(np.isnan(z), shade),
+        extent=(lon0, lon1, lat0, lat1),
+        transform=ccrs.PlateCarree(),
+        origin="upper",
+        cmap="gray",
+        vmin=0.0,
+        vmax=1.0,
+        alpha=0.45,
+        zorder=1.05,
+        interpolation="bilinear",
+        regrid_shape=1200,
+    )
+
+    rivers_gpkg = cache / "hero_rivers.gpkg"
+    if rivers_gpkg.exists():
+        rivers = gpd.read_file(rivers_gpkg)
+    else:
+        rivers = pyogrio.read_dataframe(
+            str(PROJECT_ROOT / "data/World/SpatialData/HydroSheds/RiverATLAS_v10.gdb"),
+            layer="RiverATLAS_v10",
+            columns=["UPLAND_SKM"],
+            where="UPLAND_SKM >= 25000",
+            bbox=(lon0, lat0, lon1, lat1),
+        )
+        rivers.to_file(rivers_gpkg, driver="GPKG")
+    rivers.to_crs(aea.proj4_init).plot(ax=ax, color="#5b8cb8", linewidth=0.45, alpha=0.6, zorder=1.2)
+
+
+def _scale_bar(ax: plt.Axes, length_km: float = 1000.0, fontsize: int = 14) -> None:
+    """Corner scale bar in projected meters; approximate on an equal-area conic.
+
+    Hero map only (CAMELS-CH/FR/LamaH precedent). No north arrow: on a conic spanning
+    165 degrees of longitude, north varies visibly across the map, so a single arrow
+    would be wrong — the meridian lines carry that information.
+    """
+    xlim, ylim = ax.get_xlim(), ax.get_ylim()
+    x0 = xlim[0] + 0.04 * (xlim[1] - xlim[0])
+    y0 = ylim[0] + 0.06 * (ylim[1] - ylim[0])
+    length_m = length_km * 1000.0
+    tick = 0.012 * (ylim[1] - ylim[0])
+    ax.plot([x0, x0 + length_m], [y0, y0], color="black", lw=1.6, solid_capstyle="butt", zorder=6)
+    for x in (x0, x0 + length_m):
+        ax.plot([x, x], [y0 - tick, y0 + tick], color="black", lw=1.2, zorder=6)
+    ax.text(
+        x0 + length_m / 2,
+        y0 + tick * 1.6,
+        f"{int(length_km)} km",
+        ha="center",
+        va="bottom",
+        fontsize=fontsize,
+        zorder=6,
+    )
+
+
 def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
     """Assemble the two-panel study-area figure.
 
@@ -224,6 +324,8 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
     ne_land.to_crs(aea.proj4_init).plot(
         ax=ax_map, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.3, zorder=1
     )
+    _hero_background(ax_map, aea)
+    _scale_bar(ax_map)
 
     counts = gauge["kg"].value_counts()
     # Classes with MERGE_MAX or fewer catchments merge into a grey "other" class:
