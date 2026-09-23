@@ -35,6 +35,8 @@ import pandas as pd
 from scipy.stats import spearmanr
 import xarray as xr
 
+from utils.release_io import open_release_dataset
+
 REPO = Path(__file__).resolve().parent.parent
 RELEASE = REPO / "release" / "CAMELS_RU_v1.0"
 OUT = REPO / "paper" / "tables" / "stage_discharge.csv"
@@ -48,12 +50,12 @@ WEAK = 0.5  # rho below this warrants inspection
 
 def load_pairs() -> tuple[np.ndarray, np.ndarray, list[str], np.ndarray, np.ndarray]:
     """Return observed-only discharge and stage matrices plus the gauge and month axes."""
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as dq:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as dq:
         q = dq["discharge_m3s"].values.astype(float)
         q_obs = dq["quality_flag"].values == 0
         gauge_id = [str(g) for g in dq["gauge_id"].values]
         months = pd.DatetimeIndex(dq["time"].values).month.to_numpy()
-    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as dh:
+    with open_release_dataset(RELEASE / "camels_ru_water_level.nc") as dh:
         h = dh["water_level_cm"].values.astype(float)
         h_obs = dh["quality_flag"].values == 0
         gauge_type = dh["gauge_type"].values

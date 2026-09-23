@@ -1,4 +1,6 @@
 {
+  "venvPath": ".pixi/envs",
+  "venv": "default",
   "include": ["src"],
   "exclude": ["**/data", "**/__pycache__", ".venv", "build", "dist"],
   "pythonVersion": "3.12",

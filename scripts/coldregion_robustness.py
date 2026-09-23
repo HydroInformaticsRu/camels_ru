@@ -35,7 +35,8 @@ import numba
 import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
-import xarray as xr
+
+from utils.release_io import open_release_dataset
 
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = ROOT / "release" / "CAMELS_RU_v1.0"
@@ -54,13 +55,13 @@ N_BOOT = 2000
 RNG = np.random.default_rng(1996)
 
 
-def load_subset() -> pd.DataFrame:
-    """Load the Grade A/B, dam-excluded, non-anomalous subset with cold-region attributes."""
-    sig = pd.read_csv(RELEASE / "camels_ru_signatures.csv")
+def load_subset(release_dir: Path = RELEASE) -> pd.DataFrame:
+    """Load the Grade A/B, dam-excluded, non-anomalous subset from the selected release."""
+    sig = pd.read_csv(release_dir / "camels_ru_signatures.csv")
     sig["gauge_id"] = sig["gauge_id"].astype(str)
-    att = pd.read_csv(RELEASE / "camels_ru_attributes.csv")
+    att = pd.read_csv(release_dir / "camels_ru_attributes.csv")
     att["gauge_id"] = att["gauge_id"].astype(str)
-    summary = pd.read_csv(RELEASE / "camels_ru_gauge_summary.csv")
+    summary = pd.read_csv(release_dir / "camels_ru_gauge_summary.csv")
     summary["gauge_id"] = summary["gauge_id"].astype(str)
 
     att_cols = ["gauge_id", "dor_pc_pva", "snw_pc_uyr", "prm_pc_use", "tmp_dc_uyr"]
@@ -157,7 +158,7 @@ def recession_alpha(discharge: np.ndarray) -> float:
 
 def eckhardt_bfi_for_gauges(gauge_ids: list[str]) -> pd.Series:
     """Recompute BFI with the Eckhardt filter from released daily discharge (mm/day)."""
-    ds = xr.open_dataset(RELEASE / "camels_ru_discharge.nc")
+    ds = open_release_dataset(RELEASE / "camels_ru_discharge.nc")
     q_all = ds["discharge_mm"]
     gc = "gauge_id" if "gauge_id" in ds.coords else "gauge"
     avail = set(ds[gc].values.astype(str))
@@ -190,7 +191,7 @@ def lh_bfi_for_gauges_at_alphas(gauge_ids: list[str], alphas: list[float]) -> pd
     sys.path.append(str(ROOT))
     from src.hydro.base_flow import _single_bfi_calculation
 
-    ds = xr.open_dataset(RELEASE / "camels_ru_discharge.nc")
+    ds = open_release_dataset(RELEASE / "camels_ru_discharge.nc")
     q_all = ds["discharge_mm"]
     gc = "gauge_id" if "gauge_id" in ds.coords else "gauge"
     avail = set(ds[gc].values.astype(str))

@@ -20,7 +20,8 @@ import sys
 
 import pandas as pd
 from tqdm.auto import tqdm
-import xarray as xr
+
+from utils.release_io import open_release_dataset
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "src"))
@@ -41,9 +42,9 @@ def main(limit: int | None = None) -> None:
     year_cols = [c for c in yg.columns if c.isdigit()]
     yg = yg.set_index("gauge_id")
 
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as dds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as dds:
         q = dds["discharge_mm"].sel(gauge_id=list(yg.index)).to_pandas()
-    with xr.open_dataset(RELEASE / "camels_ru_forcing.nc") as fds:
+    with open_release_dataset(RELEASE / "camels_ru_forcing.nc") as fds:
         p = fds["precip_mswep"].sel(gauge_id=list(yg.index)).to_pandas()
     if q.shape[0] != len(yg.index):  # to_pandas orients (gauge_id, time) rows-first
         q, p = q.T, p.T

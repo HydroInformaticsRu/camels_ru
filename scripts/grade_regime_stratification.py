@@ -24,7 +24,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import xarray as xr
+
+from utils.release_io import open_release_dataset
 
 REPO = Path(__file__).resolve().parent.parent
 RELEASE = REPO / "release" / "CAMELS_RU_v1.0"
@@ -57,7 +58,7 @@ WINTER_MAX = 0.5
 
 def winter_gap_flags() -> pd.DataFrame:
     """Recompute the Sect. 4.1.1 winter-gap gauges from the released discharge file."""
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
         present = ds["discharge_mm"].notnull().values
         months = pd.DatetimeIndex(ds["time"].values).month
         gauge_id = [str(g) for g in ds["gauge_id"].values]

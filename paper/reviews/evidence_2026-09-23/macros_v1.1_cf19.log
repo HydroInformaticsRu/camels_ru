@@ -1,0 +1,613 @@
+Release directory: release/CAMELS_RU_v1.1_cf19
+Audit evidence: repository paper/tables and results/hess_quality (not regenerated).
+
+======================================================================
+COUNTS
+======================================================================
+[OK ] title catchment count                     paper=3353                       actual=3353
+[OK ] nbothrecords                              paper=2158                       actual=2158
+[OK ] nanyrecord                                paper=3001                       actual=3001
+[OK ] nnorecord                                 paper=352                        actual=352
+[OK ] nshortrecord                              paper=94                         actual=94
+[OK ] ntotal (boundaries.gpkg polygons)         paper=3,353                      actual=3353
+[OK ] nattrsgauges (attributes.csv rows)        paper=3,339                      actual=3339 (HydroATLAS-covered)
+[OK ] ndischarge (discharge.nc gauges w/ any data)  paper=2,170                      actual=2170
+[OK ] ngraded                                   paper=2065                       actual=2065
+[OK ] nungraded                                 paper=105                        actual=105
+[OK ] nqanomalygauges                           paper=23                         actual=23
+[OK ] nqanomalyinsig                            paper=12                         actual=12
+[OK ] nblankyears                               paper=212                        actual=212
+[OK ] nblankyeargauges                          paper=81                         actual=81
+[OK ] ngraded                                   paper=2065                       actual=2065
+[OK ] nforcingfillgauges                        paper=7                          actual=7
+[OK ] nwaterlevel (water_level.nc gauges w/ any data)  paper=2,989                      actual=2989
+[OK ] npaperanalysiscatchments (ID length < 7)  paper=3,201                      actual=3201
+[OK ] npaperanalysisattrsgauges                 paper=3,187                      actual=3187
+[OK ] permafrostabsentpct                       paper=42                         actual=42
+[OK ] npermafrostninety                         paper=266                        actual=266
+[OK ] nforesteighty                             paper=1050                       actual=1050
+[OK ] ncroplandfifty                            paper=308                        actual=308
+[OK ] nurbanten                                 paper=61                         actual=61
+[OK ] minelevation                              paper=-28                        actual=-28
+[OK ] maxelevation                              paper=3028                       actual=3028
+[OK ] npaperanalysisexcluded                    paper=152                        actual=152
+[OK ] nwaterlevelanalysis                       paper=2,837                      actual=2837
+[OK ] nsignatures                               paper=16                         actual=16
+[OK ] nattributescols                           paper=288                        actual=288
+[OK ] nattributesfull                           paper=281                        actual=281
+[OK ] nattributes                               paper=22                         actual=22
+[OK ] nsignrows                                 paper=1729                       actual=1729
+[OK ] nsignanomalous                            paper=13                         actual=13
+[OK ] nsigngauges                               paper=1716                       actual=1716
+[OK ] nhalfflowgauges                           paper=1641                       actual=1641
+[OK ] nwaterbalgauges                           paper=1716                       actual=1716
+
+======================================================================
+GAUGE QUALITY BREAKDOWN (from year_grades.csv)
+======================================================================
+[OK ] nhighquality                              paper=936                        actual=936
+[OK ] ngradeA                                   paper=936                        actual=936
+[OK ] ngradeB                                   paper=807                        actual=807
+[OK ] ngradeC                                   paper=130                        actual=130
+[OK ] ngradeD                                   paper=178                        actual=178
+[OK ] ngradeF                                   paper=14                         actual=14
+[OK ] decentpct                                 paper=86                         actual=86
+[OK ] nwintergap                                paper=157                        actual=157
+[OK ] nwintergapsevere                          paper=118                        actual=118
+[OK ] wintergappctA                             paper=0                          actual=0
+[OK ] wintergappctB                             paper=0                          actual=0
+[OK ] wintergappctC                             paper=25                         actual=25
+[OK ] wintergappctD                             paper=66                         actual=66
+[OK ] wintergappctF                             paper=57                         actual=57
+
+======================================================================
+FLAG FREQUENCIES (paper/tables/flag_frequencies.csv vs tables/quality_flags.tex)
+======================================================================
+[OK ] nassessedyears                            paper=28,668                     actual=28,668
+[OK ] flag census assessed years                paper=28668                      actual=28668
+[OK ] Table 3 low_clim_correlation              paper=3.8                        actual=3.8
+[OK ] Table 3 very_low_clim_correlation         paper=1.3                        actual=1.3
+[OK ] Table 3 high_clim_nrmse                   paper=0.8                        actual=0.8
+[OK ] Table 3 low_amplitude                     paper=0.6                        actual=0.6
+[OK ] Table 3 high_amplitude                    paper=3.2                        actual=3.2
+[OK ] Table 3 no_seasonal_signal                paper=2.5                        actual=2.5
+[OK ] Table 3 no_precip_response                paper=7.8                        actual=7.8
+[OK ] Table 3 very_low_pq_correlation           paper=42.7                       actual=42.7
+[OK ] Table 3 low_pq_correlation                paper=19.9                       actual=19.9
+[OK ] Table 3 low_flashiness                    paper=0.4                        actual=0.4
+[OK ] Table 3 constant_value                    paper=1.3                        actual=1.3
+[OK ] Table 3 implausible_spike                 paper=31.8                       actual=31.8
+[OK ] Table 3 low_completeness                  paper=10.1                       actual=10.1
+[OK ] Table 3 very_low_completeness             paper=3.0                        actual=3.0
+[OK ] Table 3 negative_values                   paper=0.0                        actual=0.0
+[OK ] Table 3 zero_flow_dominant                paper=0.0                        actual=0.0
+
+======================================================================
+CATCHMENT AREA STATISTICS (boundaries.gpkg area_km2)
+======================================================================
+[OK ] minarea                                   paper=0.49                       actual=0.49
+[OK ] maxarea                                   paper=2,670,000                  actual=2,669,880
+[OK ] Table 1 CAMELS-RU area range cell         paper=\minareanum{} to \maxareanum  actual=\minareanum{} to \maxareanum
+[OK ] minareanum                                paper=0.49                       actual=0.49
+[OK ] maxareanum                                paper=2670000                    actual=2670000
+[OK ] meanarea                                  paper=78232                      actual=78232
+[OK ] medianarea                                paper=2827                       actual=2827
+[OK ] smallmediumpct                            paper=62                         actual=62
+
+======================================================================
+GEOGRAPHIC EXTENT (boundaries.gpkg total_bounds)
+======================================================================
+[OK ] minlat                                    paper=41.2                       actual=41.19
+[OK ] maxlat                                    paper=73.0                       actual=73.00
+[OK ] minlon                                    paper=19.9                       actual=19.92
+[OK ] maxlon                                    paper=178.3                      actual=178.28
+
+======================================================================
+AREAL ERROR DISTRIBUTION (boundaries.gpkg area_diff_perc)
+======================================================================
+[OK ] nwithreference                            paper=3011                       actual=3011
+[OK ] meanerror (|err|<=100% trim mean)         paper=5.1%                       actual=5.05%
+[OK ] medianerror                               paper=1.4                        actual=1.4
+[OK ] withinfive (no trim)                      paper=77%                        actual=77.3%
+[OK ] withinten (no trim)                       paper=87%                        actual=87.4%
+
+======================================================================
+SIGNATURE SUMMARY (signatures_summary.csv)
+======================================================================
+        signature                                                                                                                    description  n_gauges       mean     median        min        max       std
+           q_mean                                                                                                    Mean daily discharge (mm/d)      1716   0.904866   0.705756   0.017316   8.563350  0.863198
+     runoff_ratio                                                                                 Annual runoff ratio Q/P (MSWEP P, paired days)      1716   0.476113   0.409806   0.015559   4.118680  0.354448
+             q_cv                                                                                                          CV of daily discharge      1716   1.378370   1.292870   0.074810   4.864040  0.580755
+        fdc_slope                                                                                             FDC slope [ln(Q33)-ln(Q66)]/33*100      1716   2.544200   2.287620   0.174371  14.334300  1.468360
+ flashiness_index                                                                                             Richards-Baker flashiness Σ|ΔQ|/ΣQ      1716   0.116799   0.099883   0.004906   0.778976  0.079027
+              q05                                                                                                 Q05 high-flow threshold (mm/d)      1716   3.059490   2.389220   0.020098  21.773200  2.833540
+              q95                                                                                                  Q95 low-flow threshold (mm/d)      1716   0.193931   0.126161   0.000165   3.924600  0.268891
+   high_flow_freq                                                                                                    % of days with Q > 2×median      1716  21.593100  22.360900   0.000000  47.167600  8.216270
+    high_flow_dur                                                                                          Mean duration of high-flow events (d)      1716  27.868300  24.812300   0.000000 109.733000 16.327500
+   baseflow_index BFI (Lyne-Hollick ensemble, 1000 runs; smoothness index, not a groundwater fraction in nival regimes -- see winter_flow_ratio)      1716   0.556635   0.560268   0.182191   0.915409  0.121708
+    low_flow_freq                                                                                                    % of days with Q < 0.2×mean      1716  14.568900   9.436170   0.000000  73.808100 15.113800
+     low_flow_dur                                                                                           Mean duration of low-flow events (d)      1716  29.865000  17.511700   0.000000 213.267000 35.395000
+   half_flow_date                                                                              Day of hydro year when 50% of annual Q has passed      1641 216.824000 213.778000 128.444000 295.417000 29.300700
+winter_flow_ratio                                                                  Mean Jan-Mar flow / mean annual flow, both over observed days      1650   0.503452   0.359646   0.002826   2.957380  0.410991
+    aridity_index                                                               Aridity index PET/P (GLEAM4 PET, MSWEP P; mean of annual ratios)      1716   1.144770   1.063140   0.179053   3.841960  0.484176
+evaporative_index                                                                     Evaporative index (P-Q)/P (MSWEP P; mean of annual ratios)      1716   0.523887   0.590194  -3.118680   0.984441  0.354448
+
+======================================================================
+SIGNATURE STATISTICS (derived from signatures.csv)
+======================================================================
+  q_mean                  n=1729    mean=  18.864  median=   0.712  min=   0.017  max=13556.200
+  baseflow_index          n=1729    mean=   0.557  median=   0.561  min=   0.182  max=   0.915
+  fdc_slope               n=1729    mean=   2.539  median=   2.281  min=   0.174  max=  14.334
+  half_flow_date          n=1653    mean= 216.780  median= 213.923  min= 128.444  max= 295.417
+  aridity_index           n=1729    mean=   1.148  median=   1.062  min=   0.177  max=   5.916
+  evaporative_index       n=1729    mean= -18.940  median=   0.586  min=-24479.000  max=   0.984
+  runoff_ratio            n=1729    mean=  19.940  median=   0.414  min=   0.016  max=24480.000
+
+======================================================================
+DAM-EXCLUDED BROAD-ANALYSIS MACROS
+======================================================================
+[OK ] ndamfreesigngauges                        paper=1672                       actual=1672
+[OK ] nregulatedsigngauges                      paper=42                         actual=42
+[OK ] nunknownregulation                        paper=2                          actual=2
+[OK ] nwaterbaldamfree                          paper=1672                       actual=1672
+[OK ] nhalfflowdamfree                          paper=1599                       actual=1599
+[OK ] mediandamfreedischarge                    paper=0.709                      actual=0.709
+[OK ] mediandamfreerunoffratio                  paper=0.414                      actual=0.414
+[OK ] mediandamfreebaseflowindex                paper=0.558                      actual=0.558
+[OK ] mediandamfreefdcslope                     paper=2.311                      actual=2.311
+[OK ] mediandamfreehalfflowday                  paper=214                        actual=214
+[OK ] mediandamfreesnowcover                    paper=46.5                       actual=46.5
+[OK ] mediandamfreepermafrost                   paper=0.00                       actual=0.00
+
+======================================================================
+PAPER-ANALYSIS PRECIPITATION TABLES
+======================================================================
+[OK ] ERA5-Land forcing-table Mean P cell       paper=\erafiveannualnum          actual=\erafiveannualnum
+[OK ] ERA5-Land N gauges                        paper=3,201                      actual=3,201
+[OK ] ERA5-Land mean annual P                   paper=705                        actual=705
+[OK ] ERA5-Land std annual P                    paper=225                        actual=225
+[OK ] MSWEP forcing-table Mean P cell           paper=\mswepannualnum            actual=\mswepannualnum
+[OK ] MSWEP N gauges                            paper=3,201                      actual=3,201
+[OK ] MSWEP mean annual P                       paper=609                        actual=609
+[OK ] MSWEP std annual P                        paper=217                        actual=217
+[OK ] GPCP forcing-table Mean P cell            paper=\gpcpannualnum             actual=\gpcpannualnum
+[OK ] GPCP N gauges                             paper=3,201                      actual=3,201
+[OK ] GPCP mean annual P                        paper=661                        actual=661
+[OK ] GPCP std annual P                         paper=207                        actual=207
+[OK ] aggpmedsmall                              paper=0.8                        actual=0.8
+[OK ] aggpninetysmall                           paper=2.8                        actual=2.8
+[OK ] aggtmedsmall                              paper=0.04                       actual=0.04
+[OK ] aggtninetysmall                           paper=0.23                       actual=0.23
+[OK ] aggpmedtiny                               paper=1.2                        actual=1.2
+[OK ] aggpninetytiny                            paper=4.8                        actual=4.8
+[OK ] aggtmedtiny                               paper=0.04                       actual=0.04
+[OK ] aggtninetytiny                            paper=0.24                       actual=0.24
+[OK ] aggpmedmid                                paper=0.5                        actual=0.5
+[OK ] aggpninetymid                             paper=1.8                        actual=1.8
+[OK ] aggtmedmid                                paper=0.02                       actual=0.02
+[OK ] aggtninetymid                             paper=0.18                       actual=0.18
+[OK ] aggpmedlarge                              paper=0.6                        actual=0.6
+[OK ] aggpninetylarge                           paper=3.1                        actual=3.1
+[OK ] aggtmedlarge                              paper=0.02                       actual=0.02
+[OK ] aggtninetylarge                           paper=0.11                       actual=0.11
+[OK ] aggpmedhuge                               paper=0.5                        actual=0.5
+[OK ] aggpninetyhuge                            paper=1.5                        actual=1.5
+[OK ] aggpsignedhuge                            paper=+0.17                      actual=+0.17
+[OK ] aggtmedhuge                               paper=0.04                       actual=0.04
+[OK ] aggtninetyhuge                            paper=0.12                       actual=0.12
+[OK ] aggtnvalidhuge                            paper=59                         actual=59
+[OK ] 5000+ band t_n_valid + missing ids        paper=60                         actual=60
+[OK ] missing-T catchment(s) past 170E          paper=True                       actual=True
+[OK ] eramsweprcorr                             paper=0.915                      actual=0.915
+[OK ] ERA5-Land vs MSWEP N gauges               paper=3,201                      actual=3,201
+[OK ] ERA5-Land vs MSWEP mean r                 paper=0.915                      actual=0.915
+[OK ] ERA5-Land vs MSWEP mean bias              paper=0.265                      actual=0.265
+[OK ] eragpcpcorr                               paper=0.664                      actual=0.664
+[OK ] ERA5-Land vs GPCP N gauges                paper=3,201                      actual=3,201
+[OK ] ERA5-Land vs GPCP mean r                  paper=0.664                      actual=0.664
+[OK ] ERA5-Land vs GPCP mean bias               paper=0.126                      actual=0.126
+[OK ] mswepgpcpcorr                             paper=0.725                      actual=0.725
+[OK ] MSWEP vs GPCP N gauges                    paper=3,201                      actual=3,201
+[OK ] MSWEP vs GPCP mean r                      paper=0.725                      actual=0.725
+[OK ] MSWEP vs GPCP mean bias                   paper=-0.138                     actual=-0.138
+
+======================================================================
+FORCING NETCDF SUMMARY
+======================================================================
+  dims: {'gauge_id': 3353, 'time': 5844}
+  vars: ['precip_mswep', 'precip_era5', 'precip_gpcp', 'temp_mean', 'temp_min', 'temp_max', 'pet']
+  time range: 2008-01-01T00:00:00.000000000 → 2023-12-31T00:00:00.000000000
+  gauge count (forcing): 3353
+
+======================================================================
+DISCHARGE NETCDF SUMMARY
+======================================================================
+  dims: {'gauge_id': 3353, 'time': 5844}
+  vars: ['discharge_mm', 'discharge_m3s', 'specific_discharge_anomaly', 'quality_flag']
+  time range: 2008-01-01T00:00:00.000000000 → 2023-12-31T00:00:00.000000000
+  gauge count (discharge): 3353
+
+======================================================================
+ARCHIVE SIZE
+======================================================================
+  uncompressed total: 1.37 GB / 1.27 GiB (1,365,933,079 bytes)
+
+======================================================================
+FORCING WATER BALANCE (paper/tables/forcing_water_balance.csv)
+======================================================================
+[OK ] qpmedianerafive                           paper=0.358                      actual=0.358
+[OK ] qpgtoneerafive                            paper=4.4                        actual=4.4
+[OK ] aetgtpeterafive                           paper=6.8                        actual=6.8
+[OK ] budykobelowerafive                        paper=59.1                       actual=59.1
+[OK ] budykodeperafive                          paper=-0.024                     actual=-0.024
+[OK ] qpmedianmswep                             paper=0.410                      actual=0.410
+[OK ] qpgtonemswep                              paper=6.1                        actual=6.1
+[OK ] aetgtpetmswep                             paper=1.1                        actual=1.1
+[OK ] budykobelowmswep                          paper=79.8                       actual=79.8
+[OK ] budykodepmswep                            paper=-0.123                     actual=-0.123
+[OK ] qpmediangpcp                              paper=0.363                      actual=0.363
+[OK ] qpgtonegpcp                               paper=7.3                        actual=7.3
+[OK ] aetgtpetgpcp                              paper=3.0                        actual=3.0
+[OK ] budykobelowgpcp                           paper=59.8                       actual=59.8
+[OK ] budykodepgpcp                             paper=-0.036                     actual=-0.036
+[OK ] nwaterbalgauges                           paper=1716                       actual=1716
+[OK ] rhosnowbudyko                             paper=$-0.57$                    actual=$-0.57$
+[OK ] nlowsnowbudyko                            paper=112                        actual=112
+[OK ] budykodeplowsnowmswep                     paper=+0.011                     actual=+0.011
+[OK ] budykodeplowsnowerafive                   paper=+0.019                     actual=+0.019
+
+======================================================================
+NESTED MASS BALANCE (paper/tables/nested_mass_balance.csv)
+======================================================================
+[OK ] nnestedpairs                              paper=7276                       actual=7276
+[OK ] pctnestedpass                             paper=99.3                       actual=99.3
+[OK ] nnestedviolations                         paper=48                         actual=48
+[OK ] nnestedviolbig                            paper=16                         actual=16
+[OK ] nnestedviolgradea                         paper=19                         actual=19
+[OK ] pctnestedviolgradea                       paper=40                         actual=40
+[OK ] pctnestedupgradea                         paper=50                         actual=50
+[OK ] nnestedinformative                        paper=353                        actual=353
+[OK ] pctnestedinformativefail                  paper=9.1                        actual=9.1
+[OK ] pctnestedbigshare                         paper=87.2                       actual=87.2
+[OK ] pctnestedbigfail                          paper=0.2                        actual=0.2
+[OK ] nnestedgauges                             paper=1798                       actual=1798
+[OK ] nestedyieldlow                            paper=20.0                       actual=20.0
+[OK ] nestedyieldhigh                           paper=11.2                       actual=11.2
+[OK ] nnestedviolunflagged                      paper=31                         actual=31
+[OK ] worked example 2131 caught by a released screen  paper=yes                        actual=yes
+[OK ] stratification CSV total pairs            paper=7276                       actual=7276/home/dmbrmv/Development/camels_ru/scripts/verify_macros.py:780: UserWarning: Geometry is in a geographic CRS. Results from 'centroid' are likely incorrect. Use 'GeoSeries.to_crs()' to re-project geometries to a projected CRS before this operation.
+
+  lat = boundaries.geometry.centroid.y
+/home/dmbrmv/Development/camels_ru/scripts/verify_macros.py:830: RuntimeWarning: Mean of empty slice
+  mean_y = np.nanmean(qy, axis=1)
+/home/dmbrmv/Development/camels_ru/scripts/verify_macros.py:831: RuntimeWarning: All-NaN slice encountered
+  r = np.nanmax(qy, axis=1, initial=np.nan) / mean_y
+
+
+======================================================================
+NESTING DEPTH (boundaries.gpkg + attributes lat/lon)
+======================================================================
+[OK ] nnestmaxdepth                             paper=58                         actual=58
+[OK ] nnestmaxdepthanalysis                     paper=39                         actual=39
+
+======================================================================
+GRDC CROSS-CHECK (paper/tables/grdc_validation.csv + grdc_inventory.csv)
+======================================================================
+[OK ] ngrdcstations                             paper=792                        actual=792
+[OK ] ngrdcdaily                                paper=16                         actual=16
+[OK ] ngrdcmatched                              paper=15                         actual=15
+[OK ] ngrdcdischargepairs                       paper=11                         actual=11
+[OK ] ngrdcwlonly                               paper=4                          actual=4
+[OK ] GRDC discharge pairs                      paper=11                         actual=11
+[OK ] median r                                  paper=1.000                      actual=1.000
+[OK ] median NSE                                paper=1.000                      actual=1.000
+[OK ] median PBIAS                              paper=0.0%                       actual=0.0%
+[OK ] pairs identical at reported precision     paper=10                         actual=10
+[OK ] Konstantinovo r                           paper=0.996                      actual=0.996
+[OK ] Konstantinovo PBIAS                       paper=-0.6%                      actual=-0.6%
+
+======================================================================
+KOPPEN CLASSES (paper/tables/koppen_classes.csv)
+======================================================================
+[OK ] Koppen catchments (Analysis set)          paper=3201                       actual=3201
+[OK ] Koppen Dfb share                          paper=37%                        actual=37%
+[OK ] Koppen Dfc share                          paper=32%                        actual=32%
+[OK ] Koppen Dw* share                          paper=21%                        actual=21%
+[OK ] Koppen Dfa share                          paper=5%                         actual=5%
+[OK ] Koppen Cfa share                          paper=2%                         actual=2%
+[OK ] Koppen Dsc share                          paper=2%                         actual=2%
+[OK ] Koppen BSk+BWk share                      paper=1%                         actual=1%
+
+======================================================================
+RELEASE VALUE RANGES AND COVERAGE (Table 3 + Sect. 2.3/4.2/4.4)
+======================================================================
+[OK ] rngqvol                                   paper=0 to 173000                actual=0 to 173000
+[OK ] rngqmm                                    paper=0 to 66733                 actual=0 to 66733
+[OK ] nallmissingdischarge                      paper=1183                       actual=1183
+[OK ] rngpmswep                                 paper=0 to 182                   actual=0 to 182
+[OK ] rngpera                                   paper=0 to 153                   actual=0 to 153
+[OK ] rngpgpcp                                  paper=0 to 165                   actual=0 to 165
+[OK ] rngtmean                                  paper=-59 to 36                  actual=-59 to 36
+[OK ] rngtmin                                   paper=-60 to 30                  actual=-60 to 30
+[OK ] rngtmax                                   paper=-59 to 43                  actual=-59 to 43
+[OK ] rngpet                                    paper=-0.19 to 18                actual=-0.19 to 18
+[OK ] petminnum                                 paper=-0.19                      actual=-0.19
+[OK ] petnegpct                                 paper=2.4                        actual=2.4
+[OK ] ngpcpgapdays                              paper=96                         actual=96
+[OK ] ngpcpgapgauges                            paper=1584                       actual=1584
+[OK ] gpcpcoverage                              paper=99.4                       actual=99.4
+[OK ] P annual 5th pct (round 10)               paper=320                        actual=320
+[OK ] P annual 95th pct (round 10)              paper=960                        actual=960
+[OK ] T annual 5th pct                          paper=-8.7                       actual=-8.7
+[OK ] T annual 95th pct                         paper=+9.7                       actual=+9.7
+[OK ] snow 5th pct below 15%                    paper=True                       actual=True
+[OK ] snow 95th pct above 60%                   paper=True                       actual=True
+[OK ] rngwlcm                                   paper=0.5 to 12300               actual=0.5 to 12300
+[OK ] rngwlmbs                                  paper=-29 to 2136                actual=-29 to 2136
+[OK ] rngzero                                   paper=-31 to 2129                actual=-31 to 2129
+[OK ] ntrimkept                                 paper=2985                       actual=2985
+[OK ] ntrimexcluded                             paper=26                         actual=26
+[OK ] nsubfivecatchments                        paper=13                         actual=13
+[OK ] cellareasouth                             paper=93                         actual=93
+[OK ] cellareanorth                             paper=37                         actual=37
+[OK ] cellareamedian                            paper=70                         actual=70
+
+======================================================================
+NO_SEASONAL_SIGNAL COMPLETENESS BAR (released discharge + year grades)
+======================================================================
+[OK ] NSS mirror fires on assessed years (vs flag census)  paper=722                        actual=722
+[OK ] nfyeartotal                               paper=1439                       actual=1439
+[OK ] nnssbarsuppressed                         paper=94                         actual=94
+[OK ] nnssbargauges                             paper=11                         actual=11
+
+======================================================================
+ICE-WINDOW SENSITIVITY (paper/tables/ice_window_sensitivity.csv)
+======================================================================
+[OK ] nconstflagged                             paper=165                        actual=165
+[OK ] nconstwinexempt                           paper=5                          actual=5
+[OK ] nconstwinnew                              paper=14                         actual=14
+[OK ] stage screen weak May-Oct (CSV vs nstageweak)  paper=188                        actual=188
+[OK ] nstageweakjunsep                          paper=200                        actual=200
+
+======================================================================
+YEAR FLAGS (release camels_ru_year_flags.csv vs census + year grades)
+======================================================================
+[OK ] year_flags rows == assessed years         paper=28668                      actual=28668
+[OK ] per-flag counts == flag census            paper=0 mismatches               actual=0 mismatches
+[OK ] grade parity with year_grades.csv         paper=0 differences              actual=0 differences
+
+======================================================================
+FIG. 5 CAPTION (paper/tables/precip_comparison_caption.csv)
+======================================================================
+[OK ] dperamswepmean                            paper=96                         actual=96
+[OK ] dpgpcpmswepmean                           paper=53                         actual=53
+[OK ] pctgpcpwetterwest                         paper=93                         actual=93
+[OK ] dpgpcpwest                                paper=81                         actual=81
+[OK ] pctgpcpdriereast                          paper=47                         actual=47
+[OK ] dpgpcpeast                                paper=9                          actual=9
+
+======================================================================
+COLD-REGION GRADIENT (release signatures + attributes)
+======================================================================
+[OK ] ncoldregiongauges                         paper=1117                       actual=1117
+[OK ] ncoldregionclipped                        paper=57                         actual=57
+[OK ] ncoldregionabovemean                      paper=113                        actual=113
+[OK ] winterratiobaseline                       paper=0.45                       actual=0.45
+[OK ] winterratiohigh                           paper=0.14                       actual=0.14
+[OK ] nwinterbinlow                             paper=776                        actual=776
+[OK ] nwinterbinhigh                            paper=43                         actual=43
+[OK ] nhighpermafrostgraded                     paper=155                        actual=155
+[OK ] nhighpermretained                         paper=30                         actual=30
+[OK ] bfipermafrostbaseline                     paper=0.54                       actual=0.54
+[OK ] bfipermafrostpeak                         paper=0.64                       actual=0.64
+[OK ] bfipermafrosthigh                         paper=0.56                       actual=0.56
+[OK ] nfreshetinwindow                          paper=106                        actual=106
+[OK ] winterratiofreshetin                      paper=1.19                       actual=1.19
+[OK ] winterratiofreshetout                     paper=0.29                       actual=0.29
+[OK ] rhopermafrostwinter                       paper=$-0.55$                    actual=$-0.55$
+[OK ] rhopermafrostbfi                          paper=$+0.20$                    actual=$+0.20$
+[OK ] rhobfiqcv                                 paper=$-0.93$                    actual=$-0.93$
+[OK ] rhotempperm                               paper=$-0.86$                    actual=$-0.86$
+[OK ] rhopermwintercoldq                        paper=$-0.19$                    actual=$-0.19$
+[OK ] bfieckhardtagreement                      paper=0.59                       actual=0.59
+
+======================================================================
+SPIKE THRESHOLD SENSITIVITY (paper/tables/spike_threshold_sensitivity.csv)
+======================================================================
+[OK ] spikeflagfive                             paper=94%                        actual=94%
+[OK ] spikeflageight                            paper=82%                        actual=82%
+
+======================================================================
+STAGE-SCREEN ENCODING (water_level.nc)
+======================================================================
+[OK ] nstagescreenunassessed                    paper=1247                       actual=1247
+[OK ] nnowaterlevel                             paper=364                        actual=364
+
+======================================================================
+WATER-BALANCE SCREEN (signatures + gauge_summary)
+======================================================================
+[OK ] nwaterbalscreen                           paper=105                        actual=105
+[OK ] nwaterbalscreengradea                     paper=73                         actual=73
+[OK ] pctwaterbalscreengradea                   paper=70                         actual=70
+[OK ] pctsigngradea                             paper=49                         actual=49
+[OK ] maxrunoffratio                            paper=4.1                        actual=4.1
+[OK ] nwaterbalscreenall                        paper=118                        actual=118
+[OK ] nwinterflowgauges                         paper=1650                       actual=1650
+[OK ] nlowflowdurzero                           paper=279                        actual=279
+[OK ] low_flow_dur==0 set equals low_flow_freq==0 set  paper=yes                        actual=yes
+[OK ] nrronewithref                             paper=66                         actual=66
+[OK ] nrronebigerr                              paper=9                          actual=9
+[OK ] nrroneerafive                             paper=67                         actual=67
+[OK ] rronemedarea                              paper=237                        actual=237
+[OK ] nonrronemedarea                           paper=1703                       actual=1703
+
+======================================================================
+GRADE--REGIME CONFOUND (gauge_summary + attributes)
+======================================================================
+[OK ] gradeApct                                 paper=45                         actual=45
+[OK ] ngradebandcovered                         paper=2062                       actual=2062
+[OK ] prm_pc_use NaN-free (Table 1 shares)      paper=0                          actual=0
+[OK ] pctcatchpermafrost                        paper=58                         actual=58
+[OK ] pctcatchpermafrosttwenty                  paper=33                         actual=33
+[OK ] npermafrosttwenty                         paper=584                        actual=584
+[OK ] npermafrosteighty                         paper=155                        actual=155
+[OK ] nlowsnow                                  paper=135                        actual=135
+[OK ] gradeAlowsnow                             paper=16                         actual=16
+[OK ] gradeAhighsnow                            paper=57                         actual=57
+[OK ] gradeBlowsnow                             paper=51                         actual=51
+[OK ] nhighpermafrostgraded                     paper=155                        actual=155
+[OK ] gradeAnopermafrost                        paper=36                         actual=36
+[OK ] gradeAmidpermafrost                       paper=59                         actual=59
+[OK ] gradeAhighpermafrost                      paper=35                         actual=35
+[OK ] gradeDFhighpermafrost                     paper=45                         actual=45
+
+======================================================================
+GRADE VS PLAUSIBILITY + WATER-LEVEL RANGE
+======================================================================
+[OK ] nanomalygradeab                           paper=10                         actual=10
+[OK ] nanomalygradea                            paper=2                          actual=2
+[OK ] water-level negatives                     paper=0                          actual=0
+[OK ] stage min (cm)                            paper=0.50                       actual=0.50
+[OK ] stage min == observed min                 paper=True                       actual=True
+
+======================================================================
+STAGE--DISCHARGE CONSISTENCY (stage_discharge_screen + provenance CSV)
+======================================================================
+[OK ] nstageweak                                paper=188                        actual=188
+[OK ] nstageunassessed                          paper=883                        actual=883
+[OK ] nstagedischarge                           paper=2106                       actual=2106
+[OK ] rhostagemedian                            paper=0.93                       actual=0.93
+[OK ] rhostagemedianallyear                     paper=0.74                       actual=0.74
+[OK ] pctstagestrong                            paper=59                         actual=59
+[OK ] pctstagegood                              paper=74                         actual=74
+[OK ] nstageinverted                            paper=22                         actual=22
+[OK ] nstagenegative                            paper=51                         actual=51
+[OK ] pctstageweak                              paper=8.9                        actual=8.9
+
+======================================================================
+DISCHARGE GAP-FILL (quality_flag in camels_ru_discharge.nc)
+======================================================================
+[OK ] ndischargefilldays                        paper=1,691                      actual=1,691
+[OK ] ndischargefillpct                         paper=0.016                      actual=0.016/home/dmbrmv/Development/camels_ru/scripts/verify_macros.py:1024: RuntimeWarning: Mean of empty slice
+  wmean = np.nanmean(np.where(obs[:, mw], q[:, mw], np.nan), axis=1)
+
+
+======================================================================
+WATER-LEVEL PROVENANCE (quality_flag in camels_ru_water_level.nc)
+======================================================================
+[OK ] nwaterlevelfilldays                       paper=10,035                     actual=10,035
+[OK ] nwaterlevelzerodays                       paper=153,563                    actual=153,563
+[OK ] nwaterlevelzeropct                        paper=1.0                        actual=1.0
+[OK ] nwaterlevelzerogauges                     paper=617                        actual=617
+
+======================================================================
+WATER-LEVEL REVERSION (paper/tables/water_level_reversion.csv + release flags)
+======================================================================
+[OK ] nwlreverted                               paper=3420                       actual=3420
+[OK ] nwlrevertedgauges                         paper=89                         actual=89
+[OK ] nwlnegatives                              paper=991                        actual=991
+[OK ] per-gauge origin split sums to n_reverted  paper=True                       actual=True
+[OK ] nwlaltered                                paper=167,018                    actual=167,018
+[OK ] nwlrevertedpct                            paper=2.0                        actual=2.0
+[OK ] reversion gauges exist in the release     paper=True                       actual=True
+
+======================================================================
+PEAK/WINTER RATIO (camels_ru_discharge.nc)
+======================================================================
+[OK ] nqpeakwinteryears                         paper=25,471                     actual=25,471
+[OK ] qpeakwintermed                            paper=23                         actual=23
+[OK ] qpeakwinterqone                           paper=9                          actual=9
+[OK ] qpeakwinterqthree                         paper=54                         actual=54
+
+======================================================================
+FDC SLOPE VS SAWICZ WHOLE-RECORD (release discharge + signatures)
+======================================================================
+[OK ] gauges compared (nonpositive percentiles skipped)  paper=1716                       actual=1716
+[OK ] nsigngauges                               paper=1716                       actual=1716
+[OK ] sign agreement                            paper=100.0%                     actual=100.0%
+[OK ] fdcsawiczrho                              paper=0.97                       actual=0.97
+[OK ] fdcsawiczmeddiff                          paper=4                          actual=4
+[OK ] median difference direction (Sect. 5.2 says below)  paper=below                      actual=below
+
+======================================================================
+GRADE-A SIGNATURE-SPACE BIAS (signatures.csv + gauge_summary.csv)
+======================================================================
+[OK ] nsigngradea                               paper=839                        actual=839
+[OK ] nsigngradednona                           paper=877                        actual=877
+[OK ] grade split exhausts nsigngauges          paper=1716                       actual=1716
+[OK ] sgamedrr                                  paper=0.49                       actual=0.49
+[OK ] sgnamedrr                                 paper=0.33                       actual=0.33
+[OK ] sganrr                                    paper=839                        actual=839
+[OK ] sgaqonerr                                 paper=0.31                       actual=0.31
+[OK ] sgaqthreerr                               paper=0.69                       actual=0.69
+[OK ] sgnanrr                                   paper=877                        actual=877
+[OK ] sgnaqonerr                                paper=0.19                       actual=0.19
+[OK ] sgnaqthreerr                              paper=0.53                       actual=0.53
+[OK ] sgamedqmean                               paper=0.88                       actual=0.88
+[OK ] sgnamedqmean                              paper=0.54                       actual=0.54
+[OK ] sganqmean                                 paper=839                        actual=839
+[OK ] sgaqoneqmean                              paper=0.50                       actual=0.50
+[OK ] sgaqthreeqmean                            paper=1.32                       actual=1.32
+[OK ] sgnanqmean                                paper=877                        actual=877
+[OK ] sgnaqoneqmean                             paper=0.28                       actual=0.28
+[OK ] sgnaqthreeqmean                           paper=0.94                       actual=0.94
+[OK ] sgamedwfr                                 paper=0.27                       actual=0.27
+[OK ] sgnamedwfr                                paper=0.54                       actual=0.54
+[OK ] sganwfr                                   paper=839                        actual=839
+[OK ] sgaqonewfr                                paper=0.17                       actual=0.17
+[OK ] sgaqthreewfr                              paper=0.46                       actual=0.46
+[OK ] sgnanwfr                                  paper=811                        actual=811
+[OK ] sgnaqonewfr                               paper=0.28                       actual=0.28
+[OK ] sgnaqthreewfr                             paper=0.88                       actual=0.88
+[OK ] sgamedhfd                                 paper=223                        actual=223
+[OK ] sgnamedhfd                                paper=204                        actual=204
+[OK ] sganhfd                                   paper=830                        actual=830
+[OK ] sgaqonehfd                                paper=207                        actual=207
+[OK ] sgaqthreehfd                              paper=245                        actual=245
+[OK ] sgnanhfd                                  paper=811                        actual=811
+[OK ] sgnaqonehfd                               paper=191                        actual=191
+[OK ] sgnaqthreehfd                             paper=223                        actual=223
+[OK ] sgamedarea                                paper=1945                       actual=1945
+[OK ] sgnamedarea                               paper=1225                       actual=1225
+[OK ] sganarea                                  paper=839                        actual=839
+[OK ] sgaqonearea                               paper=649                        actual=649
+[OK ] sgaqthreearea                             paper=7329                       actual=7329
+[OK ] sgnanarea                                 paper=877                        actual=877
+[OK ] sgnaqonearea                              paper=420                        actual=420
+[OK ] sgnaqthreearea                            paper=3709                       actual=3709
+
+======================================================================
+FLAG-FAMILY COUNTERFACTUALS (camels_ru_year_flags.csv regrade mirror)
+======================================================================
+[OK ] regrade mirror parity with shipped year grades  paper=0 mismatches               actual=0 mismatches
+[OK ] baseline gauge grade A                    paper=936                        actual=936
+[OK ] pqfamilypct                               paper=62.5                       actual=62.5
+[OK ] ngradeanopq                               paper=1013                       actual=1013
+[OK ] ngradebnopq                               paper=731                        actual=731
+[OK ] ngradeanoclim                             paper=1152                       actual=1152
+[OK ] ngradeanospike                            paper=1009                       actual=1009
+[OK ] clim counterfactual moves grades C-F      paper=yes                        actual=yes
+[OK ] clim/pq dA ratio supports 'nearly three times'  paper=yes                        actual=yes
+
+======================================================================
+AUTHORITATIVE VALUES FOR MACROS.TEX
+======================================================================
+  ntotal               = 3,339 (3,339 HydroATLAS-covered catchments)
+                         OR 3,353 if 'total delineated' is intended
+  npaperanalysiscatchments = 3,201 (152 gauge-ID excluded)
+  npaperanalysisattrsgauges = 3,187
+  ndischarge           = 2,170
+  nwaterlevel          = 2,989
+  nwaterlevelanalysis  = 2,837
+  nhighquality         = 936
+  nsignatures          = 16
+  nsigngauges          = 1,716
+  archive size (unc.)  = 1.37 GB
+
+======================================================================
+DRIFT SUMMARY
+======================================================================
+  No drift among completed checks against the selected release + repository audits.
+  This checks numerical agreement, not scientific validity or audit provenance.
+
+Done. Cross-reference with paper/overleaf/macros.tex

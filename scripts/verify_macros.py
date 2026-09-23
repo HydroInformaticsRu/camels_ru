@@ -1,13 +1,15 @@
-"""Verify paper macros against the released CAMELS-RU v1.0 dataset.
+"""Verify paper macros against a selected CAMELS-RU release (default: frozen v1.0).
 
 Produces a drift report for values that must be reflected in paper/overleaf/macros.tex
-against the values computed directly from release/CAMELS_RU_v1.0/.
+against release values and repository audit artifacts. Audit artifacts are not
+regenerated or rebound to the selected release by this check.
 
 Run: pixi run python scripts/verify_macros.py
 """
 
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 import re
 import sys
@@ -15,8 +17,9 @@ import sys
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-from scipy.stats import mannwhitneyu, spearmanr
-import xarray as xr
+from scipy.stats import spearmanr
+
+from utils.release_io import open_release_dataset
 
 REPO = Path(__file__).resolve().parents[1]
 SCRIPTS = Path(__file__).resolve().parent
@@ -36,7 +39,8 @@ from src.utils.paper_analysis_scope import (  # noqa: E402
     paper_analysis_scope_summary,
 )
 
-RELEASE = REPO / "release" / "CAMELS_RU_v1.0"
+DEFAULT_RELEASE = REPO / "release" / "CAMELS_RU_v1.0"
+RELEASE = DEFAULT_RELEASE
 RESULTS_HESS = REPO / "results" / "hess_quality"
 PAPER = REPO / "paper"
 MACROS = PAPER / "overleaf" / "macros.tex"
@@ -60,6 +64,13 @@ def section(title: str) -> None:
 
 
 _FAILURES: list[str] = []
+_SKIPPED: list[str] = []
+
+
+def report_skip(message: str) -> None:
+    """Keep unavailable audit evidence visible in the final verification summary."""
+    print(message)
+    _SKIPPED.append(message.strip())
 
 
 def kv(label: str, paper: str, actual: str, match: bool | None = None) -> None:
@@ -120,7 +131,7 @@ def check_aet_macros(macros: dict[str, str]) -> None:
     section("FORCING WATER BALANCE (paper/tables/forcing_water_balance.csv)")
     table = PAPER / "tables" / "forcing_water_balance.csv"
     if not table.exists():
-        print("  SKIP — forcing_water_balance.csv absent; run scripts/generate_budyko_figure.py")
+        report_skip("  SKIP — forcing_water_balance.csv absent; run scripts/generate_budyko_figure.py")
         return
     wb = pd.read_csv(table).set_index("product")
     for product, suffix in (("ERA5-Land", "erafive"), ("MSWEP", "mswep"), ("GPCP", "gpcp")):
@@ -160,7 +171,7 @@ def check_aet_macros(macros: dict[str, str]) -> None:
 def check_coldregion_macros(macros: dict[str, str]) -> None:
     """Reconcile the Sect. 8 cold-region macros against a fresh recompute from the release."""
     section("COLD-REGION GRADIENT (release signatures + attributes)")
-    cr = load_subset()
+    cr = load_subset(release_dir=RELEASE)
     # The figure screens on the released winter_coverage column; recompute on the same subset
     # or the macros would be checked against a different sample than the one plotted.
     cr = cr[(cr["winter_coverage"] >= MIN_WINTER_COVERAGE) & cr["winter_flow_ratio"].notna()]
@@ -225,7 +236,7 @@ def check_coldregion_macros(macros: dict[str, str]) -> None:
         agreement = float(m_agree.group(1)) if m_agree else float("nan")
         check_macro(macros, "bfieckhardtagreement", agreement, "{:.2f}")
     else:
-        print(
+        report_skip(
             "  SKIP bfieckhardtagreement — verdict.txt absent (gitignored); run coldregion_robustness.py"
         )
 
@@ -282,7 +293,7 @@ def blank_interior_years(year_grades: pd.DataFrame) -> tuple[int, int]:
 def check_discharge_fill_macros(macros: dict[str, str]) -> None:
     """Lock the discharge gap-fill macros against quality_flag==1 in discharge.nc."""
     section("DISCHARGE GAP-FILL (quality_flag in camels_ru_discharge.nc)")
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as qds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as qds:
         qf = qds["quality_flag"].values
         n_fill = int((qf == 1).sum())
         n_present = int((qf != 3).sum())
@@ -290,7 +301,7 @@ def check_discharge_fill_macros(macros: dict[str, str]) -> None:
     check_macro(macros, "ndischargefilldays", n_fill, "{:,.0f}")
     check_macro(macros, "ndischargefillpct", fill_pct, "{:.3f}")
     section("WATER-LEVEL PROVENANCE (quality_flag in camels_ru_water_level.nc)")
-    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
+    with open_release_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
         wf = wds["quality_flag"].values
     n_present = int((wf != 3).sum())
     check_macro(macros, "nwaterlevelfilldays", float((wf == 1).sum()), "{:,.0f}")
@@ -359,10 +370,10 @@ def check_grdc_gates(macros: dict[str, str]) -> None:
         check_macro(macros, "ngrdcdischargepairs", float(inv["n_discharge_pairs"]), "{:.0f}")
         check_macro(macros, "ngrdcwlonly", float(inv["n_water_level_only"]), "{:.0f}")
     else:
-        print("  SKIP inventory — run scripts/validate_grdc.py to write grdc_inventory.csv")
+        report_skip("  SKIP inventory — run scripts/validate_grdc.py to write grdc_inventory.csv")
     table = PAPER / "tables" / "grdc_validation.csv"
     if not table.exists():
-        print("  SKIP — run scripts/validate_grdc.py and copy its CSV into paper/tables/")
+        report_skip("  SKIP — run scripts/validate_grdc.py and copy its CSV into paper/tables/")
         return
     g = pd.read_csv(table)
     check_val("GRDC discharge pairs", "11", str(len(g)))
@@ -381,7 +392,7 @@ def check_koppen_gates() -> None:
     section("KOPPEN CLASSES (paper/tables/koppen_classes.csv)")
     table = PAPER / "tables" / "koppen_classes.csv"
     if not table.exists():
-        print("  SKIP — koppen_classes.csv absent")
+        report_skip("  SKIP — koppen_classes.csv absent")
         return
     k = pd.read_csv(table, dtype=str)
     # The CSV covers the full release; the manuscript states shares over the Analysis set.
@@ -443,7 +454,7 @@ def check_precip_caption_macros(macros: dict[str, str]) -> None:
     section("FIG. 5 CAPTION (paper/tables/precip_comparison_caption.csv)")
     table = PAPER / "tables" / "precip_comparison_caption.csv"
     if not table.exists():
-        print("  SKIP — run scripts/regenerate_precip_comparison_figure.py --caption-only")
+        report_skip("  SKIP — run scripts/regenerate_precip_comparison_figure.py --caption-only")
         return
     row = pd.read_csv(table).iloc[0]
     for macro_name, column in (
@@ -462,7 +473,7 @@ def check_nested_macros(macros: dict[str, str]) -> None:
     section("NESTED MASS BALANCE (paper/tables/nested_mass_balance.csv)")
     table = PAPER / "tables" / "nested_mass_balance.csv"
     if not table.exists():
-        print("  SKIP — run scripts/nested_mass_balance.py")
+        report_skip("  SKIP — run scripts/nested_mass_balance.py")
         return
     df = pd.read_csv(table, dtype={"up": str, "down": str})
     fail = df["v_ratio"] <= 1
@@ -495,11 +506,11 @@ def check_nested_macros(macros: dict[str, str]) -> None:
     # Violations with no released screen flag on either gauge (Sect. 7.1 disclosure):
     # specific_discharge_anomaly, stage_discharge_screen == 1, is_anomalous, or
     # water_balance_screen. The worked example (2131) must remain caught.
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as dq:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as dq:
         sda = pd.Series(
             dq["specific_discharge_anomaly"].values, index=[str(g) for g in dq["gauge_id"].values]
         )
-    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as dw:
+    with open_release_dataset(RELEASE / "camels_ru_water_level.nc") as dw:
         sds = pd.Series(
             dw["stage_discharge_screen"].values, index=[str(g) for g in dw["gauge_id"].values]
         )
@@ -526,7 +537,7 @@ def check_nested_macros(macros: dict[str, str]) -> None:
             str(int(s.loc[s["band"] == "All", "n_pairs"].iloc[0])),
         )
     else:
-        print("  SKIP stratification CSV — run scripts/nested_mass_balance.py --table-only")
+        report_skip("  SKIP stratification CSV — run scripts/nested_mass_balance.py --table-only")
 
 
 def check_spike_threshold_macros(macros: dict[str, str]) -> None:
@@ -534,7 +545,7 @@ def check_spike_threshold_macros(macros: dict[str, str]) -> None:
     section("SPIKE THRESHOLD SENSITIVITY (paper/tables/spike_threshold_sensitivity.csv)")
     table = PAPER / "tables" / "spike_threshold_sensitivity.csv"
     if not table.exists():
-        print("  SKIP — run scripts/spike_threshold_sensitivity.py")
+        report_skip("  SKIP — run scripts/spike_threshold_sensitivity.py")
         return
     df = pd.read_csv(table).set_index("sigma_threshold")
     check_macro(macros, "spikeflagfive", float(df.loc[5.0, "pct_flagged"]), "{:.0f}%")
@@ -549,7 +560,7 @@ def check_stage_screen_encoding_macros(macros: dict[str, str]) -> None:
     their own scope and Sect. 8.2 describes the file.
     """
     section("STAGE-SCREEN ENCODING (water_level.nc)")
-    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as ds:
+    with open_release_dataset(RELEASE / "camels_ru_water_level.nc") as ds:
         screen = ds["stage_discharge_screen"].values
         gauge_type = ds["gauge_type"].values
     check_macro(macros, "nstagescreenunassessed", float((screen == -1).sum()), "{:.0f}")
@@ -623,7 +634,7 @@ def check_plausibility_macros(macros: dict[str, str]) -> None:
     they are recomputed here so a rebuild cannot desynchronise them again.
     """
     section("GRADE VS PLAUSIBILITY + WATER-LEVEL RANGE")
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as qds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as qds:
         anomaly = pd.Series(
             qds["specific_discharge_anomaly"].values,
             index=[str(g) for g in qds["gauge_id"].values],
@@ -636,7 +647,7 @@ def check_plausibility_macros(macros: dict[str, str]) -> None:
     )
     check_macro(macros, "nanomalygradea", float((flagged["overall_grade"] == "A").sum()), "{:.0f}")
 
-    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
+    with open_release_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
         stage = wds["water_level_cm"].values
         flag = wds["quality_flag"].values
     # After the repair no altered value may sit outside its gauge's observed range, and
@@ -656,7 +667,7 @@ def check_plausibility_macros(macros: dict[str, str]) -> None:
 def check_stage_discharge_macros(macros: dict[str, str]) -> None:
     """Lock the Sect. 6.4 stage--discharge macros against the release flag and provenance CSV."""
     section("STAGE--DISCHARGE CONSISTENCY (stage_discharge_screen + provenance CSV)")
-    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
+    with open_release_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
         screen = wds["stage_discharge_screen"].values
         gauge_type = wds["gauge_type"].values
     check_macro(macros, "nstageweak", float((screen == 1).sum()), "{:.0f}")
@@ -664,7 +675,7 @@ def check_stage_discharge_macros(macros: dict[str, str]) -> None:
 
     csv = REPO / "paper" / "tables" / "stage_discharge.csv"
     if not csv.exists():
-        print("  SKIP rho macros — stage_discharge.csv absent; run stage_discharge_consistency.py")
+        report_skip("  SKIP rho macros — stage_discharge.csv absent; run stage_discharge_consistency.py")
         return
     sd = pd.read_csv(csv)
     river = sd[sd["gauge_type"] == 0].dropna(subset=["rho_open_water"])
@@ -704,14 +715,14 @@ def check_release_range_gates(macros: dict[str, str]) -> None:
         f = 10.0**decimals
         return f"{np.ceil(float(x) * f) / f:.{decimals}f}"
 
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
         q3 = ds["discharge_m3s"]
         qm = ds["discharge_mm"]
         gate_range("rngqvol", "0", f"{np.ceil(float(q3.max()) / 1000) * 1000:.0f}")
         gate_range("rngqmm", "0", cei(qm.max()))
         check_macro(macros, "nallmissingdischarge", float(q3.isnull().all("time").sum()), "{:.0f}")
 
-    with xr.open_dataset(RELEASE / "camels_ru_forcing.nc") as fx:
+    with open_release_dataset(RELEASE / "camels_ru_forcing.nc") as fx:
         for name, var in (
             ("rngpmswep", "precip_mswep"),
             ("rngpera", "precip_era5"),
@@ -751,7 +762,7 @@ def check_release_range_gates(macros: dict[str, str]) -> None:
         check_val("snow 5th pct below 15%", "True", str(bool(snw5 < 15)))
         check_val("snow 95th pct above 60%", "True", str(bool(snw95 > 60)))
 
-    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as wl:
+    with open_release_dataset(RELEASE / "camels_ru_water_level.nc") as wl:
         cm = wl["water_level_cm"]
         mbs = wl["water_level_mbs"]
         zero = wl["gauge_zero_m"]
@@ -799,7 +810,7 @@ def _overall_grade(grades: list[str]) -> str:
 
 def _nss_flag_matrix() -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Mirror detect_flat_years on the released discharge: (nss, comp, ids, hy_years)."""
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
         q = ds["discharge_mm"].transpose("gauge_id", "time").values
         ids = ds["gauge_id"].astype(str).values
         times = pd.DatetimeIndex(ds["time"].values)
@@ -909,7 +920,7 @@ def check_year_flags_gates(year_grades: pd.DataFrame) -> None:
     section("YEAR FLAGS (release camels_ru_year_flags.csv vs census + year grades)")
     path = RELEASE / "camels_ru_year_flags.csv"
     if not path.exists():
-        print("  SKIP — run scripts/create_year_flags.py")
+        check_val("required release year_flags evidence", "present", f"missing: {path}")
         return
     yf = pd.read_csv(path, dtype={"gauge_id": str}).fillna({"flag_codes": ""})
     census = pd.read_csv(PAPER / "tables" / "flag_frequencies.csv")
@@ -964,7 +975,7 @@ def check_water_level_reversion_gates(macros: dict[str, str]) -> None:
     section("WATER-LEVEL REVERSION (paper/tables/water_level_reversion.csv + release flags)")
     table = PAPER / "tables" / "water_level_reversion.csv"
     if not table.exists():
-        print("  SKIP — run scripts/derive_water_level_reversion.py (needs the data drive)")
+        report_skip("  SKIP — run scripts/derive_water_level_reversion.py (needs the data drive)")
         return
     rev = pd.read_csv(table, dtype={"gauge_id": str})
     n_rev = int(rev["n_reverted"].sum())
@@ -976,7 +987,7 @@ def check_water_level_reversion_gates(macros: dict[str, str]) -> None:
         "True",
         str(bool((rev["n_from_gap_fill"] + rev["n_from_zero_replacement"] == rev["n_reverted"]).all())),
     )
-    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
+    with open_release_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
         flag = wds["quality_flag"].values
         rel_ids = {str(g) for g in wds["gauge_id"].values}
     n_altered = n_rev + int((flag == 1).sum()) + int((flag == 2).sum())
@@ -995,7 +1006,7 @@ def check_peak_winter_ratio_macros(macros: dict[str, str]) -> None:
     >= 30 observed Jan-Mar days, and a positive winter mean; pooled over gauge-years.
     """
     section("PEAK/WINTER RATIO (camels_ru_discharge.nc)")
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
         q = ds["discharge_m3s"].transpose("gauge_id", "time").values
         t = pd.DatetimeIndex(ds["time"].values)
     hy = (t.year + (t.month >= 10).astype(int)).to_numpy()
@@ -1104,7 +1115,7 @@ def check_fdc_sawicz_macros(macros: dict[str, str]) -> None:
     section("FDC SLOPE VS SAWICZ WHOLE-RECORD (release discharge + signatures)")
     sig = pd.read_csv(RELEASE / "camels_ru_signatures.csv", dtype={"gauge_id": str})
     sub = sig[(~sig["is_anomalous"]) & sig["fdc_slope"].notna()]
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
         pos = {str(g): i for i, g in enumerate(ds["gauge_id"].values)}
         q = ds["discharge_mm"].values
     released, sawicz = [], []
@@ -1141,7 +1152,7 @@ def check_pq_family_gates(macros: dict[str, str]) -> None:
     section("FLAG-FAMILY COUNTERFACTUALS (camels_ru_year_flags.csv regrade mirror)")
     path = RELEASE / "camels_ru_year_flags.csv"
     if not path.exists():
-        print("  SKIP — run scripts/create_year_flags.py")
+        check_val("required release year_flags evidence", "present", f"missing: {path}")
         return
     yf = pd.read_csv(path, dtype={"gauge_id": str}).fillna({"flag_codes": ""})
     mismatch = 0
@@ -1189,11 +1200,10 @@ def check_pq_family_gates(macros: dict[str, str]) -> None:
 
 
 def check_gradea_signature_bias(macros: dict[str, str]) -> None:
-    """Lock the usage-notes grade-A signature-space bias medians (Sect. 6.4).
+    """Lock grade-selection contrasts: medians, quartiles and finite-value counts.
 
     Joins the non-anomalous signature gauges to the released overall grades and
-    recomputes the strict-grade-A vs graded-below-A medians of five signatures,
-    plus the Mann-Whitney significance floor the sentence claims (p < 1e-8).
+    recomputes strict-grade-A vs graded-below-A summaries of five released variables.
     """
     section("GRADE-A SIGNATURE-SPACE BIAS (signatures.csv + gauge_summary.csv)")
     sig = pd.read_csv(RELEASE / "camels_ru_signatures.csv", dtype={"gauge_id": str})
@@ -1216,13 +1226,20 @@ def check_gradea_signature_bias(macros: dict[str, str]) -> None:
         ("half_flow_date", "sgamedhfd", "sgnamedhfd", "{:.0f}"),
         ("area_km2", "sgamedarea", "sgnamedarea", "{:.0f}"),
     ]
-    worst_p = 0.0
     for col, ma, mn, fmt in specs:
         xa, xn = a[col].dropna(), na[col].dropna()
         check_macro(macros, ma, float(xa.median()), fmt)
         check_macro(macros, mn, float(xn.median()), fmt)
-        worst_p = max(worst_p, float(mannwhitneyu(xa, xn).pvalue))
-    check_val("all five contrasts Mann-Whitney p < 1e-8", "yes", "yes" if worst_p < 1e-8 else "no")
+        for values, median_macro in ((xa, ma), (xn, mn)):
+            finite = values[np.isfinite(values)]
+            check_macro(macros, median_macro.replace("med", "n"), float(len(finite)), "{:.0f}")
+            for quantile, suffix in ((0.25, "qone"), (0.75, "qthree")):
+                check_macro(
+                    macros,
+                    median_macro.replace("med", suffix),
+                    float(finite.quantile(quantile)),
+                    fmt,
+                )
 
 
 def check_ice_window_gates(macros: dict[str, str]) -> None:
@@ -1230,7 +1247,7 @@ def check_ice_window_gates(macros: dict[str, str]) -> None:
     section("ICE-WINDOW SENSITIVITY (paper/tables/ice_window_sensitivity.csv)")
     table = PAPER / "tables" / "ice_window_sensitivity.csv"
     if not table.exists():
-        print("  SKIP — run scripts/ice_window_sensitivity.py")
+        report_skip("  SKIP — run scripts/ice_window_sensitivity.py")
         return
     row = pd.read_csv(table).iloc[0]
     check_macro(macros, "nconstflagged", float(row["n_const_flagged_fixed"]), "{:.0f}")
@@ -1247,16 +1264,34 @@ def check_ice_window_gates(macros: dict[str, str]) -> None:
 def report_drift_summary() -> None:
     """Print the drift summary; exit non-zero if any checked macro drifted from the data."""
     section("DRIFT SUMMARY")
+    if _SKIPPED:
+        print(f"  Incomplete audit evidence: {len(_SKIPPED)} check(s) skipped; not verified:")
+        for message in _SKIPPED:
+            print(f"    {message}")
     if _FAILURES:
         print(f"  {len(_FAILURES)} drift(s): {', '.join(_FAILURES)}")
         print(f"\nCross-reference with {MACROS.relative_to(REPO)}")
         sys.exit(1)
-    print("  No drift — all checked macros reproduce from release + audit artifacts.")
+    print("  No drift among completed checks against the selected release + repository audits.")
+    print("  This checks numerical agreement, not scientific validity or audit provenance.")
     print(f"\nDone. Cross-reference with {MACROS.relative_to(REPO)}")
 
 
 def main() -> None:
     """Run all macro consistency checks against the release bundle."""
+    global RELEASE
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--release-dir",
+        type=Path,
+        default=DEFAULT_RELEASE,
+        help="Release bundle to read (default: frozen release/CAMELS_RU_v1.0)",
+    )
+    RELEASE = parser.parse_args().release_dir
+    _FAILURES.clear()
+    _SKIPPED.clear()
+    print(f"Release directory: {RELEASE}")
+    print("Audit evidence: repository paper/tables and results/hess_quality (not regenerated).")
     section("COUNTS")
     macros = parse_macros()
 
@@ -1282,7 +1317,7 @@ def main() -> None:
     paper_attr_scope = paper_analysis_scope_summary(attrs["gauge_id"].astype(str))
 
     # Ground truth for \ndischarge: gauges in discharge.nc with any non-NaN value
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as qds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as qds:
         q_present = ~np.isnan(qds["discharge_mm"])
         q_has_data = q_present.any(dim="time")
         n_with_data = int(q_has_data.sum().values)
@@ -1299,7 +1334,7 @@ def main() -> None:
     winter_gap = pd.Series((q_summer > 0.8) & (q_winter < 0.5), index=q_ids)
     winter_gap_severe = winter_gap & pd.Series(q_winter < 0.2, index=q_ids)
 
-    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
+    with open_release_dataset(RELEASE / "camels_ru_water_level.nc") as wds:
         wl_has_data = (~np.isnan(wds["water_level_cm"])).any(dim="time")
         n_waterlevel = int(wl_has_data.sum().values)
         wl_coord = "gauge_id" if "gauge_id" in wds.coords else "gauge"
@@ -1638,7 +1673,7 @@ def main() -> None:
 
     section("FORCING NETCDF SUMMARY")
     forcing_nc = RELEASE / "camels_ru_forcing.nc"
-    with xr.open_dataset(forcing_nc) as ds:
+    with open_release_dataset(forcing_nc) as ds:
         print(f"  dims: {dict(ds.sizes)}")
         print(f"  vars: {list(ds.data_vars)}")
         print(f"  time range: {ds.time.min().values} → {ds.time.max().values}")
@@ -1653,7 +1688,7 @@ def main() -> None:
 
     section("DISCHARGE NETCDF SUMMARY")
     discharge_nc = RELEASE / "camels_ru_discharge.nc"
-    with xr.open_dataset(discharge_nc) as ds:
+    with open_release_dataset(discharge_nc) as ds:
         print(f"  dims: {dict(ds.sizes)}")
         print(f"  vars: {list(ds.data_vars)}")
         print(f"  time range: {ds.time.min().values} → {ds.time.max().values}")
@@ -1665,13 +1700,6 @@ def main() -> None:
     total_gb = total_bytes / 1e9
     total_gib = total_bytes / 1024**3
     print(f"  uncompressed total: {total_gb:.2f} GB / {total_gib:.2f} GiB ({total_bytes:,} bytes)")
-
-    # Try to get gzipped size if we can find the bundle
-    zenodo_dir = REPO / "data" / "zenodo" if (REPO / "data").is_symlink() else None
-    if zenodo_dir and zenodo_dir.exists():
-        for tarball in zenodo_dir.glob("*.tar.gz"):
-            gb = tarball.stat().st_size / 1024**3
-            print(f"  {tarball.name}: {gb:.2f} GB gzipped")
 
     check_aet_macros(macros)
     check_nested_macros(macros)

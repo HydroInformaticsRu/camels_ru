@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
 [![License: CC BY 4.0](https://img.shields.io/badge/Data-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
-A CAMELS-standard hydrological dataset for the Russian Federation, covering 3,353 catchments with daily discharge, water level, meteorological forcing, physiographic attributes, and hydrological signatures (2008–2023).
+A hydrological dataset following the CAMELS framework for the Russian Federation, covering 3,353 catchments with daily discharge, water level, meteorological forcing, physiographic attributes, and hydrological signatures (2008–2023).
 
 **Paper**: The active collaborative manuscript source is the Overleaf submodule at `paper/overleaf/` (target: Earth System Science Data, ESSD)
 **Dataset**: Zenodo DOI [10.5281/zenodo.22132299](https://doi.org/10.5281/zenodo.22132299) — reserved; the record goes live upon paper acceptance
@@ -12,7 +12,7 @@ A CAMELS-standard hydrological dataset for the Russian Federation, covering 3,35
 
 | Component | Coverage |
 |-----------|----------|
-| Catchments | 3,353 delineated watersheds (manually verified, mean areal error 5.1%) |
+| Catchments | 3,353 visually inspected watersheds; area comparison for 3,011 with reference areas (trimmed mean error 5.1%) |
 | Discharge | 2,170 gauges, daily, 2008–2023 (936 Grade A, 86% decent quality) |
 | Water level | 2,989 gauges, daily, 2008–2023 |
 | Forcing | ERA5-Land (T) + GLEAM4 (PET) + MSWEP v2.8 (P), basin-averaged |
@@ -20,9 +20,25 @@ A CAMELS-standard hydrological dataset for the Russian Federation, covering 3,35
 | Signatures | 16 hydrological metrics for 1,729 gauges (1,716 non-anomalous rows used in the main-text figures) |
 | Quality control | Per-year grading (A–F), strict Grade A (all years must be A) |
 
+## Release metadata and reuse
+
+The frozen v1.0 package is distinct from the generated **local v1.1 CF-1.9
+candidate** at `release/CAMELS_RU_v1.1_cf19/`, which is not yet archived/published.
+All three NetCDFs pass strict CF-1.9 checks. The tracked
+[README](paper/metadata/README_v1.1_cf19.md) and
+[changelog](paper/metadata/CHANGELOG_v1.1_cf19.md) specify its scope.
+
+[Signature definitions](paper/metadata/signature_crosswalk.json) cover 16 signatures
+and three ERA5-Land variants; annual averaging, thresholds, quantile orientation, gaps
+and interpolation prevent automatic cross-CAMELS harmonisation.
+[Attribute metadata](paper/metadata/hydroatlas_metadata.json) covers 281 source plus
+seven derived fields. Exclude the eleven invalid categorical means (`*_smj`); other
+attributes, including the primary 22, retain documented spatial-support qualifications.
+The [loading example](examples/load_camels_ru.py) reads this guidance for v1.0 or v1.1.
+
 ## Quality Grading
 
-Discharge time series are graded per hydrological year (Oct–Sep) using 21 defined flag types; the release-default grading evaluates 16 active flags (two variance flags and three optional temperature-aware effective-water flags are disabled by default). A gauge receives overall Grade A only if **every** assessed year is individually graded A. This ensures Grade A means "use without checking individual years."
+Discharge time series are graded per hydrological year (Oct–Sep) using 21 defined flag types; the release-default grading evaluates 16 active flags (two variance flags and three optional temperature-aware effective-water flags are disabled by default). A gauge receives overall Grade A only if **every** assessed year is individually graded A. These are reproducible screening/consistency grades, not independently calibrated observational accuracy; inspect the separate provenance and diagnostic flags for the intended use.
 
 The release includes `year_grades.csv` — a per-gauge × per-year grade matrix — so modelers can filter out D/F years from calibration/validation windows.
 
@@ -113,3 +129,9 @@ Abramov, D. V., Maximov, Y., Tsyplenkov, A., and Moreido, V.: CAMELS-RU: hydrome
 
 **Author**: Dmitrii V. Abramov
 **Email**: dmbrmv@icloud.com
+
+The preferred local candidate passes complete numerical-preservation and strict
+CF-1.9 checks; see [the validation report](paper/reviews/CF19_VALIDATION_2026-09-23.md).
+It stores `gauge_id(station)`; the loading helper supports both layouts. The frozen
+v1.0 and first v1.1 candidate remain untouched. The first candidate's failed CF-1.8
+checks are preserved in [the earlier report](paper/reviews/CF_VALIDATION_2026-09-23.md).

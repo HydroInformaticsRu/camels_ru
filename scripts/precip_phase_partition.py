@@ -23,7 +23,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import xarray as xr
+
+from utils.release_io import open_release_dataset
 
 REPO = Path(__file__).resolve().parents[1]
 RELEASE = REPO / "release" / "CAMELS_RU_v1.0"
@@ -34,7 +35,7 @@ DAYS_PER_YEAR = 365.25
 
 def main() -> None:
     """Partition each precipitation product by air-temperature phase and write the table."""
-    with xr.open_dataset(RELEASE / "camels_ru_forcing.nc") as ds:
+    with open_release_dataset(RELEASE / "camels_ru_forcing.nc") as ds:
         temp = ds["temp_mean"].values
         products = {name: ds[f"precip_{name}"].values for name in ("mswep", "era5")}
         n_days = ds.sizes["time"]

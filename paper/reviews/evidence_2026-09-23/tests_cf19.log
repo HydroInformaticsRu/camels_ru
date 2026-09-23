@@ -1,0 +1,120 @@
+PASS: test_boot_spearman_ci
+PASS: test_discharge_fill_flag
+OK - era5_hourly_to_daily reduction verified
+test_event_durations: all checks passed
+PASS: test_forcing_fill_selection
+PASS: test_gap_fill_edges
+PASS: test_gleam_pet_units
+PASS: test_hydroatlas_weights
+ok
+ok
+Release directory: /home/dmbrmv/Development/camels_ru/.tmp/tmpi91b5su6
+Audit evidence: repository paper/tables and results/hess_quality (not regenerated).
+
+======================================================================
+COUNTS
+======================================================================
+Release directory: /home/dmbrmv/Development/camels_ru/release/CAMELS_RU_v1.0
+Audit evidence: repository paper/tables and results/hess_quality (not regenerated).
+
+======================================================================
+COUNTS
+======================================================================
+
+======================================================================
+COLD-REGION GRADIENT (release signatures + attributes)
+======================================================================
+
+======================================================================
+YEAR FLAGS (release camels_ru_year_flags.csv vs census + year grades)
+======================================================================
+[DRIFT] required release year_flags evidence      paper=present                    actual=missing: /home/dmbrmv/Development/camels_ru/.tmp/tmpi91b5su6/camels_ru_year_flags.csv
+
+======================================================================
+DRIFT SUMMARY
+======================================================================
+  1 drift(s): required release year_flags evidence
+
+Cross-reference with paper/overleaf/macros.tex
+SKIP optional audit evidence unavailable
+
+======================================================================
+DRIFT SUMMARY
+======================================================================
+  Incomplete audit evidence: 1 check(s) skipped; not verified:
+    SKIP optional audit evidence unavailable
+  No drift among completed checks against the selected release + repository audits.
+  This checks numerical agreement, not scientific validity or audit provenance.
+
+Done. Cross-reference with paper/overleaf/macros.tex
+Release selection checks passed.
+/home/dmbrmv/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-v60p40za because there was an issue with the default path (/home/dmbrmv/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+Paper figure encoding checks passed
+ok
+Release reader checks passed.
+Writing SHA256SUMS...
+  7 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+PASS: manifests, station mapping, numerical preservation and enumerated metadata amendment
+CF compliance and author approval remain separate checks.
+Metadata amendment candidate: /home/dmbrmv/Development/camels_ru/.tmp/essd_revision_2026-09-23/tmpybebylu4/candidate
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+PASS: manifests, station mapping, numerical preservation and enumerated metadata amendment
+CF compliance and author approval remain separate checks.
+Metadata amendment candidate: /home/dmbrmv/Development/camels_ru/.tmp/essd_revision_2026-09-23/tmpybebylu4/candidate_cf19
+PASS: manifests, station mapping, numerical preservation and enumerated metadata amendment
+CF compliance and author approval remain separate checks.
+PASS: manifests, station mapping, numerical preservation and enumerated metadata amendment
+CF compliance and author approval remain separate checks.
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+Writing SHA256SUMS...
+  11 files -> SHA256SUMS
+PASS: release metadata joins, safeguards, packed preservation and tamper detection
+PASS: test_resume_coverage_nan
+/home/dmbrmv/Development/camels_ru/src/hydro/flow_extremes.py:183: RuntimeWarning: Mean of empty slice
+  mean_daily_rise = np.nanmean(daily_change[daily_change > 0])
+/home/dmbrmv/Development/camels_ru/src/hydro/flow_extremes.py:183: RuntimeWarning: Mean of empty slice
+  mean_daily_rise = np.nanmean(daily_change[daily_change > 0])
+/home/dmbrmv/Development/camels_ru/src/hydro/flow_extremes.py:183: RuntimeWarning: Mean of empty slice
+  mean_daily_rise = np.nanmean(daily_change[daily_change > 0])
+/home/dmbrmv/Development/camels_ru/src/hydro/flow_extremes.py:183: RuntimeWarning: Mean of empty slice
+  mean_daily_rise = np.nanmean(daily_change[daily_change > 0])
+/home/dmbrmv/Development/camels_ru/src/hydro/flow_extremes.py:183: RuntimeWarning: Mean of empty slice
+  mean_daily_rise = np.nanmean(daily_change[daily_change > 0])
+/home/dmbrmv/Development/camels_ru/src/hydro/flow_extremes.py:183: RuntimeWarning: Mean of empty slice
+  mean_daily_rise = np.nanmean(daily_change[daily_change > 0])
+/home/dmbrmv/Development/camels_ru/src/hydro/flow_extremes.py:183: RuntimeWarning: Mean of empty slice
+  mean_daily_rise = np.nanmean(daily_change[daily_change > 0])
+PASS: test_signature_valid_years
+2026-09-23 16:35:43 | WARNING  | camels_ru | MeteoAggregation | ⚠️  Cached weights for gauge test_gauge do not match the current grid extent; recomputing (stale cache from a different ERA5-Land grid).
+PASS: test_weight_cache_grid_key

@@ -1,0 +1,95 @@
+{
+  "source_manifest_sha256": "947bb60d6b6e70605037fb72712d8bac7387bb16b37b317b6864a48cb22c1c7e",
+  "source_files": {
+    "README.md": "22b1a8042f283585381e0354dcb851b8f1654d3bf72051c73d51a11d197c970d",
+    "camels_ru_attributes.csv": "6ba369a5e68cbd1a3d19f06d33b948e6750dc0e65c82e3e023985f684647b248",
+    "camels_ru_boundaries.gpkg": "2937d7286eee5107440f2cd15a3802cb7b356156e93b9f65937598a1a90b3ffd",
+    "camels_ru_discharge.nc": "b5519944274f0d3201602ac8cc20a3823b4750dd98a5488b3cc0279a160b5502",
+    "camels_ru_forcing.nc": "2de14c854c3a6c01b12825dd50ee171372aa4e9c7b545f768d88250e9fbc549e",
+    "camels_ru_forcing_notes.csv": "a5f86a43c8c01f10e1aa4a5a7c2e992b0a510eb66e148a029aac03dfe1ba622d",
+    "camels_ru_gauge_summary.csv": "72c57e9bccf4ba5d245350f8cf78f86ee463f388907fc5ee054990fd612d5289",
+    "camels_ru_signatures.csv": "6165214947e76c7bf9ebc45e6b1d51e27c36fab85af4795034bba6a79f0a4cef",
+    "camels_ru_signatures_summary.csv": "214db9000210b5a6892b431215d845440586b6cb1e7776048d96a6879f48ad31",
+    "camels_ru_water_level.nc": "65f82e333f50d4d020209f1c2bd22d5b78a8b6260313983e94fa57ec94d79605",
+    "camels_ru_year_flags.csv": "78b144d64a6a06959460b7afbdcf51e5de786605678c04bd885d801fa35799ab",
+    "camels_ru_year_grades.csv": "281b40eb86976f71af3dea77554568d94f5f5531ee2deae6a6d225c218ccf8ae"
+  },
+  "station_file_sha256": "eb7e009825c031c4a21e1db8548737b1563f86a7dad195ea34fd34a1a04b9cd1",
+  "station_crs": "EPSG:4326",
+  "source_station_count": 3353,
+  "planned_netcdf_coordinates": {
+    "camels_ru_discharge.nc": {
+      "gauge_count": 3353,
+      "latitude_range": [
+        41.410733872507485,
+        72.9891369112369
+      ],
+      "longitude_range": [
+        19.922287798704144,
+        174.388533611111
+      ],
+      "time_count": 5844,
+      "existing_variables": [
+        "discharge_mm",
+        "discharge_m3s",
+        "specific_discharge_anomaly",
+        "quality_flag",
+        "gauge_id",
+        "time"
+      ]
+    },
+    "camels_ru_forcing.nc": {
+      "gauge_count": 3353,
+      "latitude_range": [
+        41.410733872507485,
+        72.9891369112369
+      ],
+      "longitude_range": [
+        19.922287798704144,
+        174.388533611111
+      ],
+      "time_count": 5844,
+      "existing_variables": [
+        "precip_mswep",
+        "precip_era5",
+        "precip_gpcp",
+        "temp_mean",
+        "temp_min",
+        "temp_max",
+        "pet",
+        "gauge_id",
+        "time"
+      ]
+    },
+    "camels_ru_water_level.nc": {
+      "gauge_count": 3353,
+      "latitude_range": [
+        41.410733872507485,
+        72.9891369112369
+      ],
+      "longitude_range": [
+        19.922287798704144,
+        174.388533611111
+      ],
+      "time_count": 5844,
+      "existing_variables": [
+        "water_level_cm",
+        "water_level_mbs",
+        "gauge_zero_m",
+        "quality_flag",
+        "gauge_type",
+        "gauge_id",
+        "time",
+        "stage_discharge_screen"
+      ]
+    }
+  },
+  "metadata_sources": {
+    "CHANGELOG_v1.1.md": "e9852c4e40fb261188fb30e8e46c0c4d56593509f079529d0f122ef63831a985",
+    "README_v1.1.md": "556ed2f2ca496632cb432c502e70b3d6cba998253ae400c7cdfc62a3d139a158",
+    "signature_crosswalk.json": "ca568498d739919860b3b4850ed58206c3deb6491185ff8b42989e3935010edd",
+    "hydroatlas_metadata.json": "57bab228e81aa17133d097f6cef94d0ba81701fa16dfe1fedde80b47c13e480f"
+  },
+  "candidate_exists": false,
+  "approval_status": "Concrete release creation and isolated CF checker installation pending"
+}

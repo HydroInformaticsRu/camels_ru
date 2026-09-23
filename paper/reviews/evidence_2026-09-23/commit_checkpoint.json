@@ -1,0 +1,41 @@
+{
+  "authorization": "User explicitly authorised committing both repositories; no push/upload/submission.",
+  "manuscript_commit": "d6c45acc6b51ff2943ceb1fc6166827021c01210",
+  "parent_baseline": "e1ec631a3e36816b3016f6222a0070e442cf5b76",
+  "candidate": "release/CAMELS_RU_v1.1_cf19",
+  "candidate_manifest_sha256": "c6b763e4a3b7f9f526eb6d03acc6619e2ef8ddc7ee79e323f18a6cd10ed30e3e",
+  "candidate_provenance_sha256": "4e6da9db21f199e7192c1641047761198d7e2c5fd2c974c63843ca4e2e5870c6",
+  "candidate_code_hashes_match": true,
+  "pdf_sha256": "2dea9d11db7dc9b6b7f67d5af97190c40c912cfb133f29a6f06944e12b121309",
+  "pdf_pages": 52,
+  "figure_pages": {
+    "1": 5,
+    "2": 8,
+    "3": 16,
+    "4": 36,
+    "5": 36,
+    "6": 38,
+    "B1": 43,
+    "B2": 44,
+    "B3": 45,
+    "B4": 46
+  },
+  "build_log_sha256": "b87542709f3ee489fdaf370e018670773eac0dd08e9c3c0872b59bbf509142c3",
+  "previous_verification": "cf19_build_verification.json",
+  "fresh_checks": [
+    "all archived evidence hashes",
+    "all three exhaustive release manifests",
+    "original review and plan parity",
+    "figure asset parity",
+    "PDF rebuild and layout",
+    "diff whitespace"
+  ],
+  "remaining_gates": [
+    "final co-author approval and contributions",
+    "source licensing evidence",
+    "historical AI-use disclosure",
+    "final archival provenance",
+    "anonymous access and uploaded-file parity"
+  ],
+  "whitespace_note": "Source diff check passes. Verbatim build_after_cf19.log and build_commit_checkpoint.log retain a terminal blank line flagged by git diff --check; preserved to retain original evidence bytes."
+}

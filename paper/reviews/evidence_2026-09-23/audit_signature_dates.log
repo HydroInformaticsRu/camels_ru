@@ -1,0 +1,4 @@
+high_flow_dur rows= 1729 matching= 1729 max_raw_abs_difference= 0.0004444444444260398
+low_flow_dur rows= 1729 matching= 1729 max_raw_abs_difference= 0.0005000000000023874
+flashiness_index rows= 1729 matching= 1729 max_raw_abs_difference= 4.999245717396406e-07
+PASS: all 1729 released rows match current date-contiguous event durations and pooled flashiness at CSV precision; no BFI or regenerated products.

@@ -1,0 +1,14 @@
+{
+  "CAMELS_RU_v1.0": {
+    "files": 12,
+    "manifest_sha256": "947bb60d6b6e70605037fb72712d8bac7387bb16b37b317b6864a48cb22c1c7e"
+  },
+  "CAMELS_RU_v1.1": {
+    "files": 16,
+    "manifest_sha256": "84c66d60281ecac55924db75aa2ba25b6006ad1d44a10f736543ef2665305a42"
+  },
+  "CAMELS_RU_v1.1_cf19": {
+    "files": 16,
+    "manifest_sha256": "c6b763e4a3b7f9f526eb6d03acc6619e2ef8ddc7ee79e323f18a6cd10ed30e3e"
+  }
+}

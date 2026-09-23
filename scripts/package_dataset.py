@@ -24,6 +24,11 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+if __package__:
+    from . import verify_release_revision as revision
+else:
+    import verify_release_revision as revision
+
 PROJECT_ROOT = Path(__file__).parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "CAMELS_RU"
 OUTPUT_DIR = PROJECT_ROOT / "release" / "CAMELS_RU_v1.0"
@@ -77,6 +82,214 @@ _ACDD_ATTRS = {
     "license": LICENSE,
     "featureType": "timeSeries",
 }
+
+
+def station_coordinates(
+    stations: gpd.GeoDataFrame, gauge_ids: list[str]
+) -> tuple[np.ndarray, np.ndarray]:
+    """Validate station points and join their coordinates in the requested gauge order."""
+    if stations.crs is None or stations.crs.to_epsg() != 4326:
+        raise ValueError("Station coordinates require an explicit EPSG:4326 CRS")
+    if "gauge_id" not in stations or stations.gauge_id.isna().any():
+        raise ValueError("Station gauge IDs are absent or missing")
+    source_ids = stations.gauge_id.astype(str)
+    target_ids = pd.Index(gauge_ids)
+    if (
+        source_ids.str.strip().eq("").any()
+        or source_ids.duplicated().any()
+        or target_ids.hasnans
+        or (target_ids.astype(str).str.strip() == "").any()
+        or target_ids.astype(str).duplicated().any()
+    ):
+        raise ValueError("Gauge IDs must be nonempty and unique")
+    if (
+        stations.geometry.isna().any()
+        or stations.geometry.is_empty.any()
+        or stations.geom_type.ne("Point").any()
+    ):
+        raise ValueError("Station geometries must be nonempty points")
+    lat, lon = stations.geometry.y.to_numpy(), stations.geometry.x.to_numpy()
+    if (
+        not np.isfinite(lat).all()
+        or not np.isfinite(lon).all()
+        or (np.abs(lat) > 90).any()
+        or (np.abs(lon) > 180).any()
+    ):
+        raise ValueError("Station coordinates must be finite and within geographic ranges")
+    coordinates = pd.DataFrame({"lat": lat, "lon": lon}, index=source_ids)
+    targets = target_ids.astype(str)
+    missing = targets.difference(coordinates.index)
+    if len(missing):
+        raise ValueError(f"Missing station coordinates for {missing.tolist()}")
+    aligned = coordinates.loc[targets]
+    return aligned.lat.to_numpy(), aligned.lon.to_numpy()
+
+
+def append_station_coordinates(
+    path: Path, stations: gpd.GeoDataFrame | None = None, *, cf19: bool = False
+) -> None:
+    """Append coordinates without decoding or rewriting any existing NetCDF variable."""
+    from netCDF4 import Dataset
+
+    if stations is None:
+        stations = gpd.read_file(GEOM_DIR / "camels_gauges.gpkg")
+    with Dataset(path, "r") as nc:
+        if "lat" in nc.variables or "lon" in nc.variables:
+            raise ValueError(f"Coordinates already exist: {path}")
+        lat, lon = station_coordinates(stations, list(nc["gauge_id"][:]))
+        if cf19 and (
+            "station" in nc.dimensions
+            or nc["gauge_id"].dimensions != ("gauge_id",)
+            or nc["time"].dimensions != ("time",)
+        ):
+            raise ValueError("CF19 amendment requires the original gauge_id/time dimensions")
+    with Dataset(path, "a") as nc:
+        if cf19:
+            nc.renameDimension("gauge_id", "station")
+            nc.Conventions = "CF-1.9"
+            nc["time"].setncatts({"standard_name": "time", "long_name": "Time"})
+        station_dim = "station" if cf19 else "gauge_id"
+        for name, values, standard, units in (
+            ("lat", lat, "latitude", "degrees_north"),
+            ("lon", lon, "longitude", "degrees_east"),
+        ):
+            variable = nc.createVariable(name, "f8", (station_dim,), fill_value=False)
+            variable[:] = values
+            variable.setncatts(
+                {
+                    "standard_name": standard,
+                    "long_name": f"Gauge {standard}",
+                    "units": units,
+                    "comment": revision.COORDINATE_COMMENT,
+                }
+            )
+        for name, variable in nc.variables.items():
+            if station_dim in variable.dimensions and name not in {"gauge_id", "lat", "lon"}:
+                previous = str(getattr(variable, "coordinates", "")).split()
+                labels = (["gauge_id"] if cf19 else []) + ["lat", "lon"]
+                variable.coordinates = " ".join(dict.fromkeys([*previous, *labels]))
+
+
+def checked_amendment_paths(source: Path, output: Path) -> tuple[Path, Path]:
+    """Reject an existing destination or resolved path overlap before any write."""
+    source = source.resolve(strict=True)
+    if output.exists() or output.is_symlink():
+        raise FileExistsError(f"Amendment destination must not exist: {output}")
+    output = output.resolve()
+    if source == output or source in output.parents or output in source.parents:
+        raise ValueError("Source and amendment destination must not overlap")
+    if not source.is_dir():
+        raise ValueError("Amendment source must be a directory")
+    return source, output
+
+
+def _git_state(path: Path) -> dict:
+    import subprocess
+
+    git = shutil.which("git")
+    if git is None:
+        raise FileNotFoundError("git is required to record amendment code provenance")
+    # Fixed read-only git operations; paths are internal repository constants.
+    return {
+        "commit": subprocess.check_output(  # noqa: S603
+            [git, "-C", str(path), "rev-parse", "HEAD"], text=True
+        ).strip(),
+        "status_porcelain": subprocess.check_output(  # noqa: S603
+            [git, "-C", str(path), "status", "--porcelain"], text=True
+        ),
+    }
+
+
+def amend_metadata(source: Path, output: Path, *, cf19: bool = False) -> None:
+    """Copy a verified frozen bundle and append only the documented v1.1 metadata."""
+    from datetime import UTC, datetime
+
+    from netCDF4 import Dataset
+
+    source, output = checked_amendment_paths(source, output)
+    source_hashes = revision.verify_manifest(source)
+    # Complete all preflight validation before creating the destination.
+    metadata_dir = PROJECT_ROOT / "paper" / "metadata"
+    revision.validate_metadata(metadata_dir, source)
+    metadata_files = {
+        "signature_crosswalk.json": "signature_crosswalk.json",
+        "hydroatlas_metadata.json": "hydroatlas_metadata.json",
+        "README.md": "README_v1.1_cf19.md" if cf19 else "README_v1.1.md",
+        "CHANGELOG.md": "CHANGELOG_v1.1_cf19.md" if cf19 else "CHANGELOG_v1.1.md",
+    }
+    metadata_sources = {
+        dest: {"path": str(metadata_dir / src), "sha256": revision.sha256(metadata_dir / src)}
+        for dest, src in metadata_files.items()
+    }
+    station_path = GEOM_DIR / "camels_gauges.gpkg"
+    station_hash = revision.sha256(station_path)
+    stations = gpd.read_file(station_path)
+    if len(stations) != 3353:
+        raise ValueError("Expected exactly 3353 station records")
+    for name in revision.NETCDFS:
+        with Dataset(source / name) as nc:
+            ids = list(nc["gauge_id"][:])
+            if len(ids) != 3353 or "lat" in nc.variables or "lon" in nc.variables:
+                raise ValueError(f"Expected original 3353-gauge NetCDF without lat/lon: {name}")
+            station_coordinates(stations, ids)
+    if any(name in source_hashes for name in revision.PERMITTED_AMENDMENTS["added_files"]):
+        raise ValueError("Source already contains amendment files")
+
+    provenance = {
+        "dataset_version": "1.1",
+        "created_utc": datetime.now(UTC).isoformat(),
+        "source_directory": str(source),
+        "source_manifest": source_hashes,
+        "source_manifest_text": (source / "SHA256SUMS").read_text(),
+        "source_manifest_sha256": revision.sha256(source / "SHA256SUMS"),
+        "station_source": {
+            "path": str(station_path.resolve()),
+            "sha256": station_hash,
+            "crs": str(stations.crs),
+            "count": len(stations),
+        },
+        "code_provenance": {
+            "repository": _git_state(PROJECT_ROOT),
+            "manuscript_repository": _git_state(PROJECT_ROOT / "paper" / "overleaf"),
+            "code_sha256": {
+                name: revision.sha256(PROJECT_ROOT / name)
+                for name in ("scripts/package_dataset.py", "scripts/verify_release_revision.py")
+            },
+        },
+        "metadata_sources": metadata_sources,
+        "permitted_amendments": (
+            revision.CF19_PERMITTED_AMENDMENTS if cf19 else revision.PERMITTED_AMENDMENTS
+        ),
+        "validation_scope": (
+            "Numerical preservation and enumerated metadata amendment; "
+            "not CF compliance or author approval."
+        ),
+    }
+    if cf19:
+        provenance["schema_revision"] = "cf19_station"
+    for state in (
+        provenance["code_provenance"]["repository"],
+        provenance["code_provenance"]["manuscript_repository"],
+    ):
+        state["dirty"] = bool(state["status_porcelain"])
+    shutil.copytree(source, output)
+    for name in revision.NETCDFS:
+        append_station_coordinates(output / name, stations, cf19=cf19)
+        with Dataset(output / name, "a") as nc:
+            nc.dataset_version = "1.1"
+            history_entry = revision.CF19_HISTORY_ENTRY if cf19 else revision.HISTORY_ENTRY
+            nc.history = (str(getattr(nc, "history", "")) + "\n" + history_entry).lstrip("\n")
+    for dest, src in metadata_files.items():
+        shutil.copy2(metadata_dir / src, output / dest)
+    (output / "REVISION_PROVENANCE.json").write_text(json.dumps(provenance, indent=2) + "\n")
+    if (
+        revision.verify_manifest(source) != source_hashes
+        or revision.sha256(station_path) != station_hash
+    ):
+        raise ValueError("Source/stations changed during amendment; candidate is not verified")
+    write_checksums(output)
+    revision.verify_revision(source, output)
+    print(f"Metadata amendment candidate: {output}")
 
 
 def package_boundaries() -> None:
@@ -307,6 +520,7 @@ def package_discharge() -> None:
             "specific_discharge_anomaly": {"dtype": "int8"},
         },
     )
+    append_station_coordinates(out)
     n_with_data = int((q_flag != 3).any(axis=1).sum())
     print(f"  {n_with_data}/{n_gauges} gauges with data -> {out.name}")
 
@@ -541,6 +755,7 @@ def package_forcing() -> dict[str, str]:
     out = OUTPUT_DIR / "camels_ru_forcing.nc"
     encoding = {v: {"dtype": "float32", "zlib": True, "complevel": 4} for v in ds.data_vars}
     ds.to_netcdf(out, encoding=encoding)
+    append_station_coordinates(out)
     print(f"  {n_gauges} gauges -> {out.name}")
     return forcing_notes
 
@@ -908,6 +1123,7 @@ def package_water_level() -> None:
             "stage_discharge_screen": {"dtype": "int8", "zlib": True, "complevel": 4},
         },
     )
+    append_station_coordinates(out)
     n_with_mbs = int(np.isfinite(gauge_zero_m).sum())
     n_with_data = n_river + n_reservoir
     print(
@@ -961,21 +1177,22 @@ def run_signatures() -> None:
     )
 
 
-def write_checksums() -> None:
+def write_checksums(directory: Path | None = None) -> None:
     """Write SHA256SUMS for every file in OUTPUT_DIR (relative paths, one per line)."""
     import hashlib
 
     print("Writing SHA256SUMS...")
-    checksum_path = OUTPUT_DIR / "SHA256SUMS"
+    directory = OUTPUT_DIR if directory is None else directory
+    checksum_path = directory / "SHA256SUMS"
     # Collect files, sorted, skipping the checksums file itself if already present
-    files = sorted(p for p in OUTPUT_DIR.rglob("*") if p.is_file() and p.name != "SHA256SUMS")
+    files = sorted(p for p in directory.rglob("*") if p.is_file() and p != checksum_path)
     lines: list[str] = []
     for f in files:
         h = hashlib.sha256()
         with f.open("rb") as fh:
             for chunk in iter(lambda: fh.read(1 << 20), b""):
                 h.update(chunk)
-        rel = f.relative_to(OUTPUT_DIR).as_posix()
+        rel = f.relative_to(directory).as_posix()
         lines.append(f"{h.hexdigest()}  {rel}")
     checksum_path.write_text("\n".join(lines) + "\n")
     print(f"  {len(lines)} files -> {checksum_path.name}")
@@ -993,7 +1210,7 @@ def main() -> None:
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=default_out,
+        default=None,
         help=f"Release directory (default: {default_out})",
     )
     parser.add_argument(
@@ -1011,9 +1228,29 @@ def main() -> None:
         action="store_true",
         help="Skip writing SHA256SUMS at end",
     )
+    parser.add_argument(
+        "--amend-metadata-from",
+        type=Path,
+        help="Verified source bundle for metadata-only v1.1 amendment",
+    )
+    parser.add_argument(
+        "--cf19",
+        action="store_true",
+        help="Apply the approved CF-1.9 station dimension schema (metadata amendment only)",
+    )
     args = parser.parse_args()
+    if args.cf19 and args.amend_metadata_from is None:
+        parser.error("--cf19 requires --amend-metadata-from")
 
-    OUTPUT_DIR = args.output_dir
+    if args.amend_metadata_from is not None:
+        if args.output_dir is None:
+            parser.error("--amend-metadata-from requires an explicit --output-dir")
+        if args.skip_year_grades or args.skip_signatures or args.skip_checksums:
+            parser.error("--skip-* flags are not applicable to metadata amendment")
+        amend_metadata(args.amend_metadata_from, args.output_dir, cf19=args.cf19)
+        return
+
+    OUTPUT_DIR = args.output_dir if args.output_dir is not None else default_out
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     print(f"Packaging CAMELS-RU dataset to {OUTPUT_DIR}\n")

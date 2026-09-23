@@ -1,0 +1,542 @@
+{
+  "cf:1.8": {
+    "scored_points": 247,
+    "possible_points": 251,
+    "high_count": 3,
+    "medium_count": 0,
+    "low_count": 0,
+    "high_priorities": [
+      {
+        "name": "§2.1 Filename",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§2.2 Data Types",
+        "weight": 3,
+        "value": [
+          9,
+          10
+        ],
+        "msgs": [
+          "The variable time failed because the datatype is int64"
+        ],
+        "children": []
+      },
+      {
+        "name": "§2.4 Dimensions",
+        "weight": 3,
+        "value": [
+          10,
+          10
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§2.5.1. Missing data, valid and actual range of data",
+        "weight": 3,
+        "value": [
+          4,
+          4
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§3.1 Units",
+        "weight": 3,
+        "value": [
+          20,
+          20
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§3.3 Standard Name",
+        "weight": 3,
+        "value": [
+          20,
+          21
+        ],
+        "msgs": [
+          "Attribute long_name or/and standard_name is highly recommended for variable time"
+        ],
+        "children": []
+      },
+      {
+        "name": "§3.5 Flags",
+        "weight": 3,
+        "value": [
+          24,
+          24
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§4.1 Latitude Coordinate",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§4.2 Longitude Coordinate",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§4.4 Time Coordinate",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§5 Coordinate Systems",
+        "weight": 3,
+        "value": [
+          35,
+          35
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§5.1 Independent Latitude, Longitude, Vertical, and Time Axes",
+        "weight": 3,
+        "value": [
+          0,
+          2
+        ],
+        "msgs": [
+          "Coordinate variable 'time' should have standard_name='time', found: 'None'",
+          "Coordinate variable 'time' should have standard_name='time', found: 'None'"
+        ],
+        "children": []
+      },
+      {
+        "name": "§8.1 Packed Data",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§9.1 Dataset contains a valid featureType",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§9.1 Features and feature types",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§9.5 Coordinates and metadata",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      }
+    ],
+    "medium_priorities": [
+      {
+        "name": "§2.3 Naming Conventions",
+        "weight": 2,
+        "value": [
+          77,
+          77
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§2.4 Dimensions",
+        "weight": 2,
+        "value": [
+          9,
+          9
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§2.5 Variables",
+        "weight": 2,
+        "value": [
+          3,
+          3
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§2.6 Attributes",
+        "weight": 2,
+        "value": [
+          15,
+          15
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§3.1 Units",
+        "weight": 2,
+        "value": [
+          6,
+          6
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§4.1 Latitude Coordinate",
+        "weight": 2,
+        "value": [
+          2,
+          2
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§4.2 Longitude Coordinate",
+        "weight": 2,
+        "value": [
+          2,
+          2
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§9.1 Features and feature types",
+        "weight": 2,
+        "value": [
+          2,
+          2
+        ],
+        "msgs": [],
+        "children": []
+      }
+    ],
+    "low_priorities": [
+      {
+        "name": "§4.4.1 Calendar",
+        "weight": 1,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      }
+    ],
+    "all_priorities": [
+      {
+        "name": "§2.1 Filename",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§2.2 Data Types",
+        "weight": 3,
+        "value": [
+          9,
+          10
+        ],
+        "msgs": [
+          "The variable time failed because the datatype is int64"
+        ],
+        "children": []
+      },
+      {
+        "name": "§2.3 Naming Conventions",
+        "weight": 2,
+        "value": [
+          77,
+          77
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§2.4 Dimensions",
+        "weight": 2,
+        "value": [
+          9,
+          9
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§2.4 Dimensions",
+        "weight": 3,
+        "value": [
+          10,
+          10
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§2.5 Variables",
+        "weight": 2,
+        "value": [
+          3,
+          3
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§2.5.1. Missing data, valid and actual range of data",
+        "weight": 3,
+        "value": [
+          4,
+          4
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§2.6 Attributes",
+        "weight": 2,
+        "value": [
+          15,
+          15
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§3.1 Units",
+        "weight": 2,
+        "value": [
+          6,
+          6
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§3.1 Units",
+        "weight": 3,
+        "value": [
+          20,
+          20
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§3.3 Standard Name",
+        "weight": 3,
+        "value": [
+          20,
+          21
+        ],
+        "msgs": [
+          "Attribute long_name or/and standard_name is highly recommended for variable time"
+        ],
+        "children": []
+      },
+      {
+        "name": "§3.5 Flags",
+        "weight": 3,
+        "value": [
+          24,
+          24
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§4.1 Latitude Coordinate",
+        "weight": 2,
+        "value": [
+          2,
+          2
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§4.1 Latitude Coordinate",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§4.2 Longitude Coordinate",
+        "weight": 2,
+        "value": [
+          2,
+          2
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§4.2 Longitude Coordinate",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§4.4 Time Coordinate",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§4.4.1 Calendar",
+        "weight": 1,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§5 Coordinate Systems",
+        "weight": 3,
+        "value": [
+          35,
+          35
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§5.1 Independent Latitude, Longitude, Vertical, and Time Axes",
+        "weight": 3,
+        "value": [
+          0,
+          2
+        ],
+        "msgs": [
+          "Coordinate variable 'time' should have standard_name='time', found: 'None'",
+          "Coordinate variable 'time' should have standard_name='time', found: 'None'"
+        ],
+        "children": []
+      },
+      {
+        "name": "§8.1 Packed Data",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§9.1 Dataset contains a valid featureType",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§9.1 Features and feature types",
+        "weight": 2,
+        "value": [
+          2,
+          2
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§9.1 Features and feature types",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      },
+      {
+        "name": "§9.5 Coordinates and metadata",
+        "weight": 3,
+        "value": [
+          1,
+          1
+        ],
+        "msgs": [],
+        "children": []
+      }
+    ],
+    "testname": "cf:1.8",
+    "source_name": "release/CAMELS_RU_v1.1/camels_ru_water_level.nc",
+    "scoreheader": {
+      "3": "Errors",
+      "2": "Warnings",
+      "1": "Info"
+    },
+    "cc_spec_version": "1.8",
+    "cc_url": "http://cfconventions.org/Data/cf-conventions/cf-conventions-1.8/cf-conventions.html",
+    "report_timestamp": "2026-09-23T13:04:02Z",
+    "cc_version": "6.1.0"
+  }
+}

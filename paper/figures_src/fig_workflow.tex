@@ -24,11 +24,11 @@
 
   % Row 1 — discharge and stage
   \node[src, text width=44mm] (s1) at (\xsrc,0) {AIS GMVO portal\\ daily discharge and stage\\ 2008--2023};
-  \node[proc] (p1) at (\xproc,0) {Parsing and harmonisation\\ gap filling $\leq 6$\,d};
+  \node[proc] (p1) at (\xproc,0) {Parsing and harmonisation\\ gap filling $\leq 6$\,d\\ reservoir stage: $\leq 15$\,d};
   \node[outfile]  (o1) at (\xout,0)  {\texttt{discharge.nc}\\ \texttt{water\_level.nc}};
 
   % Row 2 — quality grading (fed by row 1)
-  \node[proc] (p2) at (\xproc,-2.3) {Per-year quality grading\\ completeness + 16 flags\\ $\rightarrow$ grades A--F};
+  \node[proc] (p2) at (\xproc,-2.3) {Discharge-only quality grading\\ completeness + 16 flags\\ $\rightarrow$ grades A--F};
   \node[outfile]  (o2) at (\xout,-2.3)  {\texttt{year\_grades.csv}\\ \texttt{year\_flags.csv}};
 
   % Row 3 — delineation
@@ -36,15 +36,20 @@
   \node[proc] (p3) at (\xproc,-4.6) {Watershed delineation,\\ manual boundary verification};
   \node[outfile]  (o3) at (\xout,-4.6)  {\texttt{boundaries.gpkg}};
 
-  % Row 4 — forcing aggregation (uses area weights from row 3)
-  \node[src]  (s4) at (\xsrc,-6.9)  {Gridded forcing\\ MSWEP, ERA5-Land,\\ GPCP, GLEAM4};
+  % Row 4 — boundaries define the basin aggregation domain
+  \node[src]  (s4) at (\xsrc,-6.9)  {Gridded forcing\\ MSWEP, ERA5-Land,\\ GPCP, GLEAM4\\ + \texttt{boundaries.gpkg}};
   \node[proc] (p4) at (\xproc,-6.9) {Basin-averaged\\ forcing aggregation};
   \node[outfile]  (o4) at (\xout,-6.9)  {\texttt{forcing.nc}};
 
-  % Row 5 — attributes and signatures
-  \node[src]  (s5) at (\xsrc,-9.2)  {HydroATLAS v1.0};
-  \node[proc] (p5) at (\xproc,-9.2) {Attribute extraction,\\ signature computation};
-  \node[outfile]  (o5) at (\xout,-9.2)  {\texttt{attributes.csv}\\ \texttt{signatures.csv}};
+  % Row 5 — boundaries also define attribute extraction
+  \node[src]  (s5) at (\xsrc,-9.2)  {HydroATLAS v1.0\\ + \texttt{boundaries.gpkg}};
+  \node[proc] (p5) at (\xproc,-9.2) {Attribute extraction};
+  \node[outfile]  (o5) at (\xout,-9.2)  {\texttt{attributes.csv}};
+
+  % Row 6 — all three signature inputs are explicit
+  \node[src]  (s6) at (\xsrc,-11.5)  {Discharge, forcing,\\ catchment area};
+  \node[proc] (p6) at (\xproc,-11.5) {Signature computation};
+  \node[outfile]  (o6) at (\xout,-11.5)  {\texttt{signatures.csv}};
 
   % Column headers
   \node[font=\large\bfseries] at (\xsrc,1.4)  {Sources};
@@ -52,12 +57,11 @@
   \node[font=\large\bfseries] at (\xout,1.4)  {Released files};
 
   % Horizontal flows (row-aligned, no crossings)
-  \foreach \r in {1,3,4,5} \draw[flow] (s\r) -- (p\r);
-  \foreach \r in {1,2,3,4,5} \draw[flow] (p\r) -- (o\r);
+  \foreach \r in {1,3,4,5,6} \draw[flow] (s\r) -- (p\r);
+  \foreach \r in {1,2,3,4,5,6} \draw[flow] (p\r) -- (o\r);
 
   % Vertical flows inside the processing column
-  \draw[flow] (p1) -- (p2);
-  \draw[flow] (p3) -- (p4) node[midway, right=1mm, font=\small\itshape] {area weights};
+  \draw[flow] (p1) -- (p2) node[midway, right=1mm, font=\small\itshape] {discharge};
 
 \end{tikzpicture}
 \end{document}

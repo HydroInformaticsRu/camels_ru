@@ -1,0 +1,65 @@
+{
+  "pdf_pages": 52,
+  "pdf_sha256": "0fec9a0d9af793f8acbc9236199691cefa157d9e0c6dbe752b145deade9b1b6e",
+  "figure_pages": [
+    [
+      "1",
+      5
+    ],
+    [
+      "2",
+      8
+    ],
+    [
+      "3",
+      16
+    ],
+    [
+      "4",
+      35
+    ],
+    [
+      "5",
+      36
+    ],
+    [
+      "6",
+      38
+    ],
+    [
+      "B1",
+      43
+    ],
+    [
+      "B2",
+      44
+    ],
+    [
+      "B3",
+      45
+    ],
+    [
+      "B4",
+      46
+    ]
+  ],
+  "data_availability_page": 47,
+  "ten_asset_parity_sha256": {
+    "fig_gauge_network.png": "6400dec8e43150044fd77bf318294c48d6e56ded8022da37b29d05635759ce2a",
+    "fig_workflow.pdf": "c75fb00e045f98e21a917c6451ccda53371d3a4bd621d0c08d54a8b3c780f516",
+    "fig_gauge_reliability.png": "c8ebcd6439bde55e5eceeaa86ee153e42dfc618d0bbe446cadfe664ae23d334b",
+    "fig_precip_comparison.png": "5d5aeba3d6a1af7f28ce9364962d77f6737d4523a2f60347541c86db19c45355",
+    "fig_budyko.pdf": "3bce6febd55a1e811997b7d4a0c007e6137ea6a604b8512863a885ec39dbb554",
+    "fig_coldregion_gradient.pdf": "a2d1bda81c84032f28858f498c33796685a6312c3e1a5fb92d3518f0b4181d63",
+    "fig_hydro_signatures_1.png": "39677069d71e11a775736e4e1ed2d28d06db0aae8592829f1c344415f6aba146",
+    "fig_hydro_signatures_2.png": "151cbee717c7e27921b371ba576234565c1c737ef96dc47b459742a71519d7d3",
+    "fig_hydro_signatures_3.png": "78df65c2930d69a10f7637483707f49222c42ba862b9ed2e8877a03a2b908ef3",
+    "fig_hydro_signatures_4.png": "50cedee1fe12702496b80b16d5b4918506d2eae1b4e01ec317897c21083d630d"
+  },
+  "macro_ok_checks": 398,
+  "test_scripts": 17,
+  "original_review_sha256": "08e649c83a21feaf66df9cc083bb594a97bee744cf04e6c75f9ef4ae9be4b1a9",
+  "candidate_exists": false,
+  "lint": "All checks passed!",
+  "typecheck": "\u2728 Pixi task (typecheck): pyright -p pyright.smoke.json\n0 errors, 0 warnings, 0 informations"
+}

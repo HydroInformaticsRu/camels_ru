@@ -1,0 +1,91 @@
+{
+  "candidate": "release/CAMELS_RU_v1.1_cf19",
+  "schema_revision": "cf19_station",
+  "build_exit": 0,
+  "equivalence_exit": 0,
+  "legacy_equivalence_exit": 0,
+  "cf_checker_version": "6.1.0",
+  "cf": {
+    "discharge": {
+      "exit": 0,
+      "scored_points": 215,
+      "possible_points": 215,
+      "high_count": 0,
+      "medium_count": 0,
+      "low_count": 0
+    },
+    "forcing": {
+      "exit": 0,
+      "scored_points": 373,
+      "possible_points": 373,
+      "high_count": 0,
+      "medium_count": 0,
+      "low_count": 0
+    },
+    "water_level": {
+      "exit": 0,
+      "scored_points": 265,
+      "possible_points": 265,
+      "high_count": 0,
+      "medium_count": 0,
+      "low_count": 0
+    }
+  },
+  "macro_ok_checks": 398,
+  "test_scripts": 18,
+  "tests_exit": 0,
+  "lint_exit": 0,
+  "scoped_ruff_exit": 0,
+  "typecheck_exit": 0,
+  "pdf_pages": 52,
+  "figure_pages": {
+    "1": 5,
+    "2": 8,
+    "3": 16,
+    "4": 36,
+    "5": 36,
+    "6": 38,
+    "B1": 43,
+    "B2": 44,
+    "B3": 45,
+    "B4": 46
+  },
+  "data_availability_page": 47,
+  "pdf_sha256": "ba2abca81e45955e5571f800b3600e08cd2aa99e5bf49c1f1b242de6d9db85ab",
+  "manifests": {
+    "CAMELS_RU_v1.0": {
+      "files": 12,
+      "manifest_sha256": "947bb60d6b6e70605037fb72712d8bac7387bb16b37b317b6864a48cb22c1c7e"
+    },
+    "CAMELS_RU_v1.1": {
+      "files": 16,
+      "manifest_sha256": "84c66d60281ecac55924db75aa2ba25b6006ad1d44a10f736543ef2665305a42"
+    },
+    "CAMELS_RU_v1.1_cf19": {
+      "files": 16,
+      "manifest_sha256": "c6b763e4a3b7f9f526eb6d03acc6619e2ef8ddc7ee79e323f18a6cd10ed30e3e"
+    }
+  },
+  "evidence_sha256": {
+    "build_v1.1_cf19.log": "9d21a345ea26fdaa88ff90d9add374759a9412ead289101afaf6ce7a04c2fa77",
+    "verify_v1.1_cf19.log": "9469deacdfed2466d015b5b44cb1e5f34094efc25bcec5c7c22d52c296cd717b",
+    "legacy_cf19.log": "9469deacdfed2466d015b5b44cb1e5f34094efc25bcec5c7c22d52c296cd717b",
+    "macros_v1.1_cf19.log": "05630f1943e60124aa1833bae637f4ec0fca685c5460b6a9e5b678138c4c32c5",
+    "cf19_manifests.json": "83d1e679b6da2bd557d756f278bfd2b994c654a8d35de8a684a312e3fce71861",
+    "tests_cf19.log": "f39ba9bdb67a8176340f523eec0399fb68605b1268131ec775c5d58cf63ad0e7",
+    "lint_cf19.log": "44f1a73c2f5315f14344163c8fce6fd2bffe6c2702c8db7fcad947a2bae7005d",
+    "ruff_cf19.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "typecheck_cf19.log": "17da92c1b424554b62c20e82ed6173220ac2a38c3d53c0aa52e0136090d47674",
+    "example_v1.1_cf19.log": "e1f83de87424eadf1f33219e1b238ebd8b234de582633fb39a231dd6e5d2397b",
+    "example_v1.0_cf19_reader.log": "e1f83de87424eadf1f33219e1b238ebd8b234de582633fb39a231dd6e5d2397b",
+    "build_after_cf19.log": "b4b07f7b6ada7e041cc642cf974bd3c6deb0064da2e87535121e7cf8a3d8d60c",
+    "cf19_page24.png": "4c5202e309846079f6a9858f804ec0f4083568b47b8b7415d6cc7a3204dc79d3",
+    "cf19_page36.png": "631d581725172b0ae4676528ccfc5c4ce451c76916105301731a17b831c3dc02",
+    "cf19_discharge.json": "2be8c5435d8599d7b5c9b3726329b0bc20cc85bfedccd7fd2027f420bea15819",
+    "cf19_discharge.log": "395ca148bceae139a38d7fbb6eef9c80185ef6957d99db2c7cf8c844777a782e",
+    "cf19_forcing.json": "8c760ff03a5ef0730ff0bcd37bde65117bde1a801dc23171acb42fe0c48f1f3c",
+    "cf19_forcing.log": "230785af613ead87414d074cea20718e312b616460370b8cd8020d3716743865",
+    "cf19_water_level.json": "6df70e3e0bd78fe94290ad0900744ff27448b7e6e80d35ed69a1c94f16086142",
+    "cf19_water_level.log": "9ddd55d2d9dc8f72724dff68c1d358277cf9d1dd700af739b82c74b73b4fe3ff"
+  }
+}

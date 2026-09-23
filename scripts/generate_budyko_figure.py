@@ -28,7 +28,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
-import xarray as xr
+
+from utils.release_io import open_release_dataset
 
 sys.path.append(str(Path(__file__).parent.parent))
 from scripts.create_paper_signatures import (  # noqa: E402
@@ -47,6 +48,23 @@ PRODUCTS = {"ERA5-Land": "precip_era5", "MSWEP": "precip_mswep", "GPCP": "precip
 OUT_PNG = ROOT / "paper/images/fig_budyko.pdf"
 OVERLEAF_OUT_PNG = ROOT / "paper/overleaf/images/fig_budyko.pdf"
 OUT_TABLE = ROOT / "paper/tables/forcing_water_balance.csv"
+X_LIM = (0, 3.5)
+Y_LIM = (-0.3, 1.5)
+
+
+def _off_axis_counts(sub: pd.DataFrame) -> dict[str, int]:
+    """Count each axis tail and the distinct union, without discarding any gauge."""
+    x, y = sub["aridity_index"], sub["evaporative_index"]
+    tails = {
+        "x_below": x < X_LIM[0],
+        "x_above": x > X_LIM[1],
+        "y_below": y < Y_LIM[0],
+        "y_above": y > Y_LIM[1],
+    }
+    return {
+        **{k: int(v.sum()) for k, v in tails.items()},
+        "outside_union": int(np.logical_or.reduce(list(tails.values())).sum()),
+    }
 
 
 def _gauge_record(
@@ -95,7 +113,7 @@ def _plot(df: pd.DataFrame) -> None:
     fs = 16
     fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.8), sharey=True, constrained_layout=True)
 
-    # Theoretical bounds in Budyko coordinates
+    # Conditional bounds when P-Q approximates AET and PET is a suitable upper bound.
     #   Water  limit: AET <= P     -> evap_index <= 1            (horizontal at y=1;
     #                                 this is the y>=1 branch of the envelope below,
     #                                 so it is not drawn again as its own line)
@@ -113,7 +131,7 @@ def _plot(df: pd.DataFrame) -> None:
             color="#AA2222",
             linestyle="--",
             linewidth=1.0,
-            label="Physical envelope",
+            label="Conditional balance/PET envelope",
         )
         ax.plot(x, budyko, color="#222222", linestyle="-", linewidth=1.2, label="Budyko (1974) curve")
         ax.scatter(
@@ -127,8 +145,20 @@ def _plot(df: pd.DataFrame) -> None:
         )
         ax.set_title(f"({panel}) {product} (n={len(sub)})", fontsize=fs, loc="left")
         ax.set_xlabel("Aridity index  PET / P", fontsize=fs)
-        ax.set_xlim(0, 3.5)
-        ax.set_ylim(-0.3, 1.5)
+        ax.set_xlim(*X_LIM)
+        ax.set_ylim(*Y_LIM)
+        outside = _off_axis_counts(sub)
+        ax.text(
+            0.0,
+            -0.32,
+            f"Off-axis: x < 0: {outside['x_below']}; x > 3.5: {outside['x_above']}\n"
+            f"y < −0.3: {outside['y_below']}; y > 1.5: {outside['y_above']}\n"
+            f"Distinct total: {outside['outside_union']}",
+            transform=ax.transAxes,
+            ha="left",
+            va="top",
+            fontsize=fs - 2,
+        )
         ax.axhline(0, color="#888888", linewidth=0.5)
         ax.axvline(1, color="#888888", linewidth=0.5, linestyle=":")
         # Anchored away from the x=1 divider (not centered on fixed x positions) so the
@@ -140,7 +170,7 @@ def _plot(df: pd.DataFrame) -> None:
         ax.grid(alpha=0.2, linestyle="--")
         ax.tick_params(labelsize=fs)
 
-    axes[0].set_ylabel("Evaporative index  (P − Q) / P", fontsize=fs, labelpad=10)
+    axes[0].set_ylabel("Balance proxy  (P − Q) / P", fontsize=fs, labelpad=10)
     axes[0].text(0.04, 1.06, "above water limit (Q < 0)", fontsize=fs, color="#AA2222")
     axes[0].text(0.04, -0.24, "below zero (Q > P)", fontsize=fs, color="#AA2222")
     # A within-panel legend wide enough to clear the font floor also spans most of this
@@ -148,7 +178,7 @@ def _plot(df: pd.DataFrame) -> None:
     # boundary annotations. Placed outside the axes instead (as in the gauge-network
     # figure's Koppen legend), which constrained_layout reserves dedicated space for.
     handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="outside lower center", ncol=2, fontsize=fs, framealpha=0.9)
+    fig.legend(handles, labels, loc="outside upper center", ncol=2, fontsize=fs, framealpha=0.9)
 
     OUT_PNG.parent.mkdir(parents=True, exist_ok=True)
     # Save once and copy: two savefig(bbox_inches="tight") calls crop differently,
@@ -195,6 +225,7 @@ def _summary_table(df: pd.DataFrame) -> None:
                 ),
                 "below_budyko_pct": float(100.0 * (departure < 0.0).mean()),
                 "median_budyko_departure": float(departure.median()),
+                **_off_axis_counts(sub),
             }
         )
         ai_med = sub["aridity_index"].median()
@@ -221,12 +252,12 @@ def _summary_table(df: pd.DataFrame) -> None:
 
 def main() -> None:
     """CLI entry point."""
-    ds = xr.open_dataset(RELEASE / "camels_ru_discharge.nc")
+    ds = open_release_dataset(RELEASE / "camels_ru_discharge.nc")
     gauge_coord = "gauge_id" if "gauge_id" in ds.coords else "gauge"
     gauges = [str(g) for g in ds[gauge_coord].values]
     dates = pd.DatetimeIndex(ds["time"].values)
     discharge = ds["discharge_mm"].values
-    forcing = xr.open_dataset(RELEASE / "camels_ru_forcing.nc").reindex(gauge_id=gauges, time=dates)
+    forcing = open_release_dataset(RELEASE / "camels_ru_forcing.nc").reindex(gauge_id=gauges, time=dates)
     precip = {product: forcing[var].values for product, var in PRODUCTS.items()}
     pet_values = forcing["pet"].values
 

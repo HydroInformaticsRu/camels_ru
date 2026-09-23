@@ -22,7 +22,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
-import xarray as xr
+
+from utils.release_io import open_release_dataset
 
 REPO = Path(__file__).resolve().parent.parent
 RELEASE = REPO / "release" / "CAMELS_RU_v1.0"
@@ -58,10 +59,10 @@ def _constant_runs(x: np.ndarray) -> list[slice]:
 
 def constant_run_sensitivity() -> dict[str, int]:
     """Constant-value exemption: fixed Nov-Apr window vs per-gauge freezing window."""
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
         q = ds["discharge_mm"].transpose("gauge_id", "time").values
         times = pd.DatetimeIndex(ds["time"].values)
-    with xr.open_dataset(RELEASE / "camels_ru_forcing.nc") as fx:
+    with open_release_dataset(RELEASE / "camels_ru_forcing.nc") as fx:
         t = fx["temp_mean"].transpose("gauge_id", "time").values
 
     doy = times.dayofyear.to_numpy()
@@ -93,11 +94,11 @@ def constant_run_sensitivity() -> dict[str, int]:
 
 def stage_window_sensitivity() -> dict[str, int]:
     """Stage--discharge screen: weak-gauge count under May-Oct vs June-September."""
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as dq:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as dq:
         q = dq["discharge_m3s"].values.astype(float)
         q_obs = dq["quality_flag"].values == 0
         months = pd.DatetimeIndex(dq["time"].values).month.to_numpy()
-    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as dh:
+    with open_release_dataset(RELEASE / "camels_ru_water_level.nc") as dh:
         h = dh["water_level_cm"].values.astype(float)
         h_obs = dh["quality_flag"].values == 0
         gtype = dh["gauge_type"].values

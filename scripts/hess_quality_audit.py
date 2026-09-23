@@ -28,6 +28,8 @@ import pandas as pd
 from tqdm.auto import tqdm
 import xarray as xr
 
+from utils.release_io import open_release_dataset
+
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -312,9 +314,9 @@ def _build_subset_flow(
     sigs = data["sigs"]
     boundaries = data["boundaries"]
 
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
         n_discharge = int((~np.isnan(ds["discharge_mm"])).any(dim="time").sum().values)
-    with xr.open_dataset(RELEASE / "camels_ru_water_level.nc") as ds:
+    with open_release_dataset(RELEASE / "camels_ru_water_level.nc") as ds:
         n_water_level = int((~np.isnan(ds["water_level_cm"])).any(dim="time").sum().values)
 
     grade_cols = [c for c in year_grades.columns if c.isdigit()]
@@ -601,7 +603,7 @@ def _gauge_ids_from_csv(path: Path, source: str) -> tuple[pd.Series, str]:
 
 def _gauge_ids_from_netcdf(path: Path, source: str) -> tuple[pd.Series, str]:
     """Read gauge IDs from a NetCDF coordinate, accepting gauge_id/Gauge ID/gauge."""
-    with xr.open_dataset(path) as ds:
+    with open_release_dataset(path) as ds:
         names = list(ds.coords) + list(ds.dims)
         field = _find_gauge_id_column(names, source)
         return pd.Series(ds[field].values.astype(str)), field
@@ -716,7 +718,7 @@ def _build_paper_analysis_scope(
         "water_level": "water_level_cm",
     }
     for nc_name, data_var in nc_data_vars.items():
-        with xr.open_dataset(RELEASE / f"camels_ru_{nc_name}.nc") as ds:
+        with open_release_dataset(RELEASE / f"camels_ru_{nc_name}.nc") as ds:
             gauge_coord = "gauge_id" if "gauge_id" in ds.coords else "gauge"
             ids = pd.Series(ds[gauge_coord].values.astype(str))
             has_data = (~np.isnan(ds[data_var])).any(dim="time").values.astype(bool)
@@ -1211,7 +1213,7 @@ def _build_budyko_aet(data: dict[str, Any], out_dir: Path, workers: int) -> pd.D
         )
     )
 
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
         gauge_coord = "gauge_id" if "gauge_id" in ds.coords else "gauge"
         gauges = [str(g) for g in ds[gauge_coord].values]
         dates = ds["time"].values

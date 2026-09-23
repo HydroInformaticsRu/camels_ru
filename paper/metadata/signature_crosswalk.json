@@ -1,0 +1,530 @@
+{
+  "schema_version": 1,
+  "applies_to_release_versions": [
+    "1.0",
+    "1.1"
+  ],
+  "description": "Definition crosswalk for unchanged released values; not a harmonised signature product. Comparator target names use published spelling.",
+  "sources": {
+    "camels_us_addor2017": {
+      "dataset": "CAMELS-US",
+      "version": "Addor et al. (2017), Tables 2 and 3; hydrological years 1990-2009",
+      "source": "https://hess.copernicus.org/articles/21/5293/2017/",
+      "definition_scope": "Published definitions, not a claim of bitwise agreement with any downstream implementation."
+    },
+    "caravan2023": {
+      "dataset": "Caravan",
+      "version": "Kratzert et al. (2023), Scientific Data 10:61",
+      "source": "https://doi.org/10.1038/s41597-023-01975-w",
+      "code_source": "https://github.com/kratzert/Caravan",
+      "definition_scope": "Framework reference only where a target signature definition was not verified; no universal Caravan signature equivalence is asserted."
+    }
+  },
+  "common_period": [
+    "2008-10-01",
+    "2023-09-30"
+  ],
+  "row_eligibility": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation.",
+  "variables": [
+    {
+      "name": "q_mean",
+      "units": "mm d-1",
+      "formula": "mean_y(nanmean(Q_y))",
+      "code_reference": "src/hydro/period_based_metrics.py:calculate_period_metrics",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation.",
+      "missing_date_handling": "NaN Q omitted within each year; dates are retained for eligibility. Missing days are not zero-filled.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "q_mean",
+          "status": "related_not_equivalent",
+          "limitations": "CAMELS-US uses the record mean; unequal annual coverage makes equal-year and pooled-day weighting differ."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null
+    },
+    {
+      "name": "runoff_ratio",
+      "units": "1",
+      "formula": "mean_y(sum(Q_y[paired])/sum(P_y[paired]))",
+      "code_reference": "scripts/create_paper_signatures.py:_water_balance_ratios",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "For each complete hydrological year require >=70% nonmissing Q and >=70% days jointly nonmissing in Q, selected P and GLEAM4 PET; require sum(P)>0 and >=5 such years. PET participates in the mask even for Q/P. No grade or provenance-flag mask.",
+      "missing_date_handling": "Only jointly available Q/P/PET dates contribute sums; no imputation at signature calculation; incomplete seasonal sampling can bias balance interpretation.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "runoff_ratio",
+          "status": "related_not_equivalent",
+          "limitations": "Mean of annual paired-day ratios differs from a ratio of long-term means; seasonal gaps, storage and forcing differ."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null,
+      "forcing": {
+        "precipitation": "precip_mswep (MSWEP v2.8)",
+        "potential_evapotranspiration": "pet (GLEAM4)"
+      }
+    },
+    {
+      "name": "q_cv",
+      "units": "1",
+      "formula": "mean_y(nanstd(Q_y, ddof=0)/nanmean(Q_y)); annual NaN when mean(Q_y)<=0",
+      "code_reference": "src/hydro/period_based_metrics.py:calculate_period_metrics",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation.",
+      "missing_date_handling": "NaN Q omitted within each year; dates are retained for eligibility. Missing days are not zero-filled.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": null,
+          "status": "no_direct_counterpart",
+          "limitations": "No direct counterpart in Addor2017 Table 3; do not substitute another variability signature."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null
+    },
+    {
+      "name": "fdc_slope",
+      "units": "1",
+      "formula": "mean_y(100*(ln(percentile(Q_y,67))-ln(percentile(Q_y,34)))/33); annual NaN if either quantile<=0; numpy default linear percentile interpolation",
+      "code_reference": "src/hydro/flow_duration.py:FlowDurationCurve.calculate_fdc_slope",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation.",
+      "missing_date_handling": "NaN Q omitted within each year; dates are retained for eligibility. Missing days are not zero-filled.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "slope_fdc",
+          "status": "related_not_equivalent",
+          "limitations": "Related log-FDC slope; annual quantiles/averaging differ from whole-record quantiles; zero handling and quantile interpolation also matter."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null
+    },
+    {
+      "name": "flashiness_index",
+      "units": "1",
+      "formula": "sum(abs(q[i]-q[i-1]), i=1..n-1)/sum(q[i], i=1..n-1), q=Q_window.dropna(); NaN for n<2 or denominator<=0",
+      "code_reference": "src/hydro/flow_variability.py:FlowVariability.calculate_flashiness_index",
+      "aggregation": "One pooled calculation over all available Q in complete-year window, including years failing the annual 70% rule, after row eligibility is met.",
+      "eligibility_and_masks": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation.",
+      "missing_date_handling": "dropna then difference consecutive retained values; calendar gaps are bridged as one step.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": null,
+          "status": "no_direct_counterpart",
+          "limitations": "No direct counterpart in Addor2017 Table 3. Denominator excludes first retained Q; gaps are bridged."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null
+    },
+    {
+      "name": "q05",
+      "units": "mm d-1",
+      "formula": "mean_y(nanpercentile(Q_y,95)); numpy default linear interpolation",
+      "code_reference": "src/hydro/flow_duration.py:FlowDurationCurve.get_percentile_flow",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation.",
+      "missing_date_handling": "NaN Q omitted within each year; dates are retained for eligibility. Missing days are not zero-filled.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "Q95",
+          "status": "related_not_equivalent",
+          "limitations": "High flow: CAMELS-RU q05 is 5% exceedance, hence the orientation matches CAMELS-US Q95, not Q5. Renaming does not remove annual-versus-whole-record differences."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null
+    },
+    {
+      "name": "q95",
+      "units": "mm d-1",
+      "formula": "mean_y(nanpercentile(Q_y,5)); numpy default linear interpolation",
+      "code_reference": "src/hydro/flow_duration.py:FlowDurationCurve.get_percentile_flow",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation.",
+      "missing_date_handling": "NaN Q omitted within each year; dates are retained for eligibility. Missing days are not zero-filled.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "Q5",
+          "status": "related_not_equivalent",
+          "limitations": "Low flow: CAMELS-RU q95 is 95% exceedance, hence the orientation matches CAMELS-US Q5, not Q95. Renaming does not remove annual-versus-whole-record differences."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null
+    },
+    {
+      "name": "high_flow_freq",
+      "units": "% of available days",
+      "formula": "mean_y(100*count(Q_y > 2*median(Q_y))/count(nonmissing Q_y))",
+      "code_reference": "src/hydro/flow_extremes.py:FlowExtremes.analyze_high_flows",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation.",
+      "missing_date_handling": "NaN Q omitted within each year; dates are retained for eligibility. Missing days are not zero-filled.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "high_q_freq",
+          "status": "related_not_equivalent",
+          "limitations": "CAMELS-US high flows exceed 9 times the record median, with frequency in days/year. A percent-to-days conversion cannot harmonise thresholds, annual reference statistics, periods or masks."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null
+    },
+    {
+      "name": "high_flow_dur",
+      "units": "d",
+      "formula": "mean_y(mean(lengths of date-contiguous runs where Q_y > 2*median(Q_y))); use 0 for a year without events",
+      "code_reference": "src/hydro/flow_extremes.py:FlowExtremes.analyze_high_flows",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation.",
+      "missing_date_handling": "NaN Q omitted; an event breaks when condition becomes false OR successive retained dates differ by more than one day. Hydrological-year boundaries also break events. Length counts retained daily observations.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "high_q_dur",
+          "status": "related_not_equivalent",
+          "limitations": "CAMELS-US uses 9 times median; annual thresholds and equal-year duration means differ from pooling all event lengths. Missing dates and year boundaries split CAMELS-RU events."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null
+    },
+    {
+      "name": "baseflow_index",
+      "units": "1",
+      "formula": "mean_y(mean_alpha(mean(max(B_alpha,0))/mean(q))); q=Q_y.dropna(); if mean(q)==0 BFI=0; 1000 uniform alpha samples on [0.9,0.98], random seed1996, forward-backward-forward filtering and 30-value reflection at each end",
+      "code_reference": "src/hydro/base_flow.py:calculate_bfi",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation.",
+      "missing_date_handling": "dropna before filtering; nonadjacent calendar dates become successive filter steps.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "baseflow_index",
+          "status": "related_not_equivalent",
+          "limitations": "Related filter-derived ratio; CAMELS-US cites Ladson2013 digital filtering, not this annual ensemble implementation. Parameter, boundary and gap handling differ. Not a measured groundwater fraction."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null,
+      "filter_recurrence": "For each pass input x: quick[j+1]=alpha*quick[j]+(1+alpha)/2*(x[j+1]-x[j]); initialize quick at first input value; base=x where quick<0 else x-quick. Reverse direction for second pass using previous base as input, then forward third pass. Reflect 30 values excluding endpoint duplication if n-1>30; trim reflection then clip final base>=0."
+    },
+    {
+      "name": "low_flow_freq",
+      "units": "% of available days",
+      "formula": "mean_y(100*count(Q_y < 0.2*mean(Q_y))/count(nonmissing Q_y))",
+      "code_reference": "src/hydro/flow_extremes.py:FlowExtremes.analyze_low_flows",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation.",
+      "missing_date_handling": "NaN Q omitted within each year; dates are retained for eligibility. Missing days are not zero-filled.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "low_q_freq",
+          "status": "related_not_equivalent",
+          "limitations": "CAMELS-US uses 0.2 times mean daily flow but reports days/year. Annual reference means, equal-year averaging, coverage and periods prevent automatic conversion."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null
+    },
+    {
+      "name": "low_flow_dur",
+      "units": "d",
+      "formula": "mean_y(mean(lengths of date-contiguous runs where Q_y < 0.2*mean(Q_y))); use 0 for a year without events",
+      "code_reference": "src/hydro/flow_extremes.py:FlowExtremes.analyze_low_flows",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation.",
+      "missing_date_handling": "NaN Q omitted; an event breaks when condition becomes false OR successive retained dates differ by more than one day. Hydrological-year boundaries also break events. Length counts retained daily observations.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "low_q_dur",
+          "status": "related_not_equivalent",
+          "limitations": "Threshold multiplier is related, but annual reference means and averaging differ from whole-record event pooling. Missing dates and year boundaries split CAMELS-RU events."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null
+    },
+    {
+      "name": "half_flow_date",
+      "units": "day of hydrological year; Oct1=1",
+      "formula": "mean_y(day_of_hydro_year(first retained date with cumsum(Q_y)>=0.5*sum(Q_y))); each year additionally needs >=300 available Q days",
+      "code_reference": "src/hydro/flow_timing.py:FlowTiming.calculate_half_flow_date",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation. Each year additionally needs >=300 available days and >=5 such annual dates.",
+      "missing_date_handling": "Cumulative sum omits missing Q but timing uses actual date relative to Oct1, preserving calendar gaps.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "hfd_mean",
+          "status": "related_not_equivalent",
+          "limitations": "Related October-origin half-flow timing; coverage thresholds and period differ. CAMELS-RU keeps actual calendar offsets after omitting missing Q; zero-total years return first retained date in current code."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null
+    },
+    {
+      "name": "winter_flow_ratio",
+      "units": "1",
+      "formula": "mean(Q_window for Jan-Mar, omit NaN)/mean(Q_window, omit NaN); denominator must be finite and >0; require >=5 Jan-Mar seasons with >=70% available Q",
+      "code_reference": "scripts/create_paper_signatures.py:_compute_one",
+      "aggregation": "Ratio of pooled Jan-Mar mean to pooled all-month mean across complete-year window, including years failing the annual 70% rule, after row eligibility is met.",
+      "eligibility_and_masks": "area_km2 < 50000; at least 5 years with >=70% nonmissing daily Q; each annual metric independently needs >=5 nonmissing annual metric values. No A-F or quality_flag mask. is_anomalous rows remain in CSV and are excluded from summary statistics; water_balance_screen does not mask signature computation.",
+      "missing_date_handling": "Missing values omitted separately from seasonal/all-month means; winter_coverage records available Jan-Mar days/total Jan-Mar days; seasonal omissions can bias ratio.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": null,
+          "status": "no_direct_counterpart",
+          "limitations": "No direct counterpart in Addor2017 Table 3. This is cold-season yield, not a groundwater fraction; winter gaps alter both samples."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null
+    },
+    {
+      "name": "aridity_index",
+      "units": "1",
+      "formula": "mean_y(sum(PET_y[paired])/sum(P_y[paired]))",
+      "code_reference": "scripts/create_paper_signatures.py:_water_balance_ratios",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "For each complete hydrological year require >=70% nonmissing Q and >=70% days jointly nonmissing in Q, selected P and GLEAM4 PET; require sum(P)>0 and >=5 such years. PET participates in the mask even for Q/P. No grade or provenance-flag mask.",
+      "missing_date_handling": "Only jointly available Q/P/PET dates contribute sums; no imputation at signature calculation; incomplete seasonal sampling can bias balance interpretation.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "aridity",
+          "status": "related_not_equivalent",
+          "limitations": "CAMELS-US aridity is ratio of mean PET to mean P. Annual paired-day averaging and GLEAM4/MSWEP forcing differ; Q-dependent eligibility makes this unlike an unconditional climate index."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null,
+      "forcing": {
+        "precipitation": "precip_mswep (MSWEP v2.8)",
+        "potential_evapotranspiration": "pet (GLEAM4)"
+      }
+    },
+    {
+      "name": "evaporative_index",
+      "units": "1",
+      "formula": "mean_y((sum(P_y[paired])-sum(Q_y[paired]))/sum(P_y[paired]))",
+      "code_reference": "scripts/create_paper_signatures.py:_water_balance_ratios",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "For each complete hydrological year require >=70% nonmissing Q and >=70% days jointly nonmissing in Q, selected P and GLEAM4 PET; require sum(P)>0 and >=5 such years. PET participates in the mask even for Q/P. No grade or provenance-flag mask.",
+      "missing_date_handling": "Only jointly available Q/P/PET dates contribute sums; no imputation at signature calculation; incomplete seasonal sampling can bias balance interpretation.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": null,
+          "status": "no_direct_counterpart",
+          "limitations": "No direct counterpart in Addor2017 Tables2-3. P-Q is a residual, not measured evaporation; storage/import and incomplete-period assumptions remain."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null,
+      "forcing": {
+        "precipitation": "precip_mswep (MSWEP v2.8)",
+        "potential_evapotranspiration": "pet (GLEAM4)"
+      }
+    },
+    {
+      "name": "runoff_ratio_era5",
+      "units": "1",
+      "formula": "mean_y(sum(Q_y[paired])/sum(P_y[paired]))",
+      "code_reference": "scripts/create_paper_signatures.py:_water_balance_ratios",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "For each complete hydrological year require >=70% nonmissing Q and >=70% days jointly nonmissing in Q, selected P and GLEAM4 PET; require sum(P)>0 and >=5 such years. PET participates in the mask even for Q/P. No grade or provenance-flag mask.",
+      "missing_date_handling": "Only jointly available Q/P/PET dates contribute sums; no imputation at signature calculation; incomplete seasonal sampling can bias balance interpretation.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "runoff_ratio",
+          "status": "related_not_equivalent",
+          "limitations": "Mean of annual paired-day ratios differs from a ratio of long-term means; seasonal gaps, storage and forcing differ."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null,
+      "forcing": {
+        "precipitation": "precip_era5 (ERA5-Land)",
+        "potential_evapotranspiration": "pet (GLEAM4)"
+      }
+    },
+    {
+      "name": "aridity_index_era5",
+      "units": "1",
+      "formula": "mean_y(sum(PET_y[paired])/sum(P_y[paired]))",
+      "code_reference": "scripts/create_paper_signatures.py:_water_balance_ratios",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "For each complete hydrological year require >=70% nonmissing Q and >=70% days jointly nonmissing in Q, selected P and GLEAM4 PET; require sum(P)>0 and >=5 such years. PET participates in the mask even for Q/P. No grade or provenance-flag mask.",
+      "missing_date_handling": "Only jointly available Q/P/PET dates contribute sums; no imputation at signature calculation; incomplete seasonal sampling can bias balance interpretation.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": "aridity",
+          "status": "related_not_equivalent",
+          "limitations": "CAMELS-US aridity is ratio of mean PET to mean P. Annual paired-day averaging and GLEAM4/ERA5-Land forcing differ; Q-dependent eligibility makes this unlike an unconditional climate index."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null,
+      "forcing": {
+        "precipitation": "precip_era5 (ERA5-Land)",
+        "potential_evapotranspiration": "pet (GLEAM4)"
+      }
+    },
+    {
+      "name": "evaporative_index_era5",
+      "units": "1",
+      "formula": "mean_y((sum(P_y[paired])-sum(Q_y[paired]))/sum(P_y[paired]))",
+      "code_reference": "scripts/create_paper_signatures.py:_water_balance_ratios",
+      "aggregation": "Arithmetic mean of annual values across complete Oct-Sep hydrological years 2009-2023 (2008-10-01 through 2023-09-30); each year has equal weight.",
+      "eligibility_and_masks": "For each complete hydrological year require >=70% nonmissing Q and >=70% days jointly nonmissing in Q, selected P and GLEAM4 PET; require sum(P)>0 and >=5 such years. PET participates in the mask even for Q/P. No grade or provenance-flag mask.",
+      "missing_date_handling": "Only jointly available Q/P/PET dates contribute sums; no imputation at signature calculation; incomplete seasonal sampling can bias balance interpretation.",
+      "interpolated_discharge": "Available Q includes observed and interpolated values (quality_flag 0 and 1); quality_flag is not read by create_paper_signatures.py. Missing Q remains NaN.",
+      "comparators": [
+        {
+          "source_id": "camels_us_addor2017",
+          "target_name": null,
+          "status": "no_direct_counterpart",
+          "limitations": "No direct counterpart in Addor2017 Tables2-3. P-Q is a residual, not measured evaporation; storage/import and incomplete-period assumptions remain."
+        },
+        {
+          "source_id": "caravan2023",
+          "target_name": null,
+          "status": "no_verified_direct_counterpart",
+          "limitations": "No corresponding signature definition verified in the 2023 source; use the actual target product definition before comparison."
+        }
+      ],
+      "automatic_conversion": null,
+      "forcing": {
+        "precipitation": "precip_era5 (ERA5-Land)",
+        "potential_evapotranspiration": "pet (GLEAM4)"
+      }
+    }
+  ]
+}

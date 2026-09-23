@@ -53,10 +53,14 @@ TEST_DIR = PROJECT_ROOT / ".tmp" / "cluster_diag"
 # (release column, panel title, bin edges) in figure order; bins as in notebooks/02.
 PANELS_1 = [
     ("q_mean", "Mean discharge (mm d$^{-1}$)", [0, 0.3, 0.6, 1.0, 1.5, 2.5, 5.0, 8.0]),
-    ("q95", "Q95 (mm d$^{-1}$)", [0, 0.05, 0.1, 0.2, 0.35, 0.6, 1.0, 2.5]),
+    (
+        "q95",
+        "Low flow: 5th percentile (95% exceedance; mm d$^{-1}$)",
+        [0, 0.05, 0.1, 0.2, 0.35, 0.6, 1.0, 2.5],
+    ),
 ]
 PANELS_2 = [
-    ("q05", "Q05 (mm d$^{-1}$)", [0, 1, 3, 5, 7, 10, 15, 20]),
+    ("q05", "High flow: 95th percentile (5% exceedance; mm d$^{-1}$)", [0, 1, 3, 5, 7, 10, 15, 20]),
     ("baseflow_index", "Baseflow index", [0.2, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85]),
 ]
 PANELS_3 = [

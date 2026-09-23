@@ -16,14 +16,13 @@ Conventions (2026-08-23 revision, science-review Domain Expert M-1/M-5):
 - A hydrological year is valid when at least 70 % of its days carry discharge; a gauge
   needs at least 5 valid years. Signatures are the mean over valid years.
 - Water-balance ratios (runoff_ratio Q/P, aridity_index PET/P, evaporative_index (P-Q)/P)
-  are computed per valid year over the days where discharge is observed, then averaged.
+  are computed per valid year over paired available values, including fills, then averaged.
+  Winter gaps can omit snowfall whose later runoff remains in the paired sample.
   MSWEP is the primary precipitation; `_era5` columns give the ERA5-Land variants.
-- winter_flow_ratio: mean Jan-Mar flow / mean annual flow, on observed days pooled
+- winter_flow_ratio: mean Jan-Mar flow / mean annual flow, on available days (fills included) pooled
   over all complete hydrological years (2009-2023), valid or not.
-  A Lyne-Hollick BFI with alpha in [0.9, 0.98] has a 10-50 day recession
-  constant and so reads a multi-week snowmelt recession as baseflow; this measures
-  cold-season yield directly and declines monotonically with permafrost extent, as the
-  BFI does not.
+  It describes flow seasonality alongside the Lyne-Hollick BFI. The filter's multi-week
+  response timescale alone cannot identify groundwater, snowmelt or permafrost causation.
 """
 
 from __future__ import annotations
@@ -36,7 +35,8 @@ import sys
 import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
-import xarray as xr
+
+from utils.release_io import open_release_dataset
 
 sys.path.append(str(Path(__file__).parent.parent))
 from src.hydro.flow_variability import FlowVariability  # noqa: E402
@@ -83,8 +83,8 @@ def _water_balance_ratios(
 
     A year is valid when at least ``min_data_fraction`` of its days carry discharge;
     within a year the sums run over the days where discharge, precipitation and PET are
-    all present, so a winter gap does not bias the ratio through the precipitation of the
-    missing days.
+    all available, including fills. Pairing aligns dates but does not remove seasonal
+    sampling bias: a winter gap can omit snowfall whose later runoff remains included.
     """
     q_periods = split_by_period(discharge, "hydrological", 10)
     ratios: list[tuple[float, float, float]] = []
@@ -141,16 +141,10 @@ def _compute_one(
 
         flashiness = FlowVariability(disch).calculate_flashiness_index().get("flashiness_index", np.nan)
 
-        # Cold-season yield, straight from the record: mean Jan-Mar flow over mean annual
-        # flow, both as means over observed days. Using means rather than sums is what makes
-        # this robust to winter gaps -- summing would count a missing under-ice day as zero
-        # and gut the signature at exactly the gauges the archive leaves incomplete.
-        #
-        # It is not fully immune. The denominator averages every observed day, so where
-        # winter days are missing the annual mean is drawn from a sample short of its
-        # low-flow days, biasing it high and the ratio low. Measured over the release that
-        # residual is negligible (Spearman(ratio, winter_coverage) = -0.02, p = 0.4), but
-        # winter_coverage ships so a user can check it per gauge rather than trust that.
+        # Mean Jan-Mar flow over mean annual flow, using available values including fills.
+        # Means avoid treating missing days as zero, but seasonal gaps can bias both
+        # means. A weak pooled coverage correlation cannot establish negligible bias
+        # at individual gauges; winter_coverage supports gauge-specific screening.
         #
         # winter_coverage counts the same Jan-Mar window as the ratio: a coverage figure
         # spanning a different season would not qualify the number it sits beside.
@@ -241,7 +235,7 @@ def main() -> None:
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     log.info(f"Loading discharge from {args.discharge_nc}")
-    ds = xr.open_dataset(args.discharge_nc)
+    ds = open_release_dataset(args.discharge_nc)
 
     dvar = None
     for candidate in ["discharge_mm", "Q_mm", "q_mm"]:
@@ -258,7 +252,7 @@ def main() -> None:
 
     log.info(f"{len(gauges)} gauges × {len(dates)} days in {dvar}")
 
-    forcing = xr.open_dataset(args.forcing_nc).reindex(gauge_id=gauges, time=dates)
+    forcing = open_release_dataset(args.forcing_nc).reindex(gauge_id=gauges, time=dates)
     p_mswep = forcing["precip_mswep"].values
     p_era5 = forcing["precip_era5"].values
     pet_values = forcing["pet"].values

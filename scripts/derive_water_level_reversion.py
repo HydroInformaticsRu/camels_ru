@@ -29,7 +29,8 @@ import sys
 
 import numpy as np
 import pandas as pd
-import xarray as xr
+
+from utils.release_io import open_release_dataset
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -117,7 +118,7 @@ def main() -> None:
     # Certify against the released file: applying the reversion must reproduce the
     # shipped flags cell for cell, and the shipped values on every surviving cell.
     post_flag = np.where(reverted, 3, flag).astype(np.int8)
-    with xr.open_dataset(RELEASE_NC) as rel:
+    with open_release_dataset(RELEASE_NC) as rel:
         rel_ids = [str(g) for g in rel["gauge_id"].values]
         if rel_ids != ws_ids:
             errors.append("gauge order differs from the release grid")

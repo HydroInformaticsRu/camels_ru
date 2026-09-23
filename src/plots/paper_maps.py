@@ -147,7 +147,7 @@ def _add_graticule(
 
 
 def _format_edge_labels(edges: np.ndarray) -> list[str]:
-    """Clean numeric tick labels: no scientific notation, no trailing zeros."""
+    """Numeric class boundaries with open-ended outer classes."""
     labels = []
     for v in edges:
         if v == 0:
@@ -156,7 +156,16 @@ def _format_edge_labels(edges: np.ndarray) -> list[str]:
             labels.append(f"{int(v)}")
         else:
             labels.append(f"{v:g}")
+    labels[0], labels[-1] = "−∞", "+∞"
     return labels
+
+
+def _class_counts(values: np.ndarray, edges: np.ndarray) -> np.ndarray:
+    """Count finite values with exactly the map's clipped BoundaryNorm membership."""
+    values = np.asarray(values)
+    n = len(edges) - 1
+    classes = BoundaryNorm(edges, n, clip=True)(values[np.isfinite(values)])
+    return np.bincount(classes, minlength=n)
 
 
 def _colorbar_histogram(cb, values: np.ndarray, edges: np.ndarray, cmap) -> None:  # noqa: ANN001
@@ -165,12 +174,12 @@ def _colorbar_histogram(cb, values: np.ndarray, edges: np.ndarray, cmap) -> None
     CAMELS-FR / LamaH-CE convention: the legend doubles as a histogram — one bar
     per colour class, aligned above its segment (BoundaryNorm colorbars use uniform
     segment widths), so the sample distribution rides along without an extra panel.
-    Values are clipped to the outer edges first so the tally matches the plotted dots.
+    Finite values use the same open-ended class membership as the plotted dots.
     """
     n = len(edges) - 1
-    counts, _ = np.histogram(np.clip(values, edges[0], edges[-1]), bins=edges)
+    counts = _class_counts(values, edges)
     hax = cb.ax.inset_axes([0.0, 1.15, 1.0, 1.6])
-    hax.bar(
+    bars = hax.bar(
         np.arange(n) + 0.5,
         counts,
         width=0.96,
@@ -178,12 +187,17 @@ def _colorbar_histogram(cb, values: np.ndarray, edges: np.ndarray, cmap) -> None
         edgecolor="none",
     )
     hax.set_xlim(0, n)
-    hax.set_ylim(0, float(counts.max()) * 1.05 if counts.max() else 1.0)
+    hax.bar_label(
+        bars, labels=[str(c) for c in counts], fontsize=cb.ax.xaxis.get_ticklabels()[0].get_fontsize()
+    )
+    hax.set_ylim(0, float(counts.max()) * 1.3 if counts.max() else 1.0)
     hax.axis("off")
 
 
 def _auto_bins(values: np.ndarray, n_bins: int = 6) -> np.ndarray:
     """Generate evenly-spaced bin edges from data range."""
+    if not values.size:
+        return np.linspace(0, 1, n_bins + 1)
     vmin, vmax = float(np.nanmin(values)), float(np.nanmax(values))
     if vmin >= vmax:
         vmax = vmin + 1.0
@@ -265,13 +279,13 @@ def scatter_map(
             zorder=1,
         )
 
-    valid = gdf[gdf[color_col].notna()].copy()
-    nan_mask = gdf[color_col].isna()
+    nan_mask = ~np.isfinite(gdf[color_col])
+    valid = gdf[~nan_mask].copy()
 
     values = np.asarray(valid[color_col])
     edges = np.asarray(bin_edges) if bin_edges is not None else _auto_bins(values, n_bins)
     n = len(edges) - 1
-    norm = BoundaryNorm(edges, n)
+    norm = BoundaryNorm(edges, n, clip=True)
     cmap = cm.get_cmap(cmap_name, n)
 
     if not valid.empty:
@@ -314,9 +328,18 @@ def scatter_map(
             marker=".",
             edgecolors="none",
             zorder=2,
-            alpha=0.5,
+            alpha=1.0,
             transform=_DATA_CRS,
         )
+
+    ax.text(
+        0.01,
+        0.01,
+        f"Finite n={len(valid)}; missing n={int(nan_mask.sum())} (grey)",
+        transform=ax.transAxes,
+        fontsize=colorbar_ticklabelsize,
+        va="bottom",
+    )
 
     if title:
         ax.set_title(title, fontsize=title_fontsize, fontweight="bold", loc="left")

@@ -59,3 +59,30 @@ Requires a TeX Live installation with the packages loaded in `main.tex` (`copern
 ## Key Numbers
 
 Current manuscript numbers must be verified against `release/CAMELS_RU_v1.0/` and reflected in `paper/overleaf/macros.tex`. The older `paper/latex/` values are not authoritative.
+
+## ESSD revision, 23 September 2026
+
+The review trail is in `paper/reviews/ESSD_REVISION_LOG_2026-09-23.md`; the original
+review and approved plan are archived beside it. This is a local author-review
+revision, with submission gates still open. `release/CAMELS_RU_v1.0/` is the frozen
+numerical baseline. The local v1.1 amendment preserves its existing numerical
+variables and files while adding station coordinates, interoperability metadata and
+reuse guidance. Do not retarget the DOI to a version that has not been released.
+
+Metadata sources live in `paper/metadata/`. The amendment command and complete
+verification sequence are in the archived plan. The macro verifier accepts
+`--release-dir`; the default stays v1.0. Figure generators retain the frozen baseline
+inputs; candidate applicability requires the complete release-equivalence report.
+
+Figure execution has side effects: precipitation previews also write
+`paper/tables/precip_comparison_caption.csv`; Budyko and cold-region generators always
+write both image trees and their provenance tables. Do not use
+`scripts/regenerate_paper_maps.py`, which executes legacy notebooks. Regenerate only
+the explicitly listed figures.
+
+The preferred local candidate, `release/CAMELS_RU_v1.1_cf19/`, passes complete
+numerical-equivalence and strict CF-1.9 checks on all three NetCDFs. It renames the
+instance dimension to `station`, retaining string `gauge_id(station)`; the shared
+loading helper supports either schema. See `paper/reviews/CF19_VALIDATION_2026-09-23.md`.
+The first candidate and its failed CF-1.8 checks remain preserved separately.
+No candidate has been archived or assigned a new DOI.

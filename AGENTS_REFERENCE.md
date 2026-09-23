@@ -38,7 +38,7 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
 | `src/hydro/` | Watershed delineation, discharge time series processing |
 | `src/quality/` | Per-year quality grading (A–F); 21 flag types defined, 16 active in release-default grading |
 | `src/meteo/` | Basin-averaged forcing from ERA5-Land, MSWEP v2.8, GPCP |
-| `src/static/` | HydroATLAS attribute extraction (288 vars, 22 primary) |
+| `src/static/` | HydroATLAS attribute extraction (281 source + 7 derived value columns; 22 qualified primary) |
 | `src/timeseries_stats/` | 16 hydrological signatures (Table 3 in paper) |
 | `src/data_processing/` | AIS GMVO XLS parsers, NetCDF builders |
 | `src/plots/` | Paper figure generation (Albers Equal-Area Conic) |
@@ -49,7 +49,9 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
 | `paper/overleaf/` | Active collaborative ESSD manuscript source (nested Overleaf git repo) |
 | `paper/latex/` | Legacy generated LaTeX snapshot (local only, not shipped) |
 | `paper/images/` | Reprojected figures for paper |
-| `release/CAMELS_RU_v1.0/` | Zenodo release: NetCDF + CSV artifacts |
+| `release/CAMELS_RU_v1.0/` | Frozen numerical baseline: NetCDF + CSV artifacts |
+| `release/CAMELS_RU_v1.1/` | Preserved first candidate; numerical equivalence passes, CF-1.8 fails; not published |
+| `release/CAMELS_RU_v1.1_cf19/` | Preferred local candidate; complete equivalence and strict CF-1.9 checks pass; not published |
 | `data/` | Symlink to external data root (not tracked, not on all machines) |
 | `results/` | Intermediate analysis output |
 | `logs/` | Runtime logs |
@@ -65,6 +67,23 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
 - `camels_ru_signatures_summary.csv` — per-signature summary statistics
 - `camels_ru_year_grades.csv` — per-year A–F grades
 - `camels_ru_water_level.nc` — daily water level (2,989 gauges, BHS-77 datum + relative stage)
+
+### Metadata amendment sources
+
+`paper/metadata/README_v1.1_cf19.md`, `CHANGELOG_v1.1_cf19.md`, `signature_crosswalk.json` and
+`hydroatlas_metadata.json` are tracked sources for a separate local v1.1 candidate.
+The frozen v1.0 package is not rewritten. The JSON definitions apply to unchanged
+values in both versions; staging a candidate does not establish publication or CF
+validation. `*_smj` values are invalid categorical means retained for provenance.
+Upstream/point/sum attributes require the sidecar qualifications; the primary 22 are
+not all independently validated catchment quantities. `gdp_ud_sav` is GDP per capita,
+not density; `hdi_ix_sav` retains its source x1000 scale.
+The first v1.1 candidate failed CF-1.8 checks and is preserved. The approved separate
+`CAMELS_RU_v1.1_cf19` candidate passes strict CF-1.9 checks on all three NetCDFs.
+Its instance dimension is `station`; the string identifier remains `gauge_id(station)`.
+Use `utils.release_io.open_release_dataset` for a gauge-indexed view of either schema.
+Do not normalize raw schema audits or repair writers. See
+`paper/reviews/CF19_VALIDATION_2026-09-23.md` for real-file checks and preservation evidence.
 
 ### Data root subdirectories (under `data/`)
 
@@ -90,7 +109,7 @@ and Cursor. `CLAUDE_REFERENCE.md` imports this file (`@AGENTS_REFERENCE.md`).
 | Mean areal error | 5.1% (trimmed mean over \|err\| ≤ 100%; median 1.4%; n=3,011 with Roshydromet reference) |
 | Grade A definition | Every assessed year Grade A |
 | CRS for paper maps | Albers Equal-Area Conic |
-| HydroATLAS attributes | 288 (22 primary subset) |
+| HydroATLAS attributes | 281 source + 7 derived = 288 value columns (plus gauge_id); 22 qualified primary; 11 categorical means excluded from recommended analysis |
 | Hydrological signatures | 16 metrics, 1,729 rows / 1,716 non-anomalous gauges (release CSV from `scripts/create_paper_signatures.py`, release-only inputs, complete hydro-years 2009–2023 at ≥ 70 % coverage, ≥ 5 valid years; MSWEP primary + `*_era5` variants; maps via `scripts/plot_signature_maps.py`) |
 | Hydrological year | Oct–Sep |
 

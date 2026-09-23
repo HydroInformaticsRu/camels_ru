@@ -22,7 +22,8 @@ import sys
 
 import numpy as np
 import pandas as pd
-import xarray as xr
+
+from utils.release_io import open_release_dataset
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "src"))
@@ -37,7 +38,7 @@ THRESHOLDS = (5.0, 8.0)
 
 def main() -> None:
     """Count gauges carrying at least one spike at each sigma threshold."""
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
         discharge = ds["discharge_m3s"].values
         gauge_ids = [str(g) for g in ds["gauge_id"].values]
         time = pd.to_datetime(ds["time"].values)

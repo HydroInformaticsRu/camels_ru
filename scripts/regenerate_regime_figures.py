@@ -45,7 +45,8 @@ import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import fcluster, linkage
 from sklearn.metrics import adjusted_rand_score
-import xarray as xr
+
+from utils.release_io import open_release_dataset
 
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.append(str(PROJECT_ROOT))
@@ -101,7 +102,7 @@ def build_seasonal_matrix() -> tuple[pd.DataFrame, pd.DataFrame, gpd.GeoDataFram
     gauge = gpd.read_file(GEOM_DIR / "camels_gauges.gpkg").set_index("gauge_id")
     gauge.index = gauge.index.astype(str)
 
-    ds = xr.open_dataset(DISCHARGE_NC)
+    ds = open_release_dataset(DISCHARGE_NC)
     q = ds["discharge_mm"].to_pandas().T
     q.columns = q.columns.astype(str)
     q = q[[g for g in ws.index if g in q.columns and g in gauge.index]]

@@ -1,17 +1,14 @@
-"""Nested mass-balance consistency check (Sect. 6.5).
+"""Conditional volume-ordering diagnostic for geometrically nested gauges (Sect. 6.5).
 
-Where one gauge sits inside another gauge's catchment, the downstream record must carry
-at least as much water as the upstream one over any period both observe. This is the only
-validation available to CAMELS-RU that is independent of any external archive, and it
-covers far more gauges than the GRDC cross-check of Sect. 6.1.
+Pairs are identified by gauge-point containment in a strictly larger catchment polygon;
+this does not establish river-network connectivity. The comparison sums discharge_m3s
+on at least 2000 common available days, including filled values. Common-day selection
+aligns the samples but may leave noncontiguous periods.
 
-Original claim (2026-08-24 domain review): joining gauge coordinates into catchment
-polygons yields ~6805 nested gauge pairs with >=2000 common observed days, and the
-downstream total volume exceeds the upstream total in 99.4 % of them.
-
-Nesting is established geometrically (upstream gauge point inside the downstream
-polygon, downstream area strictly larger), and the comparison uses discharge_m3s on
-days observed at BOTH gauges, so a gap at either end never creates a false violation.
+Downstream volume need not equal or exceed upstream volume on this sample: storage,
+routing, withdrawals, losses and noncontiguous sampling can alter the ordering even
+for connected gauges. A non-exceedance is a diagnostic flag, not proof of data error;
+an exceedance does not establish a closed water balance.
 """
 
 from pathlib import Path
@@ -20,7 +17,8 @@ import sys
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-import xarray as xr
+
+from utils.release_io import open_release_dataset
 
 REPO = Path(__file__).resolve().parents[1]
 RELEASE = REPO / "release" / "CAMELS_RU_v1.0"
@@ -32,17 +30,19 @@ RATIO_BANDS = [(0.0, 2.0, r"$\le 2$"), (2.0, 5.0, "2 to 5"), (5.0, np.inf, "$> 5
 
 TABLE_HEADER = r"""\begin{table}[t]
 \centering
-\caption{Nested mass-balance check stratified by the downstream-to-upstream area ratio,
-over the \nnestedpairs{} pairs with at least 2000 jointly observed days. The check's power
-falls as the ratio grows, because a much larger downstream catchment exceeds the upstream
-volume almost by construction; the near-nested pairs in the first row are where a
-violation is easiest to produce. Shares are rounded independently and need not sum to
-100. Per-pair results ship in \texttt{paper/tables/nested\_mass\_balance.csv}.}
+\caption{Conditional volume-ordering diagnostic stratified by the downstream-to-upstream
+area ratio, over the \nnestedpairs{} geometrically identified pairs with at least 2000
+common available days, including fills. Point containment does not establish river
+connectivity. Storage, routing, withdrawals, losses and noncontiguous sampling can
+alter volume ordering; non-exceedances ($V_{dn}/V_{up}\le 1$) are diagnostic flags,
+not proof of error. Larger area ratios make exceedance less informative. Shares are
+rounded independently and need not sum to 100. Per-pair results ship in
+\texttt{paper/tables/nested\_mass\_balance.csv}.}
 \label{tab:nested_stratification}
 \small
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
-Area ratio $A_{dn}/A_{up}$ & Pairs & Share & Violations & Failure rate \\
+Area ratio $A_{dn}/A_{up}$ & Pairs & Share & Flags & Flag rate \\
 \midrule
 """
 
@@ -101,7 +101,7 @@ def main() -> None:
     poly["gauge_id"] = poly["gauge_id"].astype(str)
     print(f"polygons {len(poly)}  crs {poly.crs}")
 
-    with xr.open_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
+    with open_release_dataset(RELEASE / "camels_ru_discharge.nc") as ds:
         ids = [str(g) for g in ds["gauge_id"].values]
         q = ds["discharge_m3s"].values
     has_q = np.isfinite(q).any(axis=1)
@@ -127,7 +127,7 @@ def main() -> None:
     pairs = pairs.assign(area_up=pairs["up"].map(up_area))
     pairs = pairs[pairs["area_km2"] > pairs["area_up"]]  # strictly larger downstream
     pairs = pairs[pairs["down"].isin(keep)]
-    print(f"nested pairs (both gauged, downstream larger): {len(pairs)}")
+    print(f"geometric pairs (point containment, larger containing catchment): {len(pairs)}")
 
     rows = []
     for up, down, a_dn, a_up in pairs.itertuples(index=False):
@@ -149,20 +149,20 @@ def main() -> None:
             }
         )
     df = pd.DataFrame(rows)
-    print(f"\npairs with >= {MIN_COMMON_DAYS} common observed days: {len(df)}")
+    print(f"\npairs with >= {MIN_COMMON_DAYS} common available days (fills included): {len(df)}")
     ok = df["v_ratio"] > 1
     print(f"downstream volume exceeds upstream: {ok.sum()} ({100 * ok.mean():.2f} %)")
-    print(f"violations: {(~ok).sum()}")
+    print(f"non-exceedance diagnostic flags: {(~ok).sum()}")
 
     bad = df[~ok].sort_values("v_ratio")
-    print(f"  of which area ratio > 2 (not explainable by noise): {(bad['area_ratio'] > 2).sum()}")
+    print(f"  of which area ratio > 2: {(bad['area_ratio'] > 2).sum()}")
     summary = pd.read_csv(RELEASE / "camels_ru_gauge_summary.csv")
     summary["gauge_id"] = summary["gauge_id"].astype(str)
     grade = summary.set_index("gauge_id")["overall_grade"]
     bad = bad.assign(grade_up=bad["up"].map(grade))
     print(f"  upstream gauge graded A: {(bad['grade_up'] == 'A').sum()}")
     print(f"  upstream gauge graded A or B: {bad['grade_up'].isin(['A', 'B']).sum()}")
-    print("\nworst 12 violations:")
+    print("\n12 flagged pairs with the lowest volume ratios:")
     print(bad.head(12).round(3).to_string(index=False))
     df.to_csv(PAIRS_CSV, index=False)
     write_stratified(df)

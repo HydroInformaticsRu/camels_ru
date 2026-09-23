@@ -31,7 +31,8 @@ from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import xarray as xr
+
+from utils.release_io import open_release_dataset
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.append(str(PROJECT_ROOT))
@@ -106,7 +107,7 @@ def load_gauges() -> gpd.GeoDataFrame:
     gauge.index = gauge.index.astype(str)
     gauge = filter_paper_analysis_index(gauge)
 
-    has_q = xr.open_dataset(DISCHARGE_NC)["discharge_m3s"].notnull().any("time").to_pandas()
+    has_q = open_release_dataset(DISCHARGE_NC)["discharge_m3s"].notnull().any("time").to_pandas()
     has_q.index = has_q.index.astype(str)
     gauge = gauge.loc[gauge.index.intersection(has_q[has_q].index)].copy()
 

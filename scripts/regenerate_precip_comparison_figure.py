@@ -3,7 +3,7 @@
 Two difference maps over the paper-analysis catchments (gauge-id length < 7):
   (a) ERA5-Land - MSWEP    (b) GPCP - MSWEP    (mm yr^-1)
 on a diverging scale centred on zero. This replaces the three near-identical
-absolute-precipitation maps: differences make ERA5-Land's high-latitude wet bias
+absolute-precipitation maps: differences make ERA5-Land's higher precipitation
 directly visible (panel a is strongly positive) while GPCP and MSWEP nearly agree
 (panel b near zero).
 
@@ -31,7 +31,7 @@ import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.append(str(PROJECT_ROOT))
-from src.plots.paper_maps import get_russia_projection, scatter_map  # noqa: E402
+from src.plots.paper_maps import _format_edge_labels, get_russia_projection, scatter_map  # noqa: E402
 from src.utils.paper_analysis_scope import paper_analysis_inclusion_mask  # noqa: E402
 
 DATA = PROJECT_ROOT / "data" / "CAMELS_RU"
@@ -155,14 +155,15 @@ def plot(df: pd.DataFrame, out: Path) -> None:
             marker_edgecolor="#444444",
             marker_linewidth=0.2,
             colorbar=False,
+            colorbar_ticklabelsize=16,
             title=f"({panel[j]}) {minuend} − {subtrahend}",
             background_gdf=ne,
         )
     n = len(edges) - 1
-    sm = plt.cm.ScalarMappable(norm=BoundaryNorm(edges, n), cmap=plt.get_cmap("RdBu_r", n))
+    sm = plt.cm.ScalarMappable(norm=BoundaryNorm(edges, n, clip=True), cmap=plt.get_cmap("RdBu_r", n))
     cb = fig.colorbar(sm, ax=list(axes), orientation="horizontal", shrink=0.5, aspect=45, pad=0.02)
     cb.set_ticks(edges)
-    cb.set_ticklabels([("0" if e == 0 else f"{e:g}") for e in edges])
+    cb.set_ticklabels(_format_edge_labels(np.asarray(edges)))
     # Font floor (ESSD editor pre-review): prints at \textwidth from a ~12.6in source
     # (~0.55x shrink), so 9/10pt source text was landing at ~5pt in the final PDF.
     cb.set_label("Mean annual precipitation difference (mm yr$^{-1}$)", fontsize=14)

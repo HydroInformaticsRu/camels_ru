@@ -33,7 +33,8 @@ import geopandas as gpd
 from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 import pandas as pd
-import xarray as xr
+
+from utils.release_io import open_release_dataset
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.append(str(PROJECT_ROOT))
@@ -136,7 +137,7 @@ def classify_catchments() -> pd.Series:
         Series indexed by ``gauge_id`` (string) with the class label, ``""`` where the
         forcing is incomplete. Also written to ``results/koppen_classes.csv``.
     """
-    ds = xr.open_dataset(FORCING_NC)
+    ds = open_release_dataset(FORCING_NC)
     t = ds["temp_mean"].groupby("time.month").mean("time").transpose("gauge_id", "month").to_pandas()
     p_month = ds["precip_mswep"].resample(time="1MS").sum(min_count=1)
     p = p_month.groupby("time.month").mean("time").transpose("gauge_id", "month").to_pandas()
@@ -320,6 +321,25 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
     from src.plots.paper_maps import _add_graticule
 
     _add_graticule(ax_map)
+    # Sparse labels give geographic orientation without crowding the climate map.
+    for lon, lat, label in (
+        (40, 44, "40°E"),
+        (100, 50, "100°E"),
+        (160, 52, "160°E"),
+        (22, 60, "60°N"),
+        (70, 75, "75°N"),
+    ):
+        ax_map.text(
+            lon,
+            lat,
+            label,
+            transform=data_crs,
+            fontsize=12,
+            color="#555555",
+            ha="center",
+            zorder=5,
+            bbox={"facecolor": "white", "alpha": 0.7, "edgecolor": "none", "pad": 1},
+        )
     ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
     ne_land.to_crs(aea.proj4_init).plot(
         ax=ax_map, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.3, zorder=1

@@ -1,0 +1,3 @@
+Running Compliance Checker on the datasets from: ['release/CAMELS_RU_v1.1/camels_ru_forcing.nc']
+WARNING: The following exceptions occurred during the cf:1.8 checker (possibly indicate compliance checker issues):
+cf:1.8.check_coordinate_variables_strict_monotonicity: unsupported operand type(s) for -: 'str' and 'str'

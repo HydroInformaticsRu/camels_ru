@@ -1,0 +1,188 @@
+{
+  "source_directory": "release/CAMELS_RU_v1.0",
+  "candidate_directory": "release/CAMELS_RU_v1.1",
+  "candidate_manifest_sha256": "84c66d60281ecac55924db75aa2ba25b6006ad1d44a10f736543ef2665305a42",
+  "source_manifest_sha256": "947bb60d6b6e70605037fb72712d8bac7387bb16b37b317b6864a48cb22c1c7e",
+  "source_manifest_entries": 12,
+  "candidate_manifest_entries": 16,
+  "complete_equivalence": "passed",
+  "macro_checks_passed": 398,
+  "checker": "IOOS Compliance Checker 6.1.0",
+  "standard": "CF-1.8",
+  "criteria": "strict",
+  "compliance_status": "not_passed",
+  "cf": {
+    "discharge": {
+      "exit_code": 2,
+      "scored_points": 198,
+      "possible_points": 202,
+      "failed_checks": [
+        {
+          "name": "\u00a72.2 Data Types",
+          "value": [
+            7,
+            8
+          ],
+          "messages": [
+            "The variable time failed because the datatype is int64"
+          ]
+        },
+        {
+          "name": "\u00a73.3 Standard Name",
+          "value": [
+            18,
+            19
+          ],
+          "messages": [
+            "Attribute long_name or/and standard_name is highly recommended for variable time"
+          ]
+        },
+        {
+          "name": "\u00a75.1 Independent Latitude, Longitude, Vertical, and Time Axes",
+          "value": [
+            0,
+            2
+          ],
+          "messages": [
+            "Coordinate variable 'time' should have standard_name='time', found: 'None'",
+            "Coordinate variable 'time' should have standard_name='time', found: 'None'"
+          ]
+        }
+      ],
+      "exception_log": "Running Compliance Checker on the datasets from: ['release/CAMELS_RU_v1.1/camels_ru_discharge.nc']\nWARNING: The following exceptions occurred during the cf:1.8 checker (possibly indicate compliance checker issues):\ncf:1.8.check_coordinate_variables_strict_monotonicity: unsupported operand type(s) for -: 'str' and 'str'\n"
+    },
+    "forcing": {
+      "exit_code": 2,
+      "scored_points": 341,
+      "possible_points": 350,
+      "failed_checks": [
+        {
+          "name": "\u00a72.2 Data Types",
+          "value": [
+            10,
+            11
+          ],
+          "messages": [
+            "The variable time failed because the datatype is int64"
+          ]
+        },
+        {
+          "name": "\u00a73.3 Standard Name",
+          "value": [
+            28,
+            29
+          ],
+          "messages": [
+            "Attribute long_name or/and standard_name is highly recommended for variable time"
+          ]
+        },
+        {
+          "name": "\u00a75.1 Independent Latitude, Longitude, Vertical, and Time Axes",
+          "value": [
+            0,
+            7
+          ],
+          "messages": [
+            "Coordinate variable 'time' should have standard_name='time', found: 'None'",
+            "Coordinate variable 'time' should have standard_name='time', found: 'None'",
+            "Coordinate variable 'time' should have standard_name='time', found: 'None'",
+            "Coordinate variable 'time' should have standard_name='time', found: 'None'",
+            "Coordinate variable 'time' should have standard_name='time', found: 'None'",
+            "Coordinate variable 'time' should have standard_name='time', found: 'None'",
+            "Coordinate variable 'time' should have standard_name='time', found: 'None'"
+          ]
+        }
+      ],
+      "exception_log": "Running Compliance Checker on the datasets from: ['release/CAMELS_RU_v1.1/camels_ru_forcing.nc']\nWARNING: The following exceptions occurred during the cf:1.8 checker (possibly indicate compliance checker issues):\ncf:1.8.check_coordinate_variables_strict_monotonicity: unsupported operand type(s) for -: 'str' and 'str'\n"
+    },
+    "water_level": {
+      "exit_code": 2,
+      "scored_points": 247,
+      "possible_points": 251,
+      "failed_checks": [
+        {
+          "name": "\u00a72.2 Data Types",
+          "value": [
+            9,
+            10
+          ],
+          "messages": [
+            "The variable time failed because the datatype is int64"
+          ]
+        },
+        {
+          "name": "\u00a73.3 Standard Name",
+          "value": [
+            20,
+            21
+          ],
+          "messages": [
+            "Attribute long_name or/and standard_name is highly recommended for variable time"
+          ]
+        },
+        {
+          "name": "\u00a75.1 Independent Latitude, Longitude, Vertical, and Time Axes",
+          "value": [
+            0,
+            2
+          ],
+          "messages": [
+            "Coordinate variable 'time' should have standard_name='time', found: 'None'",
+            "Coordinate variable 'time' should have standard_name='time', found: 'None'"
+          ]
+        }
+      ],
+      "exception_log": "Running Compliance Checker on the datasets from: ['release/CAMELS_RU_v1.1/camels_ru_water_level.nc']\nWARNING: The following exceptions occurred during the cf:1.8 checker (possibly indicate compliance checker issues):\ncf:1.8.check_coordinate_variables_strict_monotonicity: unsupported operand type(s) for -: 'str' and 'str'\n"
+    }
+  },
+  "candidate_modified_after_cf_check": false,
+  "published": false,
+  "manuscript_after_build": {
+    "pages": 52,
+    "sha256": "e0132326c10cc5d70690d6f5cba3279d743927df2122b5bb8653e354fdaceb15",
+    "latex_warning_gate": "passed",
+    "figure_pages": [
+      [
+        "1",
+        5
+      ],
+      [
+        "2",
+        8
+      ],
+      [
+        "3",
+        16
+      ],
+      [
+        "4",
+        36
+      ],
+      [
+        "5",
+        36
+      ],
+      [
+        "6",
+        38
+      ],
+      [
+        "B1",
+        43
+      ],
+      [
+        "B2",
+        44
+      ],
+      [
+        "B3",
+        45
+      ],
+      [
+        "B4",
+        46
+      ]
+    ],
+    "data_availability_page": 47
+  }
+}

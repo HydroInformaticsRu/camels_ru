@@ -1,0 +1,3 @@
+/home/dmbrmv/Development/camels_ru/.tmp/essd_cf_checker/cache/cached-envs-v0/d0e019384e8a72d6/lib/python3.12/site-packages/pyproj/network.py:59: UserWarning: pyproj unable to set PROJ database path.
+  _set_context_ca_bundle_path(ca_bundle_path)
+Running Compliance Checker on the datasets from: ['/home/dmbrmv/Development/camels_ru/.tmp/essd_revision_2026-09-23/synthetic_cf19_station.nc']
