@@ -168,7 +168,7 @@ def _class_counts(values: np.ndarray, edges: np.ndarray) -> np.ndarray:
     return np.bincount(classes, minlength=n)
 
 
-def _colorbar_histogram(cb, values: np.ndarray, edges: np.ndarray, cmap) -> None:  # noqa: ANN001
+def _colorbar_histogram(cb, values: np.ndarray, edges: np.ndarray, cmap, hax=None) -> None:  # noqa: ANN001
     """Draw a per-class frequency bar row above a horizontal discrete colorbar.
 
     CAMELS-FR / LamaH-CE convention: the legend doubles as a histogram — one bar
@@ -178,7 +178,8 @@ def _colorbar_histogram(cb, values: np.ndarray, edges: np.ndarray, cmap) -> None
     """
     n = len(edges) - 1
     counts = _class_counts(values, edges)
-    hax = cb.ax.inset_axes([0.0, 1.15, 1.0, 1.6])
+    if hax is None:
+        hax = cb.ax.inset_axes([0.0, 1.15, 1.0, 1.6])
     bars = hax.bar(
         np.arange(n) + 0.5,
         counts,
@@ -224,6 +225,9 @@ def scatter_map(
     background_gdf: gpd.GeoDataFrame | None = None,
     title_fontsize: int = 12,
     colorbar_ticklabelsize: int = 9,
+    colorbar_ax: Axes | None = None,
+    histogram_ax: Axes | None = None,
+    count_ax: Axes | None = None,
 ) -> Axes:
     """Plot continuous-valued scatter map on a single axis.
 
@@ -259,6 +263,8 @@ def scatter_map(
         Label for the colorbar.
     colorbar_orientation : str
         "horizontal" or "vertical".
+    colorbar_ax, histogram_ax, count_ax : Axes, optional
+        Reserved layout rows for the colour scale, class counts and sample counts.
 
     Returns:
     -------
@@ -305,6 +311,7 @@ def scatter_map(
             cb = ax.figure.colorbar(  # type: ignore[union-attr]
                 sc,
                 ax=ax,
+                cax=colorbar_ax,
                 orientation=colorbar_orientation,
                 shrink=0.6,
                 pad=0.02 if colorbar_orientation == "horizontal" else 0.04,
@@ -316,7 +323,7 @@ def scatter_map(
             if colorbar_label:
                 cb.set_label(colorbar_label, fontsize=10)
             if colorbar_orientation == "horizontal":
-                _colorbar_histogram(cb, values, edges, cmap)
+                _colorbar_histogram(cb, values, edges, cmap, histogram_ax)
 
     if show_nan and bool(nan_mask.any()):
         nan_gdf = gdf[nan_mask]
@@ -332,17 +339,21 @@ def scatter_map(
             transform=_DATA_CRS,
         )
 
-    ax.text(
-        0.01,
-        0.01,
+    count_target = count_ax if count_ax is not None else ax
+    if count_ax is not None:
+        count_ax.axis("off")
+    count_target.text(
+        0.0,
+        0.5 if count_ax is not None else -0.08,
         f"Finite n={len(valid)}; missing n={int(nan_mask.sum())} (grey)",
-        transform=ax.transAxes,
+        transform=count_target.transAxes,
         fontsize=colorbar_ticklabelsize,
-        va="bottom",
+        color="#444444",
+        va="center",
     )
 
     if title:
-        ax.set_title(title, fontsize=title_fontsize, fontweight="bold", loc="left")
+        ax.set_title(title, fontsize=title_fontsize, fontweight="normal", loc="left", pad=7)
 
     return ax
 
@@ -408,21 +419,22 @@ def continuous_multiplot(
 
     nrows = math.ceil(n / ncols)
     aea = get_russia_projection()
-    fig, axes = plt.subplots(
-        nrows,
-        ncols,
+    fig = plt.figure(
         figsize=(panel_size[0] * ncols, panel_size[1] * nrows),
-        squeeze=False,
         constrained_layout=True,
-        subplot_kw={"projection": aea},
     )
+    grid = fig.add_gridspec(nrows, ncols, hspace=0.12)
 
     bin_intervals = bin_intervals or {}
     colorbar_labels = colorbar_labels or {}
 
     for idx, (metric, title) in enumerate(zip(metrics, titles_use, strict=True)):
         row, col = divmod(idx, ncols)
-        ax = axes[row, col]
+        panel = grid[row, col].subgridspec(4, 1, height_ratios=[1, 0.065, 0.15, 0.035], hspace=0.02)
+        ax = fig.add_subplot(panel[0], projection=aea)
+        count_ax = fig.add_subplot(panel[1])
+        histogram_ax = fig.add_subplot(panel[2])
+        colorbar_ax = fig.add_subplot(panel[3])
 
         edges = bin_intervals.get(metric)
         cb_label = colorbar_labels.get(metric, "")
@@ -441,12 +453,10 @@ def continuous_multiplot(
             background_gdf=background_gdf,
             title_fontsize=title_fontsize,
             colorbar_ticklabelsize=colorbar_ticklabelsize,
+            colorbar_ax=colorbar_ax,
+            histogram_ax=histogram_ax,
+            count_ax=count_ax,
         )
-
-    # Hide unused axes
-    for idx in range(n, nrows * ncols):
-        row, col = divmod(idx, ncols)
-        axes[row, col].set_visible(False)
 
     if suptitle:
         fig.suptitle(suptitle, fontsize=14, fontweight="bold", y=1.04)

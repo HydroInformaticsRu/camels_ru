@@ -108,10 +108,26 @@ def _plot(df: pd.DataFrame) -> None:
     """Render the Budyko check as one panel per precipitation product."""
     colors = {"ERA5-Land": "#EE6677", "MSWEP": "#4477AA", "GPCP": "#228833"}
     products = ["ERA5-Land", "MSWEP", "GPCP"]
-    # ESSD editor pre-review font floor: this figure prints at \textwidth from a 13.5in-wide
-    # source (~0.52x shrink), so text must start at >=16pt to clear 7pt in the final PDF.
-    fs = 16
-    fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.8), sharey=True, constrained_layout=True)
+    plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 8, "pdf.fonttype": 42})
+    fs = 8
+    fig = plt.figure(figsize=(160 / 25.4, 100 / 25.4))
+    grid = fig.add_gridspec(
+        4,
+        3,
+        height_ratios=[0.28, 2.0, 0.63, 0.33],
+        left=0.10,
+        right=0.99,
+        bottom=0.03,
+        top=0.99,
+        hspace=0.60,
+        wspace=0.12,
+    )
+    legend_ax = fig.add_subplot(grid[0, :])
+    legend_ax.axis("off")
+    axes = [fig.add_subplot(grid[1, i]) for i in range(3)]
+    for ax in axes[1:]:
+        ax.sharey(axes[0])
+        ax.tick_params(labelleft=False)
 
     # Conditional bounds when P-Q approximates AET and PET is a suitable upper bound.
     #   Water  limit: AET <= P     -> evap_index <= 1            (horizontal at y=1;
@@ -131,59 +147,58 @@ def _plot(df: pd.DataFrame) -> None:
             color="#AA2222",
             linestyle="--",
             linewidth=1.0,
-            label="Conditional balance/PET envelope",
+            label="Conditional envelope",
         )
-        ax.plot(x, budyko, color="#222222", linestyle="-", linewidth=1.2, label="Budyko (1974) curve")
+        ax.plot(x, budyko, color="#222222", linestyle="-", linewidth=0.9, label="Budyko (1974) curve")
         ax.scatter(
             sub["aridity_index"],
             sub["evaporative_index"],
-            s=6,
+            s=2.2,
             c=colors[product],
             alpha=0.5,
             edgecolors="none",
             zorder=2,
         )
-        ax.set_title(f"({panel}) {product} (n={len(sub)})", fontsize=fs, loc="left")
-        ax.set_xlabel("Aridity index  PET / P", fontsize=fs)
+        ax.set_title(f"({panel}) {product}", fontsize=9, loc="left", pad=5)
+        ax.set_xlabel("Aridity index, PET / P", fontsize=fs)
         ax.set_xlim(*X_LIM)
         ax.set_ylim(*Y_LIM)
         outside = _off_axis_counts(sub)
-        ax.text(
-            0.0,
-            -0.32,
-            f"Off-axis: x < 0: {outside['x_below']}; x > 3.5: {outside['x_above']}\n"
-            f"y < −0.3: {outside['y_below']}; y > 1.5: {outside['y_above']}\n"
-            f"Distinct total: {outside['outside_union']}",
-            transform=ax.transAxes,
-            ha="left",
+        footer = fig.add_subplot(grid[2, products.index(product)])
+        footer.axis("off")
+        footer.text(
+            0, 0.90, f"n = {len(sub):,}; off-axis = {outside['outside_union']}", va="top", fontsize=fs
+        )
+        footer.text(
+            0,
+            0.60,
+            f"x < 0: {outside['x_below']}    x > 3.5: {outside['x_above']}\n"
+            f"y < −0.3: {outside['y_below']}    y > 1.5: {outside['y_above']}",
             va="top",
-            fontsize=fs - 2,
+            fontsize=fs,
+            linespacing=1.5,
         )
         ax.axhline(0, color="#888888", linewidth=0.5)
         ax.axvline(1, color="#888888", linewidth=0.5, linestyle=":")
-        # Anchored away from the x=1 divider (not centered on fixed x positions) so the
-        # two labels cannot collide once the font floor bump widens them; the humid zone
-        # is only 1 aridity-unit wide, too narrow at floor size for a qualifier that
-        # duplicates the x-axis label and the dotted divider, so it is dropped here.
-        ax.text(0.95, 1.38, "HUMID", fontsize=fs, color="#555555", ha="right")
-        ax.text(1.05, 1.38, "ARID", fontsize=fs, color="#555555", ha="left")
         ax.grid(alpha=0.2, linestyle="--")
         ax.tick_params(labelsize=fs)
 
-    axes[0].set_ylabel("Balance proxy  (P − Q) / P", fontsize=fs, labelpad=10)
-    axes[0].text(0.04, 1.06, "above water limit (Q < 0)", fontsize=fs, color="#AA2222")
-    axes[0].text(0.04, -0.24, "below zero (Q > P)", fontsize=fs, color="#AA2222")
-    # A within-panel legend wide enough to clear the font floor also spans most of this
-    # narrow (3-panel) panel width, so any in-panel corner collides with one of the two
-    # boundary annotations. Placed outside the axes instead (as in the gauge-network
-    # figure's Koppen legend), which constrained_layout reserves dedicated space for.
+    axes[0].set_ylabel("Balance proxy, (P − Q) / P", fontsize=fs, labelpad=6)
     handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="outside upper center", ncol=2, fontsize=fs, framealpha=0.9)
+    legend_ax.legend(handles, labels, loc="center", ncol=2, fontsize=fs, frameon=False)
+    note_ax = fig.add_subplot(grid[3, :])
+    note_ax.axis("off")
+    note_ax.text(
+        0,
+        1,
+        "PET/P < 1: humid; > 1: arid.  Balance proxy < 0: Q > P; > 1: Q < 0.",
+        fontsize=fs,
+        va="top",
+    )
 
     OUT_PNG.parent.mkdir(parents=True, exist_ok=True)
-    # Save once and copy: two savefig(bbox_inches="tight") calls crop differently,
-    # so the two image directories would never agree byte-for-byte.
-    fig.savefig(OUT_PNG, dpi=300, bbox_inches="tight", metadata={"CreationDate": None})
+    # Save once and copy to keep the two delivered image files identical.
+    fig.savefig(OUT_PNG, dpi=300, metadata={"CreationDate": None})
     if OVERLEAF_OUT_PNG.parent.exists():
         shutil.copy2(OUT_PNG, OVERLEAF_OUT_PNG)
     plt.close(fig)

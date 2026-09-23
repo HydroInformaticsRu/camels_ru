@@ -1,16 +1,16 @@
 """Regenerate fig_precip_comparison.png — precipitation difference maps.
 
-Two difference maps over the paper-analysis catchments (gauge-id length < 7):
-  (a) ERA5-Land - MSWEP    (b) GPCP - MSWEP    (mm yr^-1)
-on a diverging scale centred on zero. This replaces the three near-identical
-absolute-precipitation maps: differences make ERA5-Land's higher precipitation
-directly visible (panel a is strongly positive) while GPCP and MSWEP nearly agree
-(panel b near zero).
+Two Albers hexagon maps show the median per-gauge annual precipitation difference
+within each occupied cell: (a) ERA5-Land - MSWEP and (b) GPCP - MSWEP (mm yr^-1).
+The fixed pointy-top grid has 66 km circumradius and projected origin 0,0, shared
+with the other paper maps. Histograms count original gauges, not cells. Median
+aggregation changes only spatial display; all per-gauge values and caption
+statistics remain unchanged. Empty cells are unfilled; all-missing cells are grey.
 
 Reads basin-averaged daily precipitation from data/ (mounted external drive). With
 --write the figure goes to paper/images/ and paper/overleaf/images/; otherwise to
 .tmp/cluster_diag/. Prints the basin-mean of each difference for sanity against the text
-(~+218 and ~+35 mm/yr).
+(~+96 and ~+53 mm/yr).
 """
 
 from __future__ import annotations
@@ -31,7 +31,14 @@ import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.append(str(PROJECT_ROOT))
-from src.plots.paper_maps import _format_edge_labels, get_russia_projection, scatter_map  # noqa: E402
+from src.plots.hex_maps import aggregate_hex, assign_hex_cells, export_hex_support  # noqa: E402
+from src.plots.paper_maps import (  # noqa: E402
+    _add_graticule,
+    _class_counts,
+    _format_edge_labels,
+    _set_extent_from_data,
+    get_russia_projection,
+)
 from src.utils.paper_analysis_scope import paper_analysis_inclusion_mask  # noqa: E402
 
 DATA = PROJECT_ROOT / "data" / "CAMELS_RU"
@@ -49,7 +56,7 @@ WINDOW = ("2008-01-01", "2023-12-31")
 # (panel column, minuend, subtrahend)
 DIFFS = [("ERA5-Land", "MSWEP"), ("GPCP", "MSWEP")]
 
-plt.rcParams.update({"font.family": "serif", "font.serif": ["Times New Roman", "DejaVu Serif"]})
+plt.rcParams.update({"font.family": "sans-serif", "font.sans-serif": ["DejaVu Sans"]})
 
 
 def _annual_mean_mm_yr(path: Path, col: str) -> float:
@@ -125,8 +132,8 @@ def _edges(df: pd.DataFrame) -> list[int]:
     return [round(f * lim) for f in (-1.0, -0.6, -0.3, -0.1, 0.1, 0.3, 0.6, 1.0)]
 
 
-def plot(df: pd.DataFrame, out: Path) -> None:
-    """Render the 1x2 precipitation-difference maps with a shared diverging colorbar."""
+def plot(df: pd.DataFrame, out: Path, *, support_dir: Path | None = None) -> None:
+    """Render stacked cell-median maps with original-gauge histograms and scales."""
     gauge = gpd.read_file(GEOM / "camels_gauges.gpkg").set_index("gauge_id")
     gauge.index = gauge.index.astype(str)
     tbl = df.set_index("gauge_id")
@@ -141,35 +148,78 @@ def plot(df: pd.DataFrame, out: Path) -> None:
     edges = _edges(df)
     panel = "ab"
 
-    fig, axes = plt.subplots(
-        1, 2, figsize=(13, 4.4), subplot_kw={"projection": aea}, constrained_layout=True
+    if gdf.crs is None or ne.crs is None:
+        raise ValueError("Gauge and basemap layers must have a CRS")
+    gdf = gdf.to_crs(4326).sort_index()
+    ne = ne.to_crs(aea.proj4_init)
+    support = support_dir if support_dir is not None else PROJECT_ROOT / ".tmp/cluster_diag/hex_support"
+    support.mkdir(parents=True, exist_ok=True)
+    columns = [f"d_{m}" for m, _ in DIFFS]
+    assign_hex_cells(gdf, aea.proj4_init).join(gdf[columns]).to_csv(
+        support / "precip_comparison_membership.csv", index_label="gauge_id"
     )
-    for j, (minuend, subtrahend) in enumerate(DIFFS):
-        scatter_map(
-            gdf,
-            axes[j],
-            f"d_{minuend}",
-            cmap_name="RdBu_r",
-            bin_edges=edges,
-            marker_size=11,
-            marker_edgecolor="#444444",
-            marker_linewidth=0.2,
-            colorbar=False,
-            colorbar_ticklabelsize=16,
-            title=f"({panel[j]}) {minuend} − {subtrahend}",
-            background_gdf=ne,
-        )
+    fig = plt.figure(figsize=(160 / 25.4, 170 / 25.4), constrained_layout=True)
+    grid = fig.add_gridspec(4, 2, height_ratios=[1, 0.28, 1, 0.28], hspace=0.10, wspace=0.12)
     n = len(edges) - 1
-    sm = plt.cm.ScalarMappable(norm=BoundaryNorm(edges, n, clip=True), cmap=plt.get_cmap("RdBu_r", n))
-    cb = fig.colorbar(sm, ax=list(axes), orientation="horizontal", shrink=0.5, aspect=45, pad=0.02)
-    cb.set_ticks(edges)
-    cb.set_ticklabels(_format_edge_labels(np.asarray(edges)))
-    # Font floor (ESSD editor pre-review): prints at \textwidth from a ~12.6in source
-    # (~0.55x shrink), so 9/10pt source text was landing at ~5pt in the final PDF.
-    cb.set_label("Mean annual precipitation difference (mm yr$^{-1}$)", fontsize=14)
-    cb.ax.tick_params(labelsize=14)
+    norm = BoundaryNorm(edges, n, clip=True)
+    cmap = plt.get_cmap("RdBu_r", n)
+    for j, (minuend, subtrahend) in enumerate(DIFFS):
+        value_col = f"d_{minuend}"
+        cells = aggregate_hex(gdf, value_col, aea.proj4_init)
+        export_hex_support(
+            gdf,
+            value_col,
+            cells,
+            aea.proj4_init,
+            support / f"precip_comparison_{minuend}.json",
+        )
+        ax = fig.add_subplot(grid[2 * j, :], projection=aea)
+        ax.axis("off")
+        _set_extent_from_data(ax, gdf)
+        _add_graticule(ax)
+        ne.plot(ax=ax, color="#DEDEDE", edgecolor="#B9B9B9", linewidth=0.3, zorder=1)
+        facecolors = [cmap(norm(value)) if pd.notna(value) else "#BBBBBB" for value in cells["value"]]
+        ax.add_geometries(
+            cells.geometry, crs=aea, facecolor=facecolors, edgecolor="#3E3E3E", linewidth=0.22, zorder=3
+        )
+        ax.set_title(
+            f"({panel[j]}) {minuend} − {subtrahend} · cell median", fontsize=9, loc="left", pad=7
+        )
+        hist = fig.add_subplot(grid[2 * j + 1, 0])
+        counts = _class_counts(gdf[value_col].to_numpy(), np.asarray(edges))
+        bars = hist.bar(
+            np.arange(n), counts, color=[cmap(i) for i in range(n)], edgecolor="#333333", linewidth=0.3
+        )
+        hist.bar_label(bars, fontsize=8.5, padding=2)
+        hist.set_ylim(0, max(float(counts.max()) * 1.35, 1))
+        hist.set_xticks([])
+        hist.set_yticks([])
+        hist.set_title("Gauge counts by colour class", fontsize=8.5, loc="left", pad=3)
+        for side in ("left", "right", "top"):
+            hist.spines[side].set_visible(False)
+        note = fig.add_subplot(grid[2 * j + 1, 1])
+        note.axis("off")
+        missing = int(gdf[value_col].isna().sum())
+        note.text(
+            0,
+            1,
+            f"{len(gdf) - missing:,} gauges · {len(cells):,} cells · {missing} missing",
+            fontsize=8.5,
+            va="top",
+        )
+        cax = note.inset_axes([0, 0.42, 1, 0.16])
+        cb = fig.colorbar(
+            plt.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cax, orientation="horizontal", ticks=edges
+        )
+        cb.set_ticklabels(_format_edge_labels(np.asarray(edges)))
+        cb.set_label("Annual P difference (mm yr$^{-1}$)", fontsize=8.5)
+        cb.ax.tick_params(labelsize=8.5, length=2)
 
-    fig.savefig(out, dpi=300, bbox_inches="tight")
+    # Resolve the layout at delivery DPI before freezing its physical dimensions.
+    fig.set_dpi(400)
+    fig.canvas.draw()
+    fig.set_layout_engine("none")
+    fig.savefig(out, dpi=400, facecolor="white")
     plt.close(fig)
     print(f"Wrote {out}")
 
@@ -185,11 +235,13 @@ def main(write: bool, caption_only: bool = False) -> None:
     else:
         dests = [PROJECT_ROOT / ".tmp" / "cluster_diag"]
     suffix = "" if write else "_test"
-    # Save once and copy: two savefig(bbox_inches="tight") calls crop differently,
-    # so the two image directories would never agree byte-for-byte.
+    # Save once and copy so both manuscript image trees are byte-identical.
     first = dests[0] / f"fig_precip_comparison{suffix}.png"
     dests[0].mkdir(parents=True, exist_ok=True)
-    plot(df, first)
+    support_dir = PROJECT_ROOT / (
+        "paper/figure_data/hex_support" if write else ".tmp/cluster_diag/hex_support"
+    )
+    plot(df, first, support_dir=support_dir)
     for dest in dests[1:]:
         dest.mkdir(parents=True, exist_ok=True)
         shutil.copy2(first, dest / first.name)

@@ -1,8 +1,8 @@
 """Regenerate the study-area figure (Section 2, Figure 1).
 
-Two-panel layout: (a) Albers map of the Analysis-set catchments coloured by
-Köppen-Geiger climate class, (b) horizontal bar chart of the catchment size
-distribution.
+Two-panel layout: (a) fixed 66 km Albers hexagons coloured by modal
+Köppen-Geiger class of their gauge outlets (alphabetical ties), (b) individual
+catchment size distribution. Legend counts describe gauges, not cells.
 
 The climate classes are derived from the released forcing itself: the 2008-2023
 monthly climatologies of MSWEP precipitation and ERA5-Land air temperature in
@@ -40,6 +40,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
 from src.meteo.koppen import classify_koppen  # noqa: E402
+from src.plots.hex_maps import aggregate_hex, export_hex_support  # noqa: E402
 from src.plots.paper_maps import (  # noqa: E402
     _set_extent_from_data,
     get_russia_projection,
@@ -58,17 +59,15 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 plt.rcParams.update(
     {
-        "font.family": "serif",
-        "font.serif": ["Times New Roman", "DejaVu Serif"],
+        "font.family": "sans-serif",
+        "font.sans-serif": ["DejaVu Sans"],
         "figure.dpi": 150,
         "savefig.dpi": 300,
-        "axes.labelsize": 12,
-        "axes.titlesize": 13,
-        # Font floor (ESSD editor pre-review): panel (b)'s histogram ticks land at ~0.59x
-        # shrink to \textwidth from this ~11.8in figure, so 10pt was landing at ~5.9pt.
-        "xtick.labelsize": 13,
-        "ytick.labelsize": 13,
-        "legend.fontsize": 9,
+        "axes.labelsize": 9,
+        "axes.titlesize": 9,
+        "xtick.labelsize": 8,
+        "ytick.labelsize": 8,
+        "legend.fontsize": 8,
     }
 )
 
@@ -263,7 +262,7 @@ def _hero_background(ax: plt.Axes, aea: ccrs.Projection) -> None:
     rivers.to_crs(aea.proj4_init).plot(ax=ax, color="#5b8cb8", linewidth=0.45, alpha=0.6, zorder=1.2)
 
 
-def _scale_bar(ax: plt.Axes, length_km: float = 1000.0, fontsize: int = 14) -> None:
+def _scale_bar(ax: plt.Axes, length_km: float = 1000.0, fontsize: int = 8) -> None:
     """Corner scale bar in projected meters; approximate on an equal-area conic.
 
     Hero map only (CAMELS-CH/FR/LamaH precedent). No north arrow: on a conic spanning
@@ -289,28 +288,30 @@ def _scale_bar(ax: plt.Axes, length_km: float = 1000.0, fontsize: int = 14) -> N
     )
 
 
-def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
+def build_figure(
+    gauge: gpd.GeoDataFrame, size_counts: pd.Series, support_dir: Path | None = None
+) -> plt.Figure:
     """Assemble the two-panel study-area figure.
 
     Args:
         gauge: Analysis-set gauge points with a ``kg`` column.
         size_counts: Catchment counts per ordered size category.
+        support_dir: Cell-support output directory; defaults to the temporary preview folder.
 
     Returns:
         The assembled matplotlib Figure (caller saves/closes it).
     """
+    if support_dir is None:
+        support_dir = TEST_OUTPUT.parent / "hex_support"
     aea = get_russia_projection()
     data_crs = ccrs.PlateCarree()
 
-    # Editor pre-review: the map (a GeoAxes) keeps its aspect fixed to the Albers projection,
-    # so it is height-bound, not width-bound by width_ratios below - at figsize (13,4.4) it
-    # rendered at only ~26% of the figure width regardless of its 2.7/3.7 gridspec share,
-    # leaving a large dead gutter before panel (b). Taller figure gives it more height to
-    # grow into (measured via ax_map.get_position() after constrained_layout, not eyeballed).
-    fig = plt.figure(figsize=(13.0, 6.6), constrained_layout=True)
-    gs = fig.add_gridspec(1, 2, width_ratios=[2.7, 1])
-    ax_map = fig.add_subplot(gs[0, 0], projection=aea)
-    ax_hist = fig.add_subplot(gs[0, 1])
+    fig = plt.figure(figsize=(6.3, 4.9), constrained_layout=True)
+    gs = fig.add_gridspec(2, 2, height_ratios=[1.35, 1], width_ratios=[1, 1.6], hspace=0.12)
+    ax_map = fig.add_subplot(gs[0, :], projection=aea)
+    ax_legend = fig.add_subplot(gs[1, 0])
+    ax_hist = fig.add_subplot(gs[1, 1])
+    ax_legend.axis("off")
 
     ax_map.axis("off")
     _set_extent_from_data(ax_map, gauge, pad=0.04)  # tighter than the 0.08 default
@@ -334,22 +335,24 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
             lat,
             label,
             transform=data_crs,
-            fontsize=12,
+            fontsize=8,
             color="#555555",
             ha="center",
             zorder=5,
             bbox={"facecolor": "white", "alpha": 0.7, "edgecolor": "none", "pad": 1},
         )
     ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
+    if ne_land.crs is None:
+        raise ValueError("Land background requires a CRS")
     ne_land.to_crs(aea.proj4_init).plot(
-        ax=ax_map, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.3, zorder=1
+        ax=ax_map, color="#B7B7B7", edgecolor="#777777", linewidth=0.3, zorder=1
     )
     _hero_background(ax_map, aea)
     _scale_bar(ax_map)
 
     counts = gauge["kg"].value_counts()
     # Classes with MERGE_MAX or fewer catchments merge into a grey "other" class:
-    # their individual dots are indistinguishable at map scale, and dropping the
+    # preserve the established display categories before cell aggregation; dropping the
     # rare hues keeps the remaining palette legible (round-6 editor m7).
     rare = {c for c in counts.index if c and counts[c] <= MERGE_MAX}
     gauge = gauge.copy()
@@ -359,36 +362,30 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
     classes += sorted(c for c in counts.index if c and c != "other" and c not in KG_COLORS)
     if "other" in counts.index:
         classes.append("other")
-    # Draw the common classes first so the rare ones stay visible on top.
-    for cls in sorted(classes, key=lambda c: -int(counts[c])):
-        sub = gauge[gauge["kg"] == cls]
-        ax_map.scatter(
-            sub.geometry.x,
-            sub.geometry.y,
-            s=12,
-            alpha=0.85,
-            c=KG_COLORS.get(cls, FALLBACK_COLOR),
-            edgecolors="none",
-            zorder=3,
-            transform=data_crs,
-        )
+    # Aggregate categorical labels without converting classes into numeric scores.
+    plotted = gauge.copy()
+    plotted["kg"] = plotted["kg"].where(plotted["kg"].ne(""))
+    categories = sorted(classes)
+    cells = aggregate_hex(plotted, "kg", aea.proj4_init, categories=categories)
+    cells.plot(
+        ax=ax_map,
+        color=[KG_COLORS.get(value, FALLBACK_COLOR) for value in cells["value"]],
+        edgecolor="#454545",
+        linewidth=0.25,
+        zorder=3,
+    )
+    export_hex_support(
+        plotted, "kg", cells, aea.proj4_init,
+        support_dir / "network_climate.json",
+        categories=categories,
+    )
     unclassified = gauge[gauge["kg"] == ""]
-    if not unclassified.empty:
-        ax_map.scatter(
-            unclassified.geometry.x,
-            unclassified.geometry.y,
-            s=6,
-            c=FALLBACK_COLOR,
-            edgecolors="none",
-            zorder=2,
-            transform=data_crs,
-        )
 
     handles = [
         Line2D(
             [],
             [],
-            marker="o",
+            marker="h",
             linestyle="None",
             markersize=6,
             markerfacecolor=KG_COLORS.get(cls, FALLBACK_COLOR),
@@ -402,7 +399,7 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
             Line2D(
                 [],
                 [],
-                marker="o",
+                marker="h",
                 linestyle="None",
                 markersize=4,
                 markerfacecolor=FALLBACK_COLOR,
@@ -410,22 +407,20 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
                 label=f"no class (n={len(unclassified)})",
             )
         )
-    # The legend sits below the map, outside the frame, so it cannot cover the
-    # southwest gauge cluster it labels (round-6 editor m7). Anchored to the map
-    # axes (not the figure) so it centers under the panel it describes.
-    ax_map.legend(
+    ax_legend.legend(
         handles=handles,
-        loc="upper center",
-        bbox_to_anchor=(0.5, -0.01),
-        fontsize=13,
-        framealpha=0.9,
-        ncol=4,
-        columnspacing=0.8,
+        loc="upper left",
+        fontsize=8,
+        frameon=False,
+        ncol=1,
         handletextpad=0.4,
-        title="Köppen-Geiger class",
-        title_fontsize=13,
+        title="Gauge counts by climate class",
+        title_fontsize=9,
     )
-    ax_map.set_title("(a) Climate classes", fontsize=13, fontweight="bold", loc="left")
+    ax_map.set_title(
+        f"(a) Most frequent climate class ({len(cells)} cells)",
+        fontsize=9, fontweight="normal", loc="left", pad=7,
+    )
 
     # (b) Catchment size distribution
     bars = ax_hist.barh(
@@ -436,23 +431,24 @@ def build_figure(gauge: gpd.GeoDataFrame, size_counts: pd.Series) -> plt.Figure:
         linewidth=0.5,
     )
     ax_hist.set_yticks(range(len(size_counts)))
-    ax_hist.set_yticklabels([_size_label(str(cat)) for cat in size_counts.index], fontsize=13)
-    ax_hist.set_ylabel("Catchment area (km²)", fontsize=13)
-    ax_hist.set_xlabel("Number of catchments", fontsize=13)
-    ax_hist.set_title("(b) Size distribution", fontsize=13, fontweight="bold", loc="left")
+    ax_hist.set_yticklabels([_size_label(str(cat)) for cat in size_counts.index], fontsize=8)
+    ax_hist.set_ylabel("Catchment area (km²)", fontsize=8)
+    ax_hist.set_xlabel("Number of catchments", fontsize=8)
+    ax_hist.set_title("(b) Size distribution", fontsize=9, fontweight="normal", loc="left", pad=7)
     ax_hist.grid(alpha=0.15, axis="x", linestyle="--")
+    ax_hist.spines[["top", "right"]].set_visible(False)
     ax_hist.invert_yaxis()
-    # 1.18 left the "1257" count label (13pt, widened by the font-floor fix) printing
-    # outside the axes frame for the largest bar; more headroom fixes it.
+    # Leave room for the exact count to the right of the longest bar.
     ax_hist.set_xlim(0, float(size_counts.max()) * 1.3)
+    ax_hist.set_xticks([0, 500, 1000, 1500])
     for bar, cnt in zip(bars, size_counts.values, strict=False):
         ax_hist.text(
             cnt + 20,
             bar.get_y() + bar.get_height() / 2,
             f"{cnt}",
             va="center",
-            fontsize=13,
-            fontweight="bold",
+            fontsize=8,
+            fontweight="normal",
         )
 
     return fig
@@ -469,13 +465,20 @@ def main() -> None:
     args = parser.parse_args()
 
     gauge, size_counts = load_data()
-    fig = build_figure(gauge, size_counts)
-    # Save ONCE and copy: two bbox_inches="tight" saves crop a few pixels apart,
-    # so the paper/ and overleaf/ copies would never agree byte-for-byte.
+    support_dir = (
+        PROJECT_ROOT / "paper/figure_data/hex_support"
+        if args.write else TEST_OUTPUT.parent / "hex_support"
+    )
+    fig = build_figure(gauge, size_counts, support_dir)
+    # Save once and copy so both manuscript image trees are byte-identical.
     outputs = PAPER_OUTPUTS if args.write else (TEST_OUTPUT,)
     first = outputs[0]
     first.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(first, dpi=300, bbox_inches="tight")
+    # Resolve the layout at delivery DPI before freezing its physical dimensions.
+    fig.set_dpi(400)
+    fig.canvas.draw()
+    fig.set_layout_engine("none")
+    fig.savefig(first, dpi=400, facecolor="white")
     print(f"\nSaved: {first}")
     for out in outputs[1:]:
         out.parent.mkdir(parents=True, exist_ok=True)

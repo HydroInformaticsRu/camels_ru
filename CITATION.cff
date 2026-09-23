@@ -2,8 +2,6 @@ cff-version: 1.2.0
 message: "If you use this code, please cite it as below. The dataset itself has a separate record (see README)."
 type: software
 title: "CAMELS-RU processing code"
-version: 1.0.0
-date-released: 2026-08-23
 license: MIT
 repository-code: "https://github.com/HydroInformaticsRu/camels_ru"
 authors:
@@ -31,7 +29,7 @@ preferred-citation:
   title: "CAMELS-RU: hydrometeorological time series and catchment attributes for 3353 Russian catchments, 2008–2023"
   journal: "Earth System Science Data"
   year: 2026
-  notes: "in review"
+  notes: "Manuscript in preparation for submission; not a published article."
   authors:
     - family-names: Abramov
       given-names: Dmitrii V.

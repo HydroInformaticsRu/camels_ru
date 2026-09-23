@@ -1,15 +1,9 @@
 """Render the discharge-quality figure (Section 4): overall grade and per-gauge reliability.
 
-Two stacked Albers maps of the discharge gauges of the Analysis set:
-(a) the overall A-F grade of every discharge gauge (ungraded gauges in grey), from
-    the released ``camels_ru_gauge_summary.csv``;
-(b) the share of assessed hydrological years graded A, from the released
-    ``camels_ru_year_grades.csv``, in five 20-point classes that reuse the grade palette.
-
-Panel (a) gives the single grade users filter on; panel (b) shows how consistently
-reliable each record is, which the overall grade (dominated by the worst year under the
-strict rule) cannot convey. Both panels reproduce from the archive plus the gauge-point
-layer used by every other map script.
+Two stacked Albers point maps retain individual discharge gauges: overall grade
+and original per-gauge share of assessed years graded A. Ungraded gauges are grey.
+Legend and reliability-scale rows align to the rendered map frames after Cartopy
+has applied its geographic aspect ratio. No spatial aggregation is performed.
 
 Usage:
     pixi run python scripts/plot_gauge_reliability.py            # test output (.tmp)
@@ -38,6 +32,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
 from src.plots.paper_maps import (  # noqa: E402
+    _class_counts,
     _set_extent_from_data,
     get_russia_projection,
 )
@@ -50,14 +45,14 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 plt.rcParams.update(
     {
-        "font.family": "serif",
-        "font.serif": ["Times New Roman", "DejaVu Serif"],
+        "font.family": "sans-serif",
+        "font.sans-serif": ["DejaVu Sans"],
         "figure.dpi": 150,
         "savefig.dpi": 300,
-        "axes.labelsize": 12,
-        "axes.titlesize": 13,
-        "xtick.labelsize": 10,
-        "ytick.labelsize": 10,
+        "axes.labelsize": 9,
+        "axes.titlesize": 9,
+        "xtick.labelsize": 8,
+        "ytick.labelsize": 8,
     }
 )
 
@@ -89,7 +84,7 @@ GRADE_COLORS = {
 GRADE_ORDER = ["A", "B", "C", "D", "F", "ungraded"]
 
 # Discrete reliability classes on the share of grade-A years: equal 20-point bands
-# coloured with the same five grade colours (F red -> A dark green).
+# coloured with the same five grade colours (F purple -> A yellow).
 BOUNDS = [0, 20, 40, 60, 80, 100]
 BIN_COLORS = [GRADE_COLORS[g] for g in ("F", "D", "C", "B", "A")]
 
@@ -148,29 +143,37 @@ def _basemap(ax: plt.Axes, gauge: gpd.GeoDataFrame, aea: ccrs.Projection) -> Non
 
     _add_graticule(ax)
     ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
+    if ne_land.crs is None:
+        raise ValueError("Basemap has no CRS")
     ne_land.to_crs(aea.proj4_init).plot(
-        ax=ax, color="#EDEDED", edgecolor="#CCCCCC", linewidth=0.3, zorder=1
+        ax=ax, color="#DEDEDE", edgecolor="#B9B9B9", linewidth=0.3, zorder=1
     )
 
 
-def _panel_grades(ax: plt.Axes, gauge: gpd.GeoDataFrame, data_crs: ccrs.Projection) -> None:
-    """Panel (a): overall grade per discharge gauge, worse grades drawn on top."""
+def build_figure(gauge: gpd.GeoDataFrame) -> plt.Figure:
+    """Map individual gauges with legend rows aligned to final geographic frames."""
+    aea = get_russia_projection()
+    if gauge.crs is None:
+        raise ValueError("Gauge layer has no CRS")
+    gauge = gauge.to_crs(4326)
+    fig = plt.figure(figsize=(160 / 25.4, 170 / 25.4), dpi=300)
+    ax_grade = fig.add_axes([0.04, 0.57, 0.92, 0.38], projection=aea, label="map_grade")
+    ax_pct = fig.add_axes([0.04, 0.12, 0.92, 0.38], projection=aea, label="map_reliability")
+    for ax in (ax_grade, ax_pct):
+        _basemap(ax, gauge, aea)
     handles = []
     for rank, grade in enumerate(GRADE_ORDER):
         sub = gauge[gauge["grade"] == grade]
-        if sub.empty:
-            continue
-        z = 2 if grade == "ungraded" else 3 + rank
-        ax.scatter(
+        ax_grade.scatter(
             sub.geometry.x,
             sub.geometry.y,
-            s=14,
+            s=6,
             alpha=0.85,
-            c=GRADE_COLORS[grade],
+            color=GRADE_COLORS[grade],
             edgecolors="#333333",
             linewidths=0.15,
-            zorder=z,
-            transform=data_crs,
+            zorder=2 if grade == "ungraded" else 3 + rank,
+            transform=ccrs.PlateCarree(),
         )
         handles.append(
             Line2D(
@@ -178,91 +181,86 @@ def _panel_grades(ax: plt.Axes, gauge: gpd.GeoDataFrame, data_crs: ccrs.Projecti
                 [],
                 marker="o",
                 linestyle="None",
-                markersize=6,
+                markersize=4.5,
                 markerfacecolor=GRADE_COLORS[grade],
                 markeredgecolor="#333333",
                 markeredgewidth=0.3,
-                label=f"{grade} (n={len(sub)})",
+                label=f"{grade} ({len(sub):,})",
             )
         )
-    ax.legend(
-        handles=handles,
-        loc="lower left",
-        fontsize=8,
-        framealpha=0.9,
-        ncol=2,
-        columnspacing=0.8,
-        handletextpad=0.4,
-    )
-    ax.set_title("(a) Overall discharge grade", fontsize=13, fontweight="bold", loc="left")
-
-
-def _panel_reliability(
-    fig: plt.Figure, ax: plt.Axes, gauge: gpd.GeoDataFrame, data_crs: ccrs.Projection
-) -> None:
-    """Panel (b): share of assessed years graded A, five discrete classes."""
+    ax_grade.set_title(f"(a) Overall discharge grade (n = {len(gauge):,})", loc="left", pad=7)
     graded = gauge[gauge["pct_a"].notna()].sort_values("pct_a", ascending=False)
+    missing = gauge[gauge["pct_a"].isna()]
     cmap = ListedColormap(BIN_COLORS)
-    norm = BoundaryNorm(BOUNDS, cmap.N)
-    # Least-reliable gauges drawn last so they stay visible on the dense cluster.
-    sc = ax.scatter(
+    norm = BoundaryNorm(BOUNDS, cmap.N, clip=True)
+    ax_pct.scatter(
+        missing.geometry.x,
+        missing.geometry.y,
+        s=6,
+        color=GRADE_COLORS["ungraded"],
+        edgecolors="#333333",
+        linewidths=0.15,
+        zorder=2,
+        transform=ccrs.PlateCarree(),
+    )
+    sc = ax_pct.scatter(
         graded.geometry.x,
         graded.geometry.y,
         c=graded["pct_a"],
         cmap=cmap,
         norm=norm,
-        s=14,
+        s=6,
         alpha=0.95,
         edgecolors="#333333",
         linewidths=0.15,
         zorder=3,
-        transform=data_crs,
+        transform=ccrs.PlateCarree(),
     )
-    cbar = fig.colorbar(
-        sc,
-        ax=ax,
-        orientation="horizontal",
-        boundaries=BOUNDS,
-        ticks=BOUNDS,
-        spacing="uniform",
-        drawedges=True,
-        shrink=0.55,
-        pad=0.02,
-        aspect=30,
+    ax_pct.set_title(
+        f"(b) Years graded A ({len(graded):,} graded; {len(missing):,} ungraded in grey)",
+        loc="left",
+        pad=7,
     )
-    cbar.set_label("Share of assessed years graded A (%)", fontsize=10)
-    cbar.dividers.set_color("white")
-    cbar.dividers.set_linewidth(1.5)
-    ax.text(
-        0.01,
-        0.02,
-        f"n = {len(graded)} graded gauges",
-        transform=ax.transAxes,
-        fontsize=9,
-        va="bottom",
-        ha="left",
+    # Cartopy applies equal geographic aspect at draw time: use the resulting frame,
+    # not its larger requested rectangle, to position every legend/count/scale row.
+    fig.canvas.draw()
+    grade_frame = ax_grade.get_position()
+    pct_frame = ax_pct.get_position()
+    legend_ax = fig.add_axes(
+        [grade_frame.x0, grade_frame.y0 - 0.045, grade_frame.width, 0.033], label="grade_legend"
     )
-    ax.set_title("(b) Share of assessed years graded A", fontsize=13, fontweight="bold", loc="left")
-
-
-def build_figure(gauge: gpd.GeoDataFrame) -> plt.Figure:
-    """Assemble the two-panel discharge-quality figure.
-
-    Args:
-        gauge: Discharge gauge points carrying ``grade`` and ``pct_a``.
-
-    Returns:
-        The assembled matplotlib Figure (caller saves/closes it).
-    """
-    aea = get_russia_projection()
-    data_crs = ccrs.PlateCarree()
-    fig, axes = plt.subplots(
-        2, 1, figsize=(9.5, 9.2), subplot_kw={"projection": aea}, constrained_layout=True
+    legend_ax.axis("off")
+    legend_ax.legend(
+        handles=handles,
+        loc="center",
+        ncol=6,
+        fontsize=8,
+        frameon=False,
+        columnspacing=0.8,
+        handletextpad=0.3,
+        handlelength=0.8,
+        borderaxespad=0,
+        borderpad=0,
     )
-    _basemap(axes[0], gauge, aea)
-    _basemap(axes[1], gauge, aea)
-    _panel_grades(axes[0], gauge, data_crs)
-    _panel_reliability(fig, axes[1], gauge, data_crs)
+    count_ax = fig.add_axes(
+        [pct_frame.x0, pct_frame.y0 - 0.037, pct_frame.width, 0.027], label="reliability_counts"
+    )
+    count_ax.axis("off")
+    counts = _class_counts(graded["pct_a"].to_numpy(), np.asarray(BOUNDS))
+    for i, count in enumerate(counts):
+        count_ax.text(
+            (i + 0.5) / len(counts), 0.5, f"n = {count:,}", ha="center", va="center", fontsize=8.5
+        )
+    cax = fig.add_axes(
+        [pct_frame.x0, pct_frame.y0 - 0.060, pct_frame.width, 0.020], label="reliability_scale"
+    )
+    cb = fig.colorbar(sc, cax=cax, orientation="horizontal", ticks=BOUNDS)
+    cb.set_label("Share of assessed years graded A (%)", fontsize=8.5)
+    cb.ax.tick_params(labelsize=8.5, length=2)
+    ticklabels = cb.ax.get_xticklabels()
+    ticklabels[0].set_ha("left")
+    ticklabels[-1].set_ha("right")
+    fig.canvas.draw()
     return fig
 
 
@@ -279,9 +277,13 @@ def main() -> None:
     gauge = load_gauges()
     fig = build_figure(gauge)
     outputs = PAPER_OUTPUTS if args.write else (TEST_OUTPUT,)
-    first, *rest = outputs  # save once, copy: repeated tight saves differ by a few pixels
+    first, *rest = outputs  # save once and copy to preserve byte parity
     first.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(first, dpi=300, bbox_inches="tight")
+    # Resolve the layout at delivery DPI before freezing its physical dimensions.
+    fig.set_dpi(300)
+    fig.canvas.draw()
+    fig.set_layout_engine("none")
+    fig.savefig(first, dpi=300, facecolor="white")
     print(f"wrote {first}")
     for out in rest:
         out.parent.mkdir(parents=True, exist_ok=True)

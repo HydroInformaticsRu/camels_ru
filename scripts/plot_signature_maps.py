@@ -1,7 +1,7 @@
 """Render the four hydrological-signature map figures (Section 5) from the release.
 
 Reads the released ``camels_ru_signatures.csv``, drops the small-basin anomalies flagged
-``is_anomalous``, and maps eight key signatures for the remaining cleaned gauges on the
+``is_anomalous``, and summarizes eight key signatures by 66-km-radius hex-cell medians on the
 shared Albers Equal-Area basemap. The bin edges and panel order follow the original
 notebook-02 maps; the gauge set is now the released cleaned subset, so the figures
 reproduce from the archive plus the gauge-point layer used by every other map script.
@@ -24,13 +24,22 @@ import sys
 import warnings
 
 import geopandas as gpd
+from matplotlib.colors import BoundaryNorm, to_rgba
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
-from src.plots.paper_maps import continuous_multiplot  # noqa: E402
+from src.plots.hex_maps import aggregate_hex, export_hex_support  # noqa: E402
+from src.plots.paper_maps import (  # noqa: E402
+    _add_graticule,
+    _class_counts,
+    _format_edge_labels,
+    _set_extent_from_data,
+    get_russia_projection,
+)
 from src.utils.paper_analysis_scope import filter_paper_analysis_index  # noqa: E402
 
 gpd.options.io_engine = "pyogrio"
@@ -38,8 +47,8 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 plt.rcParams.update(
     {
-        "font.family": "serif",
-        "font.serif": ["Times New Roman", "DejaVu Serif"],
+        "font.family": "sans-serif",
+        "font.sans-serif": ["DejaVu Sans"],
         "figure.dpi": 150,
         "savefig.dpi": 300,
     }
@@ -101,32 +110,73 @@ def load_signatures() -> gpd.GeoDataFrame:
 
 
 def build_figure(
-    gdf: gpd.GeoDataFrame, panels: list[tuple[str, str, list[float]]], letters: str
+    gdf: gpd.GeoDataFrame,
+    panels: list[tuple[str, str, list[float]]],
+    letters: str,
+    support_dir: Path | None = None,
 ) -> plt.Figure:
-    """Two-panel signature map (stacked vertically) for one panel set."""
+    """Two hex maps: cell medians above outlet-count histograms and compact legends."""
     ne_land = gpd.read_file(GEOM_DIR / "ne_land_clipped.gpkg")
-    fig = continuous_multiplot(
-        gdf=gdf,
-        metrics=[c for c, _, _ in panels],
-        titles=[f"({letter}) {title}" for letter, (_, title, _) in zip(letters, panels, strict=True)],
-        ncols=1,
-        panel_size=(8.0, 4.1),
-        cmap_name="viridis",  # sequential: every panel is a strictly positive quantity
-        bin_intervals={c: edges for c, _, edges in panels},
-        marker_size=8,
-        show_nan=True,
-        background_gdf=ne_land,
-        # Font floor (ESSD editor round-N re-review): each figure is now 1 panel wide x 2
-        # rows (panel_size (8.0, 4.1) in -> figsize 8.0x8.2in) instead of 2x2, and prints at
-        # \textwidth ~= 12cm (4.72in) in the review-format (copernicus manuscript-mode) PDF,
-        # so the shrink factor is 4.72/8.0 ~= 0.59 (vs ~0.28 for the old 2x2 figure at
-        # 0.95\textwidth from a 16in-wide source, hence each panel prints ~2x wider now: a
-        # full \textwidth instead of half of 0.95\textwidth shared between two columns).
-        # 14pt source clears the 7pt print floor with margin (14 * 0.59 ~= 8.3pt) without
-        # printing oversized.
-        title_fontsize=14,
-        colorbar_ticklabelsize=14,
-    )
+    if ne_land.crs is None:
+        raise ValueError("The map background requires a declared CRS")
+    projection = get_russia_projection()
+    crs = projection.proj4_init
+    ne_land = ne_land.to_crs(crs)
+    fig = plt.figure(figsize=(6.3, 7.1), constrained_layout=True)
+    grid = fig.add_gridspec(2, 1, hspace=0.12)
+    for row, (letter, (metric, title, edges)) in enumerate(zip(letters, panels, strict=True)):
+        panel = grid[row].subgridspec(2, 2, height_ratios=[1, 0.22], width_ratios=[1, 1.15])
+        ax = fig.add_subplot(panel[0, :], projection=projection)
+        histogram = fig.add_subplot(panel[1, 0])
+        legend_grid = panel[1, 1].subgridspec(2, 1, height_ratios=[1, 0.18])
+        support = fig.add_subplot(legend_grid[0])
+        colour_ax = fig.add_subplot(legend_grid[1])
+        cells = aggregate_hex(gdf, metric, crs)
+        if support_dir is not None:
+            export_hex_support(gdf, metric, cells, crs, support_dir / f"signature_{metric}.json")
+            cells.drop(columns="geometry").to_csv(support_dir / f"signature_{metric}.csv", index=False)
+        _set_extent_from_data(ax, gdf)
+        ax.axis("off")
+        _add_graticule(ax)
+        ne_land.plot(ax=ax, color="#e6e6e6", edgecolor="#cccccc", linewidth=0.25, zorder=1)
+        cmap = plt.get_cmap("viridis", len(edges) - 1)
+        norm = BoundaryNorm(edges, cmap.N, clip=True)
+        colors = [
+            cmap(norm(value)) if np.isfinite(value) else to_rgba("#aaaaaa") for value in cells.value
+        ]
+        cells.plot(ax=ax, color=colors, edgecolor="#444444", linewidth=0.16, zorder=3)
+        ax.set_title(f"({letter}) {title}", fontsize=9, fontweight="normal", loc="left", pad=7)
+
+        counts = _class_counts(gdf[metric].to_numpy(), np.asarray(edges))
+        bars = histogram.bar(np.arange(len(counts)), counts, color=[cmap(i) for i in range(cmap.N)])
+        histogram.bar_label(bars, fontsize=7, padding=2)
+        histogram.set_ylim(0, max(counts.max() * 1.45, 1))
+        histogram.set_title("Individual-gauge counts by colour class", fontsize=7, loc="left", pad=2)
+        histogram.axis("off")
+        finite = int(np.isfinite(gdf[metric]).sum())
+        all_missing = int(cells.value.isna().sum())
+        support.axis("off")
+        support.text(
+            0,
+            0.5,
+            f"{len(gdf)} gauges; {len(cells)} occupied hexagons\n"
+            f"Missing gauges: {len(gdf) - finite}; all-missing cells: {all_missing}",
+            transform=support.transAxes,
+            fontsize=7,
+            va="center",
+            color="#444444",
+        )
+        colourbar = fig.colorbar(
+            plt.cm.ScalarMappable(norm=norm, cmap=cmap), cax=colour_ax, orientation="horizontal"
+        )
+        colourbar.set_ticks(edges)
+        colourbar.set_ticklabels(_format_edge_labels(np.asarray(edges)))
+        colourbar.ax.tick_params(labelsize=7, length=2)
+        colourbar.set_label("Cell median (grey: all values missing)", fontsize=7, labelpad=3)
+        print(
+            f"{metric}: gauges={len(gdf)}, finite={finite}, cells={len(cells)}, "
+            f"all_missing_cells={all_missing}, class_counts={counts.tolist()}"
+        )
     return fig
 
 
@@ -149,12 +199,18 @@ def main() -> None:
         ("fig_hydro_signatures_3", PANELS_3, "ab"),
         ("fig_hydro_signatures_4", PANELS_4, "ab"),
     ):
-        fig = build_figure(gdf, panels, letters)
-        # Save once and copy: repeated tight-bbox saves crop a few pixels differently,
-        # which breaks the md5 parity between paper/images and paper/overleaf/images.
+        support_dir = (
+            PROJECT_ROOT / "paper/figure_data/hex_support" if args.write else TEST_DIR / "hex_support"
+        )
+        fig = build_figure(gdf, panels, letters, support_dir)
+        # Save once and copy so both manuscript image trees are byte-identical.
         first, *rest = out_dirs
         first.mkdir(parents=True, exist_ok=True)
-        fig.savefig(first / f"{name}{suffix}.png", dpi=300, bbox_inches="tight")
+        # Resolve the layout at delivery DPI before freezing its physical dimensions.
+        fig.set_dpi(300)
+        fig.canvas.draw()
+        fig.set_layout_engine("none")
+        fig.savefig(first / f"{name}{suffix}.png", dpi=300, facecolor="white")
         print(f"wrote {first / f'{name}{suffix}.png'}")
         for out_dir in rest:
             out_dir.mkdir(parents=True, exist_ok=True)

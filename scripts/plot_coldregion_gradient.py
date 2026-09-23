@@ -43,16 +43,15 @@ MIN_WINTER_COVERAGE = 0.95  # released winter_coverage: share of Dec-Mar days ob
 Y_CLIP_A = 1.2  # panel (a) axis limit; the tail above it is clipped from view, not dropped
 
 
-# ESSD editor pre-review font floor: this figure prints at \textwidth from a 15in-wide
-# source (~0.46x shrink), so text must start at >=18pt to clear 7pt in the final PDF.
-FS = 18
+# Set type at the final 160 mm publication width.
+FS = 8
 
 mpl.rcParams.update(
     {
-        "font.family": "serif",
-        "font.serif": ["DejaVu Serif"],
+        "font.family": "DejaVu Sans",
+        "pdf.fonttype": 42,
         "figure.dpi": 150,
-        "savefig.dpi": 300,
+        "savefig.dpi": 400,
         "axes.labelsize": FS,
         "axes.titlesize": FS,
         "xtick.labelsize": FS,
@@ -145,78 +144,82 @@ def main() -> None:
     print("\nBaseflow index by permafrost bin:")
     print(bm[["center", "median", "n"]].round(3).to_string(index=False))
 
-    # Modest width increase (was 15in) plus constrained_layout: fig.tight_layout() doesn't
-    # reserve space for the colorbar or reflow around the font-floor bump below, causing
-    # panel titles to run into each other and axis labels to clip at the saved image edges.
-    fig, (ax_a, ax_b, ax_c) = plt.subplots(1, 3, figsize=(16, 5.0), constrained_layout=True)
+    fig = plt.figure(figsize=(160 / 25.4, 110 / 25.4))
+    grid = fig.add_gridspec(
+        3,
+        3,
+        height_ratios=[2.1, 0.28, 0.80],
+        left=0.085,
+        right=0.98,
+        bottom=0.045,
+        top=0.92,
+        hspace=0.75,
+        wspace=0.50,
+    )
+    ax_a, ax_b, ax_c = [fig.add_subplot(grid[0, i]) for i in range(3)]
 
     # ---- Panel A: winter flow fraction vs permafrost -------------------------
     norm = Normalize(vmin=float(temp.min()), vmax=float(temp.max()))
-    sc = ax_a.scatter(pf, wff, c=temp, cmap="RdBu_r", norm=norm, s=10, alpha=0.55, linewidths=0)
-    ax_a.plot(wm["center"], wm["median"], "-o", color="black", lw=1.8, ms=4, label="binned median")
+    sc = ax_a.scatter(pf, wff, c=temp, cmap="RdBu_r", norm=norm, s=2.5, alpha=0.55, linewidths=0)
+    ax_a.plot(wm["center"], wm["median"], "-o", color="black", lw=1.0, ms=2.5, label="binned median")
     ax_a.fill_between(wm["center"], wm["q25"], wm["q75"], color="black", alpha=0.12, label="IQR")
     # Clip the axis, not the data: a long upper tail (winter flow above the annual mean at
     # spring-fed gauges) would otherwise squash the binned medians into the bottom third.
     n_clipped = int((wff > Y_CLIP_A).sum())
     ax_a.set_ylim(0, Y_CLIP_A)
-    ax_a.text(
-        0.98, 0.30, f"{n_clipped} above axis", transform=ax_a.transAxes, ha="right", fontsize=FS
-    )
     print(f"panel (a): {n_clipped} of {len(wff)} points above the {Y_CLIP_A} axis limit")
-    ax_a.set_xlabel("Permafrost extent (HydroATLAS proxy, %)")
-    # Rotated at 18pt, "Winter flow ratio (mean Jan-Mar Q / mean annual Q)" is taller than
-    # the panel itself and clips at both ends; the definition moves to the caption, matching
-    # panel (b)'s bare "Baseflow index" label.
+    ax_a.set_xlabel("Permafrost extent (%)")
     ax_a.set_ylabel("Winter flow ratio")
-    ax_a.set_title(f"(a) Winter flow ratio ($\\rho$ = {rho_w:+.2f})", loc="left")
-    ax_a.legend(loc="upper right", frameon=False)
-    # Vertical inset in panel (a)'s sparse mid-right interior: the previous full-width
-    # horizontal bar below the panel forced a dead white band under panels (b)/(c),
-    # since only (a) carries a colorbar.
-    # Horizontal inset in the empty center of panel (a), below the legend: the data hug
-    # the left edge and the bottom, the right edge carries the legend and the endpoint
-    # annotation, so this is the one region where bar, ticks, and label all fit clear.
-    cax = ax_a.inset_axes([0.40, 0.60, 0.42, 0.045])
+    ax_a.set_title("(a) Winter flow", loc="left", fontsize=9, pad=5)
+    legend_ax = fig.add_subplot(grid[1, 1:])
+    legend_ax.axis("off")
+    handles, labels = ax_a.get_legend_handles_labels()
+    legend_ax.legend(handles, labels, loc="center", ncol=2, frameon=False)
+    cax = fig.add_subplot(grid[1, 0])
     cb = fig.colorbar(sc, cax=cax, orientation="horizontal")
-    cb.set_label("Mean annual T (\u00b0C)", fontsize=FS)
-    cb.ax.tick_params(labelsize=FS)
+    cb.set_label("(a) Mean annual T (°C)", fontsize=FS)
+    cb.ax.tick_params(labelsize=FS, length=2)
 
     # ---- Panel B: the baseflow index over the same bins ----------------------
-    ax_b.scatter(pf, bfi, s=10, alpha=0.35, color="0.45", linewidths=0)
-    ax_b.plot(bm["center"], bm["median"], "-o", color="#b2182b", lw=2, ms=4, label="binned median")
+    ax_b.scatter(pf, bfi, s=2.5, alpha=0.35, color="0.45", linewidths=0)
+    ax_b.plot(bm["center"], bm["median"], "-o", color="#b2182b", lw=1.0, ms=2.5, label="binned median")
     ax_b.fill_between(bm["center"], bm["q25"], bm["q75"], color="#b2182b", alpha=0.12, label="IQR")
     ax_b.set_ylim(bottom=0)
     ax_b.set_xlabel("Permafrost extent (%)")
     ax_b.set_ylabel("Baseflow index")
-    # Shortened from "..., same gauges (...)" — too wide for one panel at floor size;
-    # "same gauges" is already established by the panel (a)/(b) pairing and caption.
-    ax_b.set_title(f"(b) Baseflow index ($\\rho$ = {rho_b:+.2f})", loc="left")
-    ax_b.legend(loc="lower right", frameon=False)
+    ax_b.set_title("(b) Baseflow index", loc="left", fontsize=9, pad=5)
 
     # ---- Panel C: melt timing vs snow cover ----------------------------------
     s_edges = [0, 25, 40, 50, 60, 100]
     hm = binned_median(snow, df["half_flow_date"], s_edges)
-    ax_c.plot(hm["center"], hm["median"], "-o", color="#1b7837", lw=2, ms=4, label="binned median")
+    ax_c.plot(hm["center"], hm["median"], "-o", color="#1b7837", lw=1.0, ms=2.5, label="binned median")
     ax_c.fill_between(hm["center"], hm["q25"], hm["q75"], color="#1b7837", alpha=0.15, label="IQR")
-    ax_c.set_xlabel("Snow-cover extent (HydroATLAS proxy, %)")
-    ax_c.set_ylabel("Half-flow date\n(hydrological day; 1 = Oct 1)")
-    ax_c.set_title("(c) Half-flow date by snow-cover extent", loc="left")
-    # Lower right is the empty corner: the median line and IQR band climb through the
-    # upper left, where the legend previously sat on top of the shading.
-    ax_c.legend(loc="lower right", frameon=False)
+    ax_c.set_xlabel("Snow-cover extent (%)")
+    ax_c.set_ylabel("Half-flow date (hydrological day)")
+    ax_c.set_title("(c) Half-flow date", loc="left", fontsize=9, pad=5)
 
-    # Every bin reports its finite-pair count, including empty bins and off-axis points.
-    for ax, bins in ((ax_a, wm), (ax_b, bm), (ax_c, hm)):
+    # Counts occupy their own aligned row, never the scatter or IQR region.
+    for i, bins in enumerate((wm, bm, hm)):
         missing = len(df) - int(bins["n"].sum())
         counts = ", ".join(str(int(n)) for n in bins["n"])
-        ax.text(
-            0.0,
-            -0.29,
-            f"Bin n (left to right):\n{counts}\n"
-            f"Finite pairs: {int(bins['n'].sum())}; missing: {missing}",
-            transform=ax.transAxes,
+        footer = fig.add_subplot(grid[2, i])
+        footer.axis("off")
+        detail = (
+            f"ρ = {rho_w:+.2f}; off-axis: {n_clipped}"
+            if i == 0
+            else f"ρ = {rho_b:+.2f}"
+            if i == 1
+            else "Day 1 = 1 October"
+        )
+        footer.text(
+            0,
+            1,
+            f"{detail}\n"
+            f"Finite: {int(bins['n'].sum()):,}; missing: {missing}\n"
+            f"Bin n, left to right:\n{counts}",
             va="top",
             fontsize=FS,
+            linespacing=1.6,
         )
         bins["n_missing_pairs"] = missing
     print("Half-flow date by snow-cover bin:")
@@ -232,12 +235,10 @@ def main() -> None:
         ignore_index=True,
     )
     prov.to_csv(RESULTS / "coldregion_gradient_bins.csv", index=False)
-    first, *rest = IMG_DIRS  # save once, copy: repeated tight saves differ by a few pixels
+    first, *rest = IMG_DIRS  # save once, copy identical delivered files
     first.mkdir(parents=True, exist_ok=True)
     # Vector PDF (scatter/line figure); CreationDate stripped for reproducible bytes.
-    fig.savefig(
-        first / "fig_coldregion_gradient.pdf", bbox_inches="tight", metadata={"CreationDate": None}
-    )
+    fig.savefig(first / "fig_coldregion_gradient.pdf", metadata={"CreationDate": None})
     print(f"wrote {first / 'fig_coldregion_gradient.pdf'}")
     for d in rest:
         d.mkdir(parents=True, exist_ok=True)

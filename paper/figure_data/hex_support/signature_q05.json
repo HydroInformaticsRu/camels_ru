@@ -1,0 +1,6223 @@
+{
+  "value_column": "q05",
+  "grid": {
+    "crs": "PROJCRS[\"unknown\",BASEGEOGCRS[\"unknown\",DATUM[\"Unknown based on WGS 84 ellipsoid\",ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",7030]]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8901]]],CONVERSION[\"unknown\",METHOD[\"Albers Equal Area\",ID[\"EPSG\",9822]],PARAMETER[\"Latitude of false origin\",56,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8821]],PARAMETER[\"Longitude of false origin\",100,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8822]],PARAMETER[\"Latitude of 1st standard parallel\",46.4,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8823]],PARAMETER[\"Latitude of 2nd standard parallel\",71.8,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8824]],PARAMETER[\"Easting at false origin\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8826]],PARAMETER[\"Northing at false origin\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8827]]],CS[Cartesian,2],AXIS[\"(E)\",east,ORDER[1],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]],AXIS[\"(N)\",north,ORDER[2],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]]",
+    "orientation": "pointy-top",
+    "circumradius_km": 66.0,
+    "origin_m": [
+      0.0,
+      0.0
+    ],
+    "boundary_assignment": "cube rounding; half upward; repair priority q,r,s"
+  },
+  "reducer": "finite-value median",
+  "category_tie_order": null,
+  "support": "gauge outlet locations; no area weighting; empty cells omitted",
+  "cells": [
+    {
+      "hex_id": "-10:-1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.295914
+    },
+    {
+      "hex_id": "-10:-3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.08518
+    },
+    {
+      "hex_id": "-10:0",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.476193
+    },
+    {
+      "hex_id": "-10:12",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.35969
+    },
+    {
+      "hex_id": "-10:2",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.50768
+    },
+    {
+      "hex_id": "-10:3",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.76615
+    },
+    {
+      "hex_id": "-10:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.53103
+    },
+    {
+      "hex_id": "-10:6",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.14686
+    },
+    {
+      "hex_id": "-10:8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.26865
+    },
+    {
+      "hex_id": "-11:-2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.203336
+    },
+    {
+      "hex_id": "-11:0",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.185379
+    },
+    {
+      "hex_id": "-11:1",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.9720075
+    },
+    {
+      "hex_id": "-11:3",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.70129
+    },
+    {
+      "hex_id": "-11:5",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.49187
+    },
+    {
+      "hex_id": "-12:1",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.442508
+    },
+    {
+      "hex_id": "-12:12",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.76878
+    },
+    {
+      "hex_id": "-12:2",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.4117
+    },
+    {
+      "hex_id": "-12:4",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.60566
+    },
+    {
+      "hex_id": "-12:6",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.49969
+    },
+    {
+      "hex_id": "-13:13",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.62466
+    },
+    {
+      "hex_id": "-13:2",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.6030685
+    },
+    {
+      "hex_id": "-13:3",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.20623
+    },
+    {
+      "hex_id": "-13:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.19609
+    },
+    {
+      "hex_id": "-13:6",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.66306
+    },
+    {
+      "hex_id": "-14:10",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 12.81942
+    },
+    {
+      "hex_id": "-14:3",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.01528
+    },
+    {
+      "hex_id": "-14:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.40509
+    },
+    {
+      "hex_id": "-14:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.06136
+    },
+    {
+      "hex_id": "-15:12",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.26783
+    },
+    {
+      "hex_id": "-15:3",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.2555355
+    },
+    {
+      "hex_id": "-15:4",
+      "n_total": 9,
+      "n_valid": 9,
+      "n_missing": 0,
+      "value": 1.28887
+    },
+    {
+      "hex_id": "-16:10",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.84213
+    },
+    {
+      "hex_id": "-16:4",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.632356
+    },
+    {
+      "hex_id": "-16:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.21987
+    },
+    {
+      "hex_id": "-16:8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.4945
+    },
+    {
+      "hex_id": "-17:13",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.65119
+    },
+    {
+      "hex_id": "-17:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.875718
+    },
+    {
+      "hex_id": "-17:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.22518
+    },
+    {
+      "hex_id": "-17:8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.15226
+    },
+    {
+      "hex_id": "-17:9",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.8448
+    },
+    {
+      "hex_id": "-18:12",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.91396
+    },
+    {
+      "hex_id": "-18:13",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.32831
+    },
+    {
+      "hex_id": "-18:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.731562
+    },
+    {
+      "hex_id": "-18:6",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.751955
+    },
+    {
+      "hex_id": "-18:7",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.71242
+    },
+    {
+      "hex_id": "-19:10",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.8709
+    },
+    {
+      "hex_id": "-19:15",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.99543
+    },
+    {
+      "hex_id": "-19:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.136345
+    },
+    {
+      "hex_id": "-19:7",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.16996
+    },
+    {
+      "hex_id": "-1:-1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.42404
+    },
+    {
+      "hex_id": "-1:-4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.13666
+    },
+    {
+      "hex_id": "-1:-5",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.716195
+    },
+    {
+      "hex_id": "-1:0",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.369425
+    },
+    {
+      "hex_id": "-1:2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.06889
+    },
+    {
+      "hex_id": "-20:13",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.27557
+    },
+    {
+      "hex_id": "-20:16",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 12.7741
+    },
+    {
+      "hex_id": "-20:5",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.1132654
+    },
+    {
+      "hex_id": "-20:6",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.613978
+    },
+    {
+      "hex_id": "-20:7",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.05514
+    },
+    {
+      "hex_id": "-20:8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.07777
+    },
+    {
+      "hex_id": "-20:9",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.975081
+    },
+    {
+      "hex_id": "-21:10",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.84745
+    },
+    {
+      "hex_id": "-21:14",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.58191
+    },
+    {
+      "hex_id": "-21:4",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.2593735
+    },
+    {
+      "hex_id": "-21:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.0926213
+    },
+    {
+      "hex_id": "-21:6",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.422445
+    },
+    {
+      "hex_id": "-21:7",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.494019
+    },
+    {
+      "hex_id": "-21:8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.51589
+    },
+    {
+      "hex_id": "-22:14",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.23821
+    },
+    {
+      "hex_id": "-22:6",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.346807
+    },
+    {
+      "hex_id": "-22:7",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.595899
+    },
+    {
+      "hex_id": "-22:8",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.04939
+    },
+    {
+      "hex_id": "-23:10",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.985745
+    },
+    {
+      "hex_id": "-23:11",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.65347
+    },
+    {
+      "hex_id": "-23:13",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.19239
+    },
+    {
+      "hex_id": "-23:17",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 6.00648
+    },
+    {
+      "hex_id": "-23:18",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 5.66054
+    },
+    {
+      "hex_id": "-23:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.420082
+    },
+    {
+      "hex_id": "-23:5",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.307063
+    },
+    {
+      "hex_id": "-23:6",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.944547
+    },
+    {
+      "hex_id": "-23:7",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.20599
+    },
+    {
+      "hex_id": "-23:8",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.963552
+    },
+    {
+      "hex_id": "-23:9",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.437975
+    },
+    {
+      "hex_id": "-24:10",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 7.64202
+    },
+    {
+      "hex_id": "-24:11",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.27658
+    },
+    {
+      "hex_id": "-24:13",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 7.03999
+    },
+    {
+      "hex_id": "-24:14",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 7.620760000000001
+    },
+    {
+      "hex_id": "-24:19",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 6.07374
+    },
+    {
+      "hex_id": "-24:3",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.139281
+    },
+    {
+      "hex_id": "-24:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.314129
+    },
+    {
+      "hex_id": "-24:5",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 1.0237325
+    },
+    {
+      "hex_id": "-24:6",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.057215
+    },
+    {
+      "hex_id": "-24:7",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.37766
+    },
+    {
+      "hex_id": "-24:8",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 1.616925
+    },
+    {
+      "hex_id": "-24:9",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.30553
+    },
+    {
+      "hex_id": "-25:10",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 4.134235
+    },
+    {
+      "hex_id": "-25:11",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 6.75413
+    },
+    {
+      "hex_id": "-25:12",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 6.23297
+    },
+    {
+      "hex_id": "-25:14",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 6.16219
+    },
+    {
+      "hex_id": "-25:15",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 5.056375
+    },
+    {
+      "hex_id": "-25:16",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.486445
+    },
+    {
+      "hex_id": "-25:17",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.68397
+    },
+    {
+      "hex_id": "-25:3",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.3558415
+    },
+    {
+      "hex_id": "-25:4",
+      "n_total": 8,
+      "n_valid": 8,
+      "n_missing": 0,
+      "value": 0.429134
+    },
+    {
+      "hex_id": "-25:5",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.69913
+    },
+    {
+      "hex_id": "-25:6",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 2.10521
+    },
+    {
+      "hex_id": "-25:7",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.95188
+    },
+    {
+      "hex_id": "-25:8",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.72202
+    },
+    {
+      "hex_id": "-25:9",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 2.9044
+    },
+    {
+      "hex_id": "-26:10",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.5792
+    },
+    {
+      "hex_id": "-26:11",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.1449
+    },
+    {
+      "hex_id": "-26:12",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.43249
+    },
+    {
+      "hex_id": "-26:13",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.64024
+    },
+    {
+      "hex_id": "-26:14",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.23085
+    },
+    {
+      "hex_id": "-26:15",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 3.77975
+    },
+    {
+      "hex_id": "-26:16",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.60018
+    },
+    {
+      "hex_id": "-26:17",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.32943
+    },
+    {
+      "hex_id": "-26:4",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 0.870648
+    },
+    {
+      "hex_id": "-26:5",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.19191
+    },
+    {
+      "hex_id": "-26:6",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 3.02595
+    },
+    {
+      "hex_id": "-26:7",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 5.23554
+    },
+    {
+      "hex_id": "-26:8",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.05183
+    },
+    {
+      "hex_id": "-26:9",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 2.21751
+    },
+    {
+      "hex_id": "-27:10",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.43912
+    },
+    {
+      "hex_id": "-27:11",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.565055
+    },
+    {
+      "hex_id": "-27:12",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.37767
+    },
+    {
+      "hex_id": "-27:13",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 4.148490000000001
+    },
+    {
+      "hex_id": "-27:14",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.744165
+    },
+    {
+      "hex_id": "-27:15",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 4.04893
+    },
+    {
+      "hex_id": "-27:16",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 12.283885
+    },
+    {
+      "hex_id": "-27:18",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.09557
+    },
+    {
+      "hex_id": "-27:19",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.95064
+    },
+    {
+      "hex_id": "-27:20",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.451555
+    },
+    {
+      "hex_id": "-27:4",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.4275965
+    },
+    {
+      "hex_id": "-27:5",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.07499
+    },
+    {
+      "hex_id": "-27:6",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.681339
+    },
+    {
+      "hex_id": "-27:7",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.5328495
+    },
+    {
+      "hex_id": "-27:8",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.490946
+    },
+    {
+      "hex_id": "-27:9",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.24619
+    },
+    {
+      "hex_id": "-28:10",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.58454
+    },
+    {
+      "hex_id": "-28:11",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.31963
+    },
+    {
+      "hex_id": "-28:12",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.61197
+    },
+    {
+      "hex_id": "-28:13",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.916
+    },
+    {
+      "hex_id": "-28:14",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.63572
+    },
+    {
+      "hex_id": "-28:15",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 3.368325
+    },
+    {
+      "hex_id": "-28:16",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.84965
+    },
+    {
+      "hex_id": "-28:17",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 3.50554
+    },
+    {
+      "hex_id": "-28:18",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.44001
+    },
+    {
+      "hex_id": "-28:20",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.7181
+    },
+    {
+      "hex_id": "-28:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.856534
+    },
+    {
+      "hex_id": "-28:6",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.453163
+    },
+    {
+      "hex_id": "-28:7",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.561814
+    },
+    {
+      "hex_id": "-28:8",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.6492815
+    },
+    {
+      "hex_id": "-28:9",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.699238
+    },
+    {
+      "hex_id": "-29:10",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 0.873645
+    },
+    {
+      "hex_id": "-29:11",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.12941
+    },
+    {
+      "hex_id": "-29:12",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.40492
+    },
+    {
+      "hex_id": "-29:13",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 3.48945
+    },
+    {
+      "hex_id": "-29:14",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 4.072475000000001
+    },
+    {
+      "hex_id": "-29:15",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.23723
+    },
+    {
+      "hex_id": "-29:17",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.25461
+    },
+    {
+      "hex_id": "-29:18",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.09764
+    },
+    {
+      "hex_id": "-29:20",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.8185
+    },
+    {
+      "hex_id": "-29:7",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.49533
+    },
+    {
+      "hex_id": "-29:8",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.6638695
+    },
+    {
+      "hex_id": "-29:9",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.826121
+    },
+    {
+      "hex_id": "-2:-1",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.48525
+    },
+    {
+      "hex_id": "-2:-3",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 8.28785
+    },
+    {
+      "hex_id": "-2:-4",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 5.443765
+    },
+    {
+      "hex_id": "-2:0",
+      "n_total": 7,
+      "n_valid": 7,
+      "n_missing": 0,
+      "value": 1.91837
+    },
+    {
+      "hex_id": "-2:2",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.38203
+    },
+    {
+      "hex_id": "-2:3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.09025
+    },
+    {
+      "hex_id": "-2:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.49489
+    },
+    {
+      "hex_id": "-30:10",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.6341115
+    },
+    {
+      "hex_id": "-30:11",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.08341
+    },
+    {
+      "hex_id": "-30:12",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.229165
+    },
+    {
+      "hex_id": "-30:13",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.34046
+    },
+    {
+      "hex_id": "-30:14",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.76051
+    },
+    {
+      "hex_id": "-30:15",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.205995
+    },
+    {
+      "hex_id": "-30:16",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.392395
+    },
+    {
+      "hex_id": "-30:18",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 3.88084
+    },
+    {
+      "hex_id": "-30:19",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.484585
+    },
+    {
+      "hex_id": "-30:20",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.7123
+    },
+    {
+      "hex_id": "-30:21",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.26096
+    },
+    {
+      "hex_id": "-30:8",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.514674
+    },
+    {
+      "hex_id": "-30:9",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.797469
+    },
+    {
+      "hex_id": "-31:10",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.414873
+    },
+    {
+      "hex_id": "-31:11",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 0.8462725
+    },
+    {
+      "hex_id": "-31:12",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.43598
+    },
+    {
+      "hex_id": "-31:13",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.38087
+    },
+    {
+      "hex_id": "-31:14",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.139795
+    },
+    {
+      "hex_id": "-31:15",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.55818
+    },
+    {
+      "hex_id": "-31:16",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 2.94283
+    },
+    {
+      "hex_id": "-31:17",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.806495
+    },
+    {
+      "hex_id": "-31:18",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 4.09959
+    },
+    {
+      "hex_id": "-31:20",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.41703
+    },
+    {
+      "hex_id": "-31:21",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 2.720125
+    },
+    {
+      "hex_id": "-31:23",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.02989
+    },
+    {
+      "hex_id": "-31:8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.198404
+    },
+    {
+      "hex_id": "-31:9",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.3780555
+    },
+    {
+      "hex_id": "-32:11",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.595175
+    },
+    {
+      "hex_id": "-32:12",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.54532
+    },
+    {
+      "hex_id": "-32:13",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.96913
+    },
+    {
+      "hex_id": "-32:14",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.22527
+    },
+    {
+      "hex_id": "-32:15",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 3.3731
+    },
+    {
+      "hex_id": "-32:16",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.92323
+    },
+    {
+      "hex_id": "-32:17",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.07387
+    },
+    {
+      "hex_id": "-32:18",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.159085
+    },
+    {
+      "hex_id": "-32:19",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.52104
+    },
+    {
+      "hex_id": "-32:20",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.47539
+    },
+    {
+      "hex_id": "-32:21",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.30281
+    },
+    {
+      "hex_id": "-32:22",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 5.23262
+    },
+    {
+      "hex_id": "-32:24",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.72107
+    },
+    {
+      "hex_id": "-32:26",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 6.60379
+    },
+    {
+      "hex_id": "-32:7",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.114564
+    },
+    {
+      "hex_id": "-32:9",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.388935
+    },
+    {
+      "hex_id": "-33:10",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.541731
+    },
+    {
+      "hex_id": "-33:11",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.70767
+    },
+    {
+      "hex_id": "-33:12",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.07766
+    },
+    {
+      "hex_id": "-33:13",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.16478
+    },
+    {
+      "hex_id": "-33:14",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 1.769535
+    },
+    {
+      "hex_id": "-33:15",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 2.77071
+    },
+    {
+      "hex_id": "-33:16",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.22624
+    },
+    {
+      "hex_id": "-33:17",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 3.72797
+    },
+    {
+      "hex_id": "-33:18",
+      "n_total": 7,
+      "n_valid": 7,
+      "n_missing": 0,
+      "value": 3.26404
+    },
+    {
+      "hex_id": "-33:19",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.768725
+    },
+    {
+      "hex_id": "-33:20",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.85202
+    },
+    {
+      "hex_id": "-33:21",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 3.18014
+    },
+    {
+      "hex_id": "-33:24",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.836625
+    },
+    {
+      "hex_id": "-33:26",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 3.697325
+    },
+    {
+      "hex_id": "-33:27",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 4.43555
+    },
+    {
+      "hex_id": "-33:7",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.190671
+    },
+    {
+      "hex_id": "-33:8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.0692952
+    },
+    {
+      "hex_id": "-33:9",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.421278
+    },
+    {
+      "hex_id": "-34:10",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.519423
+    },
+    {
+      "hex_id": "-34:11",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.856827
+    },
+    {
+      "hex_id": "-34:12",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.48194
+    },
+    {
+      "hex_id": "-34:14",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.095885
+    },
+    {
+      "hex_id": "-34:15",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.77197
+    },
+    {
+      "hex_id": "-34:16",
+      "n_total": 8,
+      "n_valid": 8,
+      "n_missing": 0,
+      "value": 2.369125
+    },
+    {
+      "hex_id": "-34:17",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.76082
+    },
+    {
+      "hex_id": "-34:18",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 3.514745
+    },
+    {
+      "hex_id": "-34:19",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.15287
+    },
+    {
+      "hex_id": "-34:20",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 2.85843
+    },
+    {
+      "hex_id": "-34:22",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.795045
+    },
+    {
+      "hex_id": "-34:23",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.37571
+    },
+    {
+      "hex_id": "-34:24",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.67684
+    },
+    {
+      "hex_id": "-34:25",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.46871
+    },
+    {
+      "hex_id": "-34:26",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 8.31742
+    },
+    {
+      "hex_id": "-34:27",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 4.05382
+    },
+    {
+      "hex_id": "-34:28",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 3.91173
+    },
+    {
+      "hex_id": "-34:8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.239376
+    },
+    {
+      "hex_id": "-34:9",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.602974
+    },
+    {
+      "hex_id": "-35:0",
+      "n_total": 9,
+      "n_valid": 9,
+      "n_missing": 0,
+      "value": 4.73929
+    },
+    {
+      "hex_id": "-35:1",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 3.249735
+    },
+    {
+      "hex_id": "-35:10",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.7587
+    },
+    {
+      "hex_id": "-35:11",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.931184
+    },
+    {
+      "hex_id": "-35:12",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.880082
+    },
+    {
+      "hex_id": "-35:13",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.18488
+    },
+    {
+      "hex_id": "-35:14",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.18787
+    },
+    {
+      "hex_id": "-35:15",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 1.51906
+    },
+    {
+      "hex_id": "-35:16",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 1.603095
+    },
+    {
+      "hex_id": "-35:17",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 3.33655
+    },
+    {
+      "hex_id": "-35:18",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 3.36626
+    },
+    {
+      "hex_id": "-35:19",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 3.70691
+    },
+    {
+      "hex_id": "-35:2",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.08835
+    },
+    {
+      "hex_id": "-35:20",
+      "n_total": 7,
+      "n_valid": 7,
+      "n_missing": 0,
+      "value": 4.08516
+    },
+    {
+      "hex_id": "-35:21",
+      "n_total": 7,
+      "n_valid": 7,
+      "n_missing": 0,
+      "value": 4.3788
+    },
+    {
+      "hex_id": "-35:22",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 4.01216
+    },
+    {
+      "hex_id": "-35:23",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 4.09432
+    },
+    {
+      "hex_id": "-35:24",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.46046
+    },
+    {
+      "hex_id": "-35:25",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.47266
+    },
+    {
+      "hex_id": "-35:27",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.61806
+    },
+    {
+      "hex_id": "-35:28",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.72033
+    },
+    {
+      "hex_id": "-35:8",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.208446
+    },
+    {
+      "hex_id": "-35:9",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.833738
+    },
+    {
+      "hex_id": "-36:1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 7.13747
+    },
+    {
+      "hex_id": "-36:10",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.5569315
+    },
+    {
+      "hex_id": "-36:11",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.7163975
+    },
+    {
+      "hex_id": "-36:12",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.655278
+    },
+    {
+      "hex_id": "-36:13",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.731272
+    },
+    {
+      "hex_id": "-36:14",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.094925
+    },
+    {
+      "hex_id": "-36:15",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.86187
+    },
+    {
+      "hex_id": "-36:16",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.688555
+    },
+    {
+      "hex_id": "-36:17",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 2.27911
+    },
+    {
+      "hex_id": "-36:18",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.00527
+    },
+    {
+      "hex_id": "-36:19",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 2.99449
+    },
+    {
+      "hex_id": "-36:2",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 1.497795
+    },
+    {
+      "hex_id": "-36:20",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 2.650895
+    },
+    {
+      "hex_id": "-36:21",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 4.439155
+    },
+    {
+      "hex_id": "-36:22",
+      "n_total": 7,
+      "n_valid": 7,
+      "n_missing": 0,
+      "value": 2.47446
+    },
+    {
+      "hex_id": "-36:23",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 2.413565
+    },
+    {
+      "hex_id": "-36:24",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.07422
+    },
+    {
+      "hex_id": "-36:25",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 2.63318
+    },
+    {
+      "hex_id": "-36:26",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 3.741285
+    },
+    {
+      "hex_id": "-36:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.104902
+    },
+    {
+      "hex_id": "-36:6",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.0200983
+    },
+    {
+      "hex_id": "-36:7",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.242864
+    },
+    {
+      "hex_id": "-36:8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.139728
+    },
+    {
+      "hex_id": "-36:9",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.225958
+    },
+    {
+      "hex_id": "-37:10",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.3134695
+    },
+    {
+      "hex_id": "-37:11",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.527885
+    },
+    {
+      "hex_id": "-37:12",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.690009
+    },
+    {
+      "hex_id": "-37:13",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.723122
+    },
+    {
+      "hex_id": "-37:14",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.611717
+    },
+    {
+      "hex_id": "-37:15",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.969047
+    },
+    {
+      "hex_id": "-37:16",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.43436
+    },
+    {
+      "hex_id": "-37:17",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.28116
+    },
+    {
+      "hex_id": "-37:18",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.09582
+    },
+    {
+      "hex_id": "-37:20",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.82916
+    },
+    {
+      "hex_id": "-37:21",
+      "n_total": 8,
+      "n_valid": 8,
+      "n_missing": 0,
+      "value": 3.908555
+    },
+    {
+      "hex_id": "-37:22",
+      "n_total": 8,
+      "n_valid": 8,
+      "n_missing": 0,
+      "value": 4.324175
+    },
+    {
+      "hex_id": "-37:24",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.16264
+    },
+    {
+      "hex_id": "-37:3",
+      "n_total": 8,
+      "n_valid": 8,
+      "n_missing": 0,
+      "value": 3.71683
+    },
+    {
+      "hex_id": "-37:4",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.302121
+    },
+    {
+      "hex_id": "-37:5",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.171676
+    },
+    {
+      "hex_id": "-37:6",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.155771
+    },
+    {
+      "hex_id": "-37:8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.225737
+    },
+    {
+      "hex_id": "-38:10",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.325298
+    },
+    {
+      "hex_id": "-38:11",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.125722
+    },
+    {
+      "hex_id": "-38:12",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.485452
+    },
+    {
+      "hex_id": "-38:13",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.5484115
+    },
+    {
+      "hex_id": "-38:14",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.735662
+    },
+    {
+      "hex_id": "-38:15",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.8531945
+    },
+    {
+      "hex_id": "-38:16",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 1.28172
+    },
+    {
+      "hex_id": "-38:17",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.73148
+    },
+    {
+      "hex_id": "-38:18",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.453175
+    },
+    {
+      "hex_id": "-38:19",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.5509
+    },
+    {
+      "hex_id": "-38:20",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 3.43256
+    },
+    {
+      "hex_id": "-38:21",
+      "n_total": 9,
+      "n_valid": 9,
+      "n_missing": 0,
+      "value": 3.49281
+    },
+    {
+      "hex_id": "-38:23",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 4.13868
+    },
+    {
+      "hex_id": "-38:24",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.93883
+    },
+    {
+      "hex_id": "-38:3",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.776765
+    },
+    {
+      "hex_id": "-38:4",
+      "n_total": 10,
+      "n_valid": 10,
+      "n_missing": 0,
+      "value": 4.318565
+    },
+    {
+      "hex_id": "-38:5",
+      "n_total": 9,
+      "n_valid": 9,
+      "n_missing": 0,
+      "value": 0.898176
+    },
+    {
+      "hex_id": "-38:6",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.2802845
+    },
+    {
+      "hex_id": "-38:7",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.278882
+    },
+    {
+      "hex_id": "-38:8",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.0617764
+    },
+    {
+      "hex_id": "-38:9",
+      "n_total": 7,
+      "n_valid": 7,
+      "n_missing": 0,
+      "value": 0.175668
+    },
+    {
+      "hex_id": "-39:10",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.1751
+    },
+    {
+      "hex_id": "-39:12",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.3672285
+    },
+    {
+      "hex_id": "-39:13",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.420356
+    },
+    {
+      "hex_id": "-39:14",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.6059975
+    },
+    {
+      "hex_id": "-39:15",
+      "n_total": 7,
+      "n_valid": 7,
+      "n_missing": 0,
+      "value": 0.517901
+    },
+    {
+      "hex_id": "-39:16",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 1.177975
+    },
+    {
+      "hex_id": "-39:17",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.53193
+    },
+    {
+      "hex_id": "-39:18",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.135565
+    },
+    {
+      "hex_id": "-39:20",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.938755
+    },
+    {
+      "hex_id": "-39:21",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.084115
+    },
+    {
+      "hex_id": "-39:22",
+      "n_total": 10,
+      "n_valid": 10,
+      "n_missing": 0,
+      "value": 2.40346
+    },
+    {
+      "hex_id": "-39:23",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 3.043035
+    },
+    {
+      "hex_id": "-39:24",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.935125
+    },
+    {
+      "hex_id": "-39:5",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 7.127694999999999
+    },
+    {
+      "hex_id": "-39:6",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.80563
+    },
+    {
+      "hex_id": "-39:9",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.291166
+    },
+    {
+      "hex_id": "-3:-1",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.09389
+    },
+    {
+      "hex_id": "-3:-2",
+      "n_total": 7,
+      "n_valid": 7,
+      "n_missing": 0,
+      "value": 5.75503
+    },
+    {
+      "hex_id": "-3:-3",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.90035
+    },
+    {
+      "hex_id": "-3:-4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.51329
+    },
+    {
+      "hex_id": "-3:0",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.7625225
+    },
+    {
+      "hex_id": "-3:3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.60794
+    },
+    {
+      "hex_id": "-40:10",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.4285125
+    },
+    {
+      "hex_id": "-40:13",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.375925
+    },
+    {
+      "hex_id": "-40:14",
+      "n_total": 8,
+      "n_valid": 8,
+      "n_missing": 0,
+      "value": 0.513418
+    },
+    {
+      "hex_id": "-40:15",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.7233345
+    },
+    {
+      "hex_id": "-40:16",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 1.41537
+    },
+    {
+      "hex_id": "-40:18",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.24364
+    },
+    {
+      "hex_id": "-40:19",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.33605
+    },
+    {
+      "hex_id": "-40:20",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.53215
+    },
+    {
+      "hex_id": "-40:21",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 2.05928
+    },
+    {
+      "hex_id": "-40:22",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 2.37369
+    },
+    {
+      "hex_id": "-40:23",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 3.10562
+    },
+    {
+      "hex_id": "-40:24",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.04309
+    },
+    {
+      "hex_id": "-40:6",
+      "n_total": 8,
+      "n_valid": 8,
+      "n_missing": 0,
+      "value": 9.75171
+    },
+    {
+      "hex_id": "-40:7",
+      "n_total": 9,
+      "n_valid": 9,
+      "n_missing": 0,
+      "value": 4.44499
+    },
+    {
+      "hex_id": "-40:8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.0666409
+    },
+    {
+      "hex_id": "-41:14",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.5231765
+    },
+    {
+      "hex_id": "-41:15",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.610026
+    },
+    {
+      "hex_id": "-41:16",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.785601
+    },
+    {
+      "hex_id": "-41:17",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.529235
+    },
+    {
+      "hex_id": "-41:18",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.26617
+    },
+    {
+      "hex_id": "-41:19",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.28477
+    },
+    {
+      "hex_id": "-41:20",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.726925
+    },
+    {
+      "hex_id": "-41:21",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.27943
+    },
+    {
+      "hex_id": "-41:22",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.91425
+    },
+    {
+      "hex_id": "-41:23",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.9239
+    },
+    {
+      "hex_id": "-41:6",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 13.233149999999998
+    },
+    {
+      "hex_id": "-41:7",
+      "n_total": 9,
+      "n_valid": 9,
+      "n_missing": 0,
+      "value": 12.7042
+    },
+    {
+      "hex_id": "-41:8",
+      "n_total": 7,
+      "n_valid": 7,
+      "n_missing": 0,
+      "value": 3.27915
+    },
+    {
+      "hex_id": "-41:9",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.3951345
+    },
+    {
+      "hex_id": "-42:17",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.0636305
+    },
+    {
+      "hex_id": "-42:21",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.23922
+    },
+    {
+      "hex_id": "-42:22",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.67483
+    },
+    {
+      "hex_id": "-42:8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.0492
+    },
+    {
+      "hex_id": "-42:9",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 4.990245
+    },
+    {
+      "hex_id": "-44:10",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.044429
+    },
+    {
+      "hex_id": "-44:11",
+      "n_total": 10,
+      "n_valid": 10,
+      "n_missing": 0,
+      "value": 0.549681
+    },
+    {
+      "hex_id": "-45:11",
+      "n_total": 14,
+      "n_valid": 14,
+      "n_missing": 0,
+      "value": 2.578135
+    },
+    {
+      "hex_id": "-46:24",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.22352
+    },
+    {
+      "hex_id": "-47:24",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 1.31287
+    },
+    {
+      "hex_id": "-47:25",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.31676
+    },
+    {
+      "hex_id": "-48:25",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.04943
+    },
+    {
+      "hex_id": "-4:-1",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 2.4453
+    },
+    {
+      "hex_id": "-4:-2",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.2263835
+    },
+    {
+      "hex_id": "-4:-3",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.83024
+    },
+    {
+      "hex_id": "-4:-4",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.77062
+    },
+    {
+      "hex_id": "-4:0",
+      "n_total": 9,
+      "n_valid": 9,
+      "n_missing": 0,
+      "value": 2.04532
+    },
+    {
+      "hex_id": "-4:1",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.5416
+    },
+    {
+      "hex_id": "-4:2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.938766
+    },
+    {
+      "hex_id": "-4:3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.35459
+    },
+    {
+      "hex_id": "-5:-1",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 3.73729
+    },
+    {
+      "hex_id": "-5:-2",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.3069
+    },
+    {
+      "hex_id": "-5:-3",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 6.13939
+    },
+    {
+      "hex_id": "-5:-4",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 10.109405
+    },
+    {
+      "hex_id": "-5:-5",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 4.97285
+    },
+    {
+      "hex_id": "-5:-6",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 6.76113
+    },
+    {
+      "hex_id": "-5:0",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.5819
+    },
+    {
+      "hex_id": "-5:1",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.0519
+    },
+    {
+      "hex_id": "-5:2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.42196
+    },
+    {
+      "hex_id": "-5:3",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 5.15172
+    },
+    {
+      "hex_id": "-5:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.85303
+    },
+    {
+      "hex_id": "-6:-1",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 14.3554
+    },
+    {
+      "hex_id": "-6:-2",
+      "n_total": 7,
+      "n_valid": 7,
+      "n_missing": 0,
+      "value": 8.27711
+    },
+    {
+      "hex_id": "-6:-3",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 5.66798
+    },
+    {
+      "hex_id": "-6:-4",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.58058
+    },
+    {
+      "hex_id": "-6:-5",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 4.38844
+    },
+    {
+      "hex_id": "-6:-6",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.79963
+    },
+    {
+      "hex_id": "-6:0",
+      "n_total": 8,
+      "n_valid": 8,
+      "n_missing": 0,
+      "value": 2.395515
+    },
+    {
+      "hex_id": "-6:1",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 1.58417
+    },
+    {
+      "hex_id": "-6:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 5.4157
+    },
+    {
+      "hex_id": "-6:6",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 5.274435
+    },
+    {
+      "hex_id": "-7:-1",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 1.59873
+    },
+    {
+      "hex_id": "-7:-2",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.94036
+    },
+    {
+      "hex_id": "-7:-3",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 2.729555
+    },
+    {
+      "hex_id": "-7:-4",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.73993
+    },
+    {
+      "hex_id": "-7:-5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.16214
+    },
+    {
+      "hex_id": "-7:0",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 5.96409
+    },
+    {
+      "hex_id": "-7:1",
+      "n_total": 8,
+      "n_valid": 8,
+      "n_missing": 0,
+      "value": 1.903365
+    },
+    {
+      "hex_id": "-7:2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.86249
+    },
+    {
+      "hex_id": "-7:4",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.495075
+    },
+    {
+      "hex_id": "-7:7",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 4.86838
+    },
+    {
+      "hex_id": "-8:-1",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 2.44096
+    },
+    {
+      "hex_id": "-8:-2",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.891352
+    },
+    {
+      "hex_id": "-8:-3",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.54133
+    },
+    {
+      "hex_id": "-8:-4",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 4.83458
+    },
+    {
+      "hex_id": "-8:0",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.03261
+    },
+    {
+      "hex_id": "-8:1",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 3.13659
+    },
+    {
+      "hex_id": "-8:2",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.31753
+    },
+    {
+      "hex_id": "-8:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.88771
+    },
+    {
+      "hex_id": "-8:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.0307
+    },
+    {
+      "hex_id": "-9:-1",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.764855
+    },
+    {
+      "hex_id": "-9:-2",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.5627155
+    },
+    {
+      "hex_id": "-9:-3",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.907135
+    },
+    {
+      "hex_id": "-9:-4",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.797425
+    },
+    {
+      "hex_id": "-9:0",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.44513
+    },
+    {
+      "hex_id": "-9:1",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.8804865
+    },
+    {
+      "hex_id": "-9:2",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.5249865
+    },
+    {
+      "hex_id": "-9:3",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.224035
+    },
+    {
+      "hex_id": "-9:4",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.713635
+    },
+    {
+      "hex_id": "-9:7",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.09466
+    },
+    {
+      "hex_id": "0:-1",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.21388
+    },
+    {
+      "hex_id": "0:-2",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 4.207325
+    },
+    {
+      "hex_id": "0:-4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.57808
+    },
+    {
+      "hex_id": "0:-5",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.740595
+    },
+    {
+      "hex_id": "0:0",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.62344
+    },
+    {
+      "hex_id": "0:1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.11363
+    },
+    {
+      "hex_id": "0:2",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.327765
+    },
+    {
+      "hex_id": "0:9",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.59265
+    },
+    {
+      "hex_id": "10:-3",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.12429
+    },
+    {
+      "hex_id": "10:-4",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 1.27942
+    },
+    {
+      "hex_id": "10:-5",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.87928
+    },
+    {
+      "hex_id": "10:-7",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.35516
+    },
+    {
+      "hex_id": "10:1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.54783
+    },
+    {
+      "hex_id": "10:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 5.6356
+    },
+    {
+      "hex_id": "10:6",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 4.75332
+    },
+    {
+      "hex_id": "11:-1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.0146
+    },
+    {
+      "hex_id": "11:-3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.98922
+    },
+    {
+      "hex_id": "11:-4",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.999686
+    },
+    {
+      "hex_id": "11:-5",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.002044
+    },
+    {
+      "hex_id": "11:-6",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.0730295
+    },
+    {
+      "hex_id": "11:-7",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.26033
+    },
+    {
+      "hex_id": "11:10",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.72461
+    },
+    {
+      "hex_id": "11:3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 9.20004
+    },
+    {
+      "hex_id": "11:4",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 6.0855
+    },
+    {
+      "hex_id": "12:-4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.74504
+    },
+    {
+      "hex_id": "13:15",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.93831
+    },
+    {
+      "hex_id": "13:16",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.44194
+    },
+    {
+      "hex_id": "13:18",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.84997
+    },
+    {
+      "hex_id": "14:1",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 4.44849
+    },
+    {
+      "hex_id": "15:1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.88604
+    },
+    {
+      "hex_id": "15:13",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 5.90701
+    },
+    {
+      "hex_id": "15:14",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 6.35375
+    },
+    {
+      "hex_id": "15:2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.58409
+    },
+    {
+      "hex_id": "16:-1",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.7112075
+    },
+    {
+      "hex_id": "16:1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.72095
+    },
+    {
+      "hex_id": "17:-1",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 0.8241495
+    },
+    {
+      "hex_id": "17:-2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.925113
+    },
+    {
+      "hex_id": "17:17",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 5.59325
+    },
+    {
+      "hex_id": "18:-2",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.2926475
+    },
+    {
+      "hex_id": "18:16",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.09576
+    },
+    {
+      "hex_id": "18:17",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.15517
+    },
+    {
+      "hex_id": "19:-2",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.054935
+    },
+    {
+      "hex_id": "19:-3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.37739
+    },
+    {
+      "hex_id": "19:0",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 5.29969
+    },
+    {
+      "hex_id": "19:1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 9.07288
+    },
+    {
+      "hex_id": "19:15",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.95496
+    },
+    {
+      "hex_id": "19:2",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 4.818015
+    },
+    {
+      "hex_id": "19:3",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 4.075135
+    },
+    {
+      "hex_id": "19:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 7.37583
+    },
+    {
+      "hex_id": "19:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 12.1536
+    },
+    {
+      "hex_id": "1:-1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.11662
+    },
+    {
+      "hex_id": "1:-2",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 3.34164
+    },
+    {
+      "hex_id": "1:0",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.26907
+    },
+    {
+      "hex_id": "1:1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.61936
+    },
+    {
+      "hex_id": "1:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.39427
+    },
+    {
+      "hex_id": "1:7",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.66082
+    },
+    {
+      "hex_id": "1:8",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.022895
+    },
+    {
+      "hex_id": "1:9",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.774735
+    },
+    {
+      "hex_id": "20:-2",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.87342
+    },
+    {
+      "hex_id": "20:-3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.85284
+    },
+    {
+      "hex_id": "20:13",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.97324
+    },
+    {
+      "hex_id": "20:15",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.9112
+    },
+    {
+      "hex_id": "20:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 8.4311
+    },
+    {
+      "hex_id": "20:6",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 5.40609
+    },
+    {
+      "hex_id": "21:-2",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 5.04322
+    },
+    {
+      "hex_id": "21:-3",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 5.48634
+    },
+    {
+      "hex_id": "21:1",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 7.192055
+    },
+    {
+      "hex_id": "21:14",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 9.26387
+    },
+    {
+      "hex_id": "21:15",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.72354
+    },
+    {
+      "hex_id": "21:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.89169
+    },
+    {
+      "hex_id": "22:-2",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 4.71464
+    },
+    {
+      "hex_id": "22:-3",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 4.46798
+    },
+    {
+      "hex_id": "22:-4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.07268
+    },
+    {
+      "hex_id": "22:0",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 6.12853
+    },
+    {
+      "hex_id": "22:1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 5.73395
+    },
+    {
+      "hex_id": "22:12",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 7.283215
+    },
+    {
+      "hex_id": "22:13",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 9.54358
+    },
+    {
+      "hex_id": "22:14",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 6.2351
+    },
+    {
+      "hex_id": "22:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 9.0435
+    },
+    {
+      "hex_id": "23:-2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.25338
+    },
+    {
+      "hex_id": "23:-3",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 4.16553
+    },
+    {
+      "hex_id": "23:1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 5.13813
+    },
+    {
+      "hex_id": "23:12",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 11.6443
+    },
+    {
+      "hex_id": "23:13",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 10.7456
+    },
+    {
+      "hex_id": "23:3",
+      "n_total": 7,
+      "n_valid": 7,
+      "n_missing": 0,
+      "value": 8.79573
+    },
+    {
+      "hex_id": "24:-2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.06582
+    },
+    {
+      "hex_id": "24:-3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.73057
+    },
+    {
+      "hex_id": "24:-4",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 4.45716
+    },
+    {
+      "hex_id": "24:11",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 7.32627
+    },
+    {
+      "hex_id": "24:12",
+      "n_total": 7,
+      "n_valid": 7,
+      "n_missing": 0,
+      "value": 12.6417
+    },
+    {
+      "hex_id": "24:2",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 7.94019
+    },
+    {
+      "hex_id": "24:3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 5.94157
+    },
+    {
+      "hex_id": "25:-3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.89931
+    },
+    {
+      "hex_id": "25:-4",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 5.50948
+    },
+    {
+      "hex_id": "25:-5",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 4.11005
+    },
+    {
+      "hex_id": "25:-6",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.84586
+    },
+    {
+      "hex_id": "25:-7",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 2.691765
+    },
+    {
+      "hex_id": "25:-8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.07724
+    },
+    {
+      "hex_id": "25:1",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 8.765355
+    },
+    {
+      "hex_id": "25:10",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 11.5293
+    },
+    {
+      "hex_id": "25:2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 10.3394
+    },
+    {
+      "hex_id": "26:-6",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 4.114475
+    },
+    {
+      "hex_id": "26:-7",
+      "n_total": 10,
+      "n_valid": 10,
+      "n_missing": 0,
+      "value": 3.83062
+    },
+    {
+      "hex_id": "26:-8",
+      "n_total": 13,
+      "n_valid": 13,
+      "n_missing": 0,
+      "value": 4.15508
+    },
+    {
+      "hex_id": "26:-9",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 6.26007
+    },
+    {
+      "hex_id": "26:0",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 11.764
+    },
+    {
+      "hex_id": "27:-1",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 11.51455
+    },
+    {
+      "hex_id": "27:-5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.94551
+    },
+    {
+      "hex_id": "27:-6",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.84996
+    },
+    {
+      "hex_id": "27:-7",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 4.9598
+    },
+    {
+      "hex_id": "27:-8",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.6702
+    },
+    {
+      "hex_id": "27:0",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 9.106449999999999
+    },
+    {
+      "hex_id": "28:-1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 8.81346
+    },
+    {
+      "hex_id": "2:-2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.4689
+    },
+    {
+      "hex_id": "2:-3",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 2.43597
+    },
+    {
+      "hex_id": "2:-4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.971795
+    },
+    {
+      "hex_id": "2:1",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.7751
+    },
+    {
+      "hex_id": "30:1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 5.77462
+    },
+    {
+      "hex_id": "3:-1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.832391
+    },
+    {
+      "hex_id": "3:-2",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.5391385
+    },
+    {
+      "hex_id": "3:-3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.21426
+    },
+    {
+      "hex_id": "3:-5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.66624
+    },
+    {
+      "hex_id": "3:0",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.893937
+    },
+    {
+      "hex_id": "3:1",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.986695
+    },
+    {
+      "hex_id": "3:17",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.72705
+    },
+    {
+      "hex_id": "3:2",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.950785
+    },
+    {
+      "hex_id": "3:3",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.88052
+    },
+    {
+      "hex_id": "3:5",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.004175
+    },
+    {
+      "hex_id": "4:-2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.13509
+    },
+    {
+      "hex_id": "4:-3",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 0.405376
+    },
+    {
+      "hex_id": "4:-4",
+      "n_total": 7,
+      "n_valid": 7,
+      "n_missing": 0,
+      "value": 2.18539
+    },
+    {
+      "hex_id": "4:-5",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 2.530645
+    },
+    {
+      "hex_id": "4:0",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.04603
+    },
+    {
+      "hex_id": "4:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.69866
+    },
+    {
+      "hex_id": "4:7",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.15422
+    },
+    {
+      "hex_id": "5:-1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.74603
+    },
+    {
+      "hex_id": "5:-2",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.35949
+    },
+    {
+      "hex_id": "5:-3",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 0.6267755
+    },
+    {
+      "hex_id": "5:-4",
+      "n_total": 6,
+      "n_valid": 6,
+      "n_missing": 0,
+      "value": 1.0530235
+    },
+    {
+      "hex_id": "5:-5",
+      "n_total": 9,
+      "n_valid": 9,
+      "n_missing": 0,
+      "value": 4.07653
+    },
+    {
+      "hex_id": "5:-6",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 1.6212
+    },
+    {
+      "hex_id": "5:0",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 6.01381
+    },
+    {
+      "hex_id": "5:3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 6.43668
+    },
+    {
+      "hex_id": "5:6",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.45453
+    },
+    {
+      "hex_id": "6:-1",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.51155
+    },
+    {
+      "hex_id": "6:-2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.31472
+    },
+    {
+      "hex_id": "6:-3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.88281
+    },
+    {
+      "hex_id": "6:-4",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 1.88288
+    },
+    {
+      "hex_id": "6:-5",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 3.02054
+    },
+    {
+      "hex_id": "6:-6",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.03799
+    },
+    {
+      "hex_id": "6:1",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 6.67337
+    },
+    {
+      "hex_id": "6:22",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.760336
+    },
+    {
+      "hex_id": "6:3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 6.44646
+    },
+    {
+      "hex_id": "6:4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.82297
+    },
+    {
+      "hex_id": "6:6",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.29295
+    },
+    {
+      "hex_id": "6:7",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 2.056205
+    },
+    {
+      "hex_id": "6:9",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.10433
+    },
+    {
+      "hex_id": "7:-2",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 3.38437
+    },
+    {
+      "hex_id": "7:-3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.00232
+    },
+    {
+      "hex_id": "7:-4",
+      "n_total": 5,
+      "n_valid": 5,
+      "n_missing": 0,
+      "value": 0.641976
+    },
+    {
+      "hex_id": "7:-5",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 0.4203805
+    },
+    {
+      "hex_id": "7:-6",
+      "n_total": 3,
+      "n_valid": 3,
+      "n_missing": 0,
+      "value": 1.15338
+    },
+    {
+      "hex_id": "7:1",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 4.19918
+    },
+    {
+      "hex_id": "7:24",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.73203
+    },
+    {
+      "hex_id": "7:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.27937
+    },
+    {
+      "hex_id": "8:-2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.87532
+    },
+    {
+      "hex_id": "8:-3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.17151
+    },
+    {
+      "hex_id": "8:-5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.05592
+    },
+    {
+      "hex_id": "8:-6",
+      "n_total": 4,
+      "n_valid": 4,
+      "n_missing": 0,
+      "value": 1.1729405
+    },
+    {
+      "hex_id": "8:0",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.78133
+    },
+    {
+      "hex_id": "8:1",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.45896
+    },
+    {
+      "hex_id": "8:16",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.86967
+    },
+    {
+      "hex_id": "8:2",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.53435
+    },
+    {
+      "hex_id": "8:3",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.88614
+    },
+    {
+      "hex_id": "8:9",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 1.68749
+    },
+    {
+      "hex_id": "9:-4",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 0.631436
+    },
+    {
+      "hex_id": "9:-5",
+      "n_total": 2,
+      "n_valid": 2,
+      "n_missing": 0,
+      "value": 1.1679765
+    },
+    {
+      "hex_id": "9:-6",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.0356
+    },
+    {
+      "hex_id": "9:19",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 3.7528
+    },
+    {
+      "hex_id": "9:5",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 4.33995
+    },
+    {
+      "hex_id": "9:7",
+      "n_total": 1,
+      "n_valid": 1,
+      "n_missing": 0,
+      "value": 2.39624
+    }
+  ],
+  "gauge_membership": {
+    "1151": "13:15",
+    "1176": "13:16",
+    "1342": "13:18",
+    "1534": "15:14",
+    "1538": "15:14",
+    "1556": "15:14",
+    "1563": "15:14",
+    "1566": "15:13",
+    "1576": "20:5",
+    "1578": "9:19",
+    "1593": "15:14",
+    "1596": "7:24",
+    "1608": "15:14",
+    "2007": "22:13",
+    "2010": "22:13",
+    "2017": "21:15",
+    "2026": "22:13",
+    "2027": "22:13",
+    "2030": "22:13",
+    "2034": "22:13",
+    "2040": "22:14",
+    "2043": "21:14",
+    "2048": "21:15",
+    "2057": "20:15",
+    "2058": "20:15",
+    "2062": "20:15",
+    "2090": "24:12",
+    "2091": "23:13",
+    "2094": "23:12",
+    "2095": "23:13",
+    "2097": "24:12",
+    "2103": "23:13",
+    "2106": "24:12",
+    "2107": "24:12",
+    "2111": "24:12",
+    "2115": "24:12",
+    "2122": "24:12",
+    "2126": "25:10",
+    "2128": "25:10",
+    "2148": "23:12",
+    "2152": "23:12",
+    "2164": "24:11",
+    "2180": "22:12",
+    "2187": "20:13",
+    "2190": "19:15",
+    "2191": "19:15",
+    "2193": "19:15",
+    "2198": "18:16",
+    "2199": "18:16",
+    "2203": "18:16",
+    "2206": "18:17",
+    "2208": "18:17",
+    "2212": "17:17",
+    "2226": "21:14",
+    "2227": "21:14",
+    "2229": "22:12",
+    "2253": "25:10",
+    "2258": "21:15",
+    "2269": "22:12",
+    "2270": "23:12",
+    "2271": "21:14",
+    "2272": "21:14",
+    "2275": "22:12",
+    "2279": "23:12",
+    "3001": "5:-2",
+    "3003": "4:-2",
+    "3056": "5:-2",
+    "3059": "5:-3",
+    "3068": "3:-1",
+    "3073": "2:1",
+    "3074": "2:1",
+    "3076": "2:1",
+    "3079": "3:1",
+    "3083": "5:-1",
+    "3085": "4:0",
+    "3087": "3:2",
+    "3095": "8:-3",
+    "3096": "8:-2",
+    "3127": "8:0",
+    "3135": "7:1",
+    "3136": "7:1",
+    "3147": "6:3",
+    "3150": "5:3",
+    "3155": "3:5",
+    "3156": "4:7",
+    "3157": "5:6",
+    "3159": "6:6",
+    "3160": "6:7",
+    "3163": "10:1",
+    "3175": "8:2",
+    "3178": "8:3",
+    "3198": "6:4",
+    "3201": "7:5",
+    "3202": "6:7",
+    "3207": "6:9",
+    "3210": "8:9",
+    "3218": "9:5",
+    "3219": "10:6",
+    "3234": "10:5",
+    "3247": "11:4",
+    "3248": "10:6",
+    "3252": "11:4",
+    "3261": "10:6",
+    "3277": "11:10",
+    "3291": "9:7",
+    "3334": "1:7",
+    "3341": "1:9",
+    "3344": "1:9",
+    "3355": "1:8",
+    "3414": "3:17",
+    "3507": "8:16",
+    "3554": "4:4",
+    "3569": "8:1",
+    "3577": "3:3",
+    "3579": "0:9",
+    "3581": "3:3",
+    "3597": "1:8",
+    "3603": "5:-2",
+    "3607": "7:1",
+    "3627": "11:3",
+    "3630": "3:5",
+    "3637": "3:1",
+    "3641": "7:1",
+    "3669": "3:0",
+    "3881": "6:22",
+    "4005": "20:6",
+    "4012": "20:6",
+    "4027": "21:5",
+    "4032": "23:3",
+    "4033": "23:3",
+    "4034": "22:4",
+    "4036": "23:3",
+    "4038": "23:3",
+    "4043": "23:3",
+    "4058": "25:2",
+    "4068": "24:3",
+    "4071": "24:2",
+    "4085": "25:1",
+    "4090": "25:1",
+    "4095": "26:0",
+    "4102": "27:0",
+    "4105": "27:0",
+    "4107": "28:-1",
+    "4116": "26:0",
+    "4141": "27:-1",
+    "4145": "27:-1",
+    "4148": "27:-1",
+    "4158": "26:0",
+    "4159": "26:0",
+    "4160": "26:0",
+    "4173": "24:2",
+    "4175": "24:2",
+    "4179": "23:3",
+    "4181": "23:3",
+    "4197": "20:6",
+    "4212": "30:1",
+    "4215": "20:6",
+    "4226": "27:-1",
+    "4235": "25:1",
+    "4238": "25:1",
+    "4240": "20:6",
+    "5036": "22:-4",
+    "5052": "22:-3",
+    "5055": "21:-3",
+    "5063": "21:-2",
+    "5072": "21:-3",
+    "5074": "21:-3",
+    "5081": "21:-2",
+    "5082": "22:-3",
+    "5085": "27:-7",
+    "5092": "26:-7",
+    "5094": "26:-6",
+    "5105": "25:-6",
+    "5122": "27:-7",
+    "5128": "26:-6",
+    "5132": "26:-6",
+    "5135": "26:-6",
+    "5148": "26:-7",
+    "5151": "26:-7",
+    "5160": "26:-7",
+    "5166": "26:-7",
+    "5167": "26:-7",
+    "5171": "25:-6",
+    "5190": "26:-7",
+    "5199": "26:-7",
+    "5202": "26:-7",
+    "5208": "26:-8",
+    "5211": "25:-7",
+    "5216": "26:-8",
+    "5217": "26:-8",
+    "5237": "25:-7",
+    "5238": "25:-7",
+    "5239": "25:-7",
+    "5250": "25:-5",
+    "5254": "25:-5",
+    "5262": "25:-4",
+    "5263": "25:-4",
+    "5277": "25:-5",
+    "5280": "26:-6",
+    "5287": "25:-5",
+    "5292": "25:-5",
+    "5311": "24:-4",
+    "5313": "25:-3",
+    "5319": "24:-4",
+    "5321": "24:-4",
+    "5328": "23:-3",
+    "5336": "24:-2",
+    "5347": "23:-3",
+    "5352": "23:-2",
+    "5354": "23:-3",
+    "5358": "22:-2",
+    "5370": "21:-2",
+    "5383": "22:-2",
+    "5403": "22:0",
+    "5420": "21:1",
+    "5440": "21:1",
+    "5449": "19:2",
+    "5453": "19:3",
+    "5458": "19:3",
+    "5459": "19:3",
+    "5461": "19:3",
+    "5507": "27:-6",
+    "5529": "27:-7",
+    "5539": "27:-7",
+    "5552": "27:-7",
+    "5555": "27:-8",
+    "5580": "26:-8",
+    "5583": "26:-8",
+    "5589": "26:-8",
+    "5597": "25:-8",
+    "5600": "26:-8",
+    "5604": "26:-8",
+    "5607": "26:-8",
+    "5611": "26:-8",
+    "5613": "26:-8",
+    "5635": "26:-8",
+    "5642": "26:-8",
+    "5652": "26:-9",
+    "5662": "27:-7",
+    "5663": "22:0",
+    "5664": "19:5",
+    "5673": "23:1",
+    "5674": "22:-3",
+    "5733": "22:1",
+    "5736": "26:-6",
+    "5740": "19:2",
+    "5746": "22:-2",
+    "5749": "19:4",
+    "5758": "24:-3",
+    "5759": "27:-5",
+    "5765": "26:-7",
+    "6076": "11:-6",
+    "6077": "11:-6",
+    "6089": "11:-7",
+    "6092": "11:-5",
+    "6108": "12:-4",
+    "6121": "11:-5",
+    "6133": "10:-5",
+    "6134": "10:-5",
+    "6139": "10:-4",
+    "6141": "11:-4",
+    "6143": "11:-4",
+    "6155": "10:-3",
+    "6159": "10:-4",
+    "6163": "10:-4",
+    "6171": "10:-5",
+    "6175": "10:-4",
+    "6178": "10:-4",
+    "6180": "11:-4",
+    "6187": "11:-3",
+    "6190": "10:-3",
+    "6218": "11:-1",
+    "6256": "16:-1",
+    "6259": "16:-1",
+    "6319": "15:2",
+    "6331": "14:1",
+    "6345": "14:1",
+    "6349": "15:1",
+    "6387": "16:1",
+    "6403": "17:-1",
+    "6407": "17:-1",
+    "6411": "17:-1",
+    "6414": "17:-1",
+    "6424": "18:-2",
+    "6437": "18:-2",
+    "6443": "19:-3",
+    "6479": "19:0",
+    "6485": "19:0",
+    "6488": "19:0",
+    "6491": "20:-2",
+    "6492": "20:-2",
+    "6496": "20:-2",
+    "6506": "19:-2",
+    "6507": "19:-2",
+    "6535": "17:-1",
+    "6545": "10:-7",
+    "6549": "17:-2",
+    "6551": "19:1",
+    "6562": "17:-1",
+    "6563": "21:-3",
+    "6568": "20:-3",
+    "6574": "21:-3",
+    "7003": "5:-4",
+    "7004": "6:-4",
+    "7006": "5:-3",
+    "7008": "5:0",
+    "7009": "5:0",
+    "7011": "5:0",
+    "7012": "5:0",
+    "7015": "5:0",
+    "7016": "6:1",
+    "7017": "6:1",
+    "7020": "6:-1",
+    "7022": "6:-1",
+    "7024": "6:-2",
+    "7028": "6:-1",
+    "7029": "7:-2",
+    "7031": "7:-2",
+    "7033": "7:-2",
+    "7034": "7:-3",
+    "7036": "6:-3",
+    "7039": "6:-4",
+    "7056": "5:-6",
+    "7060": "7:-6",
+    "7062": "5:-6",
+    "7063": "5:-6",
+    "7064": "5:-6",
+    "7066": "6:-5",
+    "7072": "8:-6",
+    "7076": "7:-6",
+    "7080": "9:-6",
+    "7087": "8:-6",
+    "7091": "7:-6",
+    "7093": "9:-4",
+    "7096": "9:-5",
+    "7098": "8:-6",
+    "7099": "8:-6",
+    "7102": "7:-5",
+    "7104": "9:-5",
+    "7112": "8:-5",
+    "7118": "7:-5",
+    "7119": "7:-5",
+    "7130": "7:-5",
+    "7142": "7:-4",
+    "7148": "7:-4",
+    "7152": "6:-4",
+    "7156": "6:-4",
+    "7161": "6:-5",
+    "7167": "5:-5",
+    "7168": "5:-5",
+    "7171": "5:-5",
+    "7172": "5:-5",
+    "7174": "5:-5",
+    "7176": "5:-5",
+    "7180": "5:-5",
+    "7185": "6:-6",
+    "7187": "5:-5",
+    "7190": "10:-7",
+    "7197": "7:-4",
+    "7200": "5:-5",
+    "7202": "7:-4",
+    "7203": "7:-4",
+    "8095": "3:-5",
+    "8097": "4:-5",
+    "8099": "4:-5",
+    "8120": "4:-4",
+    "8129": "5:-4",
+    "8134": "5:-4",
+    "8139": "4:-3",
+    "8145": "5:-4",
+    "8147": "5:-4",
+    "8150": "5:-4",
+    "8155": "4:-5",
+    "8161": "4:-4",
+    "8162": "4:-4",
+    "8172": "4:-4",
+    "8184": "4:-4",
+    "8186": "4:-3",
+    "8188": "4:-3",
+    "8194": "3:-2",
+    "8198": "3:-2",
+    "8204": "2:-3",
+    "8209": "2:-2",
+    "8217": "2:-3",
+    "8219": "2:-3",
+    "8230": "1:-2",
+    "8233": "1:-2",
+    "8241": "1:-2",
+    "8246": "1:-2",
+    "8249": "1:-1",
+    "8251": "1:0",
+    "8254": "0:1",
+    "8256": "0:2",
+    "8281": "0:2",
+    "8288": "-2:4",
+    "8289": "-2:3",
+    "8290": "-2:2",
+    "8291": "-3:3",
+    "8306": "0:-1",
+    "8313": "-2:2",
+    "8317": "0:-2",
+    "8321": "0:-1",
+    "8323": "0:0",
+    "8326": "0:-2",
+    "8334": "-1:0",
+    "8339": "-1:-1",
+    "8347": "0:-1",
+    "8356": "-2:0",
+    "8359": "-1:0",
+    "8361": "-4:2",
+    "8364": "-5:3",
+    "8367": "2:-4",
+    "8374": "-4:3",
+    "8375": "-1:2",
+    "8379": "4:-5",
+    "8384": "4:-4",
+    "8389": "1:1",
+    "8410": "4:-4",
+    "8411": "3:-3",
+    "8412": "1:-2",
+    "8582": "-2:0",
+    "9112": "0:-4",
+    "9115": "-1:-4",
+    "9122": "-1:-5",
+    "9124": "0:-5",
+    "9134": "0:-5",
+    "9138": "-1:-5",
+    "9164": "-2:-4",
+    "9166": "-2:-4",
+    "9169": "-2:-4",
+    "9189": "-3:-3",
+    "9191": "-3:-3",
+    "9194": "-2:-4",
+    "9199": "-3:-3",
+    "9204": "-4:-2",
+    "9207": "-4:-3",
+    "9213": "-4:-2",
+    "9215": "-5:-3",
+    "9216": "-4:-4",
+    "9217": "-4:-4",
+    "9223": "-4:-3",
+    "9226": "-4:-3",
+    "9235": "-4:-3",
+    "9237": "-5:-2",
+    "9253": "-3:-2",
+    "9256": "-2:-3",
+    "9264": "-3:-2",
+    "9279": "-2:-3",
+    "9282": "-3:-2",
+    "9283": "-2:-3",
+    "9285": "-3:-2",
+    "9286": "-3:-2",
+    "9290": "-3:-2",
+    "9294": "-4:-1",
+    "9297": "-4:-2",
+    "9298": "-4:-2",
+    "9301": "-5:-1",
+    "9302": "-5:-1",
+    "9304": "-4:-1",
+    "9306": "-4:-1",
+    "9309": "-4:0",
+    "9312": "-3:-1",
+    "9316": "-4:0",
+    "9318": "-3:-1",
+    "9319": "-3:-1",
+    "9323": "-4:0",
+    "9324": "-4:0",
+    "9326": "-4:0",
+    "9329": "-4:0",
+    "9331": "-4:1",
+    "9333": "-2:-1",
+    "9335": "-2:0",
+    "9337": "-2:0",
+    "9341": "-2:-1",
+    "9342": "-2:0",
+    "9343": "-2:-1",
+    "9344": "-2:0",
+    "9345": "-2:0",
+    "9355": "-3:0",
+    "9356": "-4:1",
+    "9370": "-5:2",
+    "9371": "-5:3",
+    "9372": "-5:4",
+    "9374": "-5:3",
+    "9380": "-7:4",
+    "9383": "-7:4",
+    "9384": "-8:5",
+    "9385": "-9:7",
+    "9396": "-6:6",
+    "9397": "-6:5",
+    "9401": "-10:8",
+    "9403": "3:2",
+    "9404": "3:3",
+    "9417": "1:4",
+    "9422": "-10:12",
+    "9425": "-12:12",
+    "9427": "-13:13",
+    "9499": "-7:7",
+    "9511": "-4:0",
+    "9520": "-4:-1",
+    "9521": "-4:0",
+    "9522": "-4:-3",
+    "9546": "-4:0",
+    "9547": "-3:-2",
+    "9560": "-7:7",
+    "9563": "-3:0",
+    "9566": "-3:-4",
+    "9568": "-6:6",
+    "9577": "-4:-4",
+    "9588": "-4:1",
+    "10042": "-6:-4",
+    "10044": "-6:-3",
+    "10048": "-7:-3",
+    "10058": "-5:-4",
+    "10059": "-5:-4",
+    "10060": "-5:-5",
+    "10062": "-5:-5",
+    "10066": "-5:-6",
+    "10073": "-6:-6",
+    "10075": "-6:-5",
+    "10078": "-5:-6",
+    "10100": "-6:-5",
+    "10103": "-7:-4",
+    "10108": "-6:-4",
+    "10110": "-7:-3",
+    "10111": "-7:-3",
+    "10112": "-7:-3",
+    "10117": "-7:-3",
+    "10120": "-7:-4",
+    "10122": "-8:-3",
+    "10126": "-7:-5",
+    "10127": "-8:-4",
+    "10132": "-9:-3",
+    "10133": "-8:-3",
+    "10134": "-8:-3",
+    "10137": "-8:-4",
+    "10138": "-8:-4",
+    "10139": "-9:-3",
+    "10144": "-8:-2",
+    "10148": "-9:-4",
+    "10150": "-9:-4",
+    "10151": "-10:-3",
+    "10153": "-9:-2",
+    "10168": "-8:-2",
+    "10172": "-9:-2",
+    "10174": "-7:-2",
+    "10175": "-7:-2",
+    "10176": "-8:-1",
+    "10177": "-9:-1",
+    "10184": "-7:-2",
+    "10188": "-8:-1",
+    "10194": "-9:-1",
+    "10198": "-9:-1",
+    "10202": "-10:0",
+    "10204": "-8:-1",
+    "10205": "-9:0",
+    "10208": "-8:-1",
+    "10209": "-9:0",
+    "10211": "-9:0",
+    "10215": "-7:-1",
+    "10216": "-8:0",
+    "10219": "-9:0",
+    "10220": "-9:0",
+    "10221": "-7:-1",
+    "10223": "-7:-1",
+    "10225": "-8:0",
+    "10231": "-9:1",
+    "10232": "-5:-2",
+    "10240": "-6:-2",
+    "10246": "-7:0",
+    "10259": "-6:-2",
+    "10264": "-5:-3",
+    "10266": "-6:-2",
+    "10276": "-6:-3",
+    "10277": "-6:-2",
+    "10279": "-6:-2",
+    "10287": "-7:-1",
+    "10292": "-6:-1",
+    "10298": "-9:1",
+    "10301": "-9:2",
+    "10305": "-9:2",
+    "10308": "-10:2",
+    "10315": "-5:-1",
+    "10317": "-4:-1",
+    "10322": "-6:1",
+    "10323": "-6:1",
+    "10332": "-5:-1",
+    "10338": "-5:-1",
+    "10341": "-5:0",
+    "10342": "-6:0",
+    "10343": "-5:0",
+    "10349": "-6:0",
+    "10357": "-6:0",
+    "10369": "-6:0",
+    "10378": "-5:1",
+    "10379": "-5:1",
+    "10380": "-5:1",
+    "10384": "-6:0",
+    "10385": "-7:0",
+    "10387": "-7:1",
+    "10392": "-6:0",
+    "10394": "-7:1",
+    "10396": "-7:1",
+    "10400": "-7:1",
+    "10402": "-7:2",
+    "10404": "-6:1",
+    "10407": "-8:1",
+    "10411": "-8:1",
+    "10413": "-7:0",
+    "10414": "-7:1",
+    "10416": "-8:1",
+    "10423": "-9:3",
+    "10424": "-9:3",
+    "10426": "-10:3",
+    "10428": "-10:3",
+    "10430": "-10:2",
+    "10432": "-11:3",
+    "10441": "-11:3",
+    "10444": "-10:2",
+    "10453": "-8:4",
+    "10460": "-9:4",
+    "10461": "-9:4",
+    "10464": "-10:4",
+    "10466": "-11:5",
+    "10468": "-12:4",
+    "10475": "-13:4",
+    "10476": "-14:5",
+    "10478": "-13:6",
+    "10488": "-10:6",
+    "10489": "-12:6",
+    "10497": "-16:10",
+    "10505": "-16:8",
+    "10509": "-17:9",
+    "10511": "-19:10",
+    "10519": "-11:-2",
+    "10539": "-11:0",
+    "10548": "-11:1",
+    "10549": "-12:1",
+    "10554": "-10:0",
+    "10556": "-6:-2",
+    "10557": "-8:0",
+    "10560": "-7:-3",
+    "10566": "-5:-3",
+    "10567": "-6:-2",
+    "10570": "-7:1",
+    "10571": "-5:0",
+    "10573": "-5:0",
+    "10579": "-5:0",
+    "10582": "-5:-1",
+    "10583": "-8:1",
+    "10584": "-6:0",
+    "10585": "-8:-2",
+    "10586": "-8:2",
+    "10587": "-12:4",
+    "10589": "-6:-1",
+    "10591": "-6:1",
+    "10594": "-6:-4",
+    "10595": "-12:1",
+    "10620": "-7:1",
+    "10623": "-8:1",
+    "10625": "-10:-1",
+    "10632": "-8:0",
+    "10641": "-10:3",
+    "10644": "-7:-1",
+    "10651": "-11:3",
+    "10653": "-7:-1",
+    "10660": "-7:0",
+    "10678": "-11:5",
+    "10688": "-8:2",
+    "10693": "-17:8",
+    "10701": "-7:1",
+    "10705": "-8:0",
+    "10713": "-6:0",
+    "11306": "-11:1",
+    "11308": "-12:2",
+    "11309": "-12:1",
+    "11312": "-13:2",
+    "11327": "-13:2",
+    "11332": "-13:2",
+    "11334": "-12:2",
+    "11335": "-12:2",
+    "11337": "-13:2",
+    "11345": "-15:3",
+    "11350": "-13:3",
+    "11351": "-14:3",
+    "11352": "-14:3",
+    "11353": "-14:3",
+    "11357": "-13:3",
+    "11358": "-13:3",
+    "11364": "-14:3",
+    "11365": "-14:3",
+    "11368": "-14:4",
+    "11369": "-15:4",
+    "11370": "-15:4",
+    "11372": "-16:4",
+    "11374": "-15:3",
+    "11379": "-16:4",
+    "11381": "-16:4",
+    "11384": "-15:4",
+    "11385": "-15:4",
+    "11386": "-15:4",
+    "11390": "-16:5",
+    "11473": "-17:4",
+    "11487": "-18:6",
+    "11491": "-18:6",
+    "11493": "-19:5",
+    "11496": "-18:5",
+    "11499": "-18:6",
+    "11500": "-19:7",
+    "11502": "-19:7",
+    "11527": "-21:10",
+    "11534": "-18:12",
+    "11536": "-20:13",
+    "11538": "-23:13",
+    "11551": "-22:14",
+    "11555": "-21:14",
+    "11556": "-20:16",
+    "11558": "-19:15",
+    "11574": "-15:12",
+    "11575": "-14:10",
+    "11592": "-18:7",
+    "11620": "-15:4",
+    "11622": "-20:9",
+    "11626": "-18:13",
+    "11628": "-15:4",
+    "11637": "-15:4",
+    "11639": "-14:10",
+    "11675": "-15:4",
+    "11676": "-17:5",
+    "11805": "-17:13",
+    "12040": "-24:5",
+    "12043": "-23:5",
+    "12059": "-23:5",
+    "12061": "-23:5",
+    "12092": "-21:5",
+    "12098": "-20:5",
+    "12115": "-23:7",
+    "12123": "-22:6",
+    "12125": "-22:6",
+    "12136": "-24:8",
+    "12155": "-22:6",
+    "12189": "-23:6",
+    "12202": "-21:6",
+    "12222": "-21:6",
+    "12239": "-21:8",
+    "12279": "-23:9",
+    "12305": "-23:9",
+    "12315": "-22:8",
+    "12320": "-23:8",
+    "12346": "-22:8",
+    "12354": "-23:8",
+    "12383": "-20:6",
+    "12401": "-22:7",
+    "12402": "-21:6",
+    "12407": "-20:7",
+    "12417": "-23:11",
+    "12430": "-23:11",
+    "12476": "-23:11",
+    "12498": "-24:11",
+    "12511": "-23:10",
+    "12528": "-20:8",
+    "12606": "-20:6",
+    "12611": "-23:10",
+    "12613": "-23:4",
+    "12614": "-22:7",
+    "12617": "-21:4",
+    "12620": "-20:5",
+    "12631": "-21:4",
+    "12651": "-21:7",
+    "12652": "-22:8",
+    "19008": "-33:7",
+    "19016": "-32:7",
+    "19039": "-24:5",
+    "19049": "-25:4",
+    "19050": "-25:4",
+    "19087": "-24:5",
+    "19088": "-24:5",
+    "19092": "-25:6",
+    "19106": "-25:5",
+    "19108": "-25:5",
+    "19111": "-25:4",
+    "19114": "-24:4",
+    "19115": "-25:4",
+    "19118": "-24:3",
+    "19122": "-25:4",
+    "19123": "-25:4",
+    "19127": "-25:3",
+    "19128": "-24:3",
+    "19135": "-25:3",
+    "19153": "-25:4",
+    "19154": "-26:4",
+    "19158": "-26:4",
+    "19159": "-27:5",
+    "19167": "-26:5",
+    "19169": "-26:4",
+    "19170": "-26:4",
+    "19172": "-26:5",
+    "19183": "-27:5",
+    "19185": "-27:5",
+    "19190": "-28:5",
+    "19197": "-27:4",
+    "19313": "-25:4",
+    "19381": "-27:4",
+    "19382": "-26:4",
+    "19383": "-26:4",
+    "48002": "-36:21",
+    "48006": "-36:22",
+    "48011": "-36:22",
+    "48021": "-36:22",
+    "48028": "-37:22",
+    "48029": "-36:22",
+    "48030": "-37:22",
+    "48038": "-36:23",
+    "48043": "-36:22",
+    "48055": "-36:22",
+    "48056": "-36:22",
+    "48058": "-36:23",
+    "48063": "-35:22",
+    "48069": "-35:22",
+    "48071": "-35:22",
+    "48075": "-35:21",
+    "48079": "-35:21",
+    "48085": "-35:21",
+    "48088": "-35:21",
+    "48089": "-35:21",
+    "48090": "-35:21",
+    "48091": "-35:21",
+    "48097": "-35:20",
+    "48099": "-35:20",
+    "48110": "-35:20",
+    "48123": "-36:20",
+    "49001": "-35:25",
+    "49014": "-36:26",
+    "49017": "-35:27",
+    "49030": "-34:24",
+    "49047": "-36:25",
+    "49048": "-36:26",
+    "49052": "-36:25",
+    "49053": "-36:25",
+    "49054": "-36:25",
+    "49055": "-36:24",
+    "49058": "-36:25",
+    "49070": "-35:24",
+    "49090": "-35:22",
+    "49093": "-35:22",
+    "49094": "-35:22",
+    "49095": "-35:23",
+    "49099": "-36:23",
+    "49103": "-36:23",
+    "49110": "-35:23",
+    "49114": "-35:23",
+    "49116": "-35:23",
+    "49120": "-35:24",
+    "49123": "-34:23",
+    "49125": "-34:22",
+    "49126": "-34:22",
+    "49127": "-36:26",
+    "49128": "-35:25",
+    "49129": "-35:25",
+    "49130": "-36:26",
+    "49135": "-36:25",
+    "49149": "-35:24",
+    "70002": "-34:20",
+    "70011": "-33:21",
+    "70016": "-34:19",
+    "70021": "-35:20",
+    "70025": "-33:19",
+    "70027": "-34:20",
+    "70031": "-34:20",
+    "70036": "-33:19",
+    "70043": "-33:21",
+    "70085": "-34:18",
+    "70091": "-33:17",
+    "70098": "-31:16",
+    "70102": "-35:18",
+    "70117": "-34:19",
+    "70118": "-34:18",
+    "70120": "-34:18",
+    "70121": "-34:18",
+    "70129": "-35:18",
+    "70135": "-34:18",
+    "70139": "-33:17",
+    "70147": "-31:16",
+    "70150": "-31:15",
+    "70152": "-31:16",
+    "70153": "-30:15",
+    "70156": "-32:16",
+    "70158": "-31:16",
+    "70163": "-30:15",
+    "70167": "-29:15",
+    "70169": "-30:16",
+    "70175": "-26:15",
+    "70176": "-26:15",
+    "70180": "-27:15",
+    "70205": "-26:15",
+    "70206": "-26:14",
+    "70207": "-26:14",
+    "70209": "-27:14",
+    "70211": "-27:14",
+    "70212": "-27:15",
+    "70213": "-27:15",
+    "70215": "-28:15",
+    "70217": "-28:14",
+    "70221": "-28:15",
+    "70230": "-28:15",
+    "70231": "-28:15",
+    "70238": "-28:17",
+    "70242": "-28:16",
+    "70246": "-27:16",
+    "70248": "-27:16",
+    "70250": "-29:17",
+    "70252": "-30:16",
+    "70270": "-31:18",
+    "70271": "-31:18",
+    "70273": "-33:18",
+    "70275": "-33:18",
+    "70284": "-32:19",
+    "70288": "-33:18",
+    "70291": "-33:18",
+    "70292": "-33:18",
+    "70293": "-33:18",
+    "70295": "-33:18",
+    "70298": "-32:18",
+    "70299": "-32:18",
+    "70302": "-32:19",
+    "70311": "-32:20",
+    "70325": "-33:21",
+    "70328": "-30:18",
+    "70331": "-30:19",
+    "70334": "-31:21",
+    "70339": "-30:18",
+    "70340": "-30:18",
+    "70345": "-30:19",
+    "70348": "-31:20",
+    "70361": "-32:21",
+    "70362": "-32:22",
+    "70363": "-32:22",
+    "70366": "-31:21",
+    "70374": "-30:21",
+    "70376": "-31:21",
+    "70377": "-31:21",
+    "70378": "-28:17",
+    "70382": "-28:18",
+    "70390": "-28:17",
+    "70393": "-30:20",
+    "70394": "-29:18",
+    "70399": "-29:20",
+    "70403": "-28:20",
+    "70408": "-24:13",
+    "70410": "-25:14",
+    "70414": "-25:15",
+    "70442": "-24:14",
+    "70444": "-24:14",
+    "70458": "-25:17",
+    "70459": "-25:16",
+    "70466": "-23:17",
+    "70486": "-23:17",
+    "70494": "-23:17",
+    "70497": "-23:18",
+    "70499": "-24:19",
+    "70509": "-26:16",
+    "70512": "-26:17",
+    "70517": "-26:16",
+    "70522": "-26:16",
+    "70531": "-27:18",
+    "70533": "-27:19",
+    "70540": "-27:20",
+    "70542": "-27:20",
+    "70549": "-35:18",
+    "70557": "-32:20",
+    "70559": "-25:15",
+    "70566": "-33:17",
+    "70567": "-31:17",
+    "70569": "-28:20",
+    "70574": "-34:20",
+    "70575": "-35:19",
+    "70579": "-30:18",
+    "70583": "-34:18",
+    "70584": "-32:16",
+    "70586": "-26:14",
+    "70587": "-32:19",
+    "70589": "-25:16",
+    "70596": "-33:21",
+    "70597": "-33:17",
+    "70601": "-28:17",
+    "70609": "-34:20",
+    "70611": "-31:16",
+    "70614": "-35:18",
+    "70616": "-34:17",
+    "70617": "-26:15",
+    "70619": "-33:20",
+    "70620": "-31:17",
+    "70623": "-32:17",
+    "70624": "-34:19",
+    "71010": "-34:28",
+    "71018": "-34:28",
+    "71044": "-33:27",
+    "71067": "-34:27",
+    "71068": "-34:27",
+    "71085": "-35:28",
+    "71086": "-34:28",
+    "71092": "-34:28",
+    "71096": "-34:28",
+    "71098": "-33:26",
+    "71104": "-33:27",
+    "71109": "-33:27",
+    "71117": "-33:27",
+    "71126": "-33:27",
+    "71131": "-33:26",
+    "71139": "-33:26",
+    "71140": "-33:26",
+    "71146": "-32:26",
+    "71153": "-33:26",
+    "71165": "-32:24",
+    "71168": "-31:23",
+    "71185": "-33:24",
+    "71186": "-33:24",
+    "71193": "-34:26",
+    "71199": "-34:25",
+    "71239": "-34:26",
+    "71241": "-35:27",
+    "71245": "-35:27",
+    "71258": "-34:27",
+    "71260": "-33:26",
+    "71267": "-34:26",
+    "71268": "-34:26",
+    "71277": "-34:26",
+    "72002": "-40:24",
+    "72004": "-39:24",
+    "72007": "-39:23",
+    "72008": "-39:23",
+    "72039": "-39:22",
+    "72043": "-39:22",
+    "72055": "-39:23",
+    "72064": "-39:23",
+    "72076": "-39:24",
+    "72083": "-39:23",
+    "72090": "-38:23",
+    "72095": "-38:24",
+    "72096": "-38:23",
+    "72098": "-38:23",
+    "72102": "-38:23",
+    "72104": "-37:22",
+    "72106": "-37:22",
+    "72109": "-37:22",
+    "72110": "-37:22",
+    "72113": "-37:22",
+    "72130": "-36:21",
+    "72142": "-37:21",
+    "72144": "-37:21",
+    "72145": "-37:21",
+    "72148": "-37:21",
+    "72154": "-37:21",
+    "72155": "-38:21",
+    "72156": "-37:21",
+    "72158": "-37:21",
+    "72162": "-37:21",
+    "72172": "-38:21",
+    "72173": "-38:21",
+    "72179": "-38:21",
+    "72188": "-38:21",
+    "72192": "-38:21",
+    "72198": "-38:21",
+    "72227": "-39:21",
+    "72239": "-38:21",
+    "72246": "-39:22",
+    "72269": "-38:20",
+    "72281": "-39:21",
+    "72285": "-38:19",
+    "72327": "-38:20",
+    "72366": "-38:20",
+    "72423": "-39:20",
+    "72427": "-39:20",
+    "72450": "-41:20",
+    "72454": "-41:20",
+    "72459": "-40:20",
+    "72478": "-40:20",
+    "72481": "-40:20",
+    "72502": "-40:21",
+    "72504": "-40:21",
+    "72508": "-41:22",
+    "72518": "-41:22",
+    "72519": "-40:21",
+    "72552": "-40:23",
+    "72559": "-40:23",
+    "72566": "-40:22",
+    "72569": "-40:22",
+    "72577": "-40:23",
+    "72584": "-39:22",
+    "72585": "-39:22",
+    "72588": "-39:22",
+    "72590": "-39:22",
+    "72592": "-39:22",
+    "72601": "-40:22",
+    "72603": "-40:22",
+    "72610": "-40:23",
+    "72617": "-40:23",
+    "72623": "-40:22",
+    "72625": "-41:23",
+    "72649": "-41:23",
+    "72654": "-42:22",
+    "72660": "-42:22",
+    "72661": "-41:22",
+    "72668": "-42:21",
+    "72682": "-41:21",
+    "72696": "-42:22",
+    "72697": "-42:22",
+    "72716": "-41:22",
+    "72721": "-41:22",
+    "72729": "-39:22",
+    "72731": "-38:20",
+    "72738": "-37:24",
+    "72739": "-37:22",
+    "72744": "-39:23",
+    "72745": "-40:21",
+    "72748": "-38:21",
+    "72752": "-40:21",
+    "72753": "-42:22",
+    "72760": "-40:21",
+    "72761": "-41:23",
+    "72762": "-39:22",
+    "73110": "-41:19",
+    "73186": "-40:19",
+    "73190": "-40:19",
+    "74410": "-46:24",
+    "74412": "-47:25",
+    "74413": "-47:24",
+    "74416": "-47:25",
+    "74422": "-47:25",
+    "74425": "-46:24",
+    "74428": "-47:24",
+    "74434": "-47:24",
+    "74438": "-48:25",
+    "74443": "-47:24",
+    "75006": "-38:18",
+    "75033": "-39:18",
+    "75058": "-38:18",
+    "75074": "-38:17",
+    "75079": "-37:17",
+    "75106": "-36:17",
+    "75108": "-36:17",
+    "75110": "-36:17",
+    "75111": "-36:18",
+    "75119": "-36:18",
+    "75121": "-37:18",
+    "75150": "-37:20",
+    "75151": "-37:20",
+    "75156": "-38:20",
+    "75168": "-36:20",
+    "75169": "-36:19",
+    "75176": "-37:20",
+    "75190": "-36:19",
+    "75196": "-35:18",
+    "75198": "-35:19",
+    "75200": "-36:19",
+    "75201": "-36:19",
+    "75202": "-35:19",
+    "75203": "-36:20",
+    "75206": "-35:20",
+    "75208": "-36:20",
+    "75209": "-35:20",
+    "75210": "-35:19",
+    "75211": "-35:20",
+    "75217": "-35:18",
+    "75219": "-35:17",
+    "75221": "-35:17",
+    "75222": "-35:17",
+    "75225": "-35:16",
+    "75227": "-36:18",
+    "75235": "-35:16",
+    "75236": "-35:17",
+    "75238": "-35:17",
+    "75239": "-33:16",
+    "75241": "-34:16",
+    "75254": "-34:16",
+    "75257": "-34:16",
+    "75259": "-34:16",
+    "75263": "-34:16",
+    "75265": "-35:16",
+    "75266": "-35:16",
+    "75267": "-34:15",
+    "75271": "-34:15",
+    "75273": "-34:16",
+    "75274": "-34:16",
+    "75280": "-33:15",
+    "75284": "-32:15",
+    "75286": "-32:15",
+    "75287": "-33:15",
+    "75288": "-32:16",
+    "75289": "-33:16",
+    "75290": "-32:15",
+    "75291": "-32:15",
+    "75292": "-33:16",
+    "75293": "-33:15",
+    "75296": "-33:15",
+    "75297": "-33:15",
+    "75299": "-33:14",
+    "75300": "-33:14",
+    "75301": "-33:14",
+    "75303": "-33:14",
+    "75306": "-40:15",
+    "75309": "-39:15",
+    "75311": "-39:16",
+    "75332": "-40:15",
+    "75333": "-39:15",
+    "75336": "-39:15",
+    "75337": "-39:15",
+    "75339": "-39:15",
+    "75343": "-39:15",
+    "75348": "-39:15",
+    "75359": "-38:15",
+    "75361": "-38:15",
+    "75367": "-39:16",
+    "75368": "-39:16",
+    "75382": "-39:16",
+    "75387": "-38:16",
+    "75388": "-38:16",
+    "75389": "-38:16",
+    "75394": "-37:15",
+    "75402": "-38:17",
+    "75403": "-37:16",
+    "75421": "-38:17",
+    "75427": "-37:16",
+    "75428": "-38:17",
+    "75450": "-36:15",
+    "75453": "-37:15",
+    "75463": "-36:14",
+    "75469": "-37:14",
+    "75477": "-36:14",
+    "75480": "-36:15",
+    "75491": "-35:14",
+    "75497": "-35:13",
+    "75500": "-35:13",
+    "75501": "-34:11",
+    "75503": "-34:12",
+    "75505": "-34:12",
+    "75511": "-35:12",
+    "75512": "-35:13",
+    "75518": "-36:13",
+    "75520": "-36:12",
+    "75521": "-36:12",
+    "75527": "-36:12",
+    "75530": "-35:12",
+    "75536": "-35:14",
+    "75540": "-34:14",
+    "75543": "-35:14",
+    "75547": "-34:14",
+    "75552": "-35:15",
+    "75553": "-35:15",
+    "75561": "-36:16",
+    "75573": "-36:15",
+    "75576": "-35:15",
+    "75579": "-35:15",
+    "75605": "-33:13",
+    "75607": "-33:14",
+    "75608": "-33:14",
+    "75615": "-33:13",
+    "75619": "-33:10",
+    "75624": "-32:11",
+    "75631": "-33:10",
+    "75635": "-33:10",
+    "75643": "-32:11",
+    "75645": "-33:12",
+    "75646": "-32:11",
+    "75648": "-33:11",
+    "75656": "-33:12",
+    "75658": "-33:13",
+    "75664": "-32:12",
+    "75674": "-32:15",
+    "75676": "-32:14",
+    "75678": "-32:14",
+    "75682": "-31:15",
+    "75683": "-31:15",
+    "75684": "-31:14",
+    "75687": "-31:14",
+    "75692": "-32:14",
+    "75697": "-32:13",
+    "75699": "-32:13",
+    "75701": "-32:13",
+    "75710": "-32:13",
+    "75716": "-35:13",
+    "75718": "-33:11",
+    "75719": "-38:16",
+    "75720": "-38:17",
+    "75727": "-32:13",
+    "75728": "-36:17",
+    "75740": "-35:13",
+    "75749": "-36:16",
+    "75751": "-36:17",
+    "75752": "-33:10",
+    "75758": "-34:15",
+    "75772": "-34:16",
+    "75776": "-36:17",
+    "75780": "-35:17",
+    "75782": "-38:15",
+    "75783": "-38:15",
+    "76007": "-26:13",
+    "76008": "-26:13",
+    "76075": "-26:12",
+    "76076": "-27:13",
+    "76089": "-25:12",
+    "76099": "-25:12",
+    "76112": "-25:12",
+    "76130": "-25:11",
+    "76133": "-25:11",
+    "76136": "-26:12",
+    "76139": "-27:12",
+    "76141": "-26:11",
+    "76145": "-27:12",
+    "76147": "-26:12",
+    "76159": "-27:11",
+    "76165": "-23:7",
+    "76176": "-24:8",
+    "76180": "-24:9",
+    "76190": "-25:10",
+    "76200": "-23:7",
+    "76217": "-24:9",
+    "76243": "-25:9",
+    "76253": "-26:10",
+    "76255": "-26:10",
+    "76256": "-26:9",
+    "76263": "-25:6",
+    "76264": "-27:9",
+    "76270": "-25:6",
+    "76275": "-25:6",
+    "76284": "-26:6",
+    "76317": "-27:6",
+    "76318": "-26:6",
+    "76321": "-27:6",
+    "76324": "-26:6",
+    "76325": "-26:6",
+    "76345": "-26:7",
+    "76351": "-26:7",
+    "76355": "-27:7",
+    "76360": "-24:7",
+    "76363": "-24:8",
+    "76364": "-25:8",
+    "76367": "-25:8",
+    "76406": "-24:6",
+    "76408": "-24:6",
+    "76416": "-25:7",
+    "76417": "-25:8",
+    "76421": "-24:7",
+    "76423": "-24:7",
+    "76454": "-25:8",
+    "76456": "-25:8",
+    "76461": "-25:7",
+    "76462": "-25:7",
+    "76466": "-26:8",
+    "76470": "-25:6",
+    "76483": "-28:7",
+    "76486": "-26:7",
+    "76489": "-27:7",
+    "76490": "-27:8",
+    "76491": "-27:8",
+    "76492": "-26:8",
+    "76494": "-26:9",
+    "76495": "-27:9",
+    "76499": "-27:8",
+    "76500": "-28:9",
+    "76504": "-28:10",
+    "76512": "-28:9",
+    "76518": "-28:8",
+    "76519": "-28:8",
+    "76520": "-28:9",
+    "76533": "-29:9",
+    "76550": "-28:12",
+    "76553": "-28:13",
+    "76556": "-29:13",
+    "76584": "-28:13",
+    "76594": "-29:13",
+    "76596": "-27:11",
+    "76597": "-28:12",
+    "76601": "-28:11",
+    "76602": "-28:12",
+    "76603": "-29:13",
+    "76611": "-30:14",
+    "76614": "-30:13",
+    "76619": "-30:14",
+    "76620": "-30:14",
+    "76627": "-29:12",
+    "76628": "-30:12",
+    "76634": "-29:11",
+    "76638": "-29:11",
+    "76640": "-28:10",
+    "76642": "-29:11",
+    "76644": "-29:10",
+    "76646": "-29:10",
+    "76648": "-26:9",
+    "76649": "-26:9",
+    "76650": "-25:5",
+    "76651": "-30:11",
+    "76652": "-28:10",
+    "76653": "-26:10",
+    "76654": "-29:14",
+    "76655": "-29:14",
+    "76656": "-29:13",
+    "76661": "-25:7",
+    "76663": "-24:10",
+    "76664": "-24:9",
+    "76665": "-29:10",
+    "76669": "-27:6",
+    "76671": "-29:12",
+    "76673": "-26:6",
+    "76674": "-30:12",
+    "76675": "-31:13",
+    "76676": "-29:13",
+    "76685": "-25:10",
+    "76688": "-25:7",
+    "76690": "-25:11",
+    "76692": "-25:9",
+    "76695": "-31:13",
+    "76696": "-27:10",
+    "76697": "-27:12",
+    "76700": "-27:13",
+    "76701": "-25:9",
+    "76702": "-25:9",
+    "76704": "-24:8",
+    "76705": "-28:9",
+    "76706": "-29:10",
+    "77112": "-31:12",
+    "77115": "-31:11",
+    "77116": "-31:13",
+    "77124": "-31:12",
+    "77130": "-31:11",
+    "77132": "-31:12",
+    "77140": "-31:10",
+    "77146": "-31:11",
+    "77152": "-31:10",
+    "77156": "-31:11",
+    "77159": "-31:11",
+    "77164": "-31:11",
+    "77166": "-30:11",
+    "77179": "-29:9",
+    "77189": "-29:9",
+    "77193": "-29:10",
+    "77197": "-30:11",
+    "77201": "-30:10",
+    "77209": "-31:10",
+    "77210": "-31:10",
+    "77212": "-30:9",
+    "77217": "-30:10",
+    "77223": "-31:9",
+    "77231": "-30:9",
+    "77242": "-30:9",
+    "77245": "-28:6",
+    "77246": "-28:6",
+    "77250": "-29:7",
+    "77259": "-28:6",
+    "77260": "-28:6",
+    "77266": "-29:7",
+    "77270": "-29:7",
+    "77276": "-29:7",
+    "77285": "-28:7",
+    "77288": "-29:8",
+    "77292": "-30:8",
+    "77298": "-29:8",
+    "77311": "-30:8",
+    "77327": "-31:9",
+    "77329": "-32:9",
+    "77336": "-31:8",
+    "77362": "-33:8",
+    "77370": "-33:9",
+    "77397": "-30:8",
+    "77407": "-33:9",
+    "77409": "-33:9",
+    "78004": "-38:13",
+    "78050": "-38:14",
+    "78052": "-39:14",
+    "78053": "-39:14",
+    "78054": "-38:13",
+    "78055": "-39:14",
+    "78078": "-38:13",
+    "78082": "-37:13",
+    "78087": "-38:13",
+    "78092": "-37:13",
+    "78106": "-39:12",
+    "78109": "-37:12",
+    "78111": "-38:12",
+    "78112": "-37:11",
+    "78125": "-38:11",
+    "78130": "-37:10",
+    "78132": "-37:10",
+    "78135": "-34:10",
+    "78138": "-35:10",
+    "78141": "-36:10",
+    "78142": "-37:11",
+    "78144": "-36:10",
+    "78160": "-36:11",
+    "78163": "-35:11",
+    "78164": "-36:11",
+    "78165": "-36:11",
+    "78170": "-36:12",
+    "78173": "-36:11",
+    "78182": "-36:10",
+    "78188": "-36:10",
+    "78191": "-36:9",
+    "78196": "-34:9",
+    "78202": "-36:9",
+    "78205": "-34:10",
+    "78218": "-35:9",
+    "78224": "-36:9",
+    "78225": "-34:8",
+    "78229": "-35:8",
+    "78231": "-35:8",
+    "78234": "-36:8",
+    "78252": "-37:8",
+    "78261": "-36:7",
+    "78275": "-40:13",
+    "78277": "-40:13",
+    "78343": "-40:13",
+    "78345": "-40:13",
+    "78391": "-39:13",
+    "78393": "-39:12",
+    "78394": "-39:12",
+    "78404": "-39:13",
+    "78410": "-39:12",
+    "78499": "-39:10",
+    "78501": "-38:10",
+    "78502": "-38:10",
+    "78503": "-38:9",
+    "78504": "-38:9",
+    "78507": "-38:10",
+    "78509": "-38:9",
+    "78510": "-38:9",
+    "78512": "-38:9",
+    "78513": "-38:9",
+    "78515": "-38:9",
+    "78519": "-39:9",
+    "78529": "-38:8",
+    "78563": "-39:9",
+    "78568": "-39:9",
+    "78590": "-38:7",
+    "78596": "-38:6",
+    "78611": "-37:13",
+    "78613": "-35:8",
+    "78614": "-34:10",
+    "78620": "-35:10",
+    "78623": "-38:8",
+    "79001": "-39:18",
+    "79006": "-40:18",
+    "79011": "-41:18",
+    "79051": "-39:17",
+    "79244": "-41:18",
+    "79261": "-41:18",
+    "79324": "-42:17",
+    "79335": "-42:17",
+    "80113": "-41:17",
+    "80118": "-40:16",
+    "80148": "-40:16",
+    "80157": "-40:16",
+    "80160": "-40:15",
+    "80165": "-41:16",
+    "80172": "-41:16",
+    "80174": "-41:17",
+    "80196": "-40:14",
+    "80197": "-40:14",
+    "80198": "-40:14",
+    "80204": "-41:15",
+    "80218": "-40:14",
+    "80220": "-40:14",
+    "80222": "-40:14",
+    "80224": "-39:14",
+    "80230": "-40:14",
+    "80236": "-40:15",
+    "80405": "-40:14",
+    "80424": "-41:14",
+    "80442": "-41:14",
+    "80592": "-40:16",
+    "81562": "-45:11",
+    "81565": "-45:11",
+    "81580": "-45:11",
+    "81581": "-45:11",
+    "81592": "-45:11",
+    "81593": "-45:11",
+    "81597": "-45:11",
+    "81600": "-45:11",
+    "81602": "-45:11",
+    "81604": "-45:11",
+    "81616": "-45:11",
+    "81640": "-45:11",
+    "81648": "-45:11",
+    "81674": "-44:10",
+    "81677": "-44:10",
+    "81717": "-44:11",
+    "81724": "-44:11",
+    "81730": "-44:11",
+    "81737": "-44:11",
+    "81741": "-44:11",
+    "81745": "-44:11",
+    "81750": "-44:11",
+    "81753": "-44:11",
+    "81757": "-44:11",
+    "81767": "-44:11",
+    "81772": "-45:11",
+    "82001": "-42:9",
+    "82010": "-42:8",
+    "82013": "-41:7",
+    "82023": "-41:7",
+    "82025": "-41:7",
+    "82026": "-41:7",
+    "82033": "-41:7",
+    "82034": "-41:7",
+    "82039": "-41:7",
+    "82046": "-41:6",
+    "82050": "-40:6",
+    "82060": "-41:6",
+    "83061": "-40:10",
+    "83063": "-40:10",
+    "83110": "-41:9",
+    "83137": "-39:5",
+    "83150": "-39:6",
+    "83161": "-39:6",
+    "83174": "-40:7",
+    "83207": "-39:5",
+    "83214": "-39:5",
+    "83236": "-39:5",
+    "83249": "-39:5",
+    "83260": "-39:6",
+    "83262": "-40:6",
+    "83266": "-39:5",
+    "83286": "-39:6",
+    "83288": "-39:6",
+    "83314": "-40:7",
+    "83318": "-40:6",
+    "83323": "-40:6",
+    "83338": "-40:7",
+    "83340": "-40:6",
+    "83348": "-40:7",
+    "83350": "-40:7",
+    "83369": "-40:6",
+    "83372": "-40:7",
+    "83374": "-40:7",
+    "83378": "-40:7",
+    "83385": "-41:7",
+    "83395": "-41:8",
+    "83411": "-41:8",
+    "83415": "-41:8",
+    "83437": "-41:8",
+    "83441": "-42:9",
+    "83454": "-40:8",
+    "83459": "-40:6",
+    "83460": "-41:7",
+    "83481": "-41:8",
+    "83486": "-40:6",
+    "83497": "-40:7",
+    "83801": "-41:8",
+    "83809": "-41:9",
+    "83813": "-42:9",
+    "83818": "-41:8",
+    "83833": "-42:9",
+    "84004": "-36:6",
+    "84008": "-38:6",
+    "84009": "-38:6",
+    "84011": "-37:6",
+    "84019": "-38:6",
+    "84026": "-38:5",
+    "84029": "-38:5",
+    "84031": "-38:5",
+    "84034": "-37:4",
+    "84037": "-37:5",
+    "84039": "-36:4",
+    "84043": "-38:5",
+    "84064": "-37:4",
+    "84078": "-38:5",
+    "84091": "-37:5",
+    "84108": "-37:3",
+    "84119": "-38:4",
+    "84129": "-38:5",
+    "84134": "-38:4",
+    "84157": "-38:3",
+    "84165": "-37:3",
+    "84173": "-37:3",
+    "84179": "-37:3",
+    "84185": "-38:4",
+    "84192": "-38:4",
+    "84200": "-37:4",
+    "84213": "-38:4",
+    "84215": "-38:4",
+    "84233": "-38:4",
+    "84243": "-38:4",
+    "84245": "-38:4",
+    "84286": "-36:2",
+    "84295": "-36:2",
+    "84302": "-36:2",
+    "84312": "-35:1",
+    "84315": "-36:1",
+    "84320": "-35:1",
+    "84321": "-35:1",
+    "84333": "-35:1",
+    "84336": "-35:0",
+    "84342": "-35:0",
+    "84343": "-35:0",
+    "84344": "-35:0",
+    "84346": "-35:0",
+    "84347": "-35:0",
+    "84348": "-35:0",
+    "84351": "-35:0",
+    "84354": "-35:0",
+    "84397": "-37:3",
+    "84398": "-37:3",
+    "84399": "-38:5",
+    "84400": "-38:5",
+    "84401": "-38:5",
+    "84415": "-36:2",
+    "84446": "-35:2",
+    "84447": "-38:3",
+    "84448": "-37:3",
+    "84449": "-37:3",
+    "84452": "-38:4",
+    "84453": "-35:1",
+    "84454": "-35:1",
+    "84803": "-35:2",
+    "84822": "-35:2",
+    "84824": "-35:2",
+    "84827": "-35:2"
+  }
+}

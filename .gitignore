@@ -19,24 +19,8 @@ build/
 # Large files and data
 data
 data/
-docs/*
-!docs/literature/
-docs/literature/*
-!docs/literature/camels_hess_papers/
-docs/literature/camels_hess_papers/*
-!docs/literature/camels_hess_papers/README.md
-!docs/literature/camels_hess_papers/metadata.json
-!docs/literature/camels_hess_papers/*.bib
-!docs/literature/camels_essd_papers/
-docs/literature/camels_essd_papers/*
-!docs/literature/camels_essd_papers/README.md
-!docs/literature/camels_essd_papers/metadata.json
-!docs/literature/camels_essd_papers/*.bib
-!docs/literature/large_sample_hydrology_papers/
-docs/literature/large_sample_hydrology_papers/*
-!docs/literature/large_sample_hydrology_papers/README.md
-!docs/literature/large_sample_hydrology_papers/metadata.json
-!docs/literature/large_sample_hydrology_papers/*.bib
+# Local working documents and literature library
+docs/
 logs/
 results/*
 !results/hess_quality/
@@ -89,7 +73,7 @@ paper/endmember_supplement_draft.md
 .tmp/
 
 # Claude Code / AI agent config --- local-only, not shipped in the public repo.
-# AGENTS.md and CLAUDE.md stay tracked; the tooling directories do not.
+# Agent instructions and tooling stay local; scientific methods live in the manuscript and READMEs.
 .claude/
 .cursor/
 .agents/
@@ -109,3 +93,12 @@ reports/
 paper/figures_src/*.aux
 paper/figures_src/*.log
 paper/figures_src/*.pdf
+
+# Local agent instructions, internal review trail, and preview builds
+/AGENTS.md
+/AGENTS_REFERENCE.md
+/CLAUDE.md
+/CLAUDE_REFERENCE.md
+/.codex/
+/paper/reviews/
+/paper/previews/

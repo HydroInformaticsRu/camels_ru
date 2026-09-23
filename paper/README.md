@@ -1,88 +1,85 @@
-# CAMELS-RU Paper
+# CAMELS-RU manuscript and figures
 
-**Target journal:** Earth System Science Data (ESSD)
+The canonical manuscript for *Earth System Science Data* is the nested Overleaf
+repository at `paper/overleaf/`. Its Git revision is recorded by the parent
+repository. Access to the Overleaf remote may require project credentials; cloning
+the public processing repository does not establish anonymous manuscript access.
 
-## Structure
+## Manuscript source and build
 
-```
-paper/
-├── overleaf/           # Active collaborative manuscript source (git submodule, Overleaf remote)
-│   ├── main.tex
-│   ├── macros.tex
-│   ├── refs.bib
-│   ├── sections/
-│   └── tables/
-├── images/             # Canonical manuscript figures, mirrored into overleaf/images/
-├── tables/             # Data tables backing manuscript numbers (verify_macros.py audit trail)
-└── README.md           # This file
-```
-
-(A legacy `paper/latex/` snapshot from the Markdown-era workflow may exist in local
-working copies; it is gitignored and not authoritative.)
-
-## Editing
-
-The active collaborative manuscript source is the Overleaf submodule at `paper/overleaf/`.
-
-Use Overleaf comments and nested-repo diffs for manuscript review. Use parent-repo pull requests for code, data-processing, release, and documentation changes.
-
-## Figures
-
-Canonical manuscript figures live in `paper/overleaf/images/`. Figure-generation scripts may write first to `paper/images/`; copy or script-sync any manuscript-used figure into `paper/overleaf/images/` before building or pushing Overleaf.
-
-Figures referenced in the manuscript (in order of appearance; generators listed run
-with `pixi run python`):
-
-| File | Where | Description | Generator |
-|------|-------|-------------|-----------|
-| `fig_gauge_network.png` | §2 | Köppen–Geiger climate classes of the gauged catchments (forcing-derived) + catchment-size distribution | `scripts/regenerate_gauge_network_figure.py --write` |
-| `fig_workflow.pdf` | §3 | Dataset production workflow schematic | `paper/figures_src/fig_workflow.tex` (standalone TikZ; build line in its header) |
-| `fig_gauge_reliability.png` | §4 | Overall discharge grade + per-gauge share of Grade A years, mapped | `scripts/plot_gauge_reliability.py --write` |
-| `fig_precip_comparison.png` | §7 | Precipitation-product differences | `scripts/regenerate_precip_comparison_figure.py --write` |
-| `fig_budyko.pdf` | §7 | Budyko consistency check, one panel per product | `scripts/generate_budyko_figure.py` |
-| `fig_coldregion_gradient.pdf` | §8 | Example cold-region signature analysis | `scripts/plot_coldregion_gradient.py` |
-| `fig_hydro_signatures_1.png` … `_4.png` | Appendix | Signature maps, released cleaned set | `scripts/plot_signature_maps.py --write` |
-
-Generators save each figure once and copy it to the second directory (`shutil.copy2`),
-so `paper/images/` and `paper/overleaf/images/` stay byte-identical — verify md5 parity
-before pushing Overleaf.
-
-## Building the canonical manuscript
+For collaborators with Overleaf Git access, run from the repository root:
 
 ```bash
+git submodule update --init paper/overleaf
+mkdir -p .tmp/manuscript
 cd paper/overleaf
-latexmk -pdf main.tex
+latexmk -pdf -outdir=../../.tmp/manuscript main.tex
 ```
 
-Requires a TeX Live installation with the packages loaded in `main.tex` (`copernicus.cls` itself is included in the submodule).
+TeX Live and `latexmk` are required. The Copernicus class and bibliography style
+are included. Inspect the compiled PDF as well as the log for undefined references,
+overfull boxes, and oversized floats. Figures must appear before Data availability.
 
-## Key Numbers
+## Scientific assets
 
-Current manuscript numbers must be verified against `release/CAMELS_RU_v1.0/` and reflected in `paper/overleaf/macros.tex`. The older `paper/latex/` values are not authoritative.
+| Directory | Purpose |
+|---|---|
+| `overleaf/sections/`, `overleaf/tables/` | Manuscript text and LaTeX tables |
+| `overleaf/refs.bib`, `overleaf/macros.tex` | Bibliography and numerical macros |
+| `images/`, `overleaf/images/` | Matching copies of manuscript figures |
+| `figures_src/` | Workflow-diagram source |
+| `figure_data/hex_support/` | Grid definition, cell statistics, and gauge membership for current hex maps |
+| `tables/` | Scientific tables supporting manuscript values |
+| `metadata/` | Release documentation, interoperability crosswalks, and validation record |
 
-## ESSD revision, 23 September 2026
+## Figure generation
 
-The review trail is in `paper/reviews/ESSD_REVISION_LOG_2026-09-23.md`; the original
-review and approved plan are archived beside it. This is a local author-review
-revision, with submission gates still open. `release/CAMELS_RU_v1.0/` is the frozen
-numerical baseline. The local v1.1 amendment preserves its existing numerical
-variables and files while adding station coordinates, interoperability metadata and
-reuse guidance. Do not retarget the DOI to a version that has not been released.
+Commands below run from the repository root with `pixi run python`. They require
+the source inputs referenced by each script. The national basemap also uses
+external terrain/river products. Do not execute all notebooks to rebuild figures.
 
-Metadata sources live in `paper/metadata/`. The amendment command and complete
-verification sequence are in the archived plan. The macro verifier accepts
-`--release-dir`; the default stays v1.0. Figure generators retain the frozen baseline
-inputs; candidate applicability requires the complete release-equivalence report.
+| Figure | File | Generator |
+|---|---|---|
+| 1 | `fig_gauge_network.png` | `scripts/regenerate_gauge_network_figure.py --write` |
+| 2 | `fig_workflow.pdf` | `paper/figures_src/fig_workflow.tex`; build command in its header |
+| 3 | `fig_gauge_reliability.png` | `scripts/plot_gauge_reliability.py --write` |
+| 4 | `fig_grading_examples.pdf` | `scripts/plot_grading_examples.py --write` |
+| 5 | `fig_precip_comparison.png` | `scripts/regenerate_precip_comparison_figure.py --write` |
+| 6 | `fig_budyko.pdf` | `scripts/generate_budyko_figure.py` |
+| 7 | `fig_coldregion_gradient.pdf` | `scripts/plot_coldregion_gradient.py` |
+| B1–B4 | `fig_hydro_signatures_1.png` through `_4.png` | `scripts/plot_signature_maps.py --write` |
 
-Figure execution has side effects: precipitation previews also write
-`paper/tables/precip_comparison_caption.csv`; Budyko and cold-region generators always
-write both image trees and their provenance tables. Do not use
-`scripts/regenerate_paper_maps.py`, which executes legacy notebooks. Regenerate only
-the explicitly listed figures.
+The map scripts without `--write` produce local previews. Budyko and cold-region
+scripts always update both image directories and their supporting tables;
+precipitation previews also update `tables/precip_comparison_caption.csv`.
+`scripts/regenerate_paper_maps.py` is a legacy notebook runner, not the figure build
+entry point. Keep plotting caches and temporary files under the project `.tmp/`.
 
-The preferred local candidate, `release/CAMELS_RU_v1.1_cf19/`, passes complete
-numerical-equivalence and strict CF-1.9 checks on all three NetCDFs. It renames the
-instance dimension to `station`, retaining string `gauge_id(station)`; the shared
-loading helper supports either schema. See `paper/reviews/CF19_VALIDATION_2026-09-23.md`.
-The first candidate and its failed CF-1.8 checks remain preserved separately.
-No candidate has been archived or assigned a new DOI.
+Climate, precipitation-difference, and signature maps use a fixed-origin Albers
+hexagon grid with a 66 km centre-to-vertex radius. Continuous values use cell
+medians; climate uses the most frequent displayed class. Histograms count original
+gauges. Figure 3 retains individual gauge points. Section 2.4 of the manuscript and
+[the figure-data README](figure_data/hex_support/README.md) describe the calculation
+and its limits. Figure 4 shows released runoff, precipitation, and annual grades
+for gauges 19128 and 75387; it does not recompute the grading algorithm.
+
+Each generator saves once and copies its figure to the second image directory.
+Check that all eleven pairs are byte-identical before updating the manuscript.
+
+## Numerical verification and release scope
+
+With the baseline package present:
+
+```bash
+pixi run python scripts/verify_macros.py --release-dir release/CAMELS_RU_v1.0
+```
+
+This checks manuscript macros against release values and retained scientific audit
+tables. It verifies numerical consistency, not independent observational accuracy.
+The default figure inputs remain the frozen v1.0 package. Applicability to the
+separate CF-1.9 metadata candidate rests on complete numerical-preservation checks;
+see [metadata/VALIDATION.md](metadata/VALIDATION.md).
+
+The dataset packages are not stored in Git. Internal editorial reviews, companion
+working drafts, preview PDFs, and build logs remain local. Scientific methods,
+references, figure support, and reproducibility checks remain tracked.
