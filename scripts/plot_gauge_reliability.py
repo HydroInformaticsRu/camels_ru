@@ -49,6 +49,7 @@ plt.rcParams.update(
         "font.sans-serif": ["DejaVu Sans"],
         "figure.dpi": 150,
         "savefig.dpi": 300,
+        "pdf.fonttype": 42,
         "axes.labelsize": 9,
         "axes.titlesize": 9,
         "xtick.labelsize": 8,
@@ -61,12 +62,12 @@ RELEASE = PROJECT_ROOT / "release" / "CAMELS_RU_v1.0"
 GRADES_CSV = RELEASE / "camels_ru_year_grades.csv"
 SUMMARY_CSV = RELEASE / "camels_ru_gauge_summary.csv"
 DISCHARGE_NC = RELEASE / "camels_ru_discharge.nc"
-OUT_NAME = "fig_gauge_reliability.png"
+OUT_NAME = "fig_gauge_reliability.pdf"
 PAPER_OUTPUTS = (
     PROJECT_ROOT / "paper" / "images" / OUT_NAME,
     PROJECT_ROOT / "paper" / "overleaf" / "images" / OUT_NAME,
 )
-TEST_OUTPUT = PROJECT_ROOT / ".tmp" / "cluster_diag" / "fig_gauge_reliability_test.png"
+TEST_OUTPUT = PROJECT_ROOT / ".tmp" / "cluster_diag" / "fig_gauge_reliability_test.pdf"
 
 # Ordinal grade palette, shared by both panels. Sampled from viridis rather than the
 # red-yellow-green ramp this figure used through v1.0: under deuteranopia the old grade A

@@ -1,4 +1,4 @@
-"""Regenerate fig_precip_comparison.png — precipitation difference maps.
+"""Regenerate fig_precip_comparison.pdf — precipitation difference maps.
 
 Two Albers hexagon maps show the median per-gauge annual precipitation difference
 within each occupied cell: (a) ERA5-Land - MSWEP and (b) GPCP - MSWEP (mm yr^-1).
@@ -56,7 +56,9 @@ WINDOW = ("2008-01-01", "2023-12-31")
 # (panel column, minuend, subtrahend)
 DIFFS = [("ERA5-Land", "MSWEP"), ("GPCP", "MSWEP")]
 
-plt.rcParams.update({"font.family": "sans-serif", "font.sans-serif": ["DejaVu Sans"]})
+plt.rcParams.update(
+    {"font.family": "sans-serif", "font.sans-serif": ["DejaVu Sans"], "pdf.fonttype": 42}
+)
 
 
 def _annual_mean_mm_yr(path: Path, col: str) -> float:
@@ -236,7 +238,7 @@ def main(write: bool, caption_only: bool = False) -> None:
         dests = [PROJECT_ROOT / ".tmp" / "cluster_diag"]
     suffix = "" if write else "_test"
     # Save once and copy so both manuscript image trees are byte-identical.
-    first = dests[0] / f"fig_precip_comparison{suffix}.png"
+    first = dests[0] / f"fig_precip_comparison{suffix}.pdf"
     dests[0].mkdir(parents=True, exist_ok=True)
     support_dir = PROJECT_ROOT / (
         "paper/figure_data/hex_support" if write else ".tmp/cluster_diag/hex_support"

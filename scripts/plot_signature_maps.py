@@ -51,6 +51,7 @@ plt.rcParams.update(
         "font.sans-serif": ["DejaVu Sans"],
         "figure.dpi": 150,
         "savefig.dpi": 300,
+        "pdf.fonttype": 42,
     }
 )
 
@@ -210,12 +211,12 @@ def main() -> None:
         fig.set_dpi(300)
         fig.canvas.draw()
         fig.set_layout_engine("none")
-        fig.savefig(first / f"{name}{suffix}.png", dpi=300, facecolor="white")
-        print(f"wrote {first / f'{name}{suffix}.png'}")
+        fig.savefig(first / f"{name}{suffix}.pdf", dpi=300, facecolor="white")
+        print(f"wrote {first / f'{name}{suffix}.pdf'}")
         for out_dir in rest:
             out_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(first / f"{name}{suffix}.png", out_dir / f"{name}{suffix}.png")
-            print(f"wrote {out_dir / f'{name}{suffix}.png'}")
+            shutil.copy2(first / f"{name}{suffix}.pdf", out_dir / f"{name}{suffix}.pdf")
+            print(f"wrote {out_dir / f'{name}{suffix}.pdf'}")
         plt.close(fig)
 
 
