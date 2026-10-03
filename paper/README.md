@@ -82,27 +82,28 @@ the CF-1.9 schema corrections. Older local `v1.1` directory names are internal b
 labels, not a public release history; see [metadata/VALIDATION.md](metadata/VALIDATION.md)
 for the original correction checks.
 
-The submission package is `release/CAMELS_RU_v1.0_submission/`, with a local archive
-`release/CAMELS_RU_v1.0_submission.zip` uploaded as `CAMELS_RU_v1.0.zip` to the
-unpublished Zenodo draft with reserved DOI `10.5281/zenodo.22132299`.
-[The preparation script](submission/prepare_initial_release.py) preserves all
-scientific values and variable metadata while normalizing public version labels,
-publication-status references, documentation and provenance. With both the retained
-`release/CAMELS_RU_v1.1_cf19/` source and prepared submission package present, run:
+The publication delivery package is `release/zenodo_upload/CAMELS_RU_v1.0/`.
+Upload `release/zenodo_upload/CAMELS_RU_v1.0.zip` and its `.zip.sha256` companion
+to the existing Zenodo draft with reserved DOI `10.5281/zenodo.22132299`.
+[The publication preparation script](submission/prepare_publication_archive.py)
+cleans reader documentation and provenance, removes machine-specific paths and raw
+working-tree listings, and corrects one forcing-metadata section reference. Source
+hashes, code revisions, historical dirty-build indicators and scientific limitations
+are retained. No scientific values, flags, definitions or variable metadata change.
+With the retained `release/CAMELS_RU_v1.0_submission/` input and delivery package present:
 
 ```bash
-pixi run python paper/submission/prepare_initial_release.py --verify
-pixi run python scripts/verify_macros.py --release-dir release/CAMELS_RU_v1.0_submission
+pixi run python paper/submission/prepare_publication_archive.py --verify
+pixi run python scripts/verify_macros.py --release-dir release/zenodo_upload/CAMELS_RU_v1.0
 ```
 
 The first command checks raw and decoded arrays, masks, storage layouts, metadata,
-manifests and every ZIP entry. It requires the original internal source snapshot;
-it is not a source-free verification command for an arbitrary Zenodo download.
-Downloaded package integrity can be checked with `sha256sum -c SHA256SUMS` from
-inside its directory. Scientific counts and the strict Grade-A definition are
-unchanged. The archived preparation documentation records its preparation state;
-the manuscript contains the current statement of Rosvodresursy's published reuse
-terms, distinguished from the deposit's CC BY 4.0 declaration.
+manifests and every ZIP entry against the retained source snapshot. For a downloaded
+package, run `sha256sum -c SHA256SUMS` inside its directory. The reader README and
+manuscript distinguish Rosvodresursy's source-reuse terms from the deposit's CC BY
+4.0 declaration. The earlier [initial preparation script](submission/prepare_initial_release.py)
+and all old local snapshots remain available for provenance; their ZIPs are not the
+publication delivery artifact.
 
 The dataset packages are not stored in Git. Internal editorial reviews, companion
 working drafts, preview PDFs, and build logs remain local. Scientific methods,
