@@ -102,3 +102,6 @@ paper/figures_src/*.pdf
 /.codex/
 /paper/reviews/
 /paper/previews/
+# Submission correspondence and service payloads stay local; preparation code is tracked.
+/paper/submission/*.eml
+/paper/submission/zenodo_metadata_*.json

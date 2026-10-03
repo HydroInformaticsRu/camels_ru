@@ -76,9 +76,33 @@ pixi run python scripts/verify_macros.py --release-dir release/CAMELS_RU_v1.0
 
 This checks manuscript macros against release values and retained scientific audit
 tables. It verifies numerical consistency, not independent observational accuracy.
-The default figure inputs remain the frozen v1.0 package. Applicability to the
-separate CF-1.9 metadata candidate rests on complete numerical-preservation checks;
-see [metadata/VALIDATION.md](metadata/VALIDATION.md).
+The default figure inputs remain the frozen prepublication numerical snapshot.
+No dataset version has been published: the first public version is **1.0**, including
+the CF-1.9 schema corrections. Older local `v1.1` directory names are internal build
+labels, not a public release history; see [metadata/VALIDATION.md](metadata/VALIDATION.md)
+for the original correction checks.
+
+The submission package is `release/CAMELS_RU_v1.0_submission/`, with a local archive
+`release/CAMELS_RU_v1.0_submission.zip` uploaded as `CAMELS_RU_v1.0.zip` to the
+unpublished Zenodo draft with reserved DOI `10.5281/zenodo.22132299`.
+[The preparation script](submission/prepare_initial_release.py) preserves all
+scientific values and variable metadata while normalizing public version labels,
+publication-status references, documentation and provenance. With both the retained
+`release/CAMELS_RU_v1.1_cf19/` source and prepared submission package present, run:
+
+```bash
+pixi run python paper/submission/prepare_initial_release.py --verify
+pixi run python scripts/verify_macros.py --release-dir release/CAMELS_RU_v1.0_submission
+```
+
+The first command checks raw and decoded arrays, masks, storage layouts, metadata,
+manifests and every ZIP entry. It requires the original internal source snapshot;
+it is not a source-free verification command for an arbitrary Zenodo download.
+Downloaded package integrity can be checked with `sha256sum -c SHA256SUMS` from
+inside its directory. Scientific counts and the strict Grade-A definition are
+unchanged. The archived preparation documentation records its preparation state;
+the manuscript contains the current statement of Rosvodresursy's published reuse
+terms, distinguished from the deposit's CC BY 4.0 declaration.
 
 The dataset packages are not stored in Git. Internal editorial reviews, companion
 working drafts, preview PDFs, and build logs remain local. Scientific methods,
